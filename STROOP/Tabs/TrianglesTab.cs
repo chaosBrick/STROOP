@@ -26,13 +26,12 @@ namespace STROOP.Tabs
         public TrianglesTab()
         {
             InitializeComponent();
+            watchVariablePanelTriangles.SetGroups(ALL_VAR_GROUPS, VISIBLE_VAR_GROUPS);
         }
 
         public override void InitializeTab()
         {
             base.InitializeTab();
-
-            watchVariablePanelTriangles.SetGroups(ALL_VAR_GROUPS, VISIBLE_VAR_GROUPS);
 
             _recordedTriangleAddresses = new List<uint>();
 

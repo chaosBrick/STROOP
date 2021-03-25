@@ -15,15 +15,15 @@ namespace STROOP.Controls
     public class WatchVariableFlowLayoutPanel : NoTearFlowLayoutPanel, Managers.IVariableAdder
     {
         public bool initialized = false;
-        Dictionary<string, Action> deferredActions = new Dictionary<string, Action>();
+        List<Action> deferredActions = new List<Action>();
 
         private string _varFilePath;
 
         private readonly Object _objectLock;
         private List<WatchVariableControl> _watchVarControls;
-        private readonly List<VariableGroup> _allGroups;
-        private readonly List<VariableGroup> _initialVisibleGroups;
-        private readonly List<VariableGroup> _visibleGroups;
+        private List<VariableGroup> _allGroups;
+        private List<VariableGroup> _initialVisibleGroups;
+        private List<VariableGroup> _visibleGroups;
         private List<ToolStripMenuItem> _filteringDropDownItems;
 
         private List<WatchVariableControl> _selectedWatchVarControls;
@@ -57,27 +57,24 @@ namespace STROOP.Controls
             ContextMenuStrip.Opening += (sender, e) => UnselectAllVariables();
         }
 
-        List<VariableGroup> allVariableGroups, visibleVariableGroups;
-
         public void SetGroups(
             List<VariableGroup> allVariableGroupsNullable,
             List<VariableGroup> visibleVariableGroupsNullable)
         {
             if (Program.IsVisualStudioHostProcess()) return;
 
-            DeferAction(nameof(SetGroups), () =>
+            DeferActionToUpdate(nameof(SetGroups), () =>
             {
-                allVariableGroups = allVariableGroupsNullable != null ? new List<VariableGroup>(allVariableGroupsNullable) : new List<VariableGroup>();
-                if (allVariableGroups.Contains(VariableGroup.Custom)) throw new ArgumentOutOfRangeException();
-                allVariableGroups.Add(VariableGroup.Custom);
+                _allGroups = allVariableGroupsNullable != null ? new List<VariableGroup>(allVariableGroupsNullable) : new List<VariableGroup>();
+                if (_allGroups.Contains(VariableGroup.Custom)) throw new ArgumentOutOfRangeException();
+                _allGroups.Add(VariableGroup.Custom);
 
-                visibleVariableGroups = visibleVariableGroupsNullable != null ? new List<VariableGroup>(visibleVariableGroupsNullable) : new List<VariableGroup>();
-                if (visibleVariableGroups.Contains(VariableGroup.Custom)) throw new ArgumentOutOfRangeException();
-                visibleVariableGroups.Add(VariableGroup.Custom);
+                _visibleGroups = visibleVariableGroupsNullable != null ? new List<VariableGroup>(visibleVariableGroupsNullable) : new List<VariableGroup>();
+                if (_visibleGroups.Contains(VariableGroup.Custom)) throw new ArgumentOutOfRangeException();
+                _visibleGroups.Add(VariableGroup.Custom);
 
-                _allGroups.AddRange(allVariableGroups);
-                _initialVisibleGroups.AddRange(visibleVariableGroups);
-                _visibleGroups.AddRange(visibleVariableGroups);
+                _initialVisibleGroups.AddRange(_visibleGroups);
+                UpdateControlsBasedOnFilters();
             });
         }
 
@@ -86,8 +83,7 @@ namespace STROOP.Controls
             _varFilePath = varFilePath;
             if (!System.IO.File.Exists(varFilePath))
                 return;
-            SetGroups(null, null);
-            DeferAction(nameof(Initialize), () =>
+            DeferActionToUpdate(nameof(Initialize), () =>
             {
 
                 _selectionToolStripItems =
@@ -97,24 +93,29 @@ namespace STROOP.Controls
                 List<WatchVariableControlPrecursor> precursors = _varFilePath == null
                     ? new List<WatchVariableControlPrecursor>()
                     : XmlConfigParser.OpenWatchVariableControlPrecursors(_varFilePath);
-                AddVariables(precursors.ConvertAll(precursor => precursor.CreateWatchVariableControl()));
+                foreach (var watchVarControl in precursors.ConvertAll(precursor => precursor.CreateWatchVariableControl()))
+                {
+                    _watchVarControls.Add(watchVarControl);
+                    watchVarControl.SetPanel(this);
+                }
                 AddItemsToContextMenuStrip();
+
+                _allGroups.AddRange(new List<VariableGroup>(new[] { VariableGroup.Custom }));
+                _initialVisibleGroups.AddRange(new List<VariableGroup>(new[] { VariableGroup.Custom }));
+                _visibleGroups.AddRange(new List<VariableGroup>(new[] { VariableGroup.Custom }));
             });
         }
 
         public void DeferredInitialize()
         {
-            if (!initialized)
-            {
-                initialized = true;
-                foreach (var action in deferredActions)
-                    action.Value?.Invoke();
-            }
+            foreach (var action in deferredActions)
+                action.Invoke();
+            deferredActions.Clear();
         }
 
-        private void DeferAction(string name, Action action)
+        private void DeferActionToUpdate(string name, Action action)
         {
-            deferredActions[name] = action;
+            deferredActions.Add(action);
         }
 
         private void AddItemsToContextMenuStrip()
