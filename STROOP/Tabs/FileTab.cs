@@ -16,7 +16,6 @@ namespace STROOP.Tabs
 
         uint CurrentFileAddress => FileConfig.CurrentFileAddress;
 
-        TabPage _tabControl;
         FileImageGui gui;
 
         public FileMode CurrentFileMode { get; private set; }
@@ -25,8 +24,6 @@ namespace STROOP.Tabs
 
         List<FilePictureBox> _filePictureBoxList;
         List<FileTextbox> _fileTextboxList;
-
-        CheckBox checkboxInGameCopyPaste;
 
         int numRows = 26;
 
@@ -505,7 +502,7 @@ namespace STROOP.Tabs
 
         private void FileCopyButton_Click(object sender, EventArgs e)
         {
-            uint addressToCopy = checkboxInGameCopyPaste.Checked ?
+            uint addressToCopy = checkBoxInGameCopyPaste.Checked ?
                 GetNonSavedFileAddress() :
                 getFileAddress();
             _copiedFile = GetBufferedBytes(addressToCopy);
@@ -516,7 +513,7 @@ namespace STROOP.Tabs
             if (_copiedFile == null) return;
 
             uint nonSavedAddress = GetNonSavedFileAddress();
-            List<uint> addressesToPaste = checkboxInGameCopyPaste.Checked ?
+            List<uint> addressesToPaste = checkBoxInGameCopyPaste.Checked ?
                 new List<uint> { nonSavedAddress, nonSavedAddress + FileConfig.FileStructSize } :
                 new List<uint> { CurrentFileAddress };
 
