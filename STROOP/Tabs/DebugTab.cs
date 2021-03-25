@@ -18,7 +18,7 @@ namespace STROOP.Tabs
             base.InitializeTab();
 
             // Debug Image
-            pictureBoxDebug.Image = Config.ObjectAssociations.DebugImage;
+            pictureBoxDebug.Image = Config.ObjectAssociations.DebugImage.Value;
             panelDebugBorder.BackColor = Config.ObjectAssociations.DebugColor;
             pictureBoxDebug.BackColor = Config.ObjectAssociations.DebugColor.Lighten(0.5);
 

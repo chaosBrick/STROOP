@@ -64,9 +64,6 @@ namespace STROOP.Map
             return "Float Gridlines";
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.UnitGridlinesImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.UnitGridlinesImage;
     }
 }

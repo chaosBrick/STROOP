@@ -23,10 +23,7 @@ namespace STROOP.Map
             _posAngle = PositionAngle.ObjHome(objAddress);
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.HomeImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.HomeImage;
 
         public override PositionAngle GetPositionAngle()
         {

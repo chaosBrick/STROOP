@@ -30,10 +30,7 @@ namespace STROOP.Map
             InternalRotates = true;
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.NextPositionsImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.NextPositionsImage;
 
         public override string GetName()
         {
@@ -54,7 +51,7 @@ namespace STROOP.Map
                 (float x, float y, float z, float angle, int tex) = dataPoint;
                 (float x, float z) positionOnControl = MapUtilities.ConvertCoordsForControl(x, z);
                 float angleDegrees = Rotates ? MapUtilities.ConvertAngleForControl(angle) : 0;
-                SizeF size = MapUtilities.ScaleImageSizeForControl(Config.ObjectAssociations.BlueMarioMapImage.Size, Size);
+                SizeF size = MapUtilities.ScaleImageSizeForControl(Config.ObjectAssociations.BlueMarioMapImage.Value.Size, Size);
                 PointF point = new PointF(positionOnControl.x, positionOnControl.z);
                 MapUtilities.DrawTexture(tex, point, size, angleDegrees, Opacity);
             }
@@ -86,7 +83,7 @@ namespace STROOP.Map
         
         public Matrix4 GetModelMatrix(float x, float y, float z, float ang)
         {
-            Image image = Config.ObjectAssociations.BlueMarioMapImage;
+            Image image = Config.ObjectAssociations.BlueMarioMapImage.Value;
             SizeF _imageNormalizedSize = new SizeF(
                 image.Width >= image.Height ? 1.0f : (float)image.Width / image.Height,
                 image.Width <= image.Height ? 1.0f : (float)image.Height / image.Width);
@@ -158,17 +155,17 @@ namespace STROOP.Map
             if (_redMarioTex == -1)
             {
                 _redMarioTex = MapUtilities.LoadTexture(
-                    Config.ObjectAssociations.MarioMapImage as Bitmap);
+                    Config.ObjectAssociations.MarioMapImage.Value as Bitmap);
             }
             if (_blueMarioTex == -1)
             {
                 _blueMarioTex = MapUtilities.LoadTexture(
-                    Config.ObjectAssociations.BlueMarioMapImage as Bitmap);
+                    Config.ObjectAssociations.BlueMarioMapImage.Value as Bitmap);
             }
             if (_orangeMarioTex == -1)
             {
                 _orangeMarioTex = MapUtilities.LoadTexture(
-                    Config.ObjectAssociations.OrangeMarioMapImage as Bitmap);
+                    Config.ObjectAssociations.OrangeMarioMapImage.Value as Bitmap);
             }
         }
 

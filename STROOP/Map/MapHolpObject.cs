@@ -19,10 +19,7 @@ namespace STROOP.Map
         {
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.HolpImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.HolpImage;
 
         public override PositionAngle GetPositionAngle()
         {

@@ -35,7 +35,7 @@ namespace STROOP.Tabs
         {
             base.InitializeTab();
             // Misc Image
-            pictureBoxMisc.Image = Config.ObjectAssociations.MiscImage;
+            pictureBoxMisc.Image = Config.ObjectAssociations.MiscImage.Value;
             panelMiscBorder.BackColor = Config.ObjectAssociations.MiscColor;
             pictureBoxMisc.BackColor = Config.ObjectAssociations.MiscColor.Lighten(0.5);
 

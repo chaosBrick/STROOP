@@ -18,8 +18,8 @@ namespace STROOP.Map
     public class MapAllObjectsWithNameObject : MapIconObject
     {
         private readonly string _objName;
-        private readonly Image _objImage;
-        private readonly Image _objMapImage;
+        private readonly Lazy<Image> _objImage;
+        private readonly Lazy<Image> _objMapImage;
 
         public MapAllObjectsWithNameObject(ObjectBehaviorAssociation assoc)
             : base()
@@ -43,7 +43,7 @@ namespace STROOP.Map
             return () => Config.ObjectSlotsManager.GetLoadedObjectsWithName(_objName).ConvertAll(obj => PositionAngle.Obj(obj.Address));
         }
 
-        public override Image GetInternalImage()
+        public override Lazy<Image> GetInternalImage()
         {
             return _iconType == MapTrackerIconType.ObjectSlotImage ?
                 _objImage :

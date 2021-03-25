@@ -502,7 +502,7 @@ namespace STROOP.Tabs
                     _lastGeneralizedBehavior = newBehavior;
                 }
                 Name = Config.ObjectAssociations.GetObjectName(newBehavior);
-                Image = Config.ObjectAssociations.GetObjectImage(newBehavior);
+                Image = Config.ObjectAssociations.GetObjectImage(newBehavior).Value;
                 BackColor = ObjectSlotsConfig.GetProcessingGroupColor(obj.CurrentProcessGroup);
                 int slotPos = obj.VacantSlotIndex ?? obj.ProcessIndex;
                 SlotIndex = (Config.ObjectSlotsManager.GetSlotIndexFromObj(obj)
@@ -545,7 +545,7 @@ namespace STROOP.Tabs
                     // Generate new image
                     _multiImage?.Dispose();
                     List<Image> images = newBehaviors.ConvertAll(
-                        criteria => Config.ObjectAssociations.GetObjectImage(criteria, false));
+                        criteria => Config.ObjectAssociations.GetObjectImage(criteria, false).Value);
                     _multiImage = ImageUtilities.CreateMultiImage(images, 256, 256);
 
                     _lastBehaviors = newBehaviors.ToList();

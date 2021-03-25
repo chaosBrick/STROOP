@@ -33,10 +33,7 @@ namespace STROOP.Map
             };
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.SphereImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.SphereImage;
 
         public override string GetName()
         {

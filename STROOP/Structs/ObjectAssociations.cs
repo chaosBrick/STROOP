@@ -13,50 +13,61 @@ namespace STROOP.Structs
 {
     public class ObjectAssociations
     {
+        public static IEnumerable<System.Reflection.FieldInfo> GetImageFields()
+        {
+            foreach (var field in typeof(ObjectAssociations).GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+                if (field.FieldType == typeof(Lazy<Image>))
+                    yield return field;
+        }
+
         HashSet<ObjectBehaviorAssociation> _objAssoc = new HashSet<ObjectBehaviorAssociation>();
         List<SpawnHack> _spawnHacks = new List<SpawnHack>();
 
-        Image _defaultImage;
-        Image _transparentDefaultImage;
+        Lazy<Image> _defaultImage;
+        Lazy<Image> _transparentDefaultImage;
 
-        public Image EmptyImage;
-        public Image MarioImage;
-        public Image HudImage;
-        public Image DebugImage;
-        public Image MiscImage;
-        public Image CameraImage;
-        public Image CameraMapImage;
-        public Image HolpImage;
-        public Image HomeImage;
-        public Image IntendedNextPositionImage;
-        public Image MarioMapImage;
-        public Image BlueMarioMapImage;
-        public Image GreenMarioMapImage;
-        public Image OrangeMarioMapImage;
-        public Image PurpleMarioMapImage;
-        public Image TriangleFloorImage;
-        public Image TriangleWallImage;
-        public Image TriangleCeilingImage;
-        public Image TriangleOtherImage;
-        public Image HitboxHackTrisImage;
-        public Image CellGridlinesImage;
-        public Image CurrentCellImage;
-        public Image UnitGridlinesImage;
-        public Image CurrentUnitImage;
-        public Image NextPositionsImage;
-        public Image ArrowImage;
-        public Image IwerlipsesImage;
-        public Image CylinderImage;
-        public Image SphereImage;
-        public Image PathImage;
-        public Image CustomPointsImage;
-        public Image CustomGridlinesImage;
+        public Lazy<Image>
+            DefaultImage,
+            EmptyImage,
+            MarioImage,
+            HudImage,
+            DebugImage,
+            MiscImage,
+            CameraImage,
+            CameraMapImage,
+            HolpImage,
+            HomeImage,
+            IntendedNextPositionImage,
+            MarioMapImage,
+            BlueMarioMapImage,
+            GreenMarioMapImage,
+            OrangeMarioMapImage,
+            PurpleMarioMapImage,
+            TriangleFloorImage,
+            TriangleWallImage,
+            TriangleCeilingImage,
+            TriangleOtherImage,
+            HitboxHackTrisImage,
+            CellGridlinesImage,
+            CurrentCellImage,
+            UnitGridlinesImage,
+            CurrentUnitImage,
+            NextPositionsImage,
+            ArrowImage,
+            IwerlipsesImage,
+            CylinderImage,
+            SphereImage,
+            PathImage,
+            CustomPointsImage,
+            CustomGridlinesImage;
 
-        public Color MarioColor;
-        public Color HudColor;
-        public Color DebugColor;
-        public Color MiscColor;
-        public Color CameraColor;
+        public Color 
+            MarioColor,
+            HudColor,
+            DebugColor,
+            MiscColor,
+            CameraColor;
+
         public uint MarioBehavior;
         public uint SegmentTable { get => RomVersionConfig.SwitchMap(SegmentTableUS, SegmentTableJP, SegmentTableSH, SegmentTableEU); }
         public uint SegmentTableUS = 0x8033B400;
@@ -68,35 +79,12 @@ namespace STROOP.Structs
         Dictionary<Image, Image> _cachedBufferedObjectImages = new Dictionary<Image, Image>();
         object _cachedBufferedObjectImageLocker = new object();
 
-        public HashSet<ObjectBehaviorAssociation> BehaviorAssociations
-        {
-            get
-            {
-                return _objAssoc;
-            }
-        }
+        public HashSet<ObjectBehaviorAssociation> BehaviorAssociations => _objAssoc;
 
-        public List<SpawnHack> SpawnHacks
+        public List<SpawnHack> SpawnHacks => _spawnHacks;
+        public ObjectAssociations()
         {
-            get
-            {
-                return _spawnHacks;
-            }
-        }
-
-        public Image DefaultImage
-        {
-            get
-            {
-                return _defaultImage;
-            }
-            set
-            {
-                _defaultImage?.Dispose();
-                _transparentDefaultImage?.Dispose();
-                _defaultImage = value;
-                _transparentDefaultImage = value.GetOpaqueImage(0.5f);
-            }
+            _transparentDefaultImage = new Lazy<Image>(() => _defaultImage.Value.GetOpaqueImage(0.5f));
         }
 
         public bool AddAssociation(ObjectBehaviorAssociation objAsooc)
@@ -145,7 +133,7 @@ namespace STROOP.Structs
             return behaviorAssoc;
         }
 
-        public Image GetObjectImage(BehaviorCriteria behaviorCriteria, bool transparent = false)
+        public Lazy<Image> GetObjectImage(BehaviorCriteria behaviorCriteria, bool transparent = false)
         {
             if (behaviorCriteria.BehaviorAddress == 0)
                 return EmptyImage;
@@ -154,10 +142,10 @@ namespace STROOP.Structs
             if (assoc == null)
                 return transparent ? _transparentDefaultImage : _defaultImage;
 
-            return transparent ? assoc.TransparentImage : assoc.Image ;
+            return transparent ? assoc.TransparentImage : assoc.Image;
         }
 
-        public Image GetObjectImage(string objName)
+        public Lazy<Image> GetObjectImage(string objName)
         {
             ObjectBehaviorAssociation assoc = GetObjectAssociation(objName);
             if (assoc == null) return EmptyImage;
@@ -169,7 +157,7 @@ namespace STROOP.Structs
             return _objAssoc.FirstOrDefault(a => a.Name.ToLower() == objName.ToLower());
         }
 
-        public Image GetObjectMapImage(BehaviorCriteria behaviorCriteria)
+        public Lazy<Image> GetObjectMapImage(BehaviorCriteria behaviorCriteria)
         {
             if (behaviorCriteria.BehaviorAddress == 0)
                 return EmptyImage;
@@ -270,37 +258,12 @@ namespace STROOP.Structs
 
             _transparentDefaultImage?.Dispose();
             _defaultImage?.Dispose();
-            EmptyImage?.Dispose();
-            MarioImage?.Dispose();
-            MarioMapImage?.Dispose();
-            BlueMarioMapImage?.Dispose();
-            GreenMarioMapImage?.Dispose();
-            OrangeMarioMapImage?.Dispose();
-            PurpleMarioMapImage?.Dispose();
-            HolpImage?.Dispose();
-            HomeImage?.Dispose();
-            HudImage?.Dispose();
-            DebugImage?.Dispose();
-            MiscImage?.Dispose();
-            CameraImage?.Dispose();
-            CameraMapImage?.Dispose();
-            TriangleFloorImage?.Dispose();
-            TriangleWallImage?.Dispose();
-            TriangleCeilingImage?.Dispose();
-            TriangleOtherImage?.Dispose();
-            HitboxHackTrisImage?.Dispose();
-            CellGridlinesImage?.Dispose();
-            CurrentCellImage?.Dispose();
-            UnitGridlinesImage?.Dispose();
-            CurrentUnitImage?.Dispose();
-            NextPositionsImage?.Dispose();
-            ArrowImage?.Dispose();
-            IwerlipsesImage?.Dispose();
-            CylinderImage?.Dispose();
-            SphereImage?.Dispose();
-            PathImage?.Dispose();
-            CustomPointsImage?.Dispose();
-            CustomGridlinesImage?.Dispose();
+            foreach (var field in GetImageFields())
+            {
+                Lazy<Image> lazyImage = (Lazy<Image>)field.GetValue(this);
+                if (lazyImage != null && lazyImage.IsValueCreated)
+                    lazyImage.Value?.Dispose();
+            }
         }
     }
 }

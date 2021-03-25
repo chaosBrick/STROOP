@@ -191,10 +191,7 @@ namespace STROOP.Map
             return "Iwerlipses";
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.IwerlipsesImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.IwerlipsesImage;
 
         public override ContextMenuStrip GetContextMenuStrip()
         {

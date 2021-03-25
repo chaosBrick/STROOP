@@ -19,10 +19,7 @@ namespace STROOP.Map
         {
         }
 
-        public override Image GetInternalImage()
-        {
-            return MapUtilities.GetBackgroundImage();
-        }
+        public override Lazy<Image> GetInternalImage() => MapUtilities.GetBackgroundImage();
 
         public override string GetName()
         {

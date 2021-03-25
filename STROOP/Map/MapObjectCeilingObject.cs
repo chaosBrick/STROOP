@@ -38,10 +38,7 @@ namespace STROOP.Map
             return "Ceiling Tris for " + PositionAngle.GetMapNameForObject(_objAddress);
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.TriangleCeilingImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.TriangleCeilingImage;
 
         public override ContextMenuStrip GetContextMenuStrip()
         {

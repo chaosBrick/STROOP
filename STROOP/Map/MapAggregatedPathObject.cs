@@ -62,10 +62,7 @@ namespace STROOP.Map
             return "Aggregated Path";
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.PathImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.PathImage;
 
         public override MapDrawType GetDrawType()
         {

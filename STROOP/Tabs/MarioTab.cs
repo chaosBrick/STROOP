@@ -38,7 +38,7 @@ namespace STROOP.Tabs
         {
             base.InitializeTab();
             // Mario Image
-            pictureBoxMario.Image = Config.ObjectAssociations.MarioImage;
+            pictureBoxMario.Image = Config.ObjectAssociations.MarioImage.Value;
             panelMarioBorder.BackColor = Config.ObjectAssociations.MarioColor;
             pictureBoxMario.BackColor = Config.ObjectAssociations.MarioColor.Lighten(0.5);
 

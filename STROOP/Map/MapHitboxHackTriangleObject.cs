@@ -122,10 +122,7 @@ namespace STROOP.Map
             return "Level Tris";
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.HitboxHackTrisImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.HitboxHackTrisImage;
 
         public override void Update()
         {

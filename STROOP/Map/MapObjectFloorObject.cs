@@ -38,10 +38,7 @@ namespace STROOP.Map
             return "Floor Tris for " + PositionAngle.GetMapNameForObject(_objAddress);
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.TriangleFloorImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.TriangleFloorImage;
 
         public override ContextMenuStrip GetContextMenuStrip()
         {

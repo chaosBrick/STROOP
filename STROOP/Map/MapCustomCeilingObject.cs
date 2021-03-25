@@ -55,10 +55,7 @@ namespace STROOP.Map
             return "Custom Ceiling Tris";
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.TriangleCeilingImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.TriangleCeilingImage;
 
         public override ContextMenuStrip GetContextMenuStrip()
         {

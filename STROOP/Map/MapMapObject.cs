@@ -22,10 +22,7 @@ namespace STROOP.Map
 
         public abstract MapLayout GetMapLayout();
 
-        public override Image GetInternalImage()
-        {
-            return GetMapLayout().MapImage;
-        }
+        public override Lazy<Image> GetInternalImage()=> GetMapLayout().MapImage;
 
         protected override List<(PointF loc, SizeF size)> GetDimensions()
         {

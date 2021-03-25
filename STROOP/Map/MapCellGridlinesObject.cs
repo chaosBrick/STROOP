@@ -44,10 +44,7 @@ namespace STROOP.Map
             return "Cell Gridlines";
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.CellGridlinesImage;
-        }
+        public override Lazy<Image> GetInternalImage() =>Config.ObjectAssociations.CellGridlinesImage;
 
         protected override List<(float x, float y, float z)> GetVertices()
         {

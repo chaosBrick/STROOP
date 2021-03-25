@@ -75,9 +75,6 @@ namespace STROOP.Map
             return "Custom Gridlines";
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.CustomGridlinesImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.CustomGridlinesImage;
     }
 }

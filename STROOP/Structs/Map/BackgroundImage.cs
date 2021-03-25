@@ -10,7 +10,7 @@ namespace STROOP.Structs
     public struct BackgroundImage : IComparable
     {
         public string Name;
-        public Bitmap Image;
+        public Lazy<Image> Image;
 
         public static bool operator ==(BackgroundImage a, BackgroundImage b)
         {

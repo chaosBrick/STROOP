@@ -38,10 +38,7 @@ namespace STROOP.Map
             return "Wall Tris for " + PositionAngle.GetMapNameForObject(_objAddress);
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.TriangleWallImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.TriangleWallImage;
 
         public override ContextMenuStrip GetContextMenuStrip()
         {

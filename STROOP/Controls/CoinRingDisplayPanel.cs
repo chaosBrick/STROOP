@@ -68,10 +68,10 @@ namespace STROOP
         {
             DoubleBuffered = true;
 
-            _coinImage = Config.ObjectAssociations.GetObjectImage("Yellow Coin");
-            _secretImage = Config.ObjectAssociations.GetObjectImage("Secret");
+            _coinImage = Config.ObjectAssociations.GetObjectImage("Yellow Coin").Value;
+            _secretImage = Config.ObjectAssociations.GetObjectImage("Secret").Value;
             _numberImages = Enumerable.Range(0, 10).ToList().ConvertAll(
-                index => Config.ObjectAssociations.GetObjectImage("Number " + index));
+                index => Config.ObjectAssociations.GetObjectImage("Number " + index).Value);
         }
 
         protected override void OnPaint(PaintEventArgs e)

@@ -72,9 +72,7 @@ namespace STROOP.Map
             return "All Object Ceiling Tris";
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.TriangleCeilingImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.TriangleCeilingImage;
     }
 }
+

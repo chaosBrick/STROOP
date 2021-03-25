@@ -45,9 +45,6 @@ namespace STROOP.Map
             return "Custom Unit Points";
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.CustomPointsImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.CustomPointsImage;
     }
 }

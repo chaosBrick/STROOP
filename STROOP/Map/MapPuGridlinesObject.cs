@@ -120,10 +120,7 @@ namespace STROOP.Map
             return "PU Gridlines";
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.UnitGridlinesImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.UnitGridlinesImage;
 
         public override ContextMenuStrip GetContextMenuStrip()
         {

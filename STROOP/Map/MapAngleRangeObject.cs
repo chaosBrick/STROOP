@@ -59,10 +59,7 @@ namespace STROOP.Map
             return "Angle Range";
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.CustomGridlinesImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.CustomGridlinesImage;
 
         public override ContextMenuStrip GetContextMenuStrip()
         {

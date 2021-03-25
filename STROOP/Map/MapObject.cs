@@ -64,12 +64,12 @@ namespace STROOP.Map
 
         public abstract string GetName();
 
-        protected Image _customImage = null;
-        public abstract Image GetInternalImage();
-        public Image GetImage() { return _customImage ?? GetInternalImage(); }
+        protected Lazy<Image> _customImage = null;
+        public abstract Lazy<Image> GetInternalImage();
+        public Lazy<Image> GetImage() { return _customImage ?? GetInternalImage(); }
 
         protected MapTrackerIconType _iconType = MapTrackerIconType.TopDownImage;
-        public virtual void SetIconType(MapTrackerIconType iconType, Image image = null)
+        public virtual void SetIconType(MapTrackerIconType iconType, Lazy<Image> image = null)
         {
             if ((iconType == MapTrackerIconType.CustomImage) != (image != null))
                 throw new ArgumentOutOfRangeException();

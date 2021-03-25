@@ -17,9 +17,9 @@ namespace STROOP.Structs
         public bool RotatesOnMap;
         public string ImagePath = "";
         public string MapImagePath = "";
-        public Image Image;
-        public Image TransparentImage;
-        public Image MapImage;
+        public Lazy<Image> Image;
+        public Lazy<Image> TransparentImage;
+        public Lazy<Image> MapImage;
         public PushHitbox PushHitbox;
         public List<WatchVariableControlPrecursor> Precursors = new List<WatchVariableControlPrecursor>();
 

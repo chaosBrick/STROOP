@@ -33,10 +33,7 @@ namespace STROOP.Map
             return "Wall Tri";
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.TriangleWallImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.TriangleWallImage;
 
         public override ContextMenuStrip GetContextMenuStrip()
         {

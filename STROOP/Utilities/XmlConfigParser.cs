@@ -56,9 +56,9 @@ namespace STROOP.Utilities
             var doc = XDocument.Load(path);
             doc.Validate(schemaSet, Validation);
 
-            foreach(var element in doc.Root.Elements())
+            foreach (var element in doc.Root.Elements())
             {
-                switch(element.Name.ToString())
+                switch (element.Name.ToString())
                 {
                     case "Emulators":
                         foreach (var subElement in element.Elements())
@@ -72,7 +72,7 @@ namespace STROOP.Utilities
                                 RamStart = ParsingUtilities.ParseHex(subElement.Attribute(XName.Get("ramStart")).Value),
                                 Dll = subElement.Attribute(XName.Get("offsetDll")) != null
                                     ? subElement.Attribute(XName.Get("offsetDll")).Value : null,
-                                Endianness = subElement.Attribute(XName.Get("endianness")).Value == "big" 
+                                Endianness = subElement.Attribute(XName.Get("endianness")).Value == "big"
                                     ? EndiannessType.Big : EndiannessType.Little,
                                 IOType = special == "dolphin" ? typeof(DolphinProcessIO) : typeof(WindowsProcessRamIO),
                             });
@@ -212,6 +212,18 @@ namespace STROOP.Utilities
             return objectData;
         }
 
+        struct SomeStructYo
+        {
+            public Color color;
+            public string imagePath, mapImagePath;
+        }
+
+
+        class AssocConfig
+        {
+            public static string DefaultImagePath = "", EmptyImagePath = "", ImageDirectory = "", MapImageDirectory = "", OverlayImageDirectory = "";
+        }
+
         public static ObjectAssociations OpenObjectAssoc(string path)
         {
             var assoc = new ObjectAssociations();
@@ -219,7 +231,7 @@ namespace STROOP.Utilities
 
             // Create schema set
             var schemaSet = new XmlSchemaSet() { XmlResolver = new ResourceXmlResolver() };
-            schemaSet.Add("http://tempuri.org/ReusableTypes.xsd", "ReusableTypes.xsd");
+            //schemaSet.Add("http://tempuri.org/ReusableTypes.xsd", "ReusableTypes.xsd");
             schemaSet.Add("http://tempuri.org/ObjectAssociationsSchema.xsd", "ObjectAssociationsSchema.xsd");
             schemaSet.Compile();
 
@@ -228,7 +240,10 @@ namespace STROOP.Utilities
             doc.Validate(schemaSet, Validation);
 
             // Create Behavior-ImagePath list
-            string defaultImagePath = "", emptyImagePath = "", imageDir = "", mapImageDir = "", overlayImageDir = "",
+            Dictionary<string, string> assocDictionary = new Dictionary<string, string>();
+            Dictionary<string, string> assocConfigDictionary = new Dictionary<string, string>();
+
+            string
                 marioImagePath = "", holpMapImagePath = "", homeMapImagePath = "", intendedNextPositionImagePath = "", hudImagePath = "", debugImagePath = "",
                 miscImagePath = "", cameraImagePath = "", marioMapImagePath = "", cameraMapImagePath = "",
                 blueMarioMapImagePath = "", greenMarioMapImagePath = "", orangeMarioMapImagePath = "", purpleMarioMapImagePath = "",
@@ -255,22 +270,10 @@ namespace STROOP.Utilities
                     case "Config":
                         foreach (XElement subElement in element.Elements())
                         {
-                            switch(subElement.Name.ToString())
+                            switch (subElement.Name.ToString())
                             {
-                                case "ImageDirectory":
-                                    imageDir = subElement.Value;
-                                    break;
-                                case "DefaultImage":
-                                    defaultImagePath = subElement.Value;
-                                    break;
-                                case "MapImageDirectory":
-                                    mapImageDir = subElement.Value;
-                                    break;
-                                case "OverlayImageDirectory":
-                                    overlayImageDir = subElement.Value;
-                                    break;
-                                case "EmptyImage":
-                                    emptyImagePath = subElement.Value;
+                                case "String":
+                                    assocConfigDictionary[subElement.Attribute(XName.Get("name")).Value] = subElement.Value;
                                     break;
                             }
                         }
@@ -287,7 +290,7 @@ namespace STROOP.Utilities
                     case "Hud":
                         hudImagePath = element.Element(XName.Get("Image")).Attribute(XName.Get("path")).Value;
                         assoc.HudColor = ColorTranslator.FromHtml(element.Element(XName.Get("Color")).Value);
-                            break;
+                        break;
 
                     case "Debug":
                         debugImagePath = element.Element(XName.Get("Image")).Attribute(XName.Get("path")).Value;
@@ -305,100 +308,8 @@ namespace STROOP.Utilities
                         cameraMapImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
                         break;
 
-                    case "Holp":
-                        holpMapImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "BlueMario":
-                        blueMarioMapImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "GreenMario":
-                        greenMarioMapImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "OrangeMario":
-                        orangeMarioMapImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "PurpleMario":
-                        purpleMarioMapImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "Home":
-                        homeMapImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "IntendedNextPosition":
-                        intendedNextPositionImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "TriangleFloor":
-                        triangleFloorImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "TriangleWall":
-                        triangleWallImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "TriangleCeiling":
-                        triangleCeilingImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "TriangleOther":
-                        triangleOtherImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "HitboxHackTris":
-                        hitboxHackTrisImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "CellGridlines":
-                        cellGridlinesImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "CurrentCell":
-                        currentCellImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "UnitGridlines":
-                        unitGridlinesImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "CurrentUnit":
-                        currentUnitImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "NextPositions":
-                        nextPositionsImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "Arrow":
-                        arrowImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "Iwerlipses":
-                        iwerlipsesImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "Cylinder":
-                        cylinderImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "Sphere":
-                        sphereImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "Path":
-                        pathImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "CustomPoints":
-                        customPointsImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                        break;
-
-                    case "CustomGridlines":
-                        customGridlinesImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
+                    case "MapImage":
+                        assocDictionary[element.Attribute(XName.Get("name")).Value + "Image"] = element.Attribute(XName.Get("path")).Value;
                         break;
 
                     case "Overlays":
@@ -437,7 +348,7 @@ namespace STROOP.Utilities
                                 case "Used":
                                     usedOverlayImagePath = subElement.Element(XName.Get("OverlayImage")).Attribute(XName.Get("path")).Value;
                                     break;
-                                    
+
                                 case "Closest":
                                     closestOverlayImagePath = subElement.Element(XName.Get("OverlayImage")).Attribute(XName.Get("path")).Value;
                                     break;
@@ -554,176 +465,198 @@ namespace STROOP.Utilities
                         break;
 
                     case "Object":
-                        string name = element.Attribute(XName.Get("name")).Value;
-                        uint behaviorSegmented = ParsingUtilities.ParseHex(element.Attribute(XName.Get("behaviorScriptAddress")).Value);
-                        uint? gfxId = null, subType = null, appearance = null, spawnObj = null;
-                        if (element.Attribute(XName.Get("gfxId")) != null)
-                            gfxId = ParsingUtilities.ParseHex(element.Attribute(XName.Get("gfxId")).Value) | 0x80000000U;
-                        if (element.Attribute(XName.Get("subType")) != null)
-                            subType = ParsingUtilities.ParseUIntNullable(element.Attribute(XName.Get("subType")).Value);
-                        if (element.Attribute(XName.Get("appearance")) != null)
-                            appearance = ParsingUtilities.ParseUIntNullable(element.Attribute(XName.Get("appearance")).Value);
-                        if (element.Attribute(XName.Get("spawnObj")) != null)
-                            spawnObj = ParsingUtilities.ParseHex(element.Attribute(XName.Get("spawnObj")).Value);
-
-                        var spawnElement = element.Element(XName.Get("SpawnCode"));
-                        if (spawnElement != null)
                         {
-                            byte spawnGfxId = (byte)(spawnElement.Attribute(XName.Get("gfxId")) != null ? 
-                                ParsingUtilities.ParseHex(spawnElement.Attribute(XName.Get("gfxId")).Value) : 0);
-                            byte spawnExtra = (byte)(spawnElement.Attribute(XName.Get("extra")) != null ? 
-                                ParsingUtilities.ParseHex(spawnElement.Attribute(XName.Get("extra")).Value) : (byte)(subType.HasValue ? subType : 0));
-                            assoc.AddSpawnHack(new SpawnHack()
+                            string name = element.Attribute(XName.Get("name")).Value;
+                            uint behaviorSegmented = ParsingUtilities.ParseHex(element.Attribute(XName.Get("behaviorScriptAddress")).Value);
+                            uint? gfxId = null, subType = null, appearance = null, spawnObj = null;
+                            if (element.Attribute(XName.Get("gfxId")) != null)
+                                gfxId = ParsingUtilities.ParseHex(element.Attribute(XName.Get("gfxId")).Value) | 0x80000000U;
+                            if (element.Attribute(XName.Get("subType")) != null)
+                                subType = ParsingUtilities.ParseUIntNullable(element.Attribute(XName.Get("subType")).Value);
+                            if (element.Attribute(XName.Get("appearance")) != null)
+                                appearance = ParsingUtilities.ParseUIntNullable(element.Attribute(XName.Get("appearance")).Value);
+                            if (element.Attribute(XName.Get("spawnObj")) != null)
+                                spawnObj = ParsingUtilities.ParseHex(element.Attribute(XName.Get("spawnObj")).Value);
+
+                            var spawnElement = element.Element(XName.Get("SpawnCode"));
+                            if (spawnElement != null)
                             {
+                                byte spawnGfxId = (byte)(spawnElement.Attribute(XName.Get("gfxId")) != null ?
+                                    ParsingUtilities.ParseHex(spawnElement.Attribute(XName.Get("gfxId")).Value) : 0);
+                                byte spawnExtra = (byte)(spawnElement.Attribute(XName.Get("extra")) != null ?
+                                    ParsingUtilities.ParseHex(spawnElement.Attribute(XName.Get("extra")).Value) : (byte)(subType.HasValue ? subType : 0));
+                                assoc.AddSpawnHack(new SpawnHack()
+                                {
+                                    Name = name,
+                                    Behavior = behaviorSegmented,
+                                    GfxId = spawnGfxId,
+                                    Extra = spawnExtra
+                                });
+                            }
+
+                            string imagePath = element.Element(XName.Get("Image")).Attribute(XName.Get("path")).Value;
+                            string mapImagePath = null;
+                            bool rotates = false;
+                            if (element.Element(XName.Get("MapImage")) != null)
+                            {
+                                mapImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
+                                rotates = bool.Parse(element.Element(XName.Get("MapImage")).Attribute(XName.Get("rotates")).Value);
+                            }
+
+                            List<WatchVariableControlPrecursor> precursors = new List<WatchVariableControlPrecursor>();
+                            foreach (var subElement in element.Elements().Where(x => x.Name == "Data"))
+                            {
+                                WatchVariableControlPrecursor precursor = new WatchVariableControlPrecursor(subElement);
+                                precursors.Add(precursor);
+                            }
+
+                            var newBehavior = new ObjectBehaviorAssociation()
+                            {
+                                Criteria = new BehaviorCriteria()
+                                {
+                                    BehaviorAddress = behaviorSegmented,
+                                    GfxId = gfxId,
+                                    SubType = subType,
+                                    Appearance = appearance,
+                                    SpawnObj = spawnObj,
+                                },
+                                ImagePath = imagePath,
+                                MapImagePath = mapImagePath,
                                 Name = name,
-                                Behavior = behaviorSegmented,
-                                GfxId = spawnGfxId,
-                                Extra = spawnExtra
-                            });
+                                RotatesOnMap = rotates,
+                                Precursors = precursors,
+                            };
+
+                            if (!assoc.AddAssociation(newBehavior))
+                                throw new Exception("More than one behavior address was defined.");
+
+                            break;
                         }
-
-                        string imagePath = element.Element(XName.Get("Image")).Attribute(XName.Get("path")).Value;
-                        string mapImagePath = null;
-                        bool rotates = false;
-                        if (element.Element(XName.Get("MapImage")) != null)
-                        {
-                            mapImagePath = element.Element(XName.Get("MapImage")).Attribute(XName.Get("path")).Value;
-                            rotates = bool.Parse(element.Element(XName.Get("MapImage")).Attribute(XName.Get("rotates")).Value);
-                        }
-
-                        List<WatchVariableControlPrecursor> precursors = new List<WatchVariableControlPrecursor>();
-                        foreach (var subElement in element.Elements().Where(x => x.Name == "Data"))
-                        {
-                            WatchVariableControlPrecursor precursor = new WatchVariableControlPrecursor(subElement);
-                            precursors.Add(precursor);
-                        }
-
-                        var newBehavior = new ObjectBehaviorAssociation()
-                        {
-                            Criteria = new BehaviorCriteria()
-                            {
-                                BehaviorAddress = behaviorSegmented,
-                                GfxId = gfxId,
-                                SubType = subType,
-                                Appearance = appearance,
-                                SpawnObj = spawnObj,
-                            },
-                            ImagePath = imagePath,
-                            MapImagePath = mapImagePath,
-                            Name = name,
-                            RotatesOnMap = rotates,
-                            Precursors = precursors,
-                        };
-
-                        if (!assoc.AddAssociation(newBehavior))
-                            throw new Exception("More than one behavior address was defined.");
-
-                        break;
                 }
             }
 
             // Load Images
-            // TODO: Exceptions
-            assoc.DefaultImage = Image.FromFile(imageDir + defaultImagePath);
-            assoc.EmptyImage = Image.FromFile(imageDir + emptyImagePath);
-            assoc.MarioImage = Image.FromFile(imageDir + marioImagePath);
-            assoc.CameraImage = Image.FromFile(imageDir + cameraImagePath);
-            assoc.MarioMapImage = marioMapImagePath == "" ? assoc.MarioImage : Image.FromFile(mapImageDir + marioMapImagePath);
-            assoc.HudImage = Image.FromFile(imageDir + hudImagePath);
-            assoc.DebugImage = Image.FromFile(imageDir + debugImagePath);
-            assoc.MiscImage = Image.FromFile(imageDir + miscImagePath);
-            assoc.HolpImage = Image.FromFile(mapImageDir + holpMapImagePath);
-            assoc.HomeImage = Image.FromFile(mapImageDir + homeMapImagePath);
-            assoc.IntendedNextPositionImage = Image.FromFile(mapImageDir + intendedNextPositionImagePath);
-            assoc.CameraMapImage = Image.FromFile(mapImageDir + cameraMapImagePath);
-            assoc.BlueMarioMapImage = Image.FromFile(mapImageDir + blueMarioMapImagePath);
-            assoc.GreenMarioMapImage = Image.FromFile(mapImageDir + greenMarioMapImagePath);
-            assoc.OrangeMarioMapImage = Image.FromFile(mapImageDir + orangeMarioMapImagePath);
-            assoc.PurpleMarioMapImage = Image.FromFile(mapImageDir + purpleMarioMapImagePath);
 
-            assoc.AddEmptyAssociation(); // Need to do this after Empty Image is set
+            foreach (var field in typeof(AssocConfig).GetFields(BindingFlags.Public | BindingFlags.Static))
+                if (field.FieldType == typeof(string))
+                    if (assocConfigDictionary.TryGetValue(field.Name, out string configValue))
+                        field.SetValue(null, configValue);
 
-            assoc.TriangleFloorImage = Image.FromFile(mapImageDir + triangleFloorImagePath);
-            assoc.TriangleWallImage = Image.FromFile(mapImageDir + triangleWallImagePath);
-            assoc.TriangleCeilingImage = Image.FromFile(mapImageDir + triangleCeilingImagePath);
-            assoc.TriangleOtherImage = Image.FromFile(mapImageDir + triangleOtherImagePath);
-            assoc.HitboxHackTrisImage = Image.FromFile(mapImageDir + hitboxHackTrisImagePath);
+            foreach (var field in ObjectAssociations.GetImageFields())
+                if (assocDictionary.TryGetValue(field.Name, out string imagePath))
+                {
+                    Lazy<Image> lazyImage = new Lazy<Image>(() => Image.FromFile(AssocConfig.ImageDirectory + imagePath));
+                    field.SetValue(assoc, lazyImage);
+                }
 
-            assoc.CellGridlinesImage = Image.FromFile(mapImageDir + cellGridlinesImagePath);
-            assoc.CurrentCellImage = Image.FromFile(mapImageDir + currentCellImagePath);
-            assoc.UnitGridlinesImage = Image.FromFile(mapImageDir + unitGridlinesImagePath);
-            assoc.CurrentUnitImage = Image.FromFile(mapImageDir + currentUnitImagePath);
-            assoc.NextPositionsImage = Image.FromFile(mapImageDir + nextPositionsImagePath);
-            assoc.ArrowImage = Image.FromFile(mapImageDir + arrowImagePath);
-            assoc.IwerlipsesImage = Image.FromFile(mapImageDir + iwerlipsesImagePath);
-            assoc.CylinderImage = Image.FromFile(mapImageDir + cylinderImagePath);
-            assoc.SphereImage = Image.FromFile(mapImageDir + sphereImagePath);
-            assoc.PathImage = Image.FromFile(mapImageDir + pathImagePath);
-            assoc.CustomPointsImage = Image.FromFile(mapImageDir + customPointsImagePath);
-            assoc.CustomGridlinesImage = Image.FromFile(mapImageDir + customGridlinesImagePath);
+            //assoc.DefaultImage = Image.FromFile(AssocConfig.ImageDirectory + AssocConfig.DefaultImagePath);
+            //assoc.EmptyImage = Image.FromFile(imageDir + emptyImagePath);
+            //assoc.MarioImage = Image.FromFile(imageDir + marioImagePath);
+            //assoc.CameraImage = Image.FromFile(imageDir + cameraImagePath);
+            //assoc.MarioMapImage = marioMapImagePath == "" ? assoc.MarioImage : Image.FromFile(mapImageDir + marioMapImagePath);
+            //assoc.HudImage = Image.FromFile(imageDir + hudImagePath);
+            //assoc.DebugImage = Image.FromFile(imageDir + debugImagePath);
+            //assoc.MiscImage = Image.FromFile(imageDir + miscImagePath);
+            //assoc.HolpImage = Image.FromFile(mapImageDir + holpMapImagePath);
+            //assoc.HomeImage = Image.FromFile(mapImageDir + homeMapImagePath);
+            //assoc.IntendedNextPositionImage = Image.FromFile(mapImageDir + intendedNextPositionImagePath);
+            //assoc.CameraMapImage = Image.FromFile(mapImageDir + cameraMapImagePath);
+            //assoc.BlueMarioMapImage = Image.FromFile(mapImageDir + blueMarioMapImagePath);
+            //assoc.GreenMarioMapImage = Image.FromFile(mapImageDir + greenMarioMapImagePath);
+            //assoc.OrangeMarioMapImage = Image.FromFile(mapImageDir + orangeMarioMapImagePath);
+            //assoc.PurpleMarioMapImage = Image.FromFile(mapImageDir + purpleMarioMapImagePath);
+
+            //assoc.AddEmptyAssociation(); // Need to do this after Empty Image is set
+
+            //assoc.TriangleFloorImage = Image.FromFile(mapImageDir + triangleFloorImagePath);
+            //assoc.TriangleWallImage = Image.FromFile(mapImageDir + triangleWallImagePath);
+            //assoc.TriangleCeilingImage = Image.FromFile(mapImageDir + triangleCeilingImagePath);
+            //assoc.TriangleOtherImage = Image.FromFile(mapImageDir + triangleOtherImagePath);
+            //assoc.HitboxHackTrisImage = Image.FromFile(mapImageDir + hitboxHackTrisImagePath);
+
+            //assoc.CellGridlinesImage = Image.FromFile(mapImageDir + cellGridlinesImagePath);
+            //assoc.CurrentCellImage = Image.FromFile(mapImageDir + currentCellImagePath);
+            //assoc.UnitGridlinesImage = Image.FromFile(mapImageDir + unitGridlinesImagePath);
+            //assoc.CurrentUnitImage = Image.FromFile(mapImageDir + currentUnitImagePath);
+            //assoc.NextPositionsImage = Image.FromFile(mapImageDir + nextPositionsImagePath);
+            //assoc.ArrowImage = Image.FromFile(mapImageDir + arrowImagePath);
+            //assoc.IwerlipsesImage = Image.FromFile(mapImageDir + iwerlipsesImagePath);
+            //assoc.CylinderImage = Image.FromFile(mapImageDir + cylinderImagePath);
+            //assoc.SphereImage = Image.FromFile(mapImageDir + sphereImagePath);
+            //assoc.PathImage = Image.FromFile(mapImageDir + pathImagePath);
+            //assoc.CustomPointsImage = Image.FromFile(mapImageDir + customPointsImagePath);
+            //assoc.CustomGridlinesImage = Image.FromFile(mapImageDir + customGridlinesImagePath);
 
             assoc.MarioBehavior = marioBehavior;
 
-            ObjectSlotManagerGui.SelectedObjectOverlayImage = Image.FromFile(overlayImageDir + selectedOverlayImagePath);
-            ObjectSlotManagerGui.TrackedAndShownObjectOverlayImage = Image.FromFile(overlayImageDir + trackedAndShownOverlayImagePath);
-            ObjectSlotManagerGui.TrackedNotShownObjectOverlayImage = Image.FromFile(overlayImageDir + trackedNotShownOverlayImagePath);
-            ObjectSlotManagerGui.StoodOnObjectOverlayImage = Image.FromFile(overlayImageDir + stoodOnOverlayImagePath);
-            ObjectSlotManagerGui.RiddenObjectOverlayImage = Image.FromFile(overlayImageDir + riddenOverlayImagePath);
-            ObjectSlotManagerGui.HeldObjectOverlayImage = Image.FromFile(overlayImageDir + heldOverlayImagePath);
-            ObjectSlotManagerGui.InteractionObjectOverlayImage = Image.FromFile(overlayImageDir + interactionOverlayImagePath);
-            ObjectSlotManagerGui.UsedObjectOverlayImage = Image.FromFile(overlayImageDir + usedOverlayImagePath);
-            ObjectSlotManagerGui.ClosestObjectOverlayImage = Image.FromFile(overlayImageDir + closestOverlayImagePath);
-            ObjectSlotManagerGui.CameraObjectOverlayImage = Image.FromFile(overlayImageDir + cameraOverlayImagePath);
-            ObjectSlotManagerGui.CameraHackObjectOverlayImage = Image.FromFile(overlayImageDir + cameraHackOverlayImagePath);
-            ObjectSlotManagerGui.ModelObjectOverlayImage = Image.FromFile(overlayImageDir + modelOverlayImagePath);
-            ObjectSlotManagerGui.FloorObjectOverlayImage = Image.FromFile(overlayImageDir + floorOverlayImagePath);
-            ObjectSlotManagerGui.WallObjectOverlayImage = Image.FromFile(overlayImageDir + wallOverlayImagePath);
-            ObjectSlotManagerGui.CeilingObjectOverlayImage = Image.FromFile(overlayImageDir + ceilingOverlayImagePath);
-            ObjectSlotManagerGui.ParentObjectOverlayImage = Image.FromFile(overlayImageDir + parentOverlayImagePath);
-            ObjectSlotManagerGui.ParentUnusedObjectOverlayImage = Image.FromFile(overlayImageDir + parentUnusedOverlayImagePath);
-            ObjectSlotManagerGui.ParentNoneObjectOverlayImage = Image.FromFile(overlayImageDir + parentNoneOverlayImagePath);
-            ObjectSlotManagerGui.ChildObjectOverlayImage = Image.FromFile(overlayImageDir + childOverlayImagePath);
-            ObjectSlotManagerGui.Collision1OverlayImage = Image.FromFile(overlayImageDir + collision1OverlayImagePath);
-            ObjectSlotManagerGui.Collision2OverlayImage = Image.FromFile(overlayImageDir + collision2OverlayImagePath);
-            ObjectSlotManagerGui.Collision3OverlayImage = Image.FromFile(overlayImageDir + collision3OverlayImagePath);
-            ObjectSlotManagerGui.Collision4OverlayImage = Image.FromFile(overlayImageDir + collision4OverlayImagePath);
-            ObjectSlotManagerGui.MarkedRedObjectOverlayImage = Image.FromFile(overlayImageDir + markedRedOverlayImagePath);
-            ObjectSlotManagerGui.MarkedOrangeObjectOverlayImage = Image.FromFile(overlayImageDir + markedOrangeOverlayImagePath);
-            ObjectSlotManagerGui.MarkedYellowObjectOverlayImage = Image.FromFile(overlayImageDir + markedYellowOverlayImagePath);
-            ObjectSlotManagerGui.MarkedGreenObjectOverlayImage = Image.FromFile(overlayImageDir + markedGreenOverlayImagePath);
-            ObjectSlotManagerGui.MarkedLightBlueObjectOverlayImage = Image.FromFile(overlayImageDir + markedLightBlueOverlayImagePath);
-            ObjectSlotManagerGui.MarkedBlueObjectOverlayImage = Image.FromFile(overlayImageDir + markedBlueOverlayImagePath);
-            ObjectSlotManagerGui.MarkedPurpleObjectOverlayImage = Image.FromFile(overlayImageDir + markedPurpleOverlayImagePath);
-            ObjectSlotManagerGui.MarkedPinkObjectOverlayImage = Image.FromFile(overlayImageDir + markedPinkOverlayImagePath);
-            ObjectSlotManagerGui.MarkedGreyObjectOverlayImage = Image.FromFile(overlayImageDir + markedGreyOverlayImagePath);
-            ObjectSlotManagerGui.MarkedWhiteObjectOverlayImage = Image.FromFile(overlayImageDir + markedWhiteOverlayImagePath);
-            ObjectSlotManagerGui.MarkedBlackObjectOverlayImage = Image.FromFile(overlayImageDir + markedBlackOverlayImagePath);
-            ObjectSlotManagerGui.LockedOverlayImage = Image.FromFile(overlayImageDir + lockedImagePath);
-            ObjectSlotManagerGui.LockDisabledOverlayImage = Image.FromFile(overlayImageDir + lockDisabledImagePath);
+
+            string OverlayImageDirectory = AssocConfig.OverlayImageDirectory;
+            ObjectSlotManagerGui.SelectedObjectOverlayImage = Image.FromFile(OverlayImageDirectory + selectedOverlayImagePath);
+            ObjectSlotManagerGui.TrackedAndShownObjectOverlayImage = Image.FromFile(OverlayImageDirectory + trackedAndShownOverlayImagePath);
+            ObjectSlotManagerGui.TrackedNotShownObjectOverlayImage = Image.FromFile(OverlayImageDirectory + trackedNotShownOverlayImagePath);
+            ObjectSlotManagerGui.StoodOnObjectOverlayImage = Image.FromFile(OverlayImageDirectory + stoodOnOverlayImagePath);
+            ObjectSlotManagerGui.RiddenObjectOverlayImage = Image.FromFile(OverlayImageDirectory + riddenOverlayImagePath);
+            ObjectSlotManagerGui.HeldObjectOverlayImage = Image.FromFile(OverlayImageDirectory + heldOverlayImagePath);
+            ObjectSlotManagerGui.InteractionObjectOverlayImage = Image.FromFile(OverlayImageDirectory + interactionOverlayImagePath);
+            ObjectSlotManagerGui.UsedObjectOverlayImage = Image.FromFile(OverlayImageDirectory + usedOverlayImagePath);
+            ObjectSlotManagerGui.ClosestObjectOverlayImage = Image.FromFile(OverlayImageDirectory + closestOverlayImagePath);
+            ObjectSlotManagerGui.CameraObjectOverlayImage = Image.FromFile(OverlayImageDirectory + cameraOverlayImagePath);
+            ObjectSlotManagerGui.CameraHackObjectOverlayImage = Image.FromFile(OverlayImageDirectory + cameraHackOverlayImagePath);
+            ObjectSlotManagerGui.ModelObjectOverlayImage = Image.FromFile(OverlayImageDirectory + modelOverlayImagePath);
+            ObjectSlotManagerGui.FloorObjectOverlayImage = Image.FromFile(OverlayImageDirectory + floorOverlayImagePath);
+            ObjectSlotManagerGui.WallObjectOverlayImage = Image.FromFile(OverlayImageDirectory + wallOverlayImagePath);
+            ObjectSlotManagerGui.CeilingObjectOverlayImage = Image.FromFile(OverlayImageDirectory + ceilingOverlayImagePath);
+            ObjectSlotManagerGui.ParentObjectOverlayImage = Image.FromFile(OverlayImageDirectory + parentOverlayImagePath);
+            ObjectSlotManagerGui.ParentUnusedObjectOverlayImage = Image.FromFile(OverlayImageDirectory + parentUnusedOverlayImagePath);
+            ObjectSlotManagerGui.ParentNoneObjectOverlayImage = Image.FromFile(OverlayImageDirectory + parentNoneOverlayImagePath);
+            ObjectSlotManagerGui.ChildObjectOverlayImage = Image.FromFile(OverlayImageDirectory + childOverlayImagePath);
+            ObjectSlotManagerGui.Collision1OverlayImage = Image.FromFile(OverlayImageDirectory + collision1OverlayImagePath);
+            ObjectSlotManagerGui.Collision2OverlayImage = Image.FromFile(OverlayImageDirectory + collision2OverlayImagePath);
+            ObjectSlotManagerGui.Collision3OverlayImage = Image.FromFile(OverlayImageDirectory + collision3OverlayImagePath);
+            ObjectSlotManagerGui.Collision4OverlayImage = Image.FromFile(OverlayImageDirectory + collision4OverlayImagePath);
+            ObjectSlotManagerGui.MarkedRedObjectOverlayImage = Image.FromFile(OverlayImageDirectory + markedRedOverlayImagePath);
+            ObjectSlotManagerGui.MarkedOrangeObjectOverlayImage = Image.FromFile(OverlayImageDirectory + markedOrangeOverlayImagePath);
+            ObjectSlotManagerGui.MarkedYellowObjectOverlayImage = Image.FromFile(OverlayImageDirectory + markedYellowOverlayImagePath);
+            ObjectSlotManagerGui.MarkedGreenObjectOverlayImage = Image.FromFile(OverlayImageDirectory + markedGreenOverlayImagePath);
+            ObjectSlotManagerGui.MarkedLightBlueObjectOverlayImage = Image.FromFile(OverlayImageDirectory + markedLightBlueOverlayImagePath);
+            ObjectSlotManagerGui.MarkedBlueObjectOverlayImage = Image.FromFile(OverlayImageDirectory + markedBlueOverlayImagePath);
+            ObjectSlotManagerGui.MarkedPurpleObjectOverlayImage = Image.FromFile(OverlayImageDirectory + markedPurpleOverlayImagePath);
+            ObjectSlotManagerGui.MarkedPinkObjectOverlayImage = Image.FromFile(OverlayImageDirectory + markedPinkOverlayImagePath);
+            ObjectSlotManagerGui.MarkedGreyObjectOverlayImage = Image.FromFile(OverlayImageDirectory + markedGreyOverlayImagePath);
+            ObjectSlotManagerGui.MarkedWhiteObjectOverlayImage = Image.FromFile(OverlayImageDirectory + markedWhiteOverlayImagePath);
+            ObjectSlotManagerGui.MarkedBlackObjectOverlayImage = Image.FromFile(OverlayImageDirectory + markedBlackOverlayImagePath);
+            ObjectSlotManagerGui.LockedOverlayImage = Image.FromFile(OverlayImageDirectory + lockedImagePath);
+            ObjectSlotManagerGui.LockDisabledOverlayImage = Image.FromFile(OverlayImageDirectory + lockDisabledImagePath);
 
             foreach (var obj in assoc.BehaviorAssociations)
             {
                 if (obj.ImagePath == null || obj.ImagePath == "")
                     continue;
 
-                using (var preLoad = Image.FromFile(imageDir + obj.ImagePath))
+                obj.Image = new Lazy<Image>(() =>
                 {
-                    float scale = Math.Max(preLoad.Height / 128f, preLoad.Width / 128f);
-                    obj.Image = new Bitmap(preLoad, new Size((int)(preLoad.Width / scale), (int)(preLoad.Height / scale)));
-                }
+                    using (var preLoad = Image.FromFile(AssocConfig.ImageDirectory + obj.ImagePath))
+                    {
+                        float scale = Math.Max(preLoad.Height / 128f, preLoad.Width / 128f);
+                        return new Bitmap(preLoad, new Size((int)(preLoad.Width / scale), (int)(preLoad.Height / scale)));
+                    }
+                });
                 if (obj.MapImagePath == "" || obj.MapImagePath == null)
                 {
                     obj.MapImage = obj.Image;
                 }
                 else
                 {
-                    using (var preLoad = Image.FromFile(mapImageDir + obj.MapImagePath))
+                    obj.MapImage = new Lazy<Image>(() =>
                     {
-                        float scale = Math.Max(preLoad.Height / 128f, preLoad.Width / 128f);
-                        obj.MapImage = new Bitmap(preLoad, new Size((int)(preLoad.Width / scale), (int)(preLoad.Height / scale)));
-                    }
+                        using (var preLoad = Image.FromFile(AssocConfig.MapImageDirectory + obj.MapImagePath))
+                        {
+                            float scale = Math.Max(preLoad.Height / 128f, preLoad.Width / 128f);
+                            return new Bitmap(preLoad, new Size((int)(preLoad.Width / scale), (int)(preLoad.Height / scale)));
+                        }
+                    });
                 }
-                obj.TransparentImage = obj.Image.GetOpaqueImage(0.5f);
+                obj.TransparentImage = new Lazy<Image>(() => obj.Image.Value.GetOpaqueImage(0.5f));
             }
 
             return assoc;
@@ -783,7 +716,7 @@ namespace STROOP.Utilities
             schemaSet.Add("http://tempuri.org/ReusableTypes.xsd", "ReusableTypes.xsd");
             schemaSet.Add("http://tempuri.org/InputImageAssociationsSchema.xsd", "InputImageAssociationsSchema.xsd");
             schemaSet.Compile();
-            
+
             // Load and validate document
             var doc = XDocument.Load(path);
             doc.Validate(schemaSet, Validation);
@@ -1257,7 +1190,7 @@ namespace STROOP.Utilities
                         {
                             string name = element.Attribute(XName.Get("name")).Value;
                             string imagePath = element.Element(XName.Get("Image")).Attribute(XName.Get("path")).Value;
-                            Bitmap image = Image.FromFile(assoc.BackgroundImageFolderPath + imagePath) as Bitmap;
+                            Lazy<Image> image = new Lazy<Image>(() => Image.FromFile(assoc.BackgroundImageFolderPath + imagePath));
                             BackgroundImage backgroundImage = new BackgroundImage()
                             {
                                 Name = name,
@@ -1435,7 +1368,7 @@ namespace STROOP.Utilities
 
             foreach (XElement element in doc.Root.Elements())
             {
-                switch(element.Name.ToString())
+                switch (element.Name.ToString())
                 {
                     case "Default":
                         uint defaultAfterCloneValue = ParsingUtilities.ParseHex(
@@ -1452,9 +1385,9 @@ namespace STROOP.Utilities
                             element.Attribute(XName.Get("value")).Value);
                         string actionName = element.Attribute(XName.Get("name")).Value;
                         uint? afterCloneValue = element.Attribute(XName.Get("afterCloneValue")) != null ?
-                            ParsingUtilities.ParseHex(element.Attribute(XName.Get("afterCloneValue")).Value) : (uint?) null;
+                            ParsingUtilities.ParseHex(element.Attribute(XName.Get("afterCloneValue")).Value) : (uint?)null;
                         uint? afterUncloneValue = element.Attribute(XName.Get("afterUncloneValue")) != null ?
-                            ParsingUtilities.ParseHex(element.Attribute(XName.Get("afterUncloneValue")).Value) : (uint?) null;
+                            ParsingUtilities.ParseHex(element.Attribute(XName.Get("afterUncloneValue")).Value) : (uint?)null;
                         uint? handsfreeValue = element.Attribute(XName.Get("handsfreeValue")) != null ?
                             ParsingUtilities.ParseHex(element.Attribute(XName.Get("handsfreeValue")).Value) : (uint?)null;
                         actionTable?.Add(new ActionTable.ActionReference()
@@ -1597,7 +1530,7 @@ namespace STROOP.Utilities
 
             return pendulumSwingTable;
         }
-        
+
         public static WaypointTable OpenWaypointTable(string path)
         {
             var assembly = Assembly.GetExecutingAssembly();
@@ -1646,7 +1579,7 @@ namespace STROOP.Utilities
             List<PointTable.PointReference> points = new List<PointTable.PointReference>();
             foreach (XElement element in doc.Root.Elements())
             {
-                int index = ParsingUtilities.ParseInt (element.Attribute(XName.Get("index")).Value);
+                int index = ParsingUtilities.ParseInt(element.Attribute(XName.Get("index")).Value);
                 double x = ParsingUtilities.ParseDouble(element.Attribute(XName.Get("x")).Value);
                 double y = ParsingUtilities.ParseDouble(element.Attribute(XName.Get("y")).Value);
                 double z = ParsingUtilities.ParseDouble(element.Attribute(XName.Get("z")).Value);

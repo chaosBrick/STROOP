@@ -43,10 +43,7 @@ namespace STROOP.Map
             return _points.ConvertAll(point => (point.x, point.z, Size, point.y + _relativeMinY, point.y + _relativeMaxY));
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.CylinderImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.CylinderImage;
 
         public override string GetName()
         {

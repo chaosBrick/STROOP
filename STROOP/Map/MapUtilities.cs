@@ -112,7 +112,7 @@ namespace STROOP.Map
             }
         }
 
-        public static Image GetBackgroundImage(object backgroundChoice = null)
+        public static Lazy<Image> GetBackgroundImage(object backgroundChoice = null)
         {
             backgroundChoice = backgroundChoice ?? StroopMainForm.instance.mapTab.comboBoxMapOptionsBackground.SelectedItem;
             if (backgroundChoice is BackgroundImage background)

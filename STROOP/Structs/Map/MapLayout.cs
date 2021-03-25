@@ -23,7 +23,25 @@ namespace STROOP.Structs
         public float Y;
         public string Name;
         public string SubName;
-        
+
+        public MapLayout()
+        {
+            MapImage = new Lazy<Image>(() =>
+            {
+                var path = Path.Combine(Config.MapAssociations.MapImageFolderPath, ImagePath);
+                using (Bitmap preLoad = Bitmap.FromFile(path) as Bitmap)
+                {
+                    int maxSize = 1080;
+                    int largest = Math.Max(preLoad.Width, preLoad.Height);
+                    float scale = 1;
+                    if (largest > maxSize)
+                        scale = largest / maxSize;
+
+                    return new Bitmap(preLoad, new Size((int)(preLoad.Width / scale), (int)(preLoad.Height / scale)));
+                }
+            });
+        }
+
         public override bool Equals(object obj)
         {
             if (!(obj is MapLayout)) return false;
@@ -34,7 +52,7 @@ namespace STROOP.Structs
         public override int GetHashCode()
         {
             return ImagePath.GetHashCode() * 127 + Level.GetHashCode() * 31 + Area.GetHashCode() * 17 + Y.GetHashCode()
-                + 257 * MissionLayout.GetHashCode() + 67 * LoadingPoint.GetHashCode(); 
+                + 257 * MissionLayout.GetHashCode() + 67 * LoadingPoint.GetHashCode();
         }
 
         public override string ToString()
@@ -51,28 +69,9 @@ namespace STROOP.Structs
             return Id.CompareTo(other.Id);
         }
 
-        private Bitmap _mapImage;
-        public Bitmap MapImage
-        {
-            get
-            {
-                if (_mapImage != null) return _mapImage;
-                var path = Path.Combine(Config.MapAssociations.MapImageFolderPath, ImagePath);
-                using (Bitmap preLoad = Bitmap.FromFile(path) as Bitmap)
-                {
-                    int maxSize = 1080;
-                    int largest = Math.Max(preLoad.Width, preLoad.Height);
-                    float scale = 1;
-                    if (largest > maxSize)
-                        scale = largest / maxSize;
+        public readonly Lazy<Image> MapImage;
 
-                    _mapImage = new Bitmap(preLoad, new Size((int)(preLoad.Width / scale), (int)(preLoad.Height / scale)));
-                }
-                return _mapImage;
-            }
-        }
-
-        public Bitmap BackgroundImage
+        public Lazy<Image> BackgroundImage
         {
             get
             {

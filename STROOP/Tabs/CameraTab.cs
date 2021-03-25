@@ -146,7 +146,7 @@ namespace STROOP.Tabs
                 });
 
             // Camera Image
-            pictureBoxCamera.Image = Config.ObjectAssociations.CameraImage;
+            pictureBoxCamera.Image = Config.ObjectAssociations.CameraImage.Value;
             panelCameraBorder.BackColor = Config.ObjectAssociations.CameraColor;
             pictureBoxCamera.BackColor = Config.ObjectAssociations.CameraColor.Lighten(0.5);
         }

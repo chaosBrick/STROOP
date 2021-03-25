@@ -24,10 +24,7 @@ namespace STROOP.Map
             _backgroundChoice = "Recommended";
         }
 
-        public override Image GetInternalImage()
-        {
-            return MapUtilities.GetBackgroundImage(_backgroundChoice);
-        }
+        public override Lazy<Image> GetInternalImage()=>MapUtilities.GetBackgroundImage(_backgroundChoice);
 
         public override string GetName()
         {

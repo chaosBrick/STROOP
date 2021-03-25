@@ -173,10 +173,7 @@ namespace STROOP.Map
             return MapDrawType.Perspective;
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.ArrowImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.ArrowImage;
 
         public override string GetName()
         {

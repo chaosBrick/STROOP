@@ -88,9 +88,6 @@ namespace STROOP.Map
             return "Line Segment";
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.ArrowImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.ArrowImage;
     }
 }

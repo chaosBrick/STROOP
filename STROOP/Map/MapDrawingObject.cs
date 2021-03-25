@@ -44,10 +44,7 @@ namespace STROOP.Map
             return "Drawing";
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.PathImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.PathImage;
 
         public override ContextMenuStrip GetContextMenuStrip()
         {

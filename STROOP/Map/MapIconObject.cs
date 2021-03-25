@@ -27,12 +27,13 @@ namespace STROOP.Map
 
         protected void UpdateImage()
         {
-            Image image = GetImage() ?? Config.ObjectAssociations.EmptyImage;
-            if (image != Image)
+            var myImage = GetImage();
+            Lazy<Image> image = myImage ?? Config.ObjectAssociations.EmptyImage;
+            if (image.Value != Image)
             {
-                Image = image;
+                Image = image.Value;
                 GL.DeleteTexture(TextureId);
-                TextureId = MapUtilities.LoadTexture(image as Bitmap);
+                TextureId = MapUtilities.LoadTexture(Image as Bitmap);
             }
         }
 

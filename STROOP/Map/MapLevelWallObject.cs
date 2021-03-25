@@ -136,9 +136,6 @@ namespace STROOP.Map
             return "Level Wall Tris";
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.TriangleWallImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.TriangleWallImage;
     }
 }

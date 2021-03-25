@@ -76,8 +76,9 @@ namespace STROOP.Map
             itemUseCustomImage.Click += (sender, e) =>
             {
                 Image image = DialogUtilities.GetImage();
+                Lazy<Image> imageMap = new Lazy<Image>(() => image);
                 if (image == null) return;
-                _mapObjectList.ForEach(mapObj => mapObj.SetIconType(MapTrackerIconType.CustomImage, image));
+                _mapObjectList.ForEach(mapObj => mapObj.SetIconType(MapTrackerIconType.CustomImage, imageMap));
                 pictureBoxItems.ForEach(item => item.Checked = item == itemUseCustomImage);
             };
             itemUseTopDownImage.Checked = true;
@@ -866,7 +867,7 @@ namespace STROOP.Map
         {
             textBoxName.SubmitTextLoosely(_customName ?? string.Join(", ", _mapObjectList.ConvertAll(obj => obj.GetName())));
 
-            List<Image> images = _mapObjectList.ConvertAll(mapObj => mapObj.GetImage());
+            List<Image> images = _mapObjectList.ConvertAll(mapObj => mapObj.GetImage().Value);
             if (!images.SequenceEqual(_images))
             {
                 _images = images;

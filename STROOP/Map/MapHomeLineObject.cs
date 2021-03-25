@@ -40,10 +40,7 @@ namespace STROOP.Map
             return "Home Line";
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.ArrowImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.ArrowImage;
 
         public override PositionAngle GetPositionAngle()
         {

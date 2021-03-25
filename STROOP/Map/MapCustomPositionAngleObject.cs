@@ -24,10 +24,7 @@ namespace STROOP.Map
             InternalRotates = true;
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.GreenMarioMapImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.GreenMarioMapImage;
 
         public override PositionAngle GetPositionAngle()
         {

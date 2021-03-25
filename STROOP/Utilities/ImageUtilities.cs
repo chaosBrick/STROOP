@@ -12,6 +12,12 @@ namespace STROOP.Utilities
 {
     public static class ImageUtilities
     {
+        public static void Dispose(this Lazy<Image> image)
+        {
+            if (image != null && image.IsValueCreated)
+                image.Value?.Dispose();
+        }
+
         public static Image CreateMultiImage(List<Image> images, int width, int height)
         {
             Image multiBitmap = new Bitmap(width, height);

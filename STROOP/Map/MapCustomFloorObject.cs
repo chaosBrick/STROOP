@@ -55,10 +55,7 @@ namespace STROOP.Map
             return "Custom Floor Tris";
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.TriangleFloorImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.TriangleFloorImage;
 
         public override ContextMenuStrip GetContextMenuStrip()
         {

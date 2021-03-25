@@ -18,7 +18,7 @@ namespace STROOP.Tabs
             base.InitializeTab();
 
             // Hud Image
-            pictureBoxHud.Image = Config.ObjectAssociations.HudImage;
+            pictureBoxHud.Image = Config.ObjectAssociations.HudImage.Value;
             panelHudBorder.BackColor = Config.ObjectAssociations.HudColor;
             pictureBoxHud.BackColor = Config.ObjectAssociations.HudColor.Lighten(0.5);
 

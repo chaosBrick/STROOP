@@ -52,10 +52,7 @@ namespace STROOP.Map
             return "Current Unit for " + _posAngle.GetMapName();
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.CurrentUnitImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.CurrentUnitImage;
 
         public override PositionAngle GetPositionAngle()
         {

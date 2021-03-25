@@ -43,9 +43,6 @@ namespace STROOP.Map
             return "Waters";
         }
 
-        public override Image GetInternalImage()
-        {
-            return Config.ObjectAssociations.CurrentUnitImage;
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.CurrentUnitImage;
     }
 }
