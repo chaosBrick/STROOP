@@ -130,13 +130,8 @@ namespace STROOP
                     "Documentation",
                     "Show All Helpful Hints",
                     "Enable TASer Settings",
-                    "Add Gfx Vertices",
-                    "Show Skribblio Words",
                     "Show Image Form",
                     "Show Coin Ring Display Form",
-                    "Add Chuckya Map Objs",
-                    "Test Something",
-                    "Test Something Else",
                     "Format Subtitles",
                 },
                 new List<Action>()
@@ -167,8 +162,6 @@ namespace STROOP
                         tasTab.EnableTASerSettings();
                         tabControlMain.SelectedTab = tabPageTas;
                     },
-                    () => TestUtilities.AddGraphicsTriangleVerticesToTriangleTab(),
-                    () => SkribblioUtilities.ShowWords(),
                     () =>
                     {
                         ImageForm imageForm = new ImageForm();
@@ -179,9 +172,6 @@ namespace STROOP
                         CoinRingDisplayForm form = new CoinRingDisplayForm();
                         form.Show();
                     },
-                    () => TestUtilities.AddChuckyaMapObjects(),
-                    () => TestUtilities.TestSomething(),
-                    () => TestUtilities.TestSomethingElse(),
                     () => SubtitleUtilities.FormatSubtitlesFromClipboard(),
                 });
 
@@ -379,7 +369,6 @@ namespace STROOP
                 }
 
                 WatchVariableLockManager.Update();
-                TestUtilities.Update();
                 TriangleDataModel.ClearCache();
             }));
         }
