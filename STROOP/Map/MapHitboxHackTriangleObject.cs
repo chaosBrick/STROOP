@@ -19,14 +19,12 @@ namespace STROOP.Map
 {
     public class MapHitboxHackTriangleObject : MapTriangleObject
     {
-        private readonly bool _isDefaultInstance;
         private readonly List<uint> _levelTriAddressList;
         private readonly List<uint> _objTriAddressList;
 
-        public MapHitboxHackTriangleObject(bool isDefaultInstance)
+        public MapHitboxHackTriangleObject()
             : base()
         {
-            _isDefaultInstance = isDefaultInstance;
             _levelTriAddressList = TriangleUtilities.GetLevelTriangles().ConvertAll(tri => tri.Address);
             _objTriAddressList = TriangleUtilities.GetObjectTriangles().ConvertAll(tri => tri.Address);
 
@@ -34,67 +32,14 @@ namespace STROOP.Map
             OutlineWidth = 0;
         }
 
-        public override void DrawOn2DControlTopDownView()
+        public override void DrawOn2DControl()
         {
             // do nothing
         }
 
-        public override float GetWallRelativeHeightForOrthographicView()
-        {
-            return -30;
-        }
-
-        public override Color GetColorForOrthographicView(TriangleClassification classification)
-        {
-            switch (classification)
-            {
-                case TriangleClassification.Wall:
-                    return Color.Green;
-                case TriangleClassification.Floor:
-                    return Color.Blue;
-                case TriangleClassification.Ceiling:
-                    return Color.Red;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        public override float GetSizeForOrthographicView(TriangleClassification classification)
-        {
-            switch (classification)
-            {
-                case TriangleClassification.Wall:
-                    return 50;
-                case TriangleClassification.Floor:
-                    return 78;
-                case TriangleClassification.Ceiling:
-                    return 160;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        public override void DrawOn2DControlOrthographicView()
-        {
-            if (_isDefaultInstance)
-            {
-                Opacity = 0.5;
-                OutlineWidth = 1;
-                _useCrossSection = Config.MapGui.checkBoxMapOptionsEnableCrossSection.Checked;
-            }
-
-            base.DrawOn2DControlOrthographicView();
-        }
-
         public override void DrawOn3DControl()
         {
-            if (_isDefaultInstance)
-            {
-                Opacity = 1;
-                OutlineWidth = 0;
-            }
-
-            List<List<(float x, float y, float z, Color color)>> triData = GetFilteredTriangles()
+            List<List<(float x, float y, float z, Color color)>> triData = GetTrianglesWithinDist()
                 .ConvertAll(tri => new List<(float x, float y, float z, Color color)>()
                 {
                     (tri.X1, tri.Y1, tri.Z1, ColorUtilities.AddAlpha(GetColorForTri(tri, 1), OpacityByte)),
@@ -167,7 +112,7 @@ namespace STROOP.Map
             }
         }
 
-        protected override List<TriangleDataModel> GetUnfilteredTriangles()
+        protected override List<TriangleDataModel> GetTrianglesOfAnyDist()
         {
             return MapUtilities.GetTriangles(_levelTriAddressList.Concat(_objTriAddressList).ToList());
         }

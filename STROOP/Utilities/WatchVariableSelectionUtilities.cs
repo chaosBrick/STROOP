@@ -587,10 +587,10 @@ namespace STROOP.Structs
                 new List<string>() { "Regular", "Fixed", "Grouped by Base Address", "Grouped by Variable" },
                 new List<Action>()
                 {
-                    () => WatchVariableControl.AddVarsToTab(getVars(), Config.CustomManager, AddToTabTypeEnum.Regular),
-                    () => WatchVariableControl.AddVarsToTab(getVars(), Config.CustomManager, AddToTabTypeEnum.Fixed),
-                    () => WatchVariableControl.AddVarsToTab(getVars(), Config.CustomManager, AddToTabTypeEnum.GroupedByBaseAddress),
-                    () => WatchVariableControl.AddVarsToTab(getVars(), Config.CustomManager, AddToTabTypeEnum.GroupedByVariable),
+                    () => WatchVariableControl.AddVarsToTab(getVars(), StroopMainForm.instance.customTab.watchVariablePanelCustom, AddToTabTypeEnum.Regular),
+                    () => WatchVariableControl.AddVarsToTab(getVars(), StroopMainForm.instance.customTab.watchVariablePanelCustom, AddToTabTypeEnum.Fixed),
+                    () => WatchVariableControl.AddVarsToTab(getVars(), StroopMainForm.instance.customTab.watchVariablePanelCustom, AddToTabTypeEnum.GroupedByBaseAddress),
+                    () => WatchVariableControl.AddVarsToTab(getVars(), StroopMainForm.instance.customTab.watchVariablePanelCustom, AddToTabTypeEnum.GroupedByVariable),
                 });
 
             return new List<ToolStripItem>()

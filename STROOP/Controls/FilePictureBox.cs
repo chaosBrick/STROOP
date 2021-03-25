@@ -47,14 +47,14 @@ namespace STROOP
 
         private void SetValue(byte value)
         {
-            byte oldByte = Config.Stream.GetByte(Config.FileManager.CurrentFileAddress + _addressOffset);
+            byte oldByte = Config.Stream.GetByte(FileConfig.CurrentFileAddress + _addressOffset);
             byte newByte = MoreMath.ApplyValueToMaskedByte(oldByte, _mask, value);
-            Config.Stream.SetValue(newByte, Config.FileManager.CurrentFileAddress + _addressOffset);
+            Config.Stream.SetValue(newByte, FileConfig.CurrentFileAddress + _addressOffset);
         }
 
         private byte GetValue()
         {
-            byte currentByte = Config.Stream.GetByte(Config.FileManager.CurrentFileAddress + _addressOffset);
+            byte currentByte = Config.Stream.GetByte(FileConfig.CurrentFileAddress + _addressOffset);
             byte maskedCurrentByte = (byte)(currentByte & _mask);
             return maskedCurrentByte;
         }

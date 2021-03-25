@@ -25,8 +25,8 @@ namespace STROOP.Map
             : base()
         {
             _objName = assoc.Name;
-            _objImage = assoc.Image.Image;
-            _objMapImage = assoc.MapImage.Image;
+            _objImage = assoc.Image;
+            _objMapImage = assoc.MapImage;
             InternalRotates = assoc.RotatesOnMap;
         }
 
@@ -36,6 +36,11 @@ namespace STROOP.Map
             ObjectBehaviorAssociation assoc = Config.ObjectAssociations.GetObjectAssociation(objName);
             if (assoc == null) return null;
             return new MapAllObjectsWithNameObject(assoc);
+        }
+
+        public override PositionAngleProvider GetPositionAngleProvider()
+        {
+            return () => Config.ObjectSlotsManager.GetLoadedObjectsWithName(_objName).ConvertAll(obj => PositionAngle.Obj(obj.Address));
         }
 
         public override Image GetInternalImage()
@@ -50,29 +55,14 @@ namespace STROOP.Map
             return "All " + _objName;
         }
 
-        public override void DrawOn2DControlTopDownView()
+        public override void DrawOn2DControl()
         {
             List<(float x, float y, float z, float angle, int tex)> data = GetData();
             data.Reverse();
             foreach (var dataPoint in data)
             {
                 (float x, float y, float z, float angle, int tex) = dataPoint;
-                (float x, float z) positionOnControl = MapUtilities.ConvertCoordsForControlTopDownView(x, z);
-                float angleDegrees = Rotates ? MapUtilities.ConvertAngleForControl(angle) : 0;
-                SizeF size = MapUtilities.ScaleImageSizeForControl(Image.Size, Size);
-                PointF point = new PointF(positionOnControl.x, positionOnControl.z);
-                MapUtilities.DrawTexture(tex, point, size, angleDegrees, Opacity);
-            }
-        }
-
-        public override void DrawOn2DControlOrthographicView()
-        {
-            List<(float x, float y, float z, float angle, int tex)> data = GetData();
-            data.Reverse();
-            foreach (var dataPoint in data)
-            {
-                (float x, float y, float z, float angle, int tex) = dataPoint;
-                (float x, float z) positionOnControl = MapUtilities.ConvertCoordsForControlOrthographicView(x, y, z);
+                (float x, float z) positionOnControl = MapUtilities.ConvertCoordsForControl(x, z);
                 float angleDegrees = Rotates ? MapUtilities.ConvertAngleForControl(angle) : 0;
                 SizeF size = MapUtilities.ScaleImageSizeForControl(Image.Size, Size);
                 PointF point = new PointF(positionOnControl.x, positionOnControl.z);

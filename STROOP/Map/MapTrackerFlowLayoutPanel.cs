@@ -52,12 +52,6 @@ namespace STROOP.Map
             }
         }
 
-        public MapTracker GetTrackerAtIndex(int index)
-        {
-            if (index < 0 || index >= Controls.Count) return null;
-            return Controls[index] as MapTracker;
-        }
-
         public void RemoveControl(MapTracker mapTracker)
         {
             lock (_objectLock)
@@ -88,16 +82,15 @@ namespace STROOP.Map
 
         public void UpdateControl()
         {
-            if (Config.MapGui.checkBoxMapOptionsEnable3D.Checked ||
-                Config.MapGui.checkBoxMapOptionsEnableOrthographicView.Checked)
+            if (StroopMainForm.instance.mapTab.checkBoxMapOptionsEnable3D.Checked)
             {            
                 _mapObjHitboxHackTris.Update();
             }
-            if (!Config.MapGui.checkBoxMapOptionsEnable3D.Checked)
+            else
             {
                 _mapObjMap.Update();
+                _mapObjBackground.Update();
             }
-            _mapObjBackground.Update();
 
             lock (_objectLock)
             {
@@ -142,14 +135,16 @@ namespace STROOP.Map
             listOrderOnBottom.Reverse();
             listOrderByY.Reverse();
             listOrderByY = listOrderByY.OrderBy(obj => obj.GetY()).ToList();
-            List<MapObject> listCombined = listOrderOnBottom.Concat(listOrderByY).Concat(listOrderOnTop).ToList();
 
-            if (!Config.MapGui.checkBoxMapOptionsDisableHitboxHackTris.Checked)
+            foreach (MapObject obj in listOrderOnBottom)
             {
-                listCombined.Insert(0, _mapObjHitboxHackTris);
+                obj.DrawOn2DControl();
             }
-
-            foreach (MapObject obj in listCombined)
+            foreach (MapObject obj in listOrderByY)
+            {
+                obj.DrawOn2DControl();
+            }
+            foreach (MapObject obj in listOrderOnTop)
             {
                 obj.DrawOn2DControl();
             }
@@ -189,7 +184,7 @@ namespace STROOP.Map
 
             List<MapObject> listCombined = listOrderOnBottom.Concat(listOrderByY).Concat(listOrderOnTop).ToList();
             listCombined.Insert(0, _mapObjBackground);
-            if (!Config.MapGui.checkBoxMapOptionsDisableHitboxHackTris.Checked)
+            if (!StroopMainForm.instance.mapTab.checkBoxMapOptionsDisable3DHitboxHackTris.Checked)
             {
                 listCombined.Insert(0, _mapObjHitboxHackTris);
             }

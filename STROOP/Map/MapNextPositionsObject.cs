@@ -24,8 +24,6 @@ namespace STROOP.Map
         private bool _showQuarterSteps = true;
         private double _numFrames = 4;
 
-        private static readonly string SET_NUM_FRAMES_TEXT = "Set Num Frames";
-
         public MapNextPositionsObject()
             : base()
         {
@@ -47,29 +45,14 @@ namespace STROOP.Map
             return (float)PositionAngle.Mario.Y;
         }
 
-        public override void DrawOn2DControlTopDownView()
+        public override void DrawOn2DControl()
         {
             List<(float x, float y, float z, float angle, int tex)> data = GetData();
             data.Reverse();
             foreach (var dataPoint in data)
             {
                 (float x, float y, float z, float angle, int tex) = dataPoint;
-                (float x, float z) positionOnControl = MapUtilities.ConvertCoordsForControlTopDownView(x, z);
-                float angleDegrees = Rotates ? MapUtilities.ConvertAngleForControl(angle) : 0;
-                SizeF size = MapUtilities.ScaleImageSizeForControl(Config.ObjectAssociations.BlueMarioMapImage.Size, Size);
-                PointF point = new PointF(positionOnControl.x, positionOnControl.z);
-                MapUtilities.DrawTexture(tex, point, size, angleDegrees, Opacity);
-            }
-        }
-
-        public override void DrawOn2DControlOrthographicView()
-        {
-            List<(float x, float y, float z, float angle, int tex)> data = GetData();
-            data.Reverse();
-            foreach (var dataPoint in data)
-            {
-                (float x, float y, float z, float angle, int tex) = dataPoint;
-                (float x, float z) positionOnControl = MapUtilities.ConvertCoordsForControlOrthographicView(x, y, z);
+                (float x, float z) positionOnControl = MapUtilities.ConvertCoordsForControl(x, z);
                 float angleDegrees = Rotates ? MapUtilities.ConvertAngleForControl(angle) : 0;
                 SizeF size = MapUtilities.ScaleImageSizeForControl(Config.ObjectAssociations.BlueMarioMapImage.Size, Size);
                 PointF point = new PointF(positionOnControl.x, positionOnControl.z);
@@ -209,8 +192,7 @@ namespace STROOP.Map
                 };
                 itemShowQuarterSteps.Checked = _showQuarterSteps;
 
-                string suffix = string.Format(" ({0})", _numFrames);
-                ToolStripMenuItem itemSetNumFrames = new ToolStripMenuItem(SET_NUM_FRAMES_TEXT + suffix);
+                ToolStripMenuItem itemSetNumFrames = new ToolStripMenuItem("Set Num Frames...");
                 itemSetNumFrames.Click += (sender, e) =>
                 {
                     string text = DialogUtilities.GetStringFromDialog(labelText: "Enter num frames to the nearest 1/4th.");
@@ -218,8 +200,6 @@ namespace STROOP.Map
                     if (!numFramesNullable.HasValue) return;
                     double numFrames = numFramesNullable.Value;
                     _numFrames = numFrames;
-                    string suffix2 = string.Format(" ({0})", _numFrames);
-                    itemSetNumFrames.Text = SET_NUM_FRAMES_TEXT + suffix2;
                 };
 
                 _contextMenuStrip = new ContextMenuStrip();

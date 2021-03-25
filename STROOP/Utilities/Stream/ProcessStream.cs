@@ -16,7 +16,8 @@ using System.Windows.Forms;
 namespace STROOP.Utilities
 {
     public class ProcessStream : IDisposable
-    {   IEmuRamIO _io;
+    {
+        IEmuRamIO _io;
         public IEmuRamIO IO => _io;
 
         ConcurrentQueue<double> _fpsTimes = new ConcurrentQueue<double>();
@@ -284,9 +285,9 @@ namespace STROOP.Utilities
 
         public byte[] ReadRam(uint address, int length, EndiannessType endianness, bool absoluteAddress = false)
         {
-             return ReadRam((UIntPtr) address, length, endianness, absoluteAddress);
+            return ReadRam((UIntPtr)address, length, endianness, absoluteAddress);
         }
-        
+
         public byte[] ReadRam(UIntPtr address, int length, EndiannessType endianness, bool absoluteAddress = false)
         {
             byte[] readBytes = new byte[length];
@@ -301,7 +302,7 @@ namespace STROOP.Utilities
 
             if (EndiannessUtilities.DataIsMisaligned(address, length, EndiannessType.Big))
                 return readBytes;
-            
+
             /// Fix endianness
             switch (endianness)
             {
@@ -320,7 +321,10 @@ namespace STROOP.Utilities
                     byte[] swapBytes;
                     uint alignedAddress = EndiannessUtilities.AlignedAddressFloor(localAddress);
 
+
                     int alignedReadByteCount = (readBytes.Length / 4) * 4 + 8;
+                    if (alignedAddress + alignedReadByteCount> _ram.Length)
+                        break;
                     swapBytes = new byte[alignedReadByteCount];
 
                     // Read memory
@@ -355,7 +359,7 @@ namespace STROOP.Utilities
             return Readonly;
         }
 
-        public bool SetValueRoundingWrapping (
+        public bool SetValueRoundingWrapping(
             Type type, object value, uint address, bool absoluteAddress = false, uint? mask = null, int? shift = null)
         {
             // Allow short circuiting if object is already of type
@@ -530,39 +534,44 @@ namespace STROOP.Utilities
             return WriteRam(buffer, (UIntPtr)address, endianness, false, bufferStart, length, safeWrite);
         }
 
-        public bool WriteRam(byte[] buffer, UIntPtr address, EndiannessType endianness, bool absoluteAddress = false, 
+        private object ram_write_lock = new object();
+
+        public bool WriteRam(byte[] buffer, UIntPtr address, EndiannessType endianness, bool absoluteAddress = false,
             int bufferStart = 0, int? length = null, bool safeWrite = true)
         {
-            if (length == null)
-                length = buffer.Length - bufferStart;
+            lock (ram_write_lock)
+            {
+                if (length == null)
+                    length = buffer.Length - bufferStart;
 
-            if (CheckReadonlyOff())
-                return false;
+                if (CheckReadonlyOff())
+                    return false;
 
-            byte[] writeBytes = new byte[length.Value];
-            Array.Copy(buffer, bufferStart, writeBytes, 0, length.Value);
+                byte[] writeBytes = new byte[length.Value];
+                Array.Copy(buffer, bufferStart, writeBytes, 0, length.Value);
 
-            // Attempt to pause the game before writing 
-            bool preSuspended = _io?.IsSuspended ?? false;
-            if (safeWrite)
-                _io?.Suspend();
+                // Attempt to pause the game before writing 
+                bool preSuspended = _io?.IsSuspended ?? false;
+                if (safeWrite)
+                    _io?.Suspend();
 
-            if (EndiannessUtilities.DataIsMisaligned(address, length.Value, EndiannessType.Big))
-                throw new Exception("Misaligned data");
+                if (EndiannessUtilities.DataIsMisaligned(address, length.Value, EndiannessType.Big))
+                    throw new Exception("Misaligned data");
 
-            // Write memory to game/process
-            bool result;
-            if (absoluteAddress)
-                result = _io?.WriteAbsolute(address, writeBytes, endianness) ?? false;
-            else
-                result = _io?.WriteRelative(address.ToUInt32(), writeBytes, endianness) ?? false;
+                // Write memory to game/process
+                bool result;
+                if (absoluteAddress)
+                    result = _io?.WriteAbsolute(address, writeBytes, endianness) ?? false;
+                else
+                    result = _io?.WriteRelative(address.ToUInt32(), writeBytes, endianness) ?? false;
 
-            // Resume stream 
-            if (safeWrite && !preSuspended)
-                _io?.Resume();
+                // Resume stream 
+                if (safeWrite && !preSuspended)
+                    _io?.Resume();
 
-            //FocusOnEmulator();
-            return result;
+                //FocusOnEmulator();
+                return result;
+            }
         }
 
         public bool RefreshRam()
@@ -584,13 +593,27 @@ namespace STROOP.Utilities
             }
         }
 
+        public bool GetAllRam(out byte[] allRam)
+        {
+            allRam = new byte[Config.RamSize];
+            try
+            {
+                return _io?.ReadRelative(0, allRam, EndiannessType.Little) ?? false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         private void ProcessUpdate()
         {
             Stopwatch frameStopwatch = Stopwatch.StartNew();
 
             while (!disposedValue)
             {
-                try {
+                try
+                {
                     int timeToWait;
                     lock (_mStreamProcess)
                     {
@@ -630,7 +653,6 @@ namespace STROOP.Utilities
                 }
                 catch (Exception)
                 {
-                    Monitor.Exit(_mStreamProcess);
                     Debugger.Break();
                 }
             }

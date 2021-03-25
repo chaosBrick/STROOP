@@ -22,12 +22,7 @@ namespace STROOP.Map
         private float? _relativeHeight;
         private float? _absoluteHeight;
 
-        private ToolStripMenuItem _itemShowArrows;
-        private ToolStripMenuItem _itemSetRelativeHeight;
-        private ToolStripMenuItem _itemSetAbsoluteHeight;
-
-        private static readonly string SET_RELATIVE_HEIGHT_TEXT = "Set Relative Height";
-        private static readonly string SET_ABSOLUTE_HEIGHT_TEXT = "Set Absolute Height";
+        ToolStripMenuItem _itemShowArrows;
 
         public MapWallObject()
             : base()
@@ -41,12 +36,13 @@ namespace STROOP.Map
             _absoluteHeight = null;
         }
 
-        public override void DrawOn2DControlTopDownView()
+        public override void DrawOn2DControl()
         {
             float marioHeight = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
-            float? height = _relativeHeight.HasValue ? marioHeight - _relativeHeight.Value : _absoluteHeight;
+            float? height = _relativeHeight.HasValue ? marioHeight - _relativeHeight.Value : (float?)null;
+            height = height ?? _absoluteHeight;
 
-            List<(float x1, float z1, float x2, float z2, bool xProjection, double pushAngle)> wallData = GetFilteredTriangles()
+            List<(float x1, float z1, float x2, float z2, bool xProjection, double pushAngle)> wallData = GetTrianglesWithinDist()
                 .ConvertAll(tri => MapUtilities.Get2DWallDataFromTri(tri, height))
                 .FindAll(wallDataNullable => wallDataNullable.HasValue)
                 .ConvertAll(wallDataNullable => wallDataNullable.Value);
@@ -79,7 +75,7 @@ namespace STROOP.Map
 
                 List<List<(float x, float z)>> quadsForControl =
                     quads.ConvertAll(quad => quad.ConvertAll(
-                        vertex => MapUtilities.ConvertCoordsForControlTopDownView(vertex.x, vertex.z)));
+                        vertex => MapUtilities.ConvertCoordsForControl(vertex.x, vertex.z)));
 
                 GL.BindTexture(TextureTarget.Texture2D, -1);
                 GL.MatrixMode(MatrixMode.Modelview);
@@ -177,7 +173,7 @@ namespace STROOP.Map
 
                     List<List<(float x, float z)>> arrowsForControl =
                         arrowPoints.ConvertAll(arrow => arrow.ConvertAll(
-                            vertex => MapUtilities.ConvertCoordsForControlTopDownView(vertex.x, vertex.z)));
+                            vertex => MapUtilities.ConvertCoordsForControl(vertex.x, vertex.z)));
 
                     // Draw arrow
                     Color arrowColor = Color.Darken(0.5);
@@ -213,11 +209,6 @@ namespace STROOP.Map
             }
         }
 
-        public override float GetWallRelativeHeightForOrthographicView()
-        {
-            return _relativeHeight ?? 0;
-        }
-
         protected List<ToolStripMenuItem> GetWallToolStripMenuItems()
         {
             _itemShowArrows = new ToolStripMenuItem("Show Arrows");
@@ -228,8 +219,8 @@ namespace STROOP.Map
                 GetParentMapTracker().ApplySettings(settings);
             };
 
-            _itemSetRelativeHeight = new ToolStripMenuItem(SET_RELATIVE_HEIGHT_TEXT);
-            _itemSetRelativeHeight.Click += (sender, e) =>
+            ToolStripMenuItem itemSetRelativeHeight = new ToolStripMenuItem("Set Relative Height");
+            itemSetRelativeHeight.Click += (sender, e) =>
             {
                 string text = DialogUtilities.GetStringFromDialog(labelText: "Enter relative height of wall hitbox compared to wall triangle.");
                 float? relativeHeightNullable = ParsingUtilities.ParseFloatNullable(text);
@@ -247,8 +238,8 @@ namespace STROOP.Map
                 GetParentMapTracker().ApplySettings(settings);
             };
 
-            _itemSetAbsoluteHeight = new ToolStripMenuItem(SET_ABSOLUTE_HEIGHT_TEXT);
-            _itemSetAbsoluteHeight.Click += (sender, e) =>
+            ToolStripMenuItem itemSetAbsoluteHeight = new ToolStripMenuItem("Set Absolute Height");
+            itemSetAbsoluteHeight.Click += (sender, e) =>
             {
                 string text = DialogUtilities.GetStringFromDialog(labelText: "Enter the height at which you want to see the wall triangles.");
                 float? absoluteHeightNullable =
@@ -272,9 +263,9 @@ namespace STROOP.Map
             return new List<ToolStripMenuItem>()
             {
                 _itemShowArrows,
-                _itemSetRelativeHeight,
+                itemSetRelativeHeight,
                 itemClearRelativeHeight,
-                _itemSetAbsoluteHeight,
+                itemSetAbsoluteHeight,
                 itemClearAbsoluteHeight,
             };
         }
@@ -292,22 +283,18 @@ namespace STROOP.Map
             if (settings.WallChangeRelativeHeight)
             {
                 _relativeHeight = settings.WallNewRelativeHeight;
-                string suffix = _relativeHeight.HasValue ? string.Format(" ({0})", _relativeHeight.Value) : "";
-                _itemSetRelativeHeight.Text = SET_RELATIVE_HEIGHT_TEXT + suffix;
             }
 
             if (settings.WallChangeAbsoluteHeight)
             {
                 _absoluteHeight = settings.WallNewAbsoluteHeight;
-                string suffix = _absoluteHeight.HasValue ? string.Format(" ({0})", _absoluteHeight.Value) : "";
-                _itemSetAbsoluteHeight.Text = SET_ABSOLUTE_HEIGHT_TEXT + suffix;
             }
         }
 
         public override void DrawOn3DControl()
         {
             float relativeHeight = _relativeHeight ?? 0;
-            List<TriangleDataModel> tris = GetFilteredTriangles();
+            List<TriangleDataModel> tris = GetTrianglesWithinDist();
 
             List<List<(float x, float y, float z)>> centerSurfaces =
                 tris.ConvertAll(tri => tri.Get3DVertices()

@@ -23,7 +23,6 @@ namespace STROOP
         const int BorderSize = 2;
 
         ObjectSlotsManager _manager;
-        ObjectSlotManagerGui _gui;
 
         public int Index { get; private set; }
         public ObjectDataModel CurrentObject { get; set; }
@@ -76,14 +75,13 @@ namespace STROOP
             _drawClosestOverlay, _drawCameraOverlay, _drawCameraHackOverlay, _drawModelOverlay,
             _drawFloorOverlay, _drawWallOverlay, _drawCeilingOverlay,
             _drawParentOverlay, _drawParentUnusedOverlay, _drawParentNoneOverlay, _drawChildOverlay,
-            _drawCollision1Overlay, _drawCollision2Overlay, _drawCollision3Overlay, _drawCollision4Overlay, _drawHitboxOverlapOverlay,
+            _drawCollision1Overlay, _drawCollision2Overlay, _drawCollision3Overlay, _drawCollision4Overlay,
             _drawLockedOverlay, _drawLockDisabledOverlay;
         int? _drawMarkedOverlay;
 
-        public ObjectSlot(ObjectSlotsManager manager, int index, ObjectSlotManagerGui gui, Size size)
+        public ObjectSlot(ObjectSlotsManager manager, int index, Size size)
         {
             _manager = manager;
-            _gui = gui;
             Size = size;
             Index = index;
             Font = new Font(FontFamily.GenericSansSerif, 6);
@@ -118,14 +116,14 @@ namespace STROOP
             itemSelectInObjectTab.Click += (sender, e) =>
             {
                 Config.ObjectSlotsManager.DoSlotClickUsingSpecifications(
-                    this, ClickType.ObjectClick, false, false, Config.ObjectManager.Tab, null);
+                    this, ClickType.ObjectClick, false, false, StroopMainForm.instance.objectTab.Tab, null);
             };
 
             ToolStripMenuItem itemSelectInMemoryTab = new ToolStripMenuItem("Select in Memory Tab");
             itemSelectInMemoryTab.Click += (sender, e) =>
             {
                 Config.ObjectSlotsManager.DoSlotClickUsingSpecifications(
-                    this, ClickType.MemoryClick, false, false, Config.MemoryManager.Tab, null);
+                    this, ClickType.MemoryClick, false, false, StroopMainForm.instance.memoryTab.Tab, null);
             };
 
             ToolStripMenuItem itemSelectInCurrentTab = new ToolStripMenuItem("Select in Current Tab");
@@ -427,7 +425,6 @@ namespace STROOP
                 _drawCollision2Overlay,
                 _drawCollision3Overlay,
                 _drawCollision4Overlay,
-                _drawHitboxOverlapOverlay,
                 _drawMarkedOverlay,
                 _drawLockedOverlay,
                 _drawLockDisabledOverlay,
@@ -491,37 +488,37 @@ namespace STROOP
                 switch (_drawMarkedOverlay.Value)
                 {
                     case 1:
-                        e.Graphics.DrawImage(_gui.MarkedRedObjectOverlayImage, new Rectangle(new Point(), Size));
+                        e.Graphics.DrawImage(ObjectSlotManagerGui.MarkedRedObjectOverlayImage, new Rectangle(new Point(), Size));
                         break;
                     case 2:
-                        e.Graphics.DrawImage(_gui.MarkedOrangeObjectOverlayImage, new Rectangle(new Point(), Size));
+                        e.Graphics.DrawImage(ObjectSlotManagerGui.MarkedOrangeObjectOverlayImage, new Rectangle(new Point(), Size));
                         break;
                     case 3:
-                        e.Graphics.DrawImage(_gui.MarkedYellowObjectOverlayImage, new Rectangle(new Point(), Size));
+                        e.Graphics.DrawImage(ObjectSlotManagerGui.MarkedYellowObjectOverlayImage, new Rectangle(new Point(), Size));
                         break;
                     case 4:
-                        e.Graphics.DrawImage(_gui.MarkedGreenObjectOverlayImage, new Rectangle(new Point(), Size));
+                        e.Graphics.DrawImage(ObjectSlotManagerGui.MarkedGreenObjectOverlayImage, new Rectangle(new Point(), Size));
                         break;
                     case 5:
-                        e.Graphics.DrawImage(_gui.MarkedLightBlueObjectOverlayImage, new Rectangle(new Point(), Size));
+                        e.Graphics.DrawImage(ObjectSlotManagerGui.MarkedLightBlueObjectOverlayImage, new Rectangle(new Point(), Size));
                         break;
                     case 6:
-                        e.Graphics.DrawImage(_gui.MarkedBlueObjectOverlayImage, new Rectangle(new Point(), Size));
+                        e.Graphics.DrawImage(ObjectSlotManagerGui.MarkedBlueObjectOverlayImage, new Rectangle(new Point(), Size));
                         break;
                     case 7:
-                        e.Graphics.DrawImage(_gui.MarkedPurpleObjectOverlayImage, new Rectangle(new Point(), Size));
+                        e.Graphics.DrawImage(ObjectSlotManagerGui.MarkedPurpleObjectOverlayImage, new Rectangle(new Point(), Size));
                         break;
                     case 8:
-                        e.Graphics.DrawImage(_gui.MarkedPinkObjectOverlayImage, new Rectangle(new Point(), Size));
+                        e.Graphics.DrawImage(ObjectSlotManagerGui.MarkedPinkObjectOverlayImage, new Rectangle(new Point(), Size));
                         break;
                     case 9:
-                        e.Graphics.DrawImage(_gui.MarkedGreyObjectOverlayImage, new Rectangle(new Point(), Size));
+                        e.Graphics.DrawImage(ObjectSlotManagerGui.MarkedGreyObjectOverlayImage, new Rectangle(new Point(), Size));
                         break;
                     case 0:
-                        e.Graphics.DrawImage(_gui.MarkedWhiteObjectOverlayImage, new Rectangle(new Point(), Size));
+                        e.Graphics.DrawImage(ObjectSlotManagerGui.MarkedWhiteObjectOverlayImage, new Rectangle(new Point(), Size));
                         break;
                     case 10:
-                        e.Graphics.DrawImage(_gui.MarkedBlackObjectOverlayImage, new Rectangle(new Point(), Size));
+                        e.Graphics.DrawImage(ObjectSlotManagerGui.MarkedBlackObjectOverlayImage, new Rectangle(new Point(), Size));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -530,15 +527,15 @@ namespace STROOP
             switch (_selectionType)
             {
                 case SelectionType.NORMAL_SELECTION:
-                    e.Graphics.DrawImage(_gui.SelectedObjectOverlayImage, new Rectangle(new Point(), Size));
+                    e.Graphics.DrawImage(ObjectSlotManagerGui.SelectedObjectOverlayImage, new Rectangle(new Point(), Size));
                     break;
 
                 case SelectionType.MODEL_SELECTION:
-                    e.Graphics.DrawImage(_gui.ModelObjectOverlayImage, new Rectangle(new Point(), Size));
+                    e.Graphics.DrawImage(ObjectSlotManagerGui.ModelObjectOverlayImage, new Rectangle(new Point(), Size));
                     break;
 
                 case SelectionType.MAP_SELECTION:
-                    e.Graphics.DrawImage(_gui.TrackedAndShownObjectOverlayImage, new Rectangle(new Point(), Size));
+                    e.Graphics.DrawImage(ObjectSlotManagerGui.TrackedAndShownObjectOverlayImage, new Rectangle(new Point(), Size));
                     break;
 
                 case SelectionType.NOT_SELECTED:
@@ -549,49 +546,47 @@ namespace STROOP
                     throw new ArgumentOutOfRangeException();
             }
             if (_drawWallOverlay)
-                e.Graphics.DrawImage(_gui.WallObjectOverlayImage, new Rectangle(new Point(), Size));
+                e.Graphics.DrawImage(ObjectSlotManagerGui.WallObjectOverlayImage, new Rectangle(new Point(), Size));
             if (_drawFloorOverlay)
-                e.Graphics.DrawImage(_gui.FloorObjectOverlayImage, new Rectangle(new Point(), Size));
+                e.Graphics.DrawImage(ObjectSlotManagerGui.FloorObjectOverlayImage, new Rectangle(new Point(), Size));
             if (_drawCeilingOverlay)
-                e.Graphics.DrawImage(_gui.CeilingObjectOverlayImage, new Rectangle(new Point(), Size));
+                e.Graphics.DrawImage(ObjectSlotManagerGui.CeilingObjectOverlayImage, new Rectangle(new Point(), Size));
             if (_drawInteractionOverlay)
-                e.Graphics.DrawImage(_gui.InteractionObjectOverlayImage, new Rectangle(new Point(), Size));
+                e.Graphics.DrawImage(ObjectSlotManagerGui.InteractionObjectOverlayImage, new Rectangle(new Point(), Size));
             if (_drawHeldOverlay)
-                e.Graphics.DrawImage(_gui.HeldObjectOverlayImage, new Rectangle(new Point(), Size));
+                e.Graphics.DrawImage(ObjectSlotManagerGui.HeldObjectOverlayImage, new Rectangle(new Point(), Size));
             if (_drawStoodOnOverlay)
-                e.Graphics.DrawImage(_gui.StoodOnObjectOverlayImage, new Rectangle(new Point(), Size));
+                e.Graphics.DrawImage(ObjectSlotManagerGui.StoodOnObjectOverlayImage, new Rectangle(new Point(), Size));
             if (_drawRiddenOverlay)
-                e.Graphics.DrawImage(_gui.RiddenObjectOverlayImage, new Rectangle(new Point(), Size));
+                e.Graphics.DrawImage(ObjectSlotManagerGui.RiddenObjectOverlayImage, new Rectangle(new Point(), Size));
             if (_drawUsedOverlay)
-                e.Graphics.DrawImage(_gui.UsedObjectOverlayImage, new Rectangle(new Point(), Size));
+                e.Graphics.DrawImage(ObjectSlotManagerGui.UsedObjectOverlayImage, new Rectangle(new Point(), Size));
             if (_drawClosestOverlay)
-                e.Graphics.DrawImage(_gui.ClosestObjectOverlayImage, new Rectangle(new Point(), Size));
+                e.Graphics.DrawImage(ObjectSlotManagerGui.ClosestObjectOverlayImage, new Rectangle(new Point(), Size));
             if (_drawCameraOverlay)
-                e.Graphics.DrawImage(_gui.CameraObjectOverlayImage, new Rectangle(new Point(), Size));
+                e.Graphics.DrawImage(ObjectSlotManagerGui.CameraObjectOverlayImage, new Rectangle(new Point(), Size));
             if (_drawCameraHackOverlay)
-                e.Graphics.DrawImage(_gui.CameraHackObjectOverlayImage, new Rectangle(new Point(), Size));
+                e.Graphics.DrawImage(ObjectSlotManagerGui.CameraHackObjectOverlayImage, new Rectangle(new Point(), Size));
             if (_drawParentOverlay)
-                e.Graphics.DrawImage(_gui.ParentObjectOverlayImage, new Rectangle(new Point(), Size));
+                e.Graphics.DrawImage(ObjectSlotManagerGui.ParentObjectOverlayImage, new Rectangle(new Point(), Size));
             if (_drawParentUnusedOverlay)
-                e.Graphics.DrawImage(_gui.ParentUnusedObjectOverlayImage, new Rectangle(new Point(), Size));
+                e.Graphics.DrawImage(ObjectSlotManagerGui.ParentUnusedObjectOverlayImage, new Rectangle(new Point(), Size));
             if (_drawParentNoneOverlay)
-                e.Graphics.DrawImage(_gui.ParentNoneObjectOverlayImage, new Rectangle(new Point(), Size));
+                e.Graphics.DrawImage(ObjectSlotManagerGui.ParentNoneObjectOverlayImage, new Rectangle(new Point(), Size));
             if (_drawChildOverlay)
-                e.Graphics.DrawImage(_gui.ChildObjectOverlayImage, new Rectangle(new Point(), Size));
+                e.Graphics.DrawImage(ObjectSlotManagerGui.ChildObjectOverlayImage, new Rectangle(new Point(), Size));
             if (_drawCollision1Overlay)
-                e.Graphics.DrawImage(_gui.Collision1OverlayImage, new Rectangle(new Point(), Size));
+                e.Graphics.DrawImage(ObjectSlotManagerGui.Collision1OverlayImage, new Rectangle(new Point(), Size));
             if (_drawCollision2Overlay)
-                e.Graphics.DrawImage(_gui.Collision2OverlayImage, new Rectangle(new Point(), Size));
+                e.Graphics.DrawImage(ObjectSlotManagerGui.Collision2OverlayImage, new Rectangle(new Point(), Size));
             if (_drawCollision3Overlay)
-                e.Graphics.DrawImage(_gui.Collision3OverlayImage, new Rectangle(new Point(), Size));
+                e.Graphics.DrawImage(ObjectSlotManagerGui.Collision3OverlayImage, new Rectangle(new Point(), Size));
             if (_drawCollision4Overlay)
-                e.Graphics.DrawImage(_gui.Collision4OverlayImage, new Rectangle(new Point(), Size));
-            if (_drawHitboxOverlapOverlay)
-                e.Graphics.DrawImage(_gui.HitboxOverlapImage, new Rectangle(new Point(), Size));
+                e.Graphics.DrawImage(ObjectSlotManagerGui.Collision4OverlayImage, new Rectangle(new Point(), Size));
             if (_drawLockedOverlay)
-                e.Graphics.DrawImage(_gui.LockedOverlayImage, new Rectangle(new Point(), Size));
+                e.Graphics.DrawImage(ObjectSlotManagerGui.LockedOverlayImage, new Rectangle(new Point(), Size));
             if (_drawLockDisabledOverlay)
-                e.Graphics.DrawImage(_gui.LockDisabledOverlayImage, new Rectangle(new Point(), Size));
+                e.Graphics.DrawImage(ObjectSlotManagerGui.LockDisabledOverlayImage, new Rectangle(new Point(), Size));
         }
 
         public void Update(ObjectDataModel obj)
@@ -613,7 +608,7 @@ namespace STROOP
                 _drawClosestOverlay = OverlayConfig.ShowOverlayClosestObject && address == DataModels.Mario.ClosestObject;
                 _drawCameraOverlay = OverlayConfig.ShowOverlayCameraObject && address == DataModels.Camera.SecondaryObject;
                 _drawCameraHackOverlay = OverlayConfig.ShowOverlayCameraHackObject && address == DataModels.Camera.HackObject;
-                _drawModelOverlay = address == Config.ModelManager.ModelObjectAddress;
+                _drawModelOverlay = address == StroopMainForm.instance.modelTab.ModelObjectAddress;
                 _drawWallOverlay = OverlayConfig.ShowOverlayWallObject && address == DataModels.Mario.WallTriangle?.AssociatedObject;
                 _drawFloorOverlay = OverlayConfig.ShowOverlayFloorObject && address == DataModels.Mario.FloorTriangle?.AssociatedObject;
                 _drawCeilingOverlay = OverlayConfig.ShowOverlayCeilingObject && address == DataModels.Mario.CeilingTriangle?.AssociatedObject;
@@ -652,9 +647,6 @@ namespace STROOP
                     address == ObjectUtilities.GetCollisionObject(collisionObjAddress, 3);
                 _drawCollision4Overlay = OverlayConfig.ShowOverlayCollisionObject && 
                     address == ObjectUtilities.GetCollisionObject(collisionObjAddress, 4);
-
-                _drawHitboxOverlapOverlay = OverlayConfig.ShowOverlayHitboxOverlapObject &&
-                    WatchVariableSpecialUtilities.IsMarioHitboxOverlapping(address.Value) != 0;
 
                 _drawMarkedOverlay = _manager.MarkedSlotsAddressesDictionary.ContainsKey(address.Value) ?
                     _manager.MarkedSlotsAddressesDictionary[address.Value] : (int?)null;
@@ -701,7 +693,6 @@ namespace STROOP
                 _drawCollision2Overlay = false;
                 _drawCollision3Overlay = false;
                 _drawCollision4Overlay = false;
-                _drawHitboxOverlapOverlay = false;
                 _drawMarkedOverlay = null;
                 _drawLockedOverlay = false;
                 _drawLockDisabledOverlay = false;
@@ -718,7 +709,7 @@ namespace STROOP
                     break;
 
                 case TabType.Model:
-                    selectionType = CurrentObject?.Address == Config.ModelManager.ModelObjectAddress
+                    selectionType = CurrentObject?.Address == StroopMainForm.instance.modelTab.ModelObjectAddress
                         ? SelectionType.MODEL_SELECTION : SelectionType.NOT_SELECTED;
                     break;
 
@@ -733,7 +724,7 @@ namespace STROOP
             }
 
             Color mainColor =
-                (SlotLabelType)Config.ObjectSlotManagerGui.LabelMethodComboBox.SelectedItem == SlotLabelType.RngUsage ?
+                (SlotLabelType)StroopMainForm.instance.comboBoxLabelMethod.SelectedItem == SlotLabelType.RngUsage ?
                 ObjectRngUtilities.GetColor(CurrentObject) :
                 ObjectSlotsConfig.GetProcessingGroupColor(CurrentObject?.CurrentProcessGroup);
             Color textColor = _manager.LabelsLocked ? Color.Blue : Color.Black;

@@ -17,6 +17,8 @@ namespace STROOP.Map
 {
     public abstract class MapObject
     {
+        public delegate IEnumerable<PositionAngle> PositionAngleProvider();
+
         public float Size = 25;
         public double Opacity = 1;
         public byte OpacityByte
@@ -51,21 +53,7 @@ namespace STROOP.Map
         {
         }
 
-        public void DrawOn2DControl()
-        {
-            if (Config.MapGui.checkBoxMapOptionsEnableOrthographicView.Checked)
-            {
-                DrawOn2DControlOrthographicView();
-            }
-            else
-            {
-                DrawOn2DControlTopDownView();
-            }
-        }
-
-        public abstract void DrawOn2DControlTopDownView();
-
-        public abstract void DrawOn2DControlOrthographicView();
+        public abstract void DrawOn2DControl();
 
         public abstract void DrawOn3DControl();
 
@@ -129,6 +117,7 @@ namespace STROOP.Map
         {
             return null;
         }
+        public virtual PositionAngleProvider GetPositionAngleProvider() => null;
 
         public virtual ObjectDataModel GetObject()
         {
@@ -172,7 +161,7 @@ namespace STROOP.Map
 
         protected MapTracker GetParentMapTracker()
         {
-            foreach (MapTracker mapTracker in Config.MapGui.flowLayoutPanelMapTrackers.Controls)
+            foreach (MapTracker mapTracker in StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.Controls)
             {
                 if (mapTracker.ContainsMapObject(this)) return mapTracker;
             }

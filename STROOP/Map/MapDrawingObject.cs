@@ -34,7 +34,7 @@ namespace STROOP.Map
             _mouseIsDown = false;
         }
 
-        protected override List<(float x, float y, float z)> GetVerticesTopDownView()
+        protected override List<(float x, float y, float z)> GetVertices()
         {
             return _vertices;
         }
@@ -58,7 +58,7 @@ namespace STROOP.Map
                 {
                     _drawingEnabled = !_drawingEnabled;
                     itemEnableDrawing.Checked = _drawingEnabled;
-                    Config.MapManager.NotifyDrawingEnabledChange(_drawingEnabled);
+                    StroopMainForm.instance.mapTab.NotifyDrawingEnabledChange(_drawingEnabled);
                 };
 
                 ToolStripMenuItem itemClearDrawing = new ToolStripMenuItem("Clear Drawing");
@@ -105,7 +105,7 @@ namespace STROOP.Map
             if (_drawingEnabled)
             {
                 _drawingEnabled = false;
-                Config.MapManager.NotifyDrawingEnabledChange(_drawingEnabled);
+                StroopMainForm.instance.mapTab.NotifyDrawingEnabledChange(_drawingEnabled);
             }
         }
     }

@@ -41,7 +41,7 @@ namespace STROOP
 
         public void UpdateButton()
         {
-            bool isSecondary = _isSecondaryFunction();
+            bool isSecondary = _isSecondaryFunction?.Invoke() ?? false;
             _isSecondary = isSecondary;
             base.Text = isSecondary ? _secondaryText : _primaryText;
         }

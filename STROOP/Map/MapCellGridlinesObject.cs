@@ -21,7 +21,7 @@ namespace STROOP.Map
             OutlineColor = Color.Black;
         }
 
-        protected override List<(float x, float y, float z)> GetVerticesTopDownView()
+        protected List<(float x, float y, float z)> GetVerticesTopDownView()
         {
             float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
 
@@ -47,6 +47,11 @@ namespace STROOP.Map
         public override Image GetInternalImage()
         {
             return Config.ObjectAssociations.CellGridlinesImage;
+        }
+
+        protected override List<(float x, float y, float z)> GetVertices()
+        {
+            throw new NotImplementedException();
         }
     }
 }

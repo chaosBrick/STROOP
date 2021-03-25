@@ -16,11 +16,9 @@ namespace STROOP.Structs
         {
             _dictionary = new Dictionary<string, (Func<uint, object>, Func<object, uint, bool>)>();
         }
+        public bool TryGetValue(string key, out (Func<uint, object>, Func<object, uint, bool>) getterSetter) =>
+            _dictionary.TryGetValue(key, out getterSetter);
 
-        public bool ContainsKey(string key)
-        {
-            return _dictionary.ContainsKey(key);
-        }
 
         public (Func<uint, object>, Func<object, uint, bool>) Get(string key)
         {

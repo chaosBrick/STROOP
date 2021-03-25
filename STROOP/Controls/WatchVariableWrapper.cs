@@ -150,7 +150,7 @@ namespace STROOP.Controls
 
             ToolStripMenuItem itemAddToCustomTab = new ToolStripMenuItem("Add to Custom Tab");
             itemAddToCustomTab.Click += (sender, e) =>
-                _watchVarControl.AddToTab(Config.CustomManager);
+                _watchVarControl.AddToTab(StroopMainForm.instance.customTab.watchVariablePanelCustom);
 
             _contextMenuStrip.AddToEndingList(new ToolStripSeparator());
             _contextMenuStrip.AddToEndingList(itemOpenController);
@@ -190,7 +190,7 @@ namespace STROOP.Controls
                     type: WatchVar.GetTypeDescription(),
                     baseTypeOffset: WatchVar.GetBaseTypeOffsetDescription(),
                     n64BaseAddress: WatchVar.GetBaseAddressListString(_watchVarControl.FixedAddressListGetter()),
-                    emulatorBaseAddress: WatchVar.GetProcessBaseAddressListString(_watchVarControl.FixedAddressListGetter()),
+                    emulatorBaseAddress: WatchVar.GetProcessAddressListString(_watchVarControl.FixedAddressListGetter()),
                     n64Address: WatchVar.GetRamAddressListString(true, _watchVarControl.FixedAddressListGetter()),
                     emulatorAddress: WatchVar.GetProcessAddressListString(_watchVarControl.FixedAddressListGetter()));
             varInfo.Show();
@@ -205,7 +205,7 @@ namespace STROOP.Controls
                 WatchVar.GetTypeDescription(),
                 WatchVar.GetBaseTypeOffsetDescription(),
                 WatchVar.GetBaseAddressListString(_watchVarControl.FixedAddressListGetter()),
-                WatchVar.GetProcessBaseAddressListString(_watchVarControl.FixedAddressListGetter()),
+                WatchVar.GetProcessAddressListString(_watchVarControl.FixedAddressListGetter()),
                 WatchVar.GetRamAddressListString(true, _watchVarControl.FixedAddressListGetter()),
                 WatchVar.GetProcessAddressListString(_watchVarControl.FixedAddressListGetter()),
             };
@@ -259,8 +259,8 @@ namespace STROOP.Controls
             if (addressList.Count == 0) return;
             uint address = addressList[0];
             Config.TabControlMain.SelectedTab = Config.TabControlMain.TabPages["tabPageMemory"];
-            Config.MemoryManager.SetCustomAddress(address);
-            Config.MemoryManager.UpdateHexDisplay();
+            StroopMainForm.instance.memoryTab.SetCustomAddress(address);
+            StroopMainForm.instance.memoryTab.UpdateHexDisplay();
         }
 
         public CheckState GetLockedCheckState(List<uint> addresses = null)

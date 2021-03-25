@@ -151,9 +151,6 @@ namespace STROOP.Utilities
                     case "UseExpandedRamSize":
                         SavedSettingsConfig.UseExpandedRamSize = bool.Parse(element.Value);
                         break;
-                    case "DoQuickStartup":
-                        SavedSettingsConfig.DoQuickStartup = bool.Parse(element.Value);
-                        break;
 
                     case "TabOrder":
                         {
@@ -215,7 +212,7 @@ namespace STROOP.Utilities
             return objectData;
         }
 
-        public static ObjectAssociations OpenObjectAssoc(string path, ObjectSlotManagerGui objectSlotManagerGui)
+        public static ObjectAssociations OpenObjectAssoc(string path)
         {
             var assoc = new ObjectAssociations();
             var assembly = Assembly.GetExecutingAssembly();
@@ -244,7 +241,7 @@ namespace STROOP.Utilities
                 usedOverlayImagePath = "", closestOverlayImagePath = "", cameraOverlayImagePath = "", cameraHackOverlayImagePath = "",
                 modelOverlayImagePath = "", floorOverlayImagePath = "", wallOverlayImagePath = "", ceilingOverlayImagePath = "",
                 parentOverlayImagePath = "", parentUnusedOverlayImagePath = "", parentNoneOverlayImagePath = "", childOverlayImagePath = "",
-                collision1OverlayImagePath = "", collision2OverlayImagePath = "", collision3OverlayImagePath = "", collision4OverlayImagePath = "", hitboxOverlapImagePath = "",
+                collision1OverlayImagePath = "", collision2OverlayImagePath = "", collision3OverlayImagePath = "", collision4OverlayImagePath = "",
                 markedRedOverlayImagePath = "", markedOrangeOverlayImagePath = "", markedYellowOverlayImagePath = "", markedGreenOverlayImagePath = "",
                 markedLightBlueOverlayImagePath = "", markedBlueOverlayImagePath = "", markedPurpleOverlayImagePath = "", markedPinkOverlayImagePath = "",
                 markedGreyOverlayImagePath = "", markedWhiteOverlayImagePath = "", markedBlackOverlayImagePath = "",
@@ -501,10 +498,6 @@ namespace STROOP.Utilities
                                     collision4OverlayImagePath = subElement.Element(XName.Get("OverlayImage")).Attribute(XName.Get("path")).Value;
                                     break;
 
-                                case "HitboxOverlap":
-                                    hitboxOverlapImagePath = subElement.Element(XName.Get("OverlayImage")).Attribute(XName.Get("path")).Value;
-                                    break;
-
                                 case "MarkedRed":
                                     markedRedOverlayImagePath = subElement.Element(XName.Get("OverlayImage")).Attribute(XName.Get("path")).Value;
                                     break;
@@ -598,18 +591,6 @@ namespace STROOP.Utilities
                             rotates = bool.Parse(element.Element(XName.Get("MapImage")).Attribute(XName.Get("rotates")).Value);
                         }
 
-                        PushHitbox pushHitbox = null;
-                        var pushHitboxElement = element.Element(XName.Get("PushHitbox"));
-                        if (pushHitboxElement != null)
-                        {
-                            int? padding = ParsingUtilities.ParseIntNullable(pushHitboxElement.Attribute(XName.Get("padding"))?.Value);
-                            int? radius = ParsingUtilities.ParseIntNullable(pushHitboxElement.Attribute(XName.Get("radius"))?.Value);
-                            int? extentY = ParsingUtilities.ParseIntNullable(pushHitboxElement.Attribute(XName.Get("extentY"))?.Value);
-                            bool isKoopaTheQuick = ParsingUtilities.ParseBoolNullable(pushHitboxElement.Attribute(XName.Get("isKoopaTheQuick"))?.Value) ?? false;
-                            bool isRacingPenguin = ParsingUtilities.ParseBoolNullable(pushHitboxElement.Attribute(XName.Get("isRacingPenguin"))?.Value) ?? false;
-                            pushHitbox = new PushHitbox(padding, radius, extentY, isKoopaTheQuick, isRacingPenguin);
-                        }
-
                         List<WatchVariableControlPrecursor> precursors = new List<WatchVariableControlPrecursor>();
                         foreach (var subElement in element.Elements().Where(x => x.Name == "Data"))
                         {
@@ -631,7 +612,6 @@ namespace STROOP.Utilities
                             MapImagePath = mapImagePath,
                             Name = name,
                             RotatesOnMap = rotates,
-                            PushHitbox = pushHitbox,
                             Precursors = precursors,
                         };
 
@@ -684,59 +664,66 @@ namespace STROOP.Utilities
 
             assoc.MarioBehavior = marioBehavior;
 
-            objectSlotManagerGui.SelectedObjectOverlayImage = Image.FromFile(overlayImageDir + selectedOverlayImagePath);
-            objectSlotManagerGui.TrackedAndShownObjectOverlayImage = Image.FromFile(overlayImageDir + trackedAndShownOverlayImagePath);
-            objectSlotManagerGui.TrackedNotShownObjectOverlayImage = Image.FromFile(overlayImageDir + trackedNotShownOverlayImagePath);
-            objectSlotManagerGui.StoodOnObjectOverlayImage = Image.FromFile(overlayImageDir + stoodOnOverlayImagePath);
-            objectSlotManagerGui.RiddenObjectOverlayImage = Image.FromFile(overlayImageDir + riddenOverlayImagePath);
-            objectSlotManagerGui.HeldObjectOverlayImage = Image.FromFile(overlayImageDir + heldOverlayImagePath);
-            objectSlotManagerGui.InteractionObjectOverlayImage = Image.FromFile(overlayImageDir + interactionOverlayImagePath);
-            objectSlotManagerGui.UsedObjectOverlayImage = Image.FromFile(overlayImageDir + usedOverlayImagePath);
-            objectSlotManagerGui.ClosestObjectOverlayImage = Image.FromFile(overlayImageDir + closestOverlayImagePath);
-            objectSlotManagerGui.CameraObjectOverlayImage = Image.FromFile(overlayImageDir + cameraOverlayImagePath);
-            objectSlotManagerGui.CameraHackObjectOverlayImage = Image.FromFile(overlayImageDir + cameraHackOverlayImagePath);
-            objectSlotManagerGui.ModelObjectOverlayImage = Image.FromFile(overlayImageDir + modelOverlayImagePath);
-            objectSlotManagerGui.FloorObjectOverlayImage = Image.FromFile(overlayImageDir + floorOverlayImagePath);
-            objectSlotManagerGui.WallObjectOverlayImage = Image.FromFile(overlayImageDir + wallOverlayImagePath);
-            objectSlotManagerGui.CeilingObjectOverlayImage = Image.FromFile(overlayImageDir + ceilingOverlayImagePath);
-            objectSlotManagerGui.ParentObjectOverlayImage = Image.FromFile(overlayImageDir + parentOverlayImagePath);
-            objectSlotManagerGui.ParentUnusedObjectOverlayImage = Image.FromFile(overlayImageDir + parentUnusedOverlayImagePath);
-            objectSlotManagerGui.ParentNoneObjectOverlayImage = Image.FromFile(overlayImageDir + parentNoneOverlayImagePath);
-            objectSlotManagerGui.ChildObjectOverlayImage = Image.FromFile(overlayImageDir + childOverlayImagePath);
-            objectSlotManagerGui.Collision1OverlayImage = Image.FromFile(overlayImageDir + collision1OverlayImagePath);
-            objectSlotManagerGui.Collision2OverlayImage = Image.FromFile(overlayImageDir + collision2OverlayImagePath);
-            objectSlotManagerGui.Collision3OverlayImage = Image.FromFile(overlayImageDir + collision3OverlayImagePath);
-            objectSlotManagerGui.Collision4OverlayImage = Image.FromFile(overlayImageDir + collision4OverlayImagePath);
-            objectSlotManagerGui.HitboxOverlapImage = Image.FromFile(overlayImageDir + hitboxOverlapImagePath);
-            objectSlotManagerGui.MarkedRedObjectOverlayImage = Image.FromFile(overlayImageDir + markedRedOverlayImagePath);
-            objectSlotManagerGui.MarkedOrangeObjectOverlayImage = Image.FromFile(overlayImageDir + markedOrangeOverlayImagePath);
-            objectSlotManagerGui.MarkedYellowObjectOverlayImage = Image.FromFile(overlayImageDir + markedYellowOverlayImagePath);
-            objectSlotManagerGui.MarkedGreenObjectOverlayImage = Image.FromFile(overlayImageDir + markedGreenOverlayImagePath);
-            objectSlotManagerGui.MarkedLightBlueObjectOverlayImage = Image.FromFile(overlayImageDir + markedLightBlueOverlayImagePath);
-            objectSlotManagerGui.MarkedBlueObjectOverlayImage = Image.FromFile(overlayImageDir + markedBlueOverlayImagePath);
-            objectSlotManagerGui.MarkedPurpleObjectOverlayImage = Image.FromFile(overlayImageDir + markedPurpleOverlayImagePath);
-            objectSlotManagerGui.MarkedPinkObjectOverlayImage = Image.FromFile(overlayImageDir + markedPinkOverlayImagePath);
-            objectSlotManagerGui.MarkedGreyObjectOverlayImage = Image.FromFile(overlayImageDir + markedGreyOverlayImagePath);
-            objectSlotManagerGui.MarkedWhiteObjectOverlayImage = Image.FromFile(overlayImageDir + markedWhiteOverlayImagePath);
-            objectSlotManagerGui.MarkedBlackObjectOverlayImage = Image.FromFile(overlayImageDir + markedBlackOverlayImagePath);
-            objectSlotManagerGui.LockedOverlayImage = Image.FromFile(overlayImageDir + lockedImagePath);
-            objectSlotManagerGui.LockDisabledOverlayImage = Image.FromFile(overlayImageDir + lockDisabledImagePath);
+            ObjectSlotManagerGui.SelectedObjectOverlayImage = Image.FromFile(overlayImageDir + selectedOverlayImagePath);
+            ObjectSlotManagerGui.TrackedAndShownObjectOverlayImage = Image.FromFile(overlayImageDir + trackedAndShownOverlayImagePath);
+            ObjectSlotManagerGui.TrackedNotShownObjectOverlayImage = Image.FromFile(overlayImageDir + trackedNotShownOverlayImagePath);
+            ObjectSlotManagerGui.StoodOnObjectOverlayImage = Image.FromFile(overlayImageDir + stoodOnOverlayImagePath);
+            ObjectSlotManagerGui.RiddenObjectOverlayImage = Image.FromFile(overlayImageDir + riddenOverlayImagePath);
+            ObjectSlotManagerGui.HeldObjectOverlayImage = Image.FromFile(overlayImageDir + heldOverlayImagePath);
+            ObjectSlotManagerGui.InteractionObjectOverlayImage = Image.FromFile(overlayImageDir + interactionOverlayImagePath);
+            ObjectSlotManagerGui.UsedObjectOverlayImage = Image.FromFile(overlayImageDir + usedOverlayImagePath);
+            ObjectSlotManagerGui.ClosestObjectOverlayImage = Image.FromFile(overlayImageDir + closestOverlayImagePath);
+            ObjectSlotManagerGui.CameraObjectOverlayImage = Image.FromFile(overlayImageDir + cameraOverlayImagePath);
+            ObjectSlotManagerGui.CameraHackObjectOverlayImage = Image.FromFile(overlayImageDir + cameraHackOverlayImagePath);
+            ObjectSlotManagerGui.ModelObjectOverlayImage = Image.FromFile(overlayImageDir + modelOverlayImagePath);
+            ObjectSlotManagerGui.FloorObjectOverlayImage = Image.FromFile(overlayImageDir + floorOverlayImagePath);
+            ObjectSlotManagerGui.WallObjectOverlayImage = Image.FromFile(overlayImageDir + wallOverlayImagePath);
+            ObjectSlotManagerGui.CeilingObjectOverlayImage = Image.FromFile(overlayImageDir + ceilingOverlayImagePath);
+            ObjectSlotManagerGui.ParentObjectOverlayImage = Image.FromFile(overlayImageDir + parentOverlayImagePath);
+            ObjectSlotManagerGui.ParentUnusedObjectOverlayImage = Image.FromFile(overlayImageDir + parentUnusedOverlayImagePath);
+            ObjectSlotManagerGui.ParentNoneObjectOverlayImage = Image.FromFile(overlayImageDir + parentNoneOverlayImagePath);
+            ObjectSlotManagerGui.ChildObjectOverlayImage = Image.FromFile(overlayImageDir + childOverlayImagePath);
+            ObjectSlotManagerGui.Collision1OverlayImage = Image.FromFile(overlayImageDir + collision1OverlayImagePath);
+            ObjectSlotManagerGui.Collision2OverlayImage = Image.FromFile(overlayImageDir + collision2OverlayImagePath);
+            ObjectSlotManagerGui.Collision3OverlayImage = Image.FromFile(overlayImageDir + collision3OverlayImagePath);
+            ObjectSlotManagerGui.Collision4OverlayImage = Image.FromFile(overlayImageDir + collision4OverlayImagePath);
+            ObjectSlotManagerGui.MarkedRedObjectOverlayImage = Image.FromFile(overlayImageDir + markedRedOverlayImagePath);
+            ObjectSlotManagerGui.MarkedOrangeObjectOverlayImage = Image.FromFile(overlayImageDir + markedOrangeOverlayImagePath);
+            ObjectSlotManagerGui.MarkedYellowObjectOverlayImage = Image.FromFile(overlayImageDir + markedYellowOverlayImagePath);
+            ObjectSlotManagerGui.MarkedGreenObjectOverlayImage = Image.FromFile(overlayImageDir + markedGreenOverlayImagePath);
+            ObjectSlotManagerGui.MarkedLightBlueObjectOverlayImage = Image.FromFile(overlayImageDir + markedLightBlueOverlayImagePath);
+            ObjectSlotManagerGui.MarkedBlueObjectOverlayImage = Image.FromFile(overlayImageDir + markedBlueOverlayImagePath);
+            ObjectSlotManagerGui.MarkedPurpleObjectOverlayImage = Image.FromFile(overlayImageDir + markedPurpleOverlayImagePath);
+            ObjectSlotManagerGui.MarkedPinkObjectOverlayImage = Image.FromFile(overlayImageDir + markedPinkOverlayImagePath);
+            ObjectSlotManagerGui.MarkedGreyObjectOverlayImage = Image.FromFile(overlayImageDir + markedGreyOverlayImagePath);
+            ObjectSlotManagerGui.MarkedWhiteObjectOverlayImage = Image.FromFile(overlayImageDir + markedWhiteOverlayImagePath);
+            ObjectSlotManagerGui.MarkedBlackObjectOverlayImage = Image.FromFile(overlayImageDir + markedBlackOverlayImagePath);
+            ObjectSlotManagerGui.LockedOverlayImage = Image.FromFile(overlayImageDir + lockedImagePath);
+            ObjectSlotManagerGui.LockDisabledOverlayImage = Image.FromFile(overlayImageDir + lockDisabledImagePath);
 
             foreach (var obj in assoc.BehaviorAssociations)
             {
                 if (obj.ImagePath == null || obj.ImagePath == "")
                     continue;
 
-                obj.Image = new LazyImage(imageDir + obj.ImagePath);
+                using (var preLoad = Image.FromFile(imageDir + obj.ImagePath))
+                {
+                    float scale = Math.Max(preLoad.Height / 128f, preLoad.Width / 128f);
+                    obj.Image = new Bitmap(preLoad, new Size((int)(preLoad.Width / scale), (int)(preLoad.Height / scale)));
+                }
                 if (obj.MapImagePath == "" || obj.MapImagePath == null)
                 {
                     obj.MapImage = obj.Image;
                 }
                 else
                 {
-                    obj.MapImage = new LazyImage(mapImageDir + obj.MapImagePath);
+                    using (var preLoad = Image.FromFile(mapImageDir + obj.MapImagePath))
+                    {
+                        float scale = Math.Max(preLoad.Height / 128f, preLoad.Width / 128f);
+                        obj.MapImage = new Bitmap(preLoad, new Size((int)(preLoad.Width / scale), (int)(preLoad.Height / scale)));
+                    }
                 }
-                obj.TransparentImage = new LazyImage(obj.Image, 0.5f);
+                obj.TransparentImage = obj.Image.GetOpaqueImage(0.5f);
             }
 
             return assoc;
@@ -1610,12 +1597,7 @@ namespace STROOP.Utilities
 
             return pendulumSwingTable;
         }
-
-        public static PendulumVertexTable OpenPendulumVertexTable(string path)
-        {
-            return null;
-        }
-
+        
         public static WaypointTable OpenWaypointTable(string path)
         {
             var assembly = Assembly.GetExecutingAssembly();

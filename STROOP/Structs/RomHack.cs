@@ -17,10 +17,16 @@ namespace STROOP.Structs
         List<Tuple<uint, byte[]>> _payload = new List<Tuple<uint, byte[]>>();
         List<Tuple<uint, byte[]>> _originalMemory = new List<Tuple<uint, byte[]>>();
 
+        public void AddPayload(uint address, byte[] newPayload)
+        {
+            _payload.Add(new Tuple<uint, byte[]>(address, newPayload));
+        }
+
         public RomHack(string hackFileName, string hackName)
         {
             Name = hackName;
-            LoadHackFromFile(hackFileName);
+            if (File.Exists(hackFileName))
+                LoadHackFromFile(hackFileName);
         }
 
         void LoadHackFromFile(string hackFileName)

@@ -32,7 +32,7 @@ namespace STROOP.Controls
                 uint? uintValueNullable = ParsingUtilities.ParseUIntNullable(value);
                 if (!uintValueNullable.HasValue) return;
                 uint uintValue = uintValueNullable.Value;
-                Config.TriangleManager.SetCustomTriangleAddresses(uintValue);
+                StroopMainForm.instance.trianglesTab.SetCustomTriangleAddresses(uintValue);
             };
 
             _contextMenuStrip.AddToBeginningList(new ToolStripSeparator());

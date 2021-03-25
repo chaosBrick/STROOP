@@ -82,13 +82,13 @@ namespace STROOP.Structs
                     }
 
                 case BaseAddressTypeEnum.File:
-                    return new List<uint> { Config.FileManager.CurrentFileAddress };
+                    return new List<uint> { FileConfig.CurrentFileAddress };
 
                 case BaseAddressTypeEnum.MainSave:
-                    return new List<uint> { Config.MainSaveManager.CurrentMainSaveAddress };
+                    return new List<uint> { MainSaveConfig.CurrentMainSaveAddress };
 
                 case BaseAddressTypeEnum.Object:
-                    return Config.ObjectSlotsManager.SelectedSlotsAddresses;
+                    return Config.ObjectSlotsManager.SelectedSlotsAddresses.ToList();
 
                 case BaseAddressTypeEnum.ProcessGroup:
                     return Config.ObjectSlotsManager.SelectedObjects.ConvertAll(
@@ -96,9 +96,9 @@ namespace STROOP.Structs
 
                 case BaseAddressTypeEnum.Triangle:
                     {
-                        List<uint> triangleAddresses = Config.TriangleManager.TriangleAddresses;
+                        List<uint> triangleAddresses = StroopMainForm.instance.trianglesTab.TriangleAddresses;
                         if (triangleAddresses.Count == 1 && triangleAddresses[0] == 0) return BaseAddressListEmpty;
-                        return triangleAddresses;
+                        return StroopMainForm.instance.trianglesTab.TriangleAddresses;
                     }
 
                 case BaseAddressTypeEnum.TriangleExertionForceTable:
@@ -111,7 +111,7 @@ namespace STROOP.Structs
 
                 case BaseAddressTypeEnum.CellsTriangle:
                     {
-                        uint triangleAddress = Config.CellsManager.TriangleAddress;
+                        uint triangleAddress = StroopMainForm.instance.cellsTab.TriangleAddress;
                         return triangleAddress != 0 ? new List<uint>() { triangleAddress } : BaseAddressListEmpty;
                     }
 
@@ -172,31 +172,17 @@ namespace STROOP.Structs
                     return new List<uint> { Config.Stream.GetUInt32(SnowConfig.SnowArrayPointerAddress) };
 
                 case BaseAddressTypeEnum.Area:
-                    return new List<uint> { Config.AreaManager.SelectedAreaAddress };
-
-                case BaseAddressTypeEnum.Whirlpool1:
-                    {
-                        uint whirlpoolArrayAddress = Config.Stream.GetUInt32(Config.AreaManager.SelectedAreaAddress + 0x2C);
-                        if (whirlpoolArrayAddress == 0) return BaseAddressListEmpty;
-                        return new List<uint>() { whirlpoolArrayAddress + 0x00 };
-                    }
-
-                case BaseAddressTypeEnum.Whirlpool2:
-                    {
-                        uint whirlpoolArrayAddress = Config.Stream.GetUInt32(Config.AreaManager.SelectedAreaAddress + 0x2C);
-                        if (whirlpoolArrayAddress == 0) return BaseAddressListEmpty;
-                        return new List<uint>() { whirlpoolArrayAddress + 0x08 };
-                    }
+                    return new List<uint> { AreaConfig.SelectedAreaAddress };
 
                 case BaseAddressTypeEnum.Painting:
                     {
-                        uint? paintingAddress = Config.PaintingManager.GetPaintingAddress();
+                        uint? paintingAddress = StroopMainForm.instance.paintingTab.GetPaintingAddress();
                         return paintingAddress != null ? new List<uint>() { paintingAddress.Value } : BaseAddressListEmpty;
                     }
 
                 case BaseAddressTypeEnum.Music:
                     {
-                        uint? musicAddress = Config.MusicManager.GetMusicAddress();
+                        uint? musicAddress = StroopMainForm.instance.musicTab.GetMusicAddress();
                         return musicAddress != null ? new List<uint>() { musicAddress.Value } : BaseAddressListEmpty;
                     }
 
@@ -219,7 +205,7 @@ namespace STROOP.Structs
 
                 case BaseAddressTypeEnum.GfxNode:
                     {
-                        GfxNode node  = Config.GfxManager.SelectedNode;
+                        Tabs.GfxTab.GfxNode node = StroopMainForm.instance.gfxTab.SelectedNode;
                         return node != null ? new List<uint>() { node.Address } : BaseAddressListEmpty;
                     }
                 case BaseAddressTypeEnum.GhostHack:

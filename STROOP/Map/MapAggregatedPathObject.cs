@@ -21,10 +21,10 @@ namespace STROOP.Map
         {
         }
 
-        public override void DrawOn2DControlTopDownView()
+        public override void DrawOn2DControl()
         {
             List<MapPathObject> paths = new List<MapPathObject>();
-            foreach (MapTracker mapTracker in Config.MapGui.flowLayoutPanelMapTrackers.Controls)
+            foreach (MapTracker mapTracker in StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.Controls)
             {
                 paths.AddRange(mapTracker.GetMapPathObjects());
             }
@@ -50,11 +50,6 @@ namespace STROOP.Map
                 }
             }
             GL.Color4(1, 1, 1, 1.0f);
-        }
-
-        public override void DrawOn2DControlOrthographicView()
-        {
-            // do nothing
         }
 
         public override void DrawOn3DControl()

@@ -22,7 +22,7 @@ namespace STROOP.Map
             OutlineColor = Color.Black;
         }
 
-        protected override List<(float x, float y, float z)> GetVerticesTopDownView()
+        protected override List<(float x, float y, float z)> GetVertices()
         {
             // failsafe to prevent filling the whole screen
             if (!MapUtilities.IsAbleToShowUnitPrecision())
@@ -32,10 +32,10 @@ namespace STROOP.Map
 
             float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
 
-            int xMin = (int)Config.CurrentMapGraphics.MapViewXMin - 1;
-            int xMax = (int)Config.CurrentMapGraphics.MapViewXMax + 1;
-            int zMin = (int)Config.CurrentMapGraphics.MapViewZMin - 1;
-            int zMax = (int)Config.CurrentMapGraphics.MapViewZMax + 1;
+            int xMin = (int)Config.MapGraphics.MapViewXMin - 1;
+            int xMax = (int)Config.MapGraphics.MapViewXMax + 1;
+            int zMin = (int)Config.MapGraphics.MapViewZMin - 1;
+            int zMax = (int)Config.MapGraphics.MapViewZMax + 1;
 
             List<(float x, float y, float z)> vertices = new List<(float x, float y, float z)>();
             for (int x = xMin; x <= xMax; x += 1)
@@ -49,63 +49,6 @@ namespace STROOP.Map
                 vertices.Add((xMax, marioY, z));
             }
             return vertices;
-        }
-
-        protected override List<(float x, float y, float z)> GetVerticesOrthographicView()
-        {
-            // failsafe to prevent filling the whole screen
-            if (!MapUtilities.IsAbleToShowUnitPrecision())
-            {
-                return new List<(float x, float y, float z)>();
-            }
-
-            float xCenter = Config.CurrentMapGraphics.MapViewCenterXValue;
-            float zCenter = Config.CurrentMapGraphics.MapViewCenterZValue;
-            int xMin = (int)Config.CurrentMapGraphics.MapViewXMin - 1;
-            int xMax = (int)Config.CurrentMapGraphics.MapViewXMax + 1;
-            int yMin = (int)Config.CurrentMapGraphics.MapViewYMin - 1;
-            int yMax = (int)Config.CurrentMapGraphics.MapViewYMax + 1;
-            int zMin = (int)Config.CurrentMapGraphics.MapViewZMin - 1;
-            int zMax = (int)Config.CurrentMapGraphics.MapViewZMax + 1;
-
-            if (Config.CurrentMapGraphics.MapViewPitchValue == 0 &&
-                (Config.CurrentMapGraphics.MapViewYawValue == 0 ||
-                Config.CurrentMapGraphics.MapViewYawValue == 32768))
-            {
-                List<(float x, float y, float z)> vertices = new List<(float x, float y, float z)>();
-                for (int x = xMin; x <= xMax; x += 1)
-                {
-                    vertices.Add((x, yMin, zCenter));
-                    vertices.Add((x, yMax, zCenter));
-                }
-                for (int y = yMin; y <= yMax; y += 1)
-                {
-                    vertices.Add((xMin, y, zCenter));
-                    vertices.Add((xMax, y, zCenter));
-                }
-                return vertices;
-            }
-            else if (Config.CurrentMapGraphics.MapViewPitchValue == 0 &&
-                (Config.CurrentMapGraphics.MapViewYawValue == 16384 ||
-                Config.CurrentMapGraphics.MapViewYawValue == 49152))
-            {
-                List<(float x, float y, float z)> vertices = new List<(float x, float y, float z)>();
-                for (int z = zMin; z <= zMax; z += 1)
-                {
-                    vertices.Add((xCenter, yMin, z));
-                    vertices.Add((xCenter, yMax, z));
-                }
-                for (int y = yMin; y <= yMax; y += 1)
-                {
-                    vertices.Add((zCenter, y, zMin));
-                    vertices.Add((xCenter, y, zMax));
-                }
-                return vertices;
-            }
-            else
-            {
-                return new List<(float x, float y, float z)>();
-            }
         }
 
         public override string GetName()

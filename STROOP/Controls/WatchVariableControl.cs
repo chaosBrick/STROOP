@@ -279,7 +279,7 @@ namespace STROOP.Controls
 
             ContextMenuStrip.Opening += (sender, e) => OnContextMenuStripOpening();
         }
-        
+
         public void SetUseCheckbox(bool useCheckbox)
         {
             if (useCheckbox)
@@ -369,21 +369,21 @@ namespace STROOP.Controls
                 _watchVariablePanel.UnselectAllVariables();
                 BaseColor = ColorUtilities.GetColorForVariable();
             }
-            else if (isSKeyHeld)
-            {
-                _watchVariablePanel.UnselectAllVariables();
-                AddToTab(Config.CustomManager);
-            }
-            else if (isTKeyHeld)
-            {
-                _watchVariablePanel.UnselectAllVariables();
-                AddToTab(Config.TasManager);
-            }
-            else if (isMKeyHeld)
-            {
-                _watchVariablePanel.UnselectAllVariables();
-                AddToTab(Config.MemoryManager);
-            }
+            //else if (isSKeyHeld)
+            //{
+            //    _watchVariablePanel.UnselectAllVariables();
+            //    AddToTab(Config.CustomManager);
+            //}
+            //else if (isTKeyHeld)
+            //{
+            //    _watchVariablePanel.UnselectAllVariables();
+            //    AddToTab(Config.TasManager);
+            //}
+            //else if (isMKeyHeld)
+            //{
+            //    _watchVariablePanel.UnselectAllVariables();
+            //    AddToTab(Config.MemoryManager);
+            //}
             else if (isNKeyHeld)
             {
                 _watchVariablePanel.UnselectAllVariables();
@@ -782,17 +782,17 @@ namespace STROOP.Controls
             return AddToTabTypeEnum.Regular;
         }
 
-        public void AddToTab(DataManager dataManager, AddToTabTypeEnum? addToTabTypeNullable = null)
+        public void AddToTab(WatchVariableFlowLayoutPanel dataManager, AddToTabTypeEnum? addToTabTypeNullable = null)
         {
             AddVarsToTab(new List<WatchVariableControl>() { this }, dataManager, addToTabTypeNullable);
         }
 
         public static void AddVarsToTab(
-            List<WatchVariableControl> watchVars, IVariableAdder variableAdder, AddToTabTypeEnum? addToTabTypeNullable = null)
+            List<WatchVariableControl> watchVars, WatchVariableFlowLayoutPanel variableAdder, AddToTabTypeEnum? addToTabTypeNullable = null)
         {
             List<List<WatchVariableControl>> newVarListList = new List<List<WatchVariableControl>>();
             AddToTabTypeEnum addToTabType = addToTabTypeNullable ?? GetAddToTabType();
-            
+
             foreach (WatchVariableControl watchVar in watchVars)
             {
                 List<WatchVariableControl> newVarList = new List<WatchVariableControl>();
@@ -851,7 +851,7 @@ namespace STROOP.Controls
 
         public void AddToVarHackTab()
         {
-            Config.VarHackManager.AddVariable(this);
+            //Config.VarHackManager.AddVariable(this);
             FlashColor(ADD_TO_VAR_HACK_TAB_COLOR);
         }
 

@@ -23,9 +23,9 @@ namespace STROOP.Map
 
         protected override List<(PointF loc, SizeF size)> GetDimensions()
         {
-            float xCenter = Config.MapGui.CurrentControl.Width / 2;
-            float yCenter = Config.MapGui.CurrentControl.Height / 2;
-            float length = Math.Max(Config.MapGui.CurrentControl.Width, Config.MapGui.CurrentControl.Height);
+            float xCenter = StroopMainForm.instance.mapTab.glControlMap2D.Width / 2;
+            float yCenter = StroopMainForm.instance.mapTab.glControlMap2D.Height / 2;
+            float length = Math.Max(StroopMainForm.instance.mapTab.glControlMap2D.Width, StroopMainForm.instance.mapTab.glControlMap2D.Height);
             (PointF loc, SizeF size) dimension = (new PointF(xCenter, yCenter), new SizeF(length, length));
             return new List<(PointF loc, SizeF size)>() { dimension };
         }
@@ -37,8 +37,8 @@ namespace STROOP.Map
 
         private Map3DVertex[] GetVertices()
         {
-            float width = Config.MapGui.GLControlMap3D.Width;
-            float height = Config.MapGui.GLControlMap3D.Height;
+            float width = StroopMainForm.instance.mapTab.glControlMap3D.Width;
+            float height = StroopMainForm.instance.mapTab.glControlMap3D.Height;
             bool widthIsMin = width <= height;
             float ratio = Math.Max(width, height) / Math.Min(width, height);
             float widthMultiplier = widthIsMin ? ratio : 1;

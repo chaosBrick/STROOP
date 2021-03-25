@@ -2,6 +2,9 @@
 using STROOP.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace STROOP.Structs.Configurations
 {
@@ -98,7 +101,7 @@ namespace STROOP.Structs.Configurations
             set
             {
                 _numPans = Math.Max(0, value);
-                Config.CamHackManager.NotifyNumPanChange((int)_numPans);
+                StroopMainForm.instance.camHackTab.NotifyNumPanChange((int)_numPans);
             }
         }
         public static double CurrentPan
@@ -212,16 +215,9 @@ namespace STROOP.Structs.Configurations
         public static float Map3DFOV = 0;
 
         public static double Map2DScrollSpeed = 1.1;
-        public static double Map2DOrthographicHorizontalRotateSpeed = 512;
-        public static double Map2DOrthographicVerticalRotateSpeed = 512;
         public static double Map3DScrollSpeed = 100;
         public static double Map3DTranslateSpeed = 20;
         public static double Map3DRotateSpeed = 50;
-
-        public static int MapCircleNumPoints2D = 256;
-        public static int MapCircleNumPoints3D = 64;
-
-        public static double MapUnitPrecisionThreshold = 2;
 
         public static CompassPosition CompassPosition;
         public static float CompassLineHeight = 50;
@@ -250,9 +246,9 @@ namespace STROOP.Structs.Configurations
                         return relCenterX;
                     case CompassPosition.TopRight:
                     case CompassPosition.BottomRight:
-                        return Config.MapGui.CurrentControl.Width - relCenterX;
+                        return StroopMainForm.instance.mapTab.glControlMap2D.Width - relCenterX;
                     case CompassPosition.Center:
-                        return Config.MapGui.CurrentControl.Width / 2;
+                        return StroopMainForm.instance.mapTab.glControlMap2D.Width / 2;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -270,24 +266,14 @@ namespace STROOP.Structs.Configurations
                         return relCenterZ;
                     case CompassPosition.BottomLeft:
                     case CompassPosition.BottomRight:
-                        return Config.MapGui.CurrentControl.Height - relCenterZ;
+                        return StroopMainForm.instance.mapTab.glControlMap2D.Height - relCenterZ;
                     case CompassPosition.Center:
-                        return Config.MapGui.CurrentControl.Height / 2;
+                        return StroopMainForm.instance.mapTab.glControlMap2D.Height / 2;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
             }
         }
-
-        public static double CoordinateLabelsCustomSpacing = 0;
-        public static double CoordinateLabelsMargin = 40;
-        public static double CoordinateLabelsLabelDensity = 20;
-        public static double CoordinateLabelsShowCursorPos = 1;
-        public static double CoordinateLabelsShowXLabels = 1;
-        public static double CoordinateLabelsShowZLabels = 1;
-        public static double CoordinateLabelsUseHighX = 0;
-        public static double CoordinateLabelsUseHighZ = 0;
-        public static double CoordinateLabelsBoldText = 1;
 
         // Dummy Vars
 

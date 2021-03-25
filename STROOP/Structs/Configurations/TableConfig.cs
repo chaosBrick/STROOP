@@ -21,7 +21,6 @@ namespace STROOP.Structs
         public static MissionTable Missions;
         public static CourseDataTable CourseData;
         public static FlyGuyDataTable FlyGuyData;
-        public static PendulumVertexTable PendulumVertexes;
         public static ObjectAngleTable WdwRotatingPlatformTable;
         public static ObjectAngleTable ElevatorAxleTable;
     }

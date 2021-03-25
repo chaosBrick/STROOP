@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using STROOP.Structs;
+﻿using System.Collections.Generic;
 using System.Windows.Forms;
 using STROOP.Utilities;
 using STROOP.Controls;
-using System.Drawing;
-using STROOP.Structs.Configurations;
 
 namespace STROOP.Managers
 {

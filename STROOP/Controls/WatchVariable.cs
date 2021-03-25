@@ -124,7 +124,7 @@ namespace STROOP.Controls
             Mask = mask;
             Shift = shift;
             HandleMapping = handleMapping;
-            
+
             // Created getter/setter functions
             if (IsSpecial)
             {
@@ -285,24 +285,15 @@ namespace STROOP.Controls
             if (IsSpecial) return "(none)";
             List<uint> addressList = GetAddressList(addresses);
             if (addressList.Count == 0) return "(none)";
-            List<ulong> processAddressList = GetProcessAddressList(addressList, ByteCount.Value).ConvertAll(address => address.ToUInt64());
+            List<ulong> processAddressList = GetProcessAddressList(addresses).ConvertAll(address => address.ToUInt64());
             List<string> stringList = processAddressList.ConvertAll(address => HexUtilities.FormatValue(address, address > 0xFFFFFFFFU ? 16 : 8));
             return string.Join(", ", stringList);
         }
 
-        public string GetProcessBaseAddressListString(List<uint> addresses = null)
-        {
-            List<uint> addressList = addresses ?? GetBaseAddressList();
-            if (addressList.Count == 0) return "(none)";
-            List<ulong> processAddressList = GetProcessAddressList(addressList, 4).ConvertAll(address => address.ToUInt64());
-            List<string> stringList = processAddressList.ConvertAll(address => HexUtilities.FormatValue(address, address > 0xFFFFFFFFU ? 16 : 8));
-            return string.Join(", ", stringList);
-        }
-
-        private List<UIntPtr> GetProcessAddressList(List<uint> addresses, int byteCount)
+        private List<UIntPtr> GetProcessAddressList(List<uint> addresses = null)
         {
             List<uint> ramAddressList = GetRamAddressList(false, addresses);
-            return ramAddressList.ConvertAll(address => Config.Stream.GetAbsoluteAddress(address, byteCount));
+            return ramAddressList.ConvertAll(address => Config.Stream.GetAbsoluteAddress(address, ByteCount.Value));
         }
 
         public string GetRamAddressListString(bool addressArea = true, List<uint> addresses = null)
@@ -310,13 +301,14 @@ namespace STROOP.Controls
             if (IsSpecial) return "(none)";
             List<uint> addressList = GetAddressList(addresses);
             if (addressList.Count == 0) return "(none)";
-            List<uint> ramAddressList = GetRamAddressList(addressArea, addressList);
+            List<uint> ramAddressList = GetRamAddressList(addressArea, addresses);
             List<string> stringList = ramAddressList.ConvertAll(address => HexUtilities.FormatValue(address, 8));
             return string.Join(", ", stringList);
         }
 
-        private List<uint> GetRamAddressList(bool addressArea, List<uint> addressList)
+        private List<uint> GetRamAddressList(bool addressArea = true, List<uint> addresses = null)
         {
+            List<uint> addressList = GetAddressList(addresses);
             return addressList.ConvertAll(address => GetRamAddress(address, addressArea));
         }
 

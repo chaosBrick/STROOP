@@ -1,20 +1,14 @@
-﻿using STROOP.Extensions;
-using STROOP.Forms;
-using STROOP.Managers;
-using STROOP.Structs;
-using STROOP.Structs.Configurations;
-using STROOP.Utilities;
+﻿using STROOP.Forms;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
 using System.Windows.Forms;
 
 namespace STROOP.Controls
 {
     public class WatchVariableStringWrapper : WatchVariableWrapper
     {
+        public static Dictionary<string, EventHandler> specialTypeContextMenuHandlers = new Dictionary<string, EventHandler>();
+
         public WatchVariableStringWrapper(
             WatchVariable watchVar,
             WatchVariableControl watchVarControl)
@@ -26,46 +20,48 @@ namespace STROOP.Controls
         private void AddStringContextMenuStripItems(string specialType)
         {
             ToolStripMenuItem itemSelectValue = new ToolStripMenuItem("Select Value...");
-            bool addedClickAction = false;
+            bool addedClickAction = true;
 
-            switch (specialType)
+            EventHandler handler;
+            if (specialTypeContextMenuHandlers.TryGetValue(specialType, out handler))
             {
-                case "ActionDescription":
-                    itemSelectValue.Click += (sender, e) => SelectionForm.ShowActionDescriptionSelectionForm();
-                    addedClickAction = true;
-                    break;
-                case "PrevActionDescription":
-                    itemSelectValue.Click += (sender, e) => SelectionForm.ShowPreviousActionDescriptionSelectionForm();
-                    addedClickAction = true;
-                    break;
-                case "AnimationDescription":
-                    itemSelectValue.Click += (sender, e) => SelectionForm.ShowAnimationDescriptionSelectionForm();
-                    addedClickAction = true;
-                    break;
-                case "TriangleTypeDescription":
-                    itemSelectValue.Click += (sender, e) => SelectionForm.ShowTriangleTypeDescriptionSelectionForm();
-                    addedClickAction = true;
-                    break;
-                case "DemoCounterDescription":
-                    itemSelectValue.Click += (sender, e) => SelectionForm.ShowDemoCounterDescriptionSelectionForm();
-                    addedClickAction = true;
-                    break;
-                case "TtcSpeedSettingDescription":
-                    itemSelectValue.Click += (sender, e) => SelectionForm.ShowTtcSpeedSettingDescriptionSelectionForm();
-                    addedClickAction = true;
-                    break;
-                case "AreaTerrainDescription":
-                    itemSelectValue.Click += (sender, e) => SelectionForm.ShowAreaTerrainDescriptionSelectionForm();
-                    addedClickAction = true;
-                    break;
-                case "Map3DMode":
-                    itemSelectValue.Click += (sender, e) => SelectionForm.ShowMap3DModeSelectionForm();
-                    addedClickAction = true;
-                    break;
-                case "CompassPosition":
-                    itemSelectValue.Click += (sender, e) => SelectionForm.ShowCompassPositionSelectionForm();
-                    addedClickAction = true;
-                    break;
+                itemSelectValue.Click += handler;
+            }
+            else
+            {
+                switch (specialType)
+                {
+                    case "ActionDescription":
+                        itemSelectValue.Click += (sender, e) => SelectionForm.ShowActionDescriptionSelectionForm();
+                        break;
+                    case "PrevActionDescription":
+                        itemSelectValue.Click += (sender, e) => SelectionForm.ShowPreviousActionDescriptionSelectionForm();
+                        break;
+                    case "AnimationDescription":
+                        itemSelectValue.Click += (sender, e) => SelectionForm.ShowAnimationDescriptionSelectionForm();
+                        break;
+                    case "TriangleTypeDescription":
+                        itemSelectValue.Click += (sender, e) => SelectionForm.ShowTriangleTypeDescriptionSelectionForm();
+                        break;
+                    case "DemoCounterDescription":
+                        itemSelectValue.Click += (sender, e) => SelectionForm.ShowDemoCounterDescriptionSelectionForm();
+                        break;
+                    case "TtcSpeedSettingDescription":
+                        itemSelectValue.Click += (sender, e) => SelectionForm.ShowTtcSpeedSettingDescriptionSelectionForm();
+                        break;
+                    case "AreaTerrainDescription":
+                        itemSelectValue.Click += (sender, e) => SelectionForm.ShowAreaTerrainDescriptionSelectionForm();
+                        break;
+                    case "Map3DMode":
+                        itemSelectValue.Click += (sender, e) => SelectionForm.ShowMap3DModeSelectionForm();
+                        break;
+                    case "CompassPosition":
+                        itemSelectValue.Click += (sender, e) => SelectionForm.ShowCompassPositionSelectionForm();
+                        break;
+                    default:
+                        addedClickAction = false;
+                        break;
+                }
             }
 
             if (addedClickAction)

@@ -15,24 +15,26 @@ namespace STROOP.Structs
     {
         private readonly static Func<uint, object> DEFAULT_GETTER = (uint address) => Double.NaN;
         private readonly static Func<object, uint, bool> DEFAULT_SETTER = (object value, uint address) => false;
-        private readonly static WatchVariableSpecialDictionary _dictionary;
+
+        public static WatchVariableSpecialDictionary dictionary { get; private set; }
 
         static WatchVariableSpecialUtilities()
         {
-            _dictionary = new WatchVariableSpecialDictionary();
+            dictionary = new WatchVariableSpecialDictionary();
             AddLiteralEntriesToDictionary();
             AddGeneratedEntriesToDictionary();
             AddPanEntriesToDictionary();
             AddMap3DEntriesToDictionary();
+            InitializeSpecialAttribute.ExecuteInitializers();
         }
 
-        public static (Func<uint, object> getter, Func<object, uint, bool> setter)
+        public static (Func<uint, object>, Func<object, uint, bool> getterSetter)
             CreateGetterSetterFunctions(string specialType)
         {
-            if (_dictionary.ContainsKey(specialType))
-                return _dictionary.Get(specialType);
-            else
-                throw new ArgumentOutOfRangeException();
+            (Func<uint, object>, Func<object, uint, bool> getterSetter) variable;
+            if (dictionary.TryGetValue(specialType, out variable))
+                return variable;
+            return (DEFAULT_GETTER, DEFAULT_SETTER);
         }
 
         private static int _numBinaryMathOperationEntries = 0;
@@ -43,13 +45,14 @@ namespace STROOP.Structs
             switch (operation)
             {
                 case BinaryMathOperation.Add:
-                    _dictionary.Add(specialType,
+                    dictionary.Add(specialType,
                         ((uint dummy) =>
                         {
                             double value1 = ParsingUtilities.ParseDouble(control1.GetValue(handleFormatting: false));
                             double value2 = ParsingUtilities.ParseDouble(control2.GetValue(handleFormatting: false));
                             return value1 + value2;
-                        },
+                        }
+                    ,
                         (double sum, uint dummy) =>
                         {
                             if (!KeyboardUtilities.IsCtrlHeld())
@@ -64,17 +67,19 @@ namespace STROOP.Structs
                                 double newValue1 = sum - value2;
                                 return control1.SetValue(newValue1);
                             }
-                        }));
+                        }
+                    ));
                     break;
 
                 case BinaryMathOperation.Subtract:
-                    _dictionary.Add(specialType,
+                    dictionary.Add(specialType,
                         ((uint dummy) =>
                         {
                             double value1 = ParsingUtilities.ParseDouble(control1.GetValue(handleFormatting: false));
                             double value2 = ParsingUtilities.ParseDouble(control2.GetValue(handleFormatting: false));
                             return value1 - value2;
-                        },
+                        }
+                    ,
                         (double diff, uint dummy) =>
                         {
                             if (!KeyboardUtilities.IsCtrlHeld())
@@ -89,17 +94,19 @@ namespace STROOP.Structs
                                 double newValue1 = value2 + diff;
                                 return control1.SetValue(newValue1);
                             }
-                        }));
+                        }
+                    ));
                     break;
 
                 case BinaryMathOperation.Multiply:
-                    _dictionary.Add(specialType,
+                    dictionary.Add(specialType,
                         ((uint dummy) =>
                         {
                             double value1 = ParsingUtilities.ParseDouble(control1.GetValue(handleFormatting: false));
                             double value2 = ParsingUtilities.ParseDouble(control2.GetValue(handleFormatting: false));
                             return value1 * value2;
-                        },
+                        }
+                    ,
                         (double product, uint dummy) =>
                         {
                             if (!KeyboardUtilities.IsCtrlHeld())
@@ -114,17 +121,19 @@ namespace STROOP.Structs
                                 double newValue1 = product / value2;
                                 return control1.SetValue(newValue1);
                             }
-                        }));
+                        }
+                    ));
                     break;
 
                 case BinaryMathOperation.Divide:
-                    _dictionary.Add(specialType,
+                    dictionary.Add(specialType,
                         ((uint dummy) =>
                         {
                             double value1 = ParsingUtilities.ParseDouble(control1.GetValue(handleFormatting: false));
                             double value2 = ParsingUtilities.ParseDouble(control2.GetValue(handleFormatting: false));
                             return value1 / value2;
-                        },
+                        }
+                    ,
                         (double quotient, uint dummy) =>
                         {
                             if (!KeyboardUtilities.IsCtrlHeld())
@@ -139,39 +148,43 @@ namespace STROOP.Structs
                                 double newValue1 = value2 * quotient;
                                 return control1.SetValue(newValue1);
                             }
-                        }));
+                        }
+                    ));
                     break;
 
                 case BinaryMathOperation.Modulo:
-                    _dictionary.Add(specialType,
+                    dictionary.Add(specialType,
                         ((uint dummy) =>
                         {
                             double value1 = ParsingUtilities.ParseDouble(control1.GetValue(handleFormatting: false));
                             double value2 = ParsingUtilities.ParseDouble(control2.GetValue(handleFormatting: false));
                             return value1 % value2;
-                        },
+                        }
+                    ,
                         DEFAULT_SETTER));
                     break;
 
                 case BinaryMathOperation.NonNegativeModulo:
-                    _dictionary.Add(specialType,
+                    dictionary.Add(specialType,
                         ((uint dummy) =>
                         {
                             double value1 = ParsingUtilities.ParseDouble(control1.GetValue(handleFormatting: false));
                             double value2 = ParsingUtilities.ParseDouble(control2.GetValue(handleFormatting: false));
                             return MoreMath.NonNegativeModulus(value1, value2);
-                        },
+                        }
+                    ,
                         DEFAULT_SETTER));
                     break;
 
                 case BinaryMathOperation.Exponent:
-                    _dictionary.Add(specialType,
+                    dictionary.Add(specialType,
                         ((uint dummy) =>
                         {
                             double value1 = ParsingUtilities.ParseDouble(control1.GetValue(handleFormatting: false));
                             double value2 = ParsingUtilities.ParseDouble(control2.GetValue(handleFormatting: false));
                             return Math.Pow(value1, value2);
-                        },
+                        }
+                    ,
                         DEFAULT_SETTER));
                     break;
 
@@ -190,18 +203,19 @@ namespace STROOP.Structs
             switch (operation)
             {
                 case AggregateMathOperation.Mean:
-                    _dictionary.Add(specialType,
+                    dictionary.Add(specialType,
                         ((uint dummy) =>
                         {
                             return controls
                                 .ConvertAll(control => control.GetValue(handleFormatting: false))
                                 .ConvertAll(value => ParsingUtilities.ParseDouble(value))
                                 .Average();
-                        },
+                        }
+                    ,
                         DEFAULT_SETTER));
                     break;
                 case AggregateMathOperation.Median:
-                    _dictionary.Add(specialType,
+                    dictionary.Add(specialType,
                         ((uint dummy) =>
                         {
                             List<double> doubleValues = controls
@@ -216,29 +230,32 @@ namespace STROOP.Structs
                             {
                                 return (doubleValues[doubleValues.Count / 2 - 1] + doubleValues[doubleValues.Count / 2]) / 2;
                             }
-                        },
+                        }
+                    ,
                         DEFAULT_SETTER));
                     break;
                 case AggregateMathOperation.Min:
-                    _dictionary.Add(specialType,
+                    dictionary.Add(specialType,
                         ((uint dummy) =>
                         {
                             return controls
                                 .ConvertAll(control => control.GetValue(handleFormatting: false))
                                 .ConvertAll(value => ParsingUtilities.ParseDouble(value))
                                 .Min();
-                        },
+                        }
+                    ,
                         DEFAULT_SETTER));
                     break;
                 case AggregateMathOperation.Max:
-                    _dictionary.Add(specialType,
+                    dictionary.Add(specialType,
                         ((uint dummy) =>
                         {
                             return controls
                                 .ConvertAll(control => control.GetValue(handleFormatting: false))
                                 .ConvertAll(value => ParsingUtilities.ParseDouble(value))
                                 .Max();
-                        },
+                        }
+                    ,
                         DEFAULT_SETTER));
                     break;
                 default:
@@ -281,15 +298,17 @@ namespace STROOP.Structs
                         (double value) => controls[4].SetValue(value),
                         (double value) => controls[5].SetValue(value),
                     });
-                _dictionary.Add(specialType,
+                dictionary.Add(specialType,
                     ((uint dummy) =>
                     {
                         return PositionAngle.GetDistance(p1, p2);
-                    },
+                    }
+                ,
                     (double dist, uint dummy) =>
                     {
                         return PositionAngle.SetDistance(p1, p2, dist);
-                    }));
+                    }
+                ));
             }
             else
             {
@@ -319,15 +338,17 @@ namespace STROOP.Structs
                         (double value) => true,
                         (double value) => controls[3].SetValue(value),
                     });
-                _dictionary.Add(specialType,
+                dictionary.Add(specialType,
                     ((uint dummy) =>
                     {
                         return PositionAngle.GetHDistance(p1, p2);
-                    },
+                    }
+                ,
                     (double dist, uint dummy) =>
                     {
                         return PositionAngle.SetHDistance(p1, p2, dist);
-                    }));
+                    }
+                ));
             }
             _numDistanceMathOperationEntries++;
             return specialType;
@@ -338,13 +359,14 @@ namespace STROOP.Structs
         public static string AddRealTimeEntry(WatchVariableControl control)
         {
             string specialType = "RealTime" + _numRealTimeEntries;
-            _dictionary.Add(specialType,
+            dictionary.Add(specialType,
                 ((uint dummy) =>
                 {
                     uint totalFrames = ParsingUtilities.ParseUIntRoundingWrapping(
                         control.GetValue(useRounding: false, handleFormatting: false)) ?? 0;
                     return GetRealTime(totalFrames);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
             _numRealTimeEntries++;
             return specialType;
@@ -357,11 +379,12 @@ namespace STROOP.Structs
             SpecialConfig.DummyValues.Add(ParsingUtilities.ParseValueRoundingWrapping(0, type));
             string specialType = "Dummy" + index + StringUtilities.Capitalize(typeString);
 
-            _dictionary.Add(specialType,
+            dictionary.Add(specialType,
                 ((uint dummy) =>
                 {
                     return SpecialConfig.DummyValues[index];
-                },
+                }
+            ,
                 (double value, uint dummy) =>
                 {
                     object o = ParsingUtilities.ParseValueRoundingWrapping(value, type);
@@ -377,11 +400,12 @@ namespace STROOP.Structs
         public static string AddSchedulerEntry(int index)
         {
             string specialType = "Scheduler" + index;
-            _dictionary.Add(specialType,
+            dictionary.Add(specialType,
                 ((uint dummy) =>
                 {
                     return PositionAngle.Scheduler.GetAdditionalValue(index);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
             return specialType;
         }
@@ -401,16 +425,18 @@ namespace STROOP.Structs
 
             foreach ((string key, Func<double> getter, Action<double> setter) in entries)
             {
-                _dictionary.Add(key,
+                dictionary.Add(key,
                     ((uint dummy) =>
                     {
                         return getter();
-                    },
+                    }
+                ,
                     (double doubleValue, uint dummy) =>
                     {
                         setter(doubleValue);
                         return true;
-                    }));
+                    }
+                ));
             }
         }
 
@@ -451,16 +477,18 @@ namespace STROOP.Structs
 
             foreach ((string key, Func<double> getter, Action<double> setter) in entries)
             {
-                _dictionary.Add(key,
+                dictionary.Add(key,
                     ((uint dummy) =>
                     {
                         return getter();
-                    },
+                    }
+                ,
                     (double doubleValue, uint dummy) =>
                     {
                         setter(doubleValue);
                         return true;
-                    }));
+                    }
+                ));
             }
         }
 
@@ -500,11 +528,12 @@ namespace STROOP.Structs
 
             foreach ((string key, Func<float> getter, Action<float> setter) in floatEntries)
             {
-                _dictionary.Add(key,
+                dictionary.Add(key,
                     ((uint dummy) =>
                     {
                         return getter();
-                    },
+                    }
+                ,
                     (float floatValue, uint dummy) =>
                     {
                         setter(floatValue);
@@ -517,57 +546,22 @@ namespace STROOP.Structs
                 new List<(string, Func<double>, Action<double>)>()
                 {
                     ("Map2DScrollSpeed", () => SpecialConfig.Map2DScrollSpeed, (double value) => SpecialConfig.Map2DScrollSpeed = value),
-                    ("Map2DOrthographicHorizontalRotateSpeed", () => SpecialConfig.Map2DOrthographicHorizontalRotateSpeed, (double value) => SpecialConfig.Map2DOrthographicHorizontalRotateSpeed = value),
-                    ("Map2DOrthographicVerticalRotateSpeed", () => SpecialConfig.Map2DOrthographicVerticalRotateSpeed, (double value) => SpecialConfig.Map2DOrthographicVerticalRotateSpeed = value),
                     ("Map3DScrollSpeed", () => SpecialConfig.Map3DScrollSpeed, (double value) => SpecialConfig.Map3DScrollSpeed = value),
                     ("Map3DTranslateSpeed", () => SpecialConfig.Map3DTranslateSpeed, (double value) => SpecialConfig.Map3DTranslateSpeed = value),
                     ("Map3DRotateSpeed", () => SpecialConfig.Map3DRotateSpeed, (double value) => SpecialConfig.Map3DRotateSpeed = value),
-
-                    ("MapUnitPrecisionThreshold", () => SpecialConfig.MapUnitPrecisionThreshold, (double value) => SpecialConfig.MapUnitPrecisionThreshold = value),
-
-                    ("CoordinateLabelsCustomSpacing", () => SpecialConfig.CoordinateLabelsCustomSpacing, (double value) => SpecialConfig.CoordinateLabelsCustomSpacing = value),
-                    ("CoordinateLabelsMargin", () => SpecialConfig.CoordinateLabelsMargin, (double value) => SpecialConfig.CoordinateLabelsMargin = value),
-                    ("CoordinateLabelsLabelDensity", () => SpecialConfig.CoordinateLabelsLabelDensity, (double value) => SpecialConfig.CoordinateLabelsLabelDensity = value),
-                    ("CoordinateLabelsShowCursorPos", () => SpecialConfig.CoordinateLabelsShowCursorPos, (double value) => SpecialConfig.CoordinateLabelsShowCursorPos = value),
-                    ("CoordinateLabelsShowXLabels", () => SpecialConfig.CoordinateLabelsShowXLabels, (double value) => SpecialConfig.CoordinateLabelsShowXLabels = value),
-                    ("CoordinateLabelsShowZLabels", () => SpecialConfig.CoordinateLabelsShowZLabels, (double value) => SpecialConfig.CoordinateLabelsShowZLabels = value),
-                    ("CoordinateLabelsUseHighX", () => SpecialConfig.CoordinateLabelsUseHighX, (double value) => SpecialConfig.CoordinateLabelsUseHighX = value),
-                    ("CoordinateLabelsUseHighZ", () => SpecialConfig.CoordinateLabelsUseHighZ, (double value) => SpecialConfig.CoordinateLabelsUseHighZ = value),
-                    ("CoordinateLabelsBoldText", () => SpecialConfig.CoordinateLabelsBoldText, (double value) => SpecialConfig.CoordinateLabelsBoldText = value),
                 };
 
             foreach ((string key, Func<double> getter, Action<double> setter) in doubleEntries)
             {
-                _dictionary.Add(key,
+                dictionary.Add(key,
                     ((uint dummy) =>
                     {
                         return getter();
-                    },
+                    }
+                ,
                     (double doubleValue, uint dummy) =>
                     {
                         setter(doubleValue);
-                        return true;
-                    }
-                ));
-            }
-
-            List<(string, Func<int>, Action<int>)> intEntries =
-                new List<(string, Func<int>, Action<int>)>()
-                {
-                    ("MapCircleNumPoints2D", () => SpecialConfig.MapCircleNumPoints2D, (int value) => SpecialConfig.MapCircleNumPoints2D = value),
-                    ("MapCircleNumPoints3D", () => SpecialConfig.MapCircleNumPoints3D, (int value) => SpecialConfig.MapCircleNumPoints3D = value),
-                };
-
-            foreach ((string key, Func<int> getter, Action<int> setter) in intEntries)
-            {
-                _dictionary.Add(key,
-                    ((uint dummy) =>
-                    {
-                        return getter();
-                    },
-                    (int intValue, uint dummy) =>
-                    {
-                        setter(intValue);
                         return true;
                     }
                 ));
@@ -584,11 +578,12 @@ namespace STROOP.Structs
 
             foreach ((string key, Func<string> getter, Action<PositionAngle> setter) in posAngleEntries)
             {
-                _dictionary.Add(key,
+                dictionary.Add(key,
                     ((uint dummy) =>
                     {
                         return getter();
-                    },
+                    }
+                ,
                     (PositionAngle posAngle, uint dummy) =>
                     {
                         setter(posAngle);
@@ -606,11 +601,12 @@ namespace STROOP.Structs
 
             foreach ((string key, Func<string> getter, Action<string> setter) in stringEntries)
             {
-                _dictionary.Add(key,
+                dictionary.Add(key,
                     ((uint dummy) =>
                     {
                         return getter();
-                    },
+                    }
+                ,
                     (string value, uint dummy) =>
                     {
                         try
@@ -702,46 +698,54 @@ namespace STROOP.Structs
                         Func<PositionAngle, PositionAngle, double> getter = distGetters[k];
                         Func<PositionAngle, PositionAngle, double, bool> setter = distSetters[k];
 
-                        _dictionary.Add(String.Format("{0}Dist{1}To{2}", distType, string1, string2),
+                        dictionary.Add(String.Format("{0}Dist{1}To{2}", distType, string1, string2),
                             ((uint address) =>
                             {
                                 return getter(func1(address), func2(address));
-                            },
+                            }
+                        ,
                             (double dist, uint address) =>
                             {
                                 return setter(func1(address), func2(address), dist);
-                            }));
+                            }
+                        ));
                     }
 
-                    _dictionary.Add(String.Format("Angle{0}To{1}", string1, string2),
+                    dictionary.Add(String.Format("Angle{0}To{1}", string1, string2),
                         ((uint address) =>
                         {
                             return PositionAngle.GetAngleTo(func1(address), func2(address), null, false);
-                        },
+                        }
+                    ,
                         (double angle, uint address) =>
                         {
                             return PositionAngle.SetAngleTo(func1(address), func2(address), angle);
-                        }));
+                        }
+                    ));
 
-                    _dictionary.Add(String.Format("DAngle{0}To{1}", string1, string2),
+                    dictionary.Add(String.Format("DAngle{0}To{1}", string1, string2),
                         ((uint address) =>
                         {
                             return PositionAngle.GetDAngleTo(func1(address), func2(address), null, false);
-                        },
+                        }
+                    ,
                         (double angleDiff, uint address) =>
                         {
                             return PositionAngle.SetDAngleTo(func1(address), func2(address), angleDiff);
-                        }));
+                        }
+                    ));
 
-                    _dictionary.Add(String.Format("AngleDiff{0}To{1}", string1, string2),
+                    dictionary.Add(String.Format("AngleDiff{0}To{1}", string1, string2),
                         ((uint address) =>
                         {
                             return PositionAngle.GetAngleDifference(func1(address), func2(address), false);
-                        },
+                        }
+                    ,
                         (double angleDiff, uint address) =>
                         {
                             return PositionAngle.SetAngleDifference(func1(address), func2(address), angleDiff);
-                        }));
+                        }
+                    ));
                 }
             }
         }
@@ -750,30 +754,32 @@ namespace STROOP.Structs
         {
             // Buffer
 
-            _dictionary.Add("Buffer",
+            dictionary.Add("Buffer",
                 ((uint objAddress) => 0,
                 DEFAULT_SETTER));
 
             // Object vars
 
-            _dictionary.Add("DAngleMarioToObjMod512",
+            dictionary.Add("DAngleMarioToObjMod512",
                 ((uint objAddress) =>
                 {
                     double dAngle = PositionAngle.GetDAngleTo(PositionAngle.Mario, PositionAngle.Obj(objAddress), false, false);
                     return MoreMath.MaybeNegativeModulus(dAngle, 512);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("PitchMarioToObj",
+            dictionary.Add("PitchMarioToObj",
                 ((uint objAddress) =>
                 {
                     PositionAngle mario = PositionAngle.Mario;
                     PositionAngle obj = PositionAngle.Obj(objAddress);
                     return MoreMath.GetPitch(mario.X, mario.Y, mario.Z, obj.X, obj.Y, obj.Z);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("DPitchMarioToObj",
+            dictionary.Add("DPitchMarioToObj",
                 ((uint objAddress) =>
                 {
                     PositionAngle mario = PositionAngle.Mario;
@@ -781,7 +787,8 @@ namespace STROOP.Structs
                     double pitch = MoreMath.GetPitch(mario.X, mario.Y, mario.Z, obj.X, obj.Y, obj.Z);
                     ushort marioPitch = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.FacingPitchOffset);
                     return marioPitch - pitch;
-                },
+                }
+            ,
                 (double diff, uint objAddress) =>
                 {
                     PositionAngle mario = PositionAngle.Mario;
@@ -789,37 +796,41 @@ namespace STROOP.Structs
                     double pitch = MoreMath.GetPitch(mario.X, mario.Y, mario.Z, obj.X, obj.Y, obj.Z);
                     short newMarioPitch = MoreMath.NormalizeAngleShort(pitch + diff);
                     return Config.Stream.SetValue(newMarioPitch, MarioConfig.StructAddress + MarioConfig.FacingPitchOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("ObjectInGameDeltaYaw",
+            dictionary.Add("ObjectInGameDeltaYaw",
                 ((uint objAddress) =>
                 {
                     ushort objectAngle = Config.Stream.GetUInt16(objAddress + ObjectConfig.YawFacingOffset);
                     return GetDeltaInGameAngle(objectAngle);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("EffectiveHitboxRadius",
+            dictionary.Add("EffectiveHitboxRadius",
                 ((uint objAddress) =>
                 {
                     uint marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
                     float mObjHitboxRadius = Config.Stream.GetSingle(marioObjRef + ObjectConfig.HitboxRadiusOffset);
                     float objHitboxRadius = Config.Stream.GetSingle(objAddress + ObjectConfig.HitboxRadiusOffset);
                     return mObjHitboxRadius + objHitboxRadius;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("EffectiveHurtboxRadius",
+            dictionary.Add("EffectiveHurtboxRadius",
                 ((uint objAddress) =>
                 {
                     uint marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
                     float mObjHurtboxRadius = Config.Stream.GetSingle(marioObjRef + ObjectConfig.HurtboxRadiusOffset);
                     float objHurtboxRadius = Config.Stream.GetSingle(objAddress + ObjectConfig.HurtboxRadiusOffset);
                     return mObjHurtboxRadius + objHurtboxRadius;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("MarioHitboxAwayFromObject",
+            dictionary.Add("MarioHitboxAwayFromObject",
                 ((uint objAddress) =>
                 {
                     uint marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
@@ -833,7 +844,8 @@ namespace STROOP.Structs
 
                     double marioHitboxAwayFromObject = MoreMath.GetDistanceBetween(mObjX, mObjZ, objX, objZ) - mObjHitboxRadius - objHitboxRadius;
                     return marioHitboxAwayFromObject;
-                },
+                }
+            ,
                 (double hitboxDistAway, uint objAddress) =>
                 {
                     uint marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
@@ -854,9 +866,10 @@ namespace STROOP.Structs
                     return BoolUtilities.Combine(
                         marioPos.SetValues(x: newMarioX, z: newMarioZ),
                         PositionAngle.MarioObj().SetValues(x: newMarioX, z: newMarioZ));
-                }));
+                }
+            ));
 
-            _dictionary.Add("MarioHitboxAboveObject",
+            dictionary.Add("MarioHitboxAboveObject",
                 ((uint objAddress) =>
                 {
                     uint marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
@@ -872,7 +885,8 @@ namespace STROOP.Structs
 
                     double marioHitboxAboveObject = mObjHitboxBottom - objHitboxTop;
                     return marioHitboxAboveObject;
-                },
+                }
+            ,
                 (double hitboxDistAbove, uint objAddress) =>
                 {
                     uint marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
@@ -888,9 +902,10 @@ namespace STROOP.Structs
                     return BoolUtilities.Combine(
                         PositionAngle.Mario.SetY(newMarioY),
                         PositionAngle.MarioObj().SetY(newMarioY));
-                }));
+                }
+            ));
 
-            _dictionary.Add("MarioHitboxBelowObject",
+            dictionary.Add("MarioHitboxBelowObject",
                 ((uint objAddress) =>
                 {
                     uint marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
@@ -906,7 +921,8 @@ namespace STROOP.Structs
 
                     double marioHitboxBelowObject = objHitboxBottom - mObjHitboxTop;
                     return marioHitboxBelowObject;
-                }, 
+                }
+            ,
                 (double hitboxDistBelow, uint objAddress) =>
                 {
                     uint marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
@@ -924,16 +940,42 @@ namespace STROOP.Structs
                     return BoolUtilities.Combine(
                         PositionAngle.Mario.SetY(newMarioY),
                         PositionAngle.MarioObj().SetY(newMarioY));
-                }));
+                }
+            ));
 
-            _dictionary.Add("MarioHitboxOverlapsObject",
+            dictionary.Add("MarioHitboxOverlapsObject",
                 ((uint objAddress) =>
                 {
-                    return IsMarioHitboxOverlapping(objAddress);
-                },
+                    uint marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
+                    float mObjX = Config.Stream.GetSingle(marioObjRef + ObjectConfig.XOffset);
+                    float mObjY = Config.Stream.GetSingle(marioObjRef + ObjectConfig.YOffset);
+                    float mObjZ = Config.Stream.GetSingle(marioObjRef + ObjectConfig.ZOffset);
+                    float mObjHitboxRadius = Config.Stream.GetSingle(marioObjRef + ObjectConfig.HitboxRadiusOffset);
+                    float mObjHitboxHeight = Config.Stream.GetSingle(marioObjRef + ObjectConfig.HitboxHeightOffset);
+                    float mObjHitboxDownOffset = Config.Stream.GetSingle(marioObjRef + ObjectConfig.HitboxDownOffsetOffset);
+                    float mObjHitboxBottom = mObjY - mObjHitboxDownOffset;
+                    float mObjHitboxTop = mObjY + mObjHitboxHeight - mObjHitboxDownOffset;
+
+                    float objX = Config.Stream.GetSingle(objAddress + ObjectConfig.XOffset);
+                    float objY = Config.Stream.GetSingle(objAddress + ObjectConfig.YOffset);
+                    float objZ = Config.Stream.GetSingle(objAddress + ObjectConfig.ZOffset);
+                    float objHitboxRadius = Config.Stream.GetSingle(objAddress + ObjectConfig.HitboxRadiusOffset);
+                    float objHitboxHeight = Config.Stream.GetSingle(objAddress + ObjectConfig.HitboxHeightOffset);
+                    float objHitboxDownOffset = Config.Stream.GetSingle(objAddress + ObjectConfig.HitboxDownOffsetOffset);
+                    float objHitboxBottom = objY - objHitboxDownOffset;
+                    float objHitboxTop = objY + objHitboxHeight - objHitboxDownOffset;
+
+                    double marioHitboxAwayFromObject = MoreMath.GetDistanceBetween(mObjX, mObjZ, objX, objZ) - mObjHitboxRadius - objHitboxRadius;
+                    double marioHitboxAboveObject = mObjHitboxBottom - objHitboxTop;
+                    double marioHitboxBelowObject = objHitboxBottom - mObjHitboxTop;
+
+                    bool overlap = marioHitboxAwayFromObject < 0 && marioHitboxAboveObject <= 0 && marioHitboxBelowObject <= 0;
+                    return overlap ? 1 : 0;
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("MarioHurtboxAwayFromObject",
+            dictionary.Add("MarioHurtboxAwayFromObject",
                 ((uint objAddress) =>
                 {
                     uint marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
@@ -947,7 +989,8 @@ namespace STROOP.Structs
 
                     double marioHurtboxAwayFromObject = MoreMath.GetDistanceBetween(mObjX, mObjZ, objX, objZ) - mObjHurtboxRadius - objHurtboxRadius;
                     return marioHurtboxAwayFromObject;
-                },
+                }
+            ,
                 (double hurtboxDistAway, uint objAddress) =>
                 {
                     uint marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
@@ -971,7 +1014,7 @@ namespace STROOP.Structs
                 }
             ));
 
-            _dictionary.Add("MarioHurtboxAboveObject",
+            dictionary.Add("MarioHurtboxAboveObject",
                 ((uint objAddress) =>
                 {
                     uint marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
@@ -986,7 +1029,8 @@ namespace STROOP.Structs
 
                     double marioHurtboxAboveObject = mObjHurtboxBottom - objHurtboxTop;
                     return marioHurtboxAboveObject;
-                },
+                }
+            ,
                 (double hurtboxDistAbove, uint objAddress) =>
                 {
                     uint marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
@@ -1005,7 +1049,7 @@ namespace STROOP.Structs
                 }
             ));
 
-            _dictionary.Add("MarioHurtboxBelowObject",
+            dictionary.Add("MarioHurtboxBelowObject",
                 ((uint objAddress) =>
                 {
                     uint marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
@@ -1021,7 +1065,8 @@ namespace STROOP.Structs
 
                     double marioHurtboxBelowObject = objHurtboxBottom - mObjHurtboxTop;
                     return marioHurtboxBelowObject;
-                },
+                }
+            ,
                 (double hurtboxDistBelow, uint objAddress) =>
                 {
                     uint marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
@@ -1042,7 +1087,7 @@ namespace STROOP.Structs
                 }
             ));
 
-            _dictionary.Add("MarioHurtboxOverlapsObject",
+            dictionary.Add("MarioHurtboxOverlapsObject",
                 ((uint objAddress) =>
                 {
                     uint marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
@@ -1070,10 +1115,11 @@ namespace STROOP.Structs
 
                     bool overlap = marioHurtboxAwayFromObject < 0 && marioHurtboxAboveObject <= 0 && marioHurtboxBelowObject <= 0;
                     return overlap ? 1 : 0;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("MarioPunchAngleAway",
+            dictionary.Add("MarioPunchAngleAway",
                 ((uint objAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -1085,7 +1131,8 @@ namespace STROOP.Structs
                     int angleDiffAbs = Math.Abs(angleDiffShort);
                     int angleAway = angleDiffAbs - 0x2AAA;
                     return angleAway;
-                },
+                }
+            ,
                 (double angleAway, uint objAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -1102,9 +1149,10 @@ namespace STROOP.Structs
                     ushort marioAngleUShort = MoreMath.NormalizeAngleUshort(marioAngleDouble);
 
                     return Config.Stream.SetValue(marioAngleUShort, MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("ObjectRngCallsPerFrame",
+            dictionary.Add("ObjectRngCallsPerFrame",
                 ((uint objAddress) =>
                 {
                     uint numberOfRngObjs = Config.Stream.GetUInt32(MiscConfig.HackedAreaAddress);
@@ -1120,68 +1168,77 @@ namespace STROOP.Structs
                         break;
                     }
                     return numOfCalls;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("ObjectProcessGroup",
+            dictionary.Add("ObjectProcessGroup",
                 ((uint processGroupUint) =>
                 {
                     sbyte processGroupByte = processGroupUint == uint.MaxValue ? (sbyte)(-1) : (sbyte)processGroupUint;
                     return processGroupByte;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("ObjectProcessGroupDescription",
+            dictionary.Add("ObjectProcessGroupDescription",
                 ((uint processGroupUint) =>
                 {
                     return ProcessGroupUtilities.GetProcessGroupDescription(processGroupUint);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("ObjectRngIndex",
+            dictionary.Add("ObjectRngIndex",
                 ((uint objAddress) =>
                 {
                     ushort coinRngValue = Config.Stream.GetUInt16(objAddress + ObjectConfig.YawMovingOffset);
                     int coinRngIndex = RngIndexer.GetRngIndex(coinRngValue);
                     return coinRngIndex;
-                },
+                }
+            ,
                 (int rngIndex, uint objAddress) =>
                 {
                     ushort coinRngValue = RngIndexer.GetRngValue(rngIndex);
                     return Config.Stream.SetValue(coinRngValue, objAddress + ObjectConfig.YawMovingOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("ObjectRngIndexDiff",
+            dictionary.Add("ObjectRngIndexDiff",
                 ((uint objAddress) =>
                 {
                     ushort coinRngValue = Config.Stream.GetUInt16(objAddress + ObjectConfig.YawMovingOffset);
                     int coinRngIndex = RngIndexer.GetRngIndex(coinRngValue);
                     int rngIndexDiff = coinRngIndex - SpecialConfig.GoalRngIndex;
                     return rngIndexDiff;
-                },
+                }
+            ,
                 (int rngIndexDiff, uint objAddress) =>
                 {
                     int coinRngIndex = SpecialConfig.GoalRngIndex + rngIndexDiff;
                     ushort coinRngValue = RngIndexer.GetRngValue(coinRngIndex);
                     return Config.Stream.SetValue(coinRngValue, objAddress + ObjectConfig.YawMovingOffset);
-                }));
+                }
+            ));
 
             // Object specific vars - Pendulum
 
-            _dictionary.Add("PendulumCountdown",
+            dictionary.Add("PendulumCountdown",
                 ((uint objAddress) =>
                 {
                     int pendulumCountdown = GetPendulumCountdown(objAddress);
                     return pendulumCountdown;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("PendulumAmplitude",
+            dictionary.Add("PendulumAmplitude",
                 ((uint objAddress) =>
                 {
                     float pendulumAmplitude = GetPendulumAmplitude(objAddress);
                     return pendulumAmplitude;
-                },
+                }
+            ,
                 (double amplitude, uint objAddress) =>
                 {
                     float accelerationDirection = amplitude > 0 ? -1 : 1;
@@ -1191,9 +1248,10 @@ namespace STROOP.Structs
                     success &= Config.Stream.SetValue(0f, objAddress + ObjectConfig.PendulumAngularVelocityOffset);
                     success &= Config.Stream.SetValue((float)amplitude, objAddress + ObjectConfig.PendulumAngleOffset);
                     return success;
-                }));
+                }
+            ));
 
-            _dictionary.Add("PendulumSwingIndex",
+            dictionary.Add("PendulumSwingIndex",
                 ((uint objAddress) =>
                 {
                     float pendulumAmplitudeFloat = GetPendulumAmplitude(objAddress);
@@ -1201,7 +1259,8 @@ namespace STROOP.Structs
                     if (!pendulumAmplitudeIntNullable.HasValue) return Double.NaN.ToString();
                     int pendulumAmplitudeInt = pendulumAmplitudeIntNullable.Value;
                     return TableConfig.PendulumSwings.GetPendulumSwingIndexExtended(pendulumAmplitudeInt);
-                },
+                }
+            ,
                 (int index, uint objAddress) =>
                 {
                     float amplitude = TableConfig.PendulumSwings.GetPendulumAmplitude(index);
@@ -1212,103 +1271,114 @@ namespace STROOP.Structs
                     success &= Config.Stream.SetValue(0f, objAddress + ObjectConfig.PendulumAngularVelocityOffset);
                     success &= Config.Stream.SetValue(amplitude, objAddress + ObjectConfig.PendulumAngleOffset);
                     return success;
-                }));
+                }
+            ));
 
             // Object specific vars - Cog
 
-            _dictionary.Add("CogCountdown",
+            dictionary.Add("CogCountdown",
                 ((uint objAddress) =>
                 {
                     int cogCountdown = GetCogNumFramesInRotation(objAddress);
                     return cogCountdown;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("CogEndingYaw",
+            dictionary.Add("CogEndingYaw",
                 ((uint objAddress) =>
                 {
                     ushort cogEndingYaw = GetCogEndingYaw(objAddress);
                     return cogEndingYaw;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("CogRotationIndex",
+            dictionary.Add("CogRotationIndex",
                 ((uint objAddress) =>
                 {
                     ushort yawFacing = Config.Stream.GetUInt16(objAddress + ObjectConfig.YawFacingOffset);
                     double rotationIndex = CogUtilities.GetRotationIndex(yawFacing) ?? Double.NaN;
                     return rotationIndex;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
             // Object specific vars - Waypoint
 
-            _dictionary.Add("ObjectDotProductToWaypoint",
+            dictionary.Add("ObjectDotProductToWaypoint",
                 ((uint objAddress) =>
                 {
                     (double dotProduct, double distToWaypointPlane, double distToWaypoint) =
                         GetWaypointSpecialVars(objAddress);
                     return dotProduct;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("ObjectDistanceToWaypointPlane",
+            dictionary.Add("ObjectDistanceToWaypointPlane",
                 ((uint objAddress) =>
                 {
                     (double dotProduct, double distToWaypointPlane, double distToWaypoint) =
                         GetWaypointSpecialVars(objAddress);
                     return distToWaypointPlane;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("ObjectDistanceToWaypoint",
+            dictionary.Add("ObjectDistanceToWaypoint",
                 ((uint objAddress) =>
                 {
                     (double dotProduct, double distToWaypointPlane, double distToWaypoint) =
                         GetWaypointSpecialVars(objAddress);
                     return distToWaypoint;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
             // Object specific vars - Racing Penguin
 
-            _dictionary.Add("RacingPenguinEffortTarget",
+            dictionary.Add("RacingPenguinEffortTarget",
                 ((uint objAddress) =>
                 {
                     (double effortTarget, double effortChange, double minHSpeed, double hSpeedTarget) =
                         GetRacingPenguinSpecialVars(objAddress);
                     return effortTarget;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("RacingPenguinEffortChange",
+            dictionary.Add("RacingPenguinEffortChange",
                 ((uint objAddress) =>
                 {
                     (double effortTarget, double effortChange, double minHSpeed, double hSpeedTarget) =
                         GetRacingPenguinSpecialVars(objAddress);
                     return effortChange;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("RacingPenguinMinHSpeed",
+            dictionary.Add("RacingPenguinMinHSpeed",
                 ((uint objAddress) =>
                 {
                     (double effortTarget, double effortChange, double minHSpeed, double hSpeedTarget) =
                         GetRacingPenguinSpecialVars(objAddress);
                     return minHSpeed;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("RacingPenguinHSpeedTarget",
+            dictionary.Add("RacingPenguinHSpeedTarget",
                 ((uint objAddress) =>
                 {
                     (double effortTarget, double effortChange, double minHSpeed, double hSpeedTarget) =
                         GetRacingPenguinSpecialVars(objAddress);
                     return hSpeedTarget;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("RacingPenguinDiffHSpeedTarget",
+            dictionary.Add("RacingPenguinDiffHSpeedTarget",
                 ((uint objAddress) =>
                 {
                     (double effortTarget, double effortChange, double minHSpeed, double hSpeedTarget) =
@@ -1316,73 +1386,81 @@ namespace STROOP.Structs
                     float hSpeed = Config.Stream.GetSingle(objAddress + ObjectConfig.HSpeedOffset);
                     double hSpeedDiff = hSpeed - hSpeedTarget;
                     return hSpeedDiff;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("RacingPenguinProgress",
+            dictionary.Add("RacingPenguinProgress",
                 ((uint objAddress) =>
                 {
                     double progress = TableConfig.RacingPenguinWaypoints.GetProgress(objAddress);
                     return progress;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
             // Object specific vars - Koopa the Quick
 
-            _dictionary.Add("KoopaTheQuickHSpeedTarget",
+            dictionary.Add("KoopaTheQuickHSpeedTarget",
                 ((uint objAddress) =>
                 {
                     (double hSpeedTarget, double hSpeedChange) = GetKoopaTheQuickSpecialVars(objAddress);
                     return hSpeedTarget;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("KoopaTheQuickHSpeedChange",
+            dictionary.Add("KoopaTheQuickHSpeedChange",
                 ((uint objAddress) =>
                 {
                     (double hSpeedTarget, double hSpeedChange) = GetKoopaTheQuickSpecialVars(objAddress);
                     return hSpeedChange;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("KoopaTheQuick1Progress",
+            dictionary.Add("KoopaTheQuick1Progress",
                 ((uint objAddress) =>
                 {
                     double progress = TableConfig.KoopaTheQuick1Waypoints.GetProgress(objAddress);
                     return progress;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("KoopaTheQuick2Progress",
+            dictionary.Add("KoopaTheQuick2Progress",
                 ((uint objAddress) =>
                 {
                     double progress = TableConfig.KoopaTheQuick2Waypoints.GetProgress(objAddress);
                     return progress;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("KoopaTheQuick1ProgressOld",
+            dictionary.Add("KoopaTheQuick1ProgressOld",
                 ((uint objAddress) =>
                 {
                     uint globalTimer = Config.Stream.GetUInt32(MiscConfig.GlobalTimerAddress);
                     double progressOld = PlushUtilities.GetProgress(globalTimer);
                     return progressOld;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("KoopaTheQuick1ProgressDiff",
+            dictionary.Add("KoopaTheQuick1ProgressDiff",
                 ((uint objAddress) =>
                 {
                     uint globalTimer = Config.Stream.GetUInt32(MiscConfig.GlobalTimerAddress);
                     double progressOld = PlushUtilities.GetProgress(globalTimer);
                     double progressNew = TableConfig.KoopaTheQuick1Waypoints.GetProgress(objAddress);
                     return progressNew - progressOld;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
             // Object specific vars - Fly Guy
 
-            _dictionary.Add("FlyGuyZone",
+            dictionary.Add("FlyGuyZone",
                 ((uint objAddress) =>
                 {
                     float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
@@ -1391,26 +1469,29 @@ namespace STROOP.Structs
                     if (heightDiff < -400) return "Low";
                     if (heightDiff > -200) return "High";
                     return "Medium";
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("FlyGuyRelativeHeight",
+            dictionary.Add("FlyGuyRelativeHeight",
                 ((uint objAddress) =>
                 {
                     int oscillationTimer = Config.Stream.GetInt32(objAddress + ObjectConfig.FlyGuyOscillationTimerOffset);
                     double relativeHeight = TableConfig.FlyGuyData.GetRelativeHeight(oscillationTimer);
                     return relativeHeight;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("FlyGuyMinHeight",
+            dictionary.Add("FlyGuyMinHeight",
                 ((uint objAddress) =>
                 {
                     float objY = Config.Stream.GetSingle(objAddress + ObjectConfig.YOffset);
                     int oscillationTimer = Config.Stream.GetInt32(objAddress + ObjectConfig.FlyGuyOscillationTimerOffset);
                     double minHeight = TableConfig.FlyGuyData.GetMinHeight(oscillationTimer, objY);
                     return minHeight;
-                },
+                }
+            ,
                 (double newMinHeight, uint objAddress) =>
                 {
                     int oscillationTimer = Config.Stream.GetInt32(objAddress + ObjectConfig.FlyGuyOscillationTimerOffset);
@@ -1419,16 +1500,18 @@ namespace STROOP.Structs
                     double heightDiff = newMinHeight - oldMinHeight;
                     double newHeight = oldHeight + heightDiff;
                     return Config.Stream.SetValue((float)newHeight, objAddress + ObjectConfig.YOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("FlyGuyMaxHeight",
+            dictionary.Add("FlyGuyMaxHeight",
                 ((uint objAddress) =>
                 {
                     float objY = Config.Stream.GetSingle(objAddress + ObjectConfig.YOffset);
                     int oscillationTimer = Config.Stream.GetInt32(objAddress + ObjectConfig.FlyGuyOscillationTimerOffset);
                     double maxHeight = TableConfig.FlyGuyData.GetMaxHeight(oscillationTimer, objY);
                     return maxHeight;
-                },
+                }
+            ,
                 (double newMaxHeight, uint objAddress) =>
                 {
                     int oscillationTimer = Config.Stream.GetInt32(objAddress + ObjectConfig.FlyGuyOscillationTimerOffset);
@@ -1437,9 +1520,10 @@ namespace STROOP.Structs
                     double heightDiff = newMaxHeight - oldMaxHeight;
                     double newHeight = oldHeight + heightDiff;
                     return Config.Stream.SetValue((float)newHeight, objAddress + ObjectConfig.YOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("FlyGuyActivationDistanceDiff",
+            dictionary.Add("FlyGuyActivationDistanceDiff",
                 ((uint objAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -1448,7 +1532,8 @@ namespace STROOP.Structs
                         marioPos.X, marioPos.Y, marioPos.Z, objPos.X, objPos.Y, objPos.Z);
                     double distDiff = dist - 4000;
                     return distDiff;
-                },
+                }
+            ,
                 (double distDiff, uint objAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -1458,17 +1543,19 @@ namespace STROOP.Structs
                         MoreMath.ExtrapolateLine3D(
                             objPos.X, objPos.Y, objPos.Z, marioPos.X, marioPos.Y, marioPos.Z, distAway);
                     return marioPos.SetValues(x: newMarioX, y: newMarioY, z: newMarioZ);
-                }));
+                }
+            ));
 
             // Object specific vars - Bob-omb
 
-            _dictionary.Add("BobombBloatSize",
+            dictionary.Add("BobombBloatSize",
                 ((uint objAddress) =>
                 {
                     float hitboxRadius = Config.Stream.GetSingle(objAddress + ObjectConfig.HitboxRadiusOffset);
                     float bloatSize = (hitboxRadius - 65) / 13;
                     return bloatSize;
-                },
+                }
+            ,
                 (float bloatSize, uint objAddress) =>
                 {
                     float hitboxRadius = bloatSize * 13 + 65;
@@ -1482,15 +1569,17 @@ namespace STROOP.Structs
                     success &= Config.Stream.SetValue(scale, objAddress + ObjectConfig.ScaleHeightOffset);
                     success &= Config.Stream.SetValue(scale, objAddress + ObjectConfig.ScaleDepthOffset);
                     return success;
-                }));
+                }
+            ));
 
-            _dictionary.Add("BobombRadius",
+            dictionary.Add("BobombRadius",
                 ((uint objAddress) =>
                 {
                     float hitboxRadius = Config.Stream.GetSingle(objAddress + ObjectConfig.HitboxRadiusOffset);
                     float radius = hitboxRadius + 32;
                     return radius;
-                },
+                }
+            ,
                 (float radius, uint objAddress) =>
                 {
                     float bloatSize = (radius - 97) / 13;
@@ -1505,9 +1594,10 @@ namespace STROOP.Structs
                     success &= Config.Stream.SetValue(scale, objAddress + ObjectConfig.ScaleHeightOffset);
                     success &= Config.Stream.SetValue(scale, objAddress + ObjectConfig.ScaleDepthOffset);
                     return success;
-                }));
+                }
+            ));
 
-            _dictionary.Add("BobombSpaceBetween",
+            dictionary.Add("BobombSpaceBetween",
                 ((uint objAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -1518,7 +1608,8 @@ namespace STROOP.Structs
                     float radius = hitboxRadius + 32;
                     double spaceBetween = hDist - radius;
                     return spaceBetween;
-                },
+                }
+            ,
                 (double spaceBetween, uint objAddress) =>
                 {
                     float hitboxRadius = Config.Stream.GetSingle(objAddress + ObjectConfig.HitboxRadiusOffset);
@@ -1531,78 +1622,89 @@ namespace STROOP.Structs
                         MoreMath.ExtrapolateLine2D(
                             objPos.X, objPos.Z, marioPos.X, marioPos.Z, distAway);
                     return marioPos.SetValues(x: newMarioX, z: newMarioZ);
-                }));
+                }
+            ));
 
-            _dictionary.Add("BobombHomeRadiusDiff",
+            dictionary.Add("BobombHomeRadiusDiff",
                 ((uint objAddress) =>
                 {
                     return GetRadiusDiff(PositionAngle.Mario, PositionAngle.ObjHome(objAddress), 400);
-                },
+                }
+            ,
                 (double dist, uint objAddress) =>
                 {
                     return SetRadiusDiff(PositionAngle.Mario, PositionAngle.ObjHome(objAddress), 400, dist);
-                }));
+                }
+            ));
 
             // Object specific vars - Chuckya
 
-            _dictionary.Add("ChuckyaAngleMod1024",
+            dictionary.Add("ChuckyaAngleMod1024",
                 ((uint objAddress) =>
                 {
                     ushort angle = Config.Stream.GetUInt16(objAddress + ObjectConfig.YawMovingOffset);
                     int mod = angle % 1024;
                     return mod;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
             // Object specific vars - Scuttlebug
 
-            _dictionary.Add("ScuttlebugDeltaAngleToTarget",
+            dictionary.Add("ScuttlebugDeltaAngleToTarget",
                 ((uint objAddress) =>
                 {
                     ushort facingAngle = Config.Stream.GetUInt16(objAddress + ObjectConfig.YawFacingOffset);
                     ushort targetAngle = Config.Stream.GetUInt16(objAddress + ObjectConfig.ScuttlebugTargetAngleOffset);
                     int angleDiff = facingAngle - targetAngle;
                     return MoreMath.NormalizeAngleDoubleSigned(angleDiff);
-                },
+                }
+            ,
                 (double angleDiff, uint objAddress) =>
                 {
                     ushort targetAngle = Config.Stream.GetUInt16(objAddress + ObjectConfig.ScuttlebugTargetAngleOffset);
                     double newObjAngleDouble = targetAngle + angleDiff;
                     ushort newObjAngleUShort = MoreMath.NormalizeAngleUshort(newObjAngleDouble);
                     return PositionAngle.Obj(objAddress).SetAngle(newObjAngleUShort);
-                }));
+                }
+            ));
 
             // Object specific vars - Goomba Triplet Spawner
 
-            _dictionary.Add("GoombaTripletLoadingRadiusDiff",
+            dictionary.Add("GoombaTripletLoadingRadiusDiff",
                 ((uint objAddress) =>
                 {
                     return GetRadiusDiff(PositionAngle.Mario, PositionAngle.Obj(objAddress), 3000);
-                },
+                }
+            ,
                 (double dist, uint objAddress) =>
                 {
                     return SetRadiusDiff(PositionAngle.Mario, PositionAngle.Obj(objAddress), 3000, dist);
-                }));
+                }
+            ));
 
-            _dictionary.Add("GoombaTripletUnloadingRadiusDiff",
+            dictionary.Add("GoombaTripletUnloadingRadiusDiff",
                 ((uint objAddress) =>
                 {
                     return GetRadiusDiff(PositionAngle.Mario, PositionAngle.Obj(objAddress), 4000);
-                },
+                }
+            ,
                 (double dist, uint objAddress) =>
                 {
                     return SetRadiusDiff(PositionAngle.Mario, PositionAngle.Obj(objAddress), 4000, dist);
-                }));
+                }
+            ));
 
             // Object specific vars - BitFS Platform
 
-            _dictionary.Add("BitfsPlatformGroupMinHeight",
+            dictionary.Add("BitfsPlatformGroupMinHeight",
                 ((uint objAddress) =>
                 {
                     int timer = Config.Stream.GetInt32(objAddress + ObjectConfig.BitfsPlatformGroupTimerOffset);
                     float height = Config.Stream.GetSingle(objAddress + ObjectConfig.YOffset);
                     return BitfsPlatformGroupTable.GetMinHeight(timer, height);
-                },
+                }
+            ,
                 (double newMinHeight, uint objAddress) =>
                 {
                     int timer = Config.Stream.GetInt32(objAddress + ObjectConfig.BitfsPlatformGroupTimerOffset);
@@ -1612,15 +1714,17 @@ namespace STROOP.Structs
                     float oldHeight = Config.Stream.GetSingle(objAddress + ObjectConfig.YOffset);
                     double newHeight = oldHeight + heightDiff;
                     return Config.Stream.SetValue((float)newHeight, objAddress + ObjectConfig.YOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("BitfsPlatformGroupMaxHeight",
+            dictionary.Add("BitfsPlatformGroupMaxHeight",
                 ((uint objAddress) =>
                 {
                     int timer = Config.Stream.GetInt32(objAddress + ObjectConfig.BitfsPlatformGroupTimerOffset);
                     float height = Config.Stream.GetSingle(objAddress + ObjectConfig.YOffset);
                     return BitfsPlatformGroupTable.GetMaxHeight(timer, height);
-                },
+                }
+            ,
                 (double newMaxHeight, uint objAddress) =>
                 {
                     int timer = Config.Stream.GetInt32(objAddress + ObjectConfig.BitfsPlatformGroupTimerOffset);
@@ -1630,24 +1734,27 @@ namespace STROOP.Structs
                     float oldHeight = Config.Stream.GetSingle(objAddress + ObjectConfig.YOffset);
                     double newHeight = oldHeight + heightDiff;
                     return Config.Stream.SetValue((float)newHeight, objAddress + ObjectConfig.YOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("BitfsPlatformGroupRelativeHeight",
+            dictionary.Add("BitfsPlatformGroupRelativeHeight",
                 ((uint objAddress) =>
                 {
                     int timer = Config.Stream.GetInt32(objAddress + ObjectConfig.BitfsPlatformGroupTimerOffset);
                     return BitfsPlatformGroupTable.GetRelativeHeightFromMin(timer);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("BitfsPlatformGroupDisplacedHeight",
+            dictionary.Add("BitfsPlatformGroupDisplacedHeight",
                 ((uint objAddress) =>
                 {
                     int timer = Config.Stream.GetInt32(objAddress + ObjectConfig.BitfsPlatformGroupTimerOffset);
                     float height = Config.Stream.GetSingle(objAddress + ObjectConfig.YOffset);
                     float homeHeight = Config.Stream.GetSingle(objAddress + ObjectConfig.HomeYOffset);
                     return BitfsPlatformGroupTable.GetDisplacedHeight(timer, height, homeHeight);
-                },
+                }
+            ,
                 (double displacedHeight, uint objAddress) =>
                 {
                     float homeHeight = Config.Stream.GetSingle(objAddress + ObjectConfig.HomeYOffset);
@@ -1656,45 +1763,50 @@ namespace STROOP.Structs
                     float relativeHeightFromMax = BitfsPlatformGroupTable.GetRelativeHeightFromMax(timer);
                     double newHeight = newMaxHeight + relativeHeightFromMax;
                     return Config.Stream.SetValue((float)newHeight, objAddress + ObjectConfig.YOffset);
-                }));
+                }
+            ));
 
             // Object specific vars - Hoot
 
-            _dictionary.Add("HootReleaseTimer",
+            dictionary.Add("HootReleaseTimer",
                 ((uint objAddress) =>
                 {
                     uint globalTimer = Config.Stream.GetUInt32(MiscConfig.GlobalTimerAddress);
                     uint lastReleaseTime = Config.Stream.GetUInt32(objAddress + ObjectConfig.HootLastReleaseTimeOffset);
                     int diff = (int)(globalTimer - lastReleaseTime);
                     return diff;
-                },
+                }
+            ,
                 (int newDiff, uint objAddress) =>
                 {
                     uint globalTimer = Config.Stream.GetUInt32(MiscConfig.GlobalTimerAddress);
                     uint newLastReleaseTime = (uint)(globalTimer - newDiff);
                     return Config.Stream.SetValue(newLastReleaseTime, objAddress + ObjectConfig.HootLastReleaseTimeOffset);
-                }));
+                }
+            ));
 
             // Object specific vars - Power Star
 
-            _dictionary.Add("PowerStarMissionName",
+            dictionary.Add("PowerStarMissionName",
                 ((uint objAddress) =>
                 {
                     int courseIndex = Config.Stream.GetInt16(MiscConfig.LevelIndexAddress);
                     int missionIndex = Config.Stream.GetByte(objAddress + ObjectConfig.PowerStarMissionIndexOffset);
                     return TableConfig.Missions.GetInGameMissionName(courseIndex, missionIndex);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
             // Object specific vars - Coordinates
 
-            _dictionary.Add("MinXCoordinate",
+            dictionary.Add("MinXCoordinate",
                 ((uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
                     if (tris.Count == 0) return double.NaN;
                     return tris.Min(tri => tri.GetMinX());
-                },
+                }
+            ,
                 (float newMinX, uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
@@ -1704,15 +1816,17 @@ namespace STROOP.Structs
                     float objX = Config.Stream.GetSingle(objAddress + ObjectConfig.XOffset);
                     float newObjX = objX + diff;
                     return Config.Stream.SetValue(newObjX, objAddress + ObjectConfig.XOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("MaxXCoordinate",
+            dictionary.Add("MaxXCoordinate",
                 ((uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
                     if (tris.Count == 0) return double.NaN;
                     return tris.Max(tri => tri.GetMaxX());
-                },
+                }
+            ,
                 (float newMaxX, uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
@@ -1722,15 +1836,17 @@ namespace STROOP.Structs
                     float objX = Config.Stream.GetSingle(objAddress + ObjectConfig.XOffset);
                     float newObjX = objX + diff;
                     return Config.Stream.SetValue(newObjX, objAddress + ObjectConfig.XOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("MinYCoordinate",
+            dictionary.Add("MinYCoordinate",
                 ((uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
                     if (tris.Count == 0) return double.NaN;
                     return tris.Min(tri => tri.GetMinY());
-                },
+                }
+            ,
                 (float newMinY, uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
@@ -1740,15 +1856,17 @@ namespace STROOP.Structs
                     float objY = Config.Stream.GetSingle(objAddress + ObjectConfig.YOffset);
                     float newObjY = objY + diff;
                     return Config.Stream.SetValue(newObjY, objAddress + ObjectConfig.YOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("MaxYCoordinate",
+            dictionary.Add("MaxYCoordinate",
                 ((uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
                     if (tris.Count == 0) return double.NaN;
                     return tris.Max(tri => tri.GetMaxY());
-                },
+                }
+            ,
                 (float newMaxY, uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
@@ -1758,15 +1876,17 @@ namespace STROOP.Structs
                     float objY = Config.Stream.GetSingle(objAddress + ObjectConfig.YOffset);
                     float newObjY = objY + diff;
                     return Config.Stream.SetValue(newObjY, objAddress + ObjectConfig.YOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("MinZCoordinate",
+            dictionary.Add("MinZCoordinate",
                 ((uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
                     if (tris.Count == 0) return double.NaN;
                     return tris.Min(tri => tri.GetMinZ());
-                },
+                }
+            ,
                 (float newMinZ, uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
@@ -1776,15 +1896,17 @@ namespace STROOP.Structs
                     float objZ = Config.Stream.GetSingle(objAddress + ObjectConfig.ZOffset);
                     float newObjZ = objZ + diff;
                     return Config.Stream.SetValue(newObjZ, objAddress + ObjectConfig.ZOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("MaxZCoordinate",
+            dictionary.Add("MaxZCoordinate",
                 ((uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
                     if (tris.Count == 0) return double.NaN;
                     return tris.Max(tri => tri.GetMaxZ());
-                },
+                }
+            ,
                 (float newMaxZ, uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
@@ -1794,15 +1916,17 @@ namespace STROOP.Structs
                     float objZ = Config.Stream.GetSingle(objAddress + ObjectConfig.ZOffset);
                     float newObjZ = objZ + diff;
                     return Config.Stream.SetValue(newObjZ, objAddress + ObjectConfig.ZOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("RangeXCoordinate",
+            dictionary.Add("RangeXCoordinate",
                 ((uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
                     if (tris.Count == 0) return double.NaN;
                     return tris.Max(tri => tri.GetMaxX()) - tris.Min(tri => tri.GetMinX());
-                },
+                }
+            ,
                 (float newXRange, uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
@@ -1812,15 +1936,17 @@ namespace STROOP.Structs
                     float scaleX = Config.Stream.GetSingle(objAddress + ObjectConfig.ScaleWidthOffset);
                     float newScaleX = scaleX * ratio;
                     return Config.Stream.SetValue(newScaleX, objAddress + ObjectConfig.ScaleWidthOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("RangeYCoordinate",
+            dictionary.Add("RangeYCoordinate",
                 ((uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
                     if (tris.Count == 0) return double.NaN;
                     return tris.Max(tri => tri.GetMaxY()) - tris.Min(tri => tri.GetMinY());
-                },
+                }
+            ,
                 (float newYRange, uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
@@ -1830,15 +1956,17 @@ namespace STROOP.Structs
                     float scaleY = Config.Stream.GetSingle(objAddress + ObjectConfig.ScaleHeightOffset);
                     float newScaleY = scaleY * ratio;
                     return Config.Stream.SetValue(newScaleY, objAddress + ObjectConfig.ScaleHeightOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("RangeZCoordinate",
+            dictionary.Add("RangeZCoordinate",
                 ((uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
                     if (tris.Count == 0) return double.NaN;
                     return tris.Max(tri => tri.GetMaxZ()) - tris.Min(tri => tri.GetMinZ());
-                },
+                }
+            ,
                 (float newZRange, uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
@@ -1848,15 +1976,17 @@ namespace STROOP.Structs
                     float scaleZ = Config.Stream.GetSingle(objAddress + ObjectConfig.ScaleDepthOffset);
                     float newScaleZ = scaleZ * ratio;
                     return Config.Stream.SetValue(newScaleZ, objAddress + ObjectConfig.ScaleDepthOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("MidpointXCoordinate",
+            dictionary.Add("MidpointXCoordinate",
                 ((uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
                     if (tris.Count == 0) return double.NaN;
                     return (tris.Max(tri => tri.GetMaxX()) + tris.Min(tri => tri.GetMinX())) / 2.0;
-                },
+                }
+            ,
                 (float newMidpointX, uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
@@ -1866,15 +1996,17 @@ namespace STROOP.Structs
                     float objX = Config.Stream.GetSingle(objAddress + ObjectConfig.XOffset);
                     float newObjX = objX + diff;
                     return Config.Stream.SetValue(newObjX, objAddress + ObjectConfig.XOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("MidpointYCoordinate",
+            dictionary.Add("MidpointYCoordinate",
                 ((uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
                     if (tris.Count == 0) return double.NaN;
                     return (tris.Max(tri => tri.GetMaxY()) + tris.Min(tri => tri.GetMinY())) / 2.0;
-                },
+                }
+            ,
                 (float newMidpointY, uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
@@ -1884,15 +2016,17 @@ namespace STROOP.Structs
                     float objY = Config.Stream.GetSingle(objAddress + ObjectConfig.YOffset);
                     float newObjY = objY + diff;
                     return Config.Stream.SetValue(newObjY, objAddress + ObjectConfig.YOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("MidpointZCoordinate",
+            dictionary.Add("MidpointZCoordinate",
                 ((uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
                     if (tris.Count == 0) return double.NaN;
                     return (tris.Max(tri => tri.GetMaxZ()) + tris.Min(tri => tri.GetMinZ())) / 2.0;
-                },
+                }
+            ,
                 (float newMidpointZ, uint objAddress) =>
                 {
                     List<TriangleDataModel> tris = TriangleUtilities.GetObjectTrianglesForObject(objAddress);
@@ -1902,9 +2036,10 @@ namespace STROOP.Structs
                     float objZ = Config.Stream.GetSingle(objAddress + ObjectConfig.ZOffset);
                     float newObjZ = objZ + diff;
                     return Config.Stream.SetValue(newObjZ, objAddress + ObjectConfig.ZOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("FarthestCoordinateDistance",
+            dictionary.Add("FarthestCoordinateDistance",
                 ((uint objAddress) =>
                 {
                     float objX = Config.Stream.GetSingle(objAddress + ObjectConfig.XOffset);
@@ -1922,139 +2057,28 @@ namespace STROOP.Structs
                         coordinates.Add((tri.X3, tri.Y3, tri.Z3));
                     });
                     return coordinates.Max(coord => MoreMath.GetDistanceBetween(objX, objY, objZ, coord.Item1, coord.Item2, coord.Item3));
-                },
+                }
+            ,
                 DEFAULT_SETTER));
-
-            _dictionary.Add("MinXFloorCoordinate",
-                ((uint objAddress) =>
-                {
-                    List<TriangleDataModel> tris = TriangleUtilities.GetObjectFloorTrianglesForObject(objAddress);
-                    if (tris.Count == 0) return double.NaN;
-                    return tris.Min(tri => tri.GetMinX());
-                },
-                (float newMinX, uint objAddress) =>
-                {
-                    List<TriangleDataModel> tris = TriangleUtilities.GetObjectFloorTrianglesForObject(objAddress);
-                    if (tris.Count == 0) return false;
-                    int minX = tris.Min(tri => tri.GetMinX());
-                    float diff = newMinX - minX;
-                    float objX = Config.Stream.GetSingle(objAddress + ObjectConfig.XOffset);
-                    float newObjX = objX + diff;
-                    return Config.Stream.SetValue(newObjX, objAddress + ObjectConfig.XOffset);
-                }
-            ));
-
-            _dictionary.Add("MaxXFloorCoordinate",
-                ((uint objAddress) =>
-                {
-                    List<TriangleDataModel> tris = TriangleUtilities.GetObjectFloorTrianglesForObject(objAddress);
-                    if (tris.Count == 0) return double.NaN;
-                    return tris.Max(tri => tri.GetMaxX());
-                },
-                (float newMaxX, uint objAddress) =>
-                {
-                    List<TriangleDataModel> tris = TriangleUtilities.GetObjectFloorTrianglesForObject(objAddress);
-                    if (tris.Count == 0) return false;
-                    int maxX = tris.Max(tri => tri.GetMaxX());
-                    float diff = newMaxX - maxX;
-                    float objX = Config.Stream.GetSingle(objAddress + ObjectConfig.XOffset);
-                    float newObjX = objX + diff;
-                    return Config.Stream.SetValue(newObjX, objAddress + ObjectConfig.XOffset);
-                }
-            ));
-
-            _dictionary.Add("MinYFloorCoordinate",
-                ((uint objAddress) =>
-                {
-                    List<TriangleDataModel> tris = TriangleUtilities.GetObjectFloorTrianglesForObject(objAddress);
-                    if (tris.Count == 0) return double.NaN;
-                    return tris.Min(tri => tri.GetMinY());
-                },
-                (float newMinY, uint objAddress) =>
-                {
-                    List<TriangleDataModel> tris = TriangleUtilities.GetObjectFloorTrianglesForObject(objAddress);
-                    if (tris.Count == 0) return false;
-                    int minY = tris.Min(tri => tri.GetMinY());
-                    float diff = newMinY - minY;
-                    float objY = Config.Stream.GetSingle(objAddress + ObjectConfig.YOffset);
-                    float newObjY = objY + diff;
-                    return Config.Stream.SetValue(newObjY, objAddress + ObjectConfig.YOffset);
-                }
-            ));
-
-            _dictionary.Add("MaxYFloorCoordinate",
-                ((uint objAddress) =>
-                {
-                    List<TriangleDataModel> tris = TriangleUtilities.GetObjectFloorTrianglesForObject(objAddress);
-                    if (tris.Count == 0) return double.NaN;
-                    return tris.Max(tri => tri.GetMaxY());
-                },
-                (float newMaxY, uint objAddress) =>
-                {
-                    List<TriangleDataModel> tris = TriangleUtilities.GetObjectFloorTrianglesForObject(objAddress);
-                    if (tris.Count == 0) return false;
-                    int maxY = tris.Max(tri => tri.GetMaxY());
-                    float diff = newMaxY - maxY;
-                    float objY = Config.Stream.GetSingle(objAddress + ObjectConfig.YOffset);
-                    float newObjY = objY + diff;
-                    return Config.Stream.SetValue(newObjY, objAddress + ObjectConfig.YOffset);
-                }
-            ));
-
-            _dictionary.Add("MinZFloorCoordinate",
-                ((uint objAddress) =>
-                {
-                    List<TriangleDataModel> tris = TriangleUtilities.GetObjectFloorTrianglesForObject(objAddress);
-                    if (tris.Count == 0) return double.NaN;
-                    return tris.Min(tri => tri.GetMinZ());
-                },
-                (float newMinZ, uint objAddress) =>
-                {
-                    List<TriangleDataModel> tris = TriangleUtilities.GetObjectFloorTrianglesForObject(objAddress);
-                    if (tris.Count == 0) return false;
-                    int minZ = tris.Min(tri => tri.GetMinZ());
-                    float diff = newMinZ - minZ;
-                    float objZ = Config.Stream.GetSingle(objAddress + ObjectConfig.ZOffset);
-                    float newObjZ = objZ + diff;
-                    return Config.Stream.SetValue(newObjZ, objAddress + ObjectConfig.ZOffset);
-                }
-            ));
-
-            _dictionary.Add("MaxZFloorCoordinate",
-                ((uint objAddress) =>
-                {
-                    List<TriangleDataModel> tris = TriangleUtilities.GetObjectFloorTrianglesForObject(objAddress);
-                    if (tris.Count == 0) return double.NaN;
-                    return tris.Max(tri => tri.GetMaxZ());
-                },
-                (float newMaxZ, uint objAddress) =>
-                {
-                    List<TriangleDataModel> tris = TriangleUtilities.GetObjectFloorTrianglesForObject(objAddress);
-                    if (tris.Count == 0) return false;
-                    int maxZ = tris.Max(tri => tri.GetMaxZ());
-                    float diff = newMaxZ - maxZ;
-                    float objZ = Config.Stream.GetSingle(objAddress + ObjectConfig.ZOffset);
-                    float newObjZ = objZ + diff;
-                    return Config.Stream.SetValue(newObjZ, objAddress + ObjectConfig.ZOffset);
-                }
-            ));
 
             // Object specific vars - Rolling Log
 
-            _dictionary.Add("RollingLogDistLimit",
+            dictionary.Add("RollingLogDistLimit",
                 ((uint objAddress) =>
                 {
                     float distLimitSquared = Config.Stream.GetSingle(objAddress + ObjectConfig.RollingLogDistLimitSquaredOffset);
                     double distLimit = Math.Sqrt(distLimitSquared);
                     return distLimit;
-                },
+                }
+            ,
                 (double newDistLimit, uint objAddress) =>
                 {
                     double newDistLimitSquared = newDistLimit * newDistLimit;
                     return Config.Stream.SetValue((float)newDistLimitSquared, objAddress + ObjectConfig.RollingLogDistLimitSquaredOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("RollingLogDist",
+            dictionary.Add("RollingLogDist",
                 ((uint objAddress) =>
                 {
                     float x = Config.Stream.GetSingle(objAddress + ObjectConfig.XOffset);
@@ -2063,156 +2087,179 @@ namespace STROOP.Structs
                     float zCenter = Config.Stream.GetSingle(objAddress + ObjectConfig.RollingLogZCenterOffset);
                     double dist = MoreMath.GetDistanceBetween(xCenter, zCenter, x, z);
                     return dist;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
             // Object specific vars - Object Spawner
 
-            _dictionary.Add("ObjectSpawnerRadiusDiff",
+            dictionary.Add("ObjectSpawnerRadiusDiff",
                 ((uint objAddress) =>
                 {
                     float radius = Config.Stream.GetSingle(objAddress + ObjectConfig.ObjectSpawnerRadiusOffset);
                     return GetRadiusDiff(PositionAngle.Mario, PositionAngle.Obj(objAddress), radius);
-                },
+                }
+            ,
                 (double dist, uint objAddress) =>
                 {
                     float radius = Config.Stream.GetSingle(objAddress + ObjectConfig.ObjectSpawnerRadiusOffset);
                     return SetRadiusDiff(PositionAngle.Mario, PositionAngle.Obj(objAddress), radius, dist);
-                }));
+                }
+            ));
 
             // Object specific vars - WDW Rotating Platform
 
-            _dictionary.Add("WdwRotatingPlatformCurrentIndex",
+            dictionary.Add("WdwRotatingPlatformCurrentIndex",
                 ((uint objAddress) =>
                 {
                     ushort angle = Config.Stream.GetUInt16(objAddress + ObjectConfig.YawFacingOffset);
                     return TableConfig.WdwRotatingPlatformTable.GetIndex(angle) ?? double.NaN;
-                },
+                }
+            ,
                 (int index, uint objAddress) =>
                 {
                     ushort angle = TableConfig.WdwRotatingPlatformTable.GetAngle(index);
                     return Config.Stream.SetValue(angle, objAddress + ObjectConfig.YawFacingOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("WdwRotatingPlatformGoalIndex",
+            dictionary.Add("WdwRotatingPlatformGoalIndex",
                 ((uint dummy) =>
                 {
                     return TableConfig.WdwRotatingPlatformTable.GetIndex(TableConfig.WdwRotatingPlatformTable.GoalAngle) ?? double.NaN;
-                },
+                }
+            ,
                 (int index, uint dummy) =>
                 {
                     TableConfig.WdwRotatingPlatformTable.GoalAngle = TableConfig.WdwRotatingPlatformTable.GetAngle(index);
                     return true;
-                }));
+                }
+            ));
 
-            _dictionary.Add("WdwRotatingPlatformGoalAngle",
+            dictionary.Add("WdwRotatingPlatformGoalAngle",
                 ((uint dummy) =>
                 {
                     return TableConfig.WdwRotatingPlatformTable.GoalAngle;
-                },
+                }
+            ,
                 (ushort goalAngle, uint dummy) =>
                 {
                     TableConfig.WdwRotatingPlatformTable.GoalAngle = goalAngle;
                     return true;
-                }));
+                }
+            ));
 
-            _dictionary.Add("WdwRotatingPlatformFramesUntilGoal",
+            dictionary.Add("WdwRotatingPlatformFramesUntilGoal",
                 ((uint objAddress) =>
                 {
                     ushort angle = Config.Stream.GetUInt16(objAddress + ObjectConfig.YawFacingOffset);
                     return TableConfig.WdwRotatingPlatformTable.GetFramesToGoalAngle(angle);
-                },
+                }
+            ,
                 (int numFrames, uint objAddress) =>
                 {
                     ushort? newAngle = TableConfig.WdwRotatingPlatformTable.GetAngleNumFramesBeforeGoal(numFrames);
                     if (!newAngle.HasValue) return false;
                     return Config.Stream.SetValue(newAngle.Value, objAddress + ObjectConfig.YawFacingOffset);
-                }));
+                }
+            ));
 
             // Object specific vars - Elevator Axle
 
-            _dictionary.Add("ElevatorAxleCurrentIndex",
+            dictionary.Add("ElevatorAxleCurrentIndex",
                 ((uint objAddress) =>
                 {
                     ushort angle = Config.Stream.GetUInt16(objAddress + ObjectConfig.RollFacingOffset);
                     return TableConfig.ElevatorAxleTable.GetIndex(angle) ?? double.NaN;
-                },
+                }
+            ,
                 (int index, uint objAddress) =>
                 {
                     ushort angle = TableConfig.ElevatorAxleTable.GetAngle(index);
                     return Config.Stream.SetValue(angle, objAddress + ObjectConfig.RollFacingOffset);
-                }));
-            
-            _dictionary.Add("ElevatorAxleGoalIndex",
+                }
+            ));
+
+            dictionary.Add("ElevatorAxleGoalIndex",
                 ((uint dummy) =>
                 {
                     return TableConfig.ElevatorAxleTable.GetIndex(TableConfig.ElevatorAxleTable.GoalAngle) ?? double.NaN;
-                },
+                }
+            ,
                 (int index, uint dummy) =>
                 {
                     TableConfig.ElevatorAxleTable.GoalAngle = TableConfig.ElevatorAxleTable.GetAngle(index);
                     return true;
-                }));
+                }
+            ));
 
-            _dictionary.Add("ElevatorAxleGoalAngle",
+            dictionary.Add("ElevatorAxleGoalAngle",
                 ((uint dummy) =>
                 {
                     return TableConfig.ElevatorAxleTable.GoalAngle;
-                },
+                }
+            ,
                 (ushort goalAngle, uint dummy) =>
                 {
                     TableConfig.ElevatorAxleTable.GoalAngle = goalAngle;
                     return true;
-                }));
+                }
+            ));
 
-            _dictionary.Add("ElevatorAxleFramesUntilGoal",
+            dictionary.Add("ElevatorAxleFramesUntilGoal",
                 ((uint objAddress) =>
                 {
                     ushort angle = Config.Stream.GetUInt16(objAddress + ObjectConfig.RollFacingOffset);
                     return TableConfig.ElevatorAxleTable.GetFramesToGoalAngle(angle);
-                },
+                }
+            ,
                 (int numFrames, uint objAddress) =>
                 {
                     ushort? newAngle = TableConfig.ElevatorAxleTable.GetAngleNumFramesBeforeGoal(numFrames);
                     if (!newAngle.HasValue) return false;
                     return Config.Stream.SetValue(newAngle.Value, objAddress + ObjectConfig.RollFacingOffset);
-                }));
+                }
+            ));
 
             // Object specific vars - Swooper
 
-            _dictionary.Add("SwooperEffectiveTargetYaw",
+            dictionary.Add("SwooperEffectiveTargetYaw",
                 ((uint objAddress) =>
                 {
                     uint globalTimer = Config.Stream.GetUInt32(MiscConfig.GlobalTimerAddress);
                     int targetAngle = Config.Stream.GetInt32(objAddress + ObjectConfig.SwooperTargetYawOffset);
                     return targetAngle + (short)(3000 * InGameTrigUtilities.InGameCosine(4000 * (int)globalTimer));
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
             // Mario vars
 
-            _dictionary.Add("RotationDisplacementX",
+            dictionary.Add("RotationDisplacementX",
                 ((uint dummy) =>
                 {
                     return GetRotationDisplacement().ToTuple().Item1;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("RotationDisplacementY",
+            dictionary.Add("RotationDisplacementY",
                 ((uint dummy) =>
                 {
                     return GetRotationDisplacement().ToTuple().Item2;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("RotationDisplacementZ",
+            dictionary.Add("RotationDisplacementZ",
                 ((uint dummy) =>
                 {
                     return GetRotationDisplacement().ToTuple().Item3;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("SpeedMultiplier",
+            dictionary.Add("SpeedMultiplier",
                 ((uint dummy) =>
                 {
                     /*
@@ -2243,25 +2290,29 @@ namespace STROOP.Structs
                     double multiplier = (scaledMagnitude / 32) * InGameTrigUtilities.InGameCosine(intendedDYaw) * K * 0.02 + A;
 
                     return multiplier;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("DeFactoSpeed",
+            dictionary.Add("DeFactoSpeed",
                 ((uint dummy) =>
                 {
                     return GetMarioDeFactoSpeed();
-                },
+                }
+            ,
                 (double newDefactoSpeed, uint dummy) =>
                 {
                     double newHSpeed = newDefactoSpeed / GetDeFactoMultiplier();
                     return Config.Stream.SetValue((float)newHSpeed, MarioConfig.StructAddress + MarioConfig.HSpeedOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("SlidingSpeed",
+            dictionary.Add("SlidingSpeed",
                 ((uint dummy) =>
                 {
                     return GetMarioSlidingSpeed();
-                },
+                }
+            ,
                 (double newHSlidingSpeed, uint dummy) =>
                 {
                     float xSlidingSpeed = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.SlidingSpeedXOffset);
@@ -2277,13 +2328,15 @@ namespace STROOP.Structs
                     success &= Config.Stream.SetValue((float)newXSlidingSpeed, MarioConfig.StructAddress + MarioConfig.SlidingSpeedXOffset);
                     success &= Config.Stream.SetValue((float)newZSlidingSpeed, MarioConfig.StructAddress + MarioConfig.SlidingSpeedZOffset);
                     return success;
-                }));
+                }
+            ));
 
-            _dictionary.Add("SlidingAngle",
+            dictionary.Add("SlidingAngle",
                 ((uint dummy) =>
                 {
                     return GetMarioSlidingAngle();
-                },
+                }
+            ,
                 (double newHSlidingAngle, uint dummy) =>
                 {
                     float xSlidingSpeed = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.SlidingSpeedXOffset);
@@ -2297,31 +2350,35 @@ namespace STROOP.Structs
                     success &= Config.Stream.SetValue((float)newXSlidingSpeed, MarioConfig.StructAddress + MarioConfig.SlidingSpeedXOffset);
                     success &= Config.Stream.SetValue((float)newZSlidingSpeed, MarioConfig.StructAddress + MarioConfig.SlidingSpeedZOffset);
                     return success;
-                }));
+                }
+            ));
 
-            _dictionary.Add("TwirlYawMod2048",
+            dictionary.Add("TwirlYawMod2048",
                 ((uint dummy) =>
                 {
                     ushort twirlYaw = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.TwirlYawOffset);
                     return twirlYaw % 2048;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("FlyingEnergy",
+            dictionary.Add("FlyingEnergy",
                 ((uint dummy) =>
                 {
                     return FlyingUtilities.GetEnergy();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("BobombTrajectoryFramesToPoint",
+            dictionary.Add("BobombTrajectoryFramesToPoint",
                 ((uint dummy) =>
                 {
                     PositionAngle holpPos = PositionAngle.Holp;
                     double yDist = SpecialConfig.PointY - holpPos.Y;
                     double frames = GetObjectTrajectoryYDistToFrames(yDist);
                     return frames;
-                },
+                }
+            ,
                 (double frames, uint dummy) =>
                 {
                     PositionAngle holpPos = PositionAngle.Holp;
@@ -2334,16 +2391,18 @@ namespace STROOP.Structs
                         SpecialConfig.PointX,
                         SpecialConfig.PointZ);
                     return PositionAngle.Holp.SetValues(x: newX, y: newY, z: newZ);
-                }));
+                }
+            ));
 
-            _dictionary.Add("CorkBoxTrajectoryFramesToPoint",
+            dictionary.Add("CorkBoxTrajectoryFramesToPoint",
                 ((uint dummy) =>
                 {
                     PositionAngle holpPos = PositionAngle.Holp;
                     double yDist = SpecialConfig.PointY - holpPos.Y;
                     double frames = GetObjectTrajectoryYDistToFrames(yDist);
                     return frames;
-                },
+                }
+            ,
                 (double frames, uint dummy) =>
                 {
                     PositionAngle holpPos = PositionAngle.Holp;
@@ -2356,22 +2415,25 @@ namespace STROOP.Structs
                         SpecialConfig.PointX,
                         SpecialConfig.PointZ);
                     return PositionAngle.Holp.SetValues(x: newX, y: newY, z: newZ);
-                }));
+                }
+            ));
 
-            _dictionary.Add("TrajectoryRemainingHeight",
+            dictionary.Add("TrajectoryRemainingHeight",
                 ((uint dummy) =>
                 {
                     float vSpeed = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YSpeedOffset);
                     double remainingHeight = ComputeHeightChangeFromInitialVerticalSpeed(vSpeed);
                     return remainingHeight;
-                },
+                }
+            ,
                 (double newRemainingHeight, uint dummy) =>
                 {
                     double initialVSpeed = ComputeInitialVerticalSpeedFromHeightChange(newRemainingHeight);
                     return Config.Stream.SetValue((float)initialVSpeed, MarioConfig.StructAddress + MarioConfig.YSpeedOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("TrajectoryPeakHeight",
+            dictionary.Add("TrajectoryPeakHeight",
                 ((uint dummy) =>
                 {
                     float vSpeed = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YSpeedOffset);
@@ -2379,44 +2441,50 @@ namespace STROOP.Structs
                     float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
                     double peakHeight = marioY + remainingHeight;
                     return peakHeight;
-                },
+                }
+            ,
                 (double newPeakHeight, uint dummy) =>
                 {
                     float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
                     double newRemainingHeight = newPeakHeight - marioY;
                     double initialVSpeed = ComputeInitialVerticalSpeedFromHeightChange(newRemainingHeight);
                     return Config.Stream.SetValue((float)initialVSpeed, MarioConfig.StructAddress + MarioConfig.YSpeedOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("DoubleJumpVerticalSpeed",
+            dictionary.Add("DoubleJumpVerticalSpeed",
                 ((uint dummy) =>
                 {
                     float hSpeed = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.HSpeedOffset);
                     double vSpeed = ConvertDoubleJumpHSpeedToVSpeed(hSpeed);
                     return vSpeed;
-                },
+                }
+            ,
                 (double newVSpeed, uint dummy) =>
                 {
                     double newHSpeed = ConvertDoubleJumpVSpeedToHSpeed(newVSpeed);
                     return Config.Stream.SetValue((float)newHSpeed, MarioConfig.StructAddress + MarioConfig.HSpeedOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("DoubleJumpHeight",
+            dictionary.Add("DoubleJumpHeight",
                 ((uint dummy) =>
                 {
                     float hSpeed = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.HSpeedOffset);
                     double vSpeed = ConvertDoubleJumpHSpeedToVSpeed(hSpeed);
                     double doubleJumpHeight = ComputeHeightChangeFromInitialVerticalSpeed(vSpeed);
                     return doubleJumpHeight;
-                },
+                }
+            ,
                 (double newHeight, uint dummy) =>
                 {
                     double initialVSpeed = ComputeInitialVerticalSpeedFromHeightChange(newHeight);
                     double newHSpeed = ConvertDoubleJumpVSpeedToHSpeed(initialVSpeed);
                     return Config.Stream.SetValue((float)newHSpeed, MarioConfig.StructAddress + MarioConfig.HSpeedOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("DoubleJumpPeakHeight",
+            dictionary.Add("DoubleJumpPeakHeight",
                 ((uint dummy) =>
                 {
                     float hSpeed = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.HSpeedOffset);
@@ -2425,7 +2493,8 @@ namespace STROOP.Structs
                     float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
                     double doubleJumpPeakHeight = marioY + doubleJumpHeight;
                     return doubleJumpPeakHeight;
-                },
+                }
+            ,
                 (double newPeakHeight, uint dummy) =>
                 {
                     float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
@@ -2433,39 +2502,43 @@ namespace STROOP.Structs
                     double initialVSpeed = ComputeInitialVerticalSpeedFromHeightChange(newHeight);
                     double newHSpeed = ConvertDoubleJumpVSpeedToHSpeed(initialVSpeed);
                     return Config.Stream.SetValue((float)newHSpeed, MarioConfig.StructAddress + MarioConfig.HSpeedOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("MovementX",
+            dictionary.Add("MovementX",
                 ((uint dummy) =>
                 {
                     float endX = Config.Stream.GetSingle(MiscConfig.HackedAreaAddress + 0x10);
                     float startX = Config.Stream.GetSingle(MiscConfig.HackedAreaAddress + 0x1C);
                     float movementX = endX - startX;
                     return movementX;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("MovementY",
+            dictionary.Add("MovementY",
                 ((uint dummy) =>
                 {
                     float endY = Config.Stream.GetSingle(MiscConfig.HackedAreaAddress + 0x14);
                     float startY = Config.Stream.GetSingle(MiscConfig.HackedAreaAddress + 0x20);
                     float movementY = endY - startY;
                     return movementY;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("MovementZ",
+            dictionary.Add("MovementZ",
                 ((uint dummy) =>
                 {
                     float endZ = Config.Stream.GetSingle(MiscConfig.HackedAreaAddress + 0x18);
                     float startZ = Config.Stream.GetSingle(MiscConfig.HackedAreaAddress + 0x24);
                     float movementZ = endZ - startZ;
                     return movementZ;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("MovementForwards",
+            dictionary.Add("MovementForwards",
                 ((uint dummy) =>
                 {
                     float endX = Config.Stream.GetSingle(MiscConfig.HackedAreaAddress + 0x10);
@@ -2480,10 +2553,11 @@ namespace STROOP.Structs
                     (double movementSideways, double movementForwards) =
                         MoreMath.GetComponentsFromVectorRelatively(movementHorizontal, movementAngle, marioAngle);
                     return movementForwards;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("MovementSideways",
+            dictionary.Add("MovementSideways",
                 ((uint dummy) =>
                 {
                     float endX = Config.Stream.GetSingle(MiscConfig.HackedAreaAddress + 0x10);
@@ -2498,10 +2572,11 @@ namespace STROOP.Structs
                     (double movementSideways, double movementForwards) =
                         MoreMath.GetComponentsFromVectorRelatively(movementHorizontal, movementAngle, marioAngle);
                     return movementSideways;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("MovementHorizontal",
+            dictionary.Add("MovementHorizontal",
                 ((uint dummy) =>
                 {
                     float endX = Config.Stream.GetSingle(MiscConfig.HackedAreaAddress + 0x10);
@@ -2512,10 +2587,11 @@ namespace STROOP.Structs
                     float movementZ = endZ - startZ;
                     double movementHorizontal = MoreMath.GetHypotenuse(movementX, movementZ);
                     return movementHorizontal;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("MovementTotal",
+            dictionary.Add("MovementTotal",
                 ((uint dummy) =>
                 {
                     float endX = Config.Stream.GetSingle(MiscConfig.HackedAreaAddress + 0x10);
@@ -2529,10 +2605,11 @@ namespace STROOP.Structs
                     float movementZ = endZ - startZ;
                     double movementTotal = MoreMath.GetHypotenuse(movementX, movementY, movementZ);
                     return movementTotal;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("MovementAngle",
+            dictionary.Add("MovementAngle",
                 ((uint dummy) =>
                 {
                     float endX = Config.Stream.GetSingle(MiscConfig.HackedAreaAddress + 0x10);
@@ -2543,10 +2620,11 @@ namespace STROOP.Structs
                     float movementZ = endZ - startZ;
                     double movementAngle = MoreMath.AngleTo_AngleUnits(movementX, movementZ);
                     return movementAngle;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("QFrameCountEstimate",
+            dictionary.Add("QFrameCountEstimate",
                 ((uint dummy) =>
                 {
                     float endX = Config.Stream.GetSingle(MiscConfig.HackedAreaAddress + 0x10);
@@ -2562,53 +2640,60 @@ namespace STROOP.Structs
                     double qframes = Math.Abs(Math.Round(Math.Sqrt(movementX * movementX + movementZ * movementZ) / (oldHSpeed / 4)));
                     if (qframes > 4) qframes = double.NaN;
                     return qframes;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("DeltaYawIntendedFacing",
+            dictionary.Add("DeltaYawIntendedFacing",
                 ((uint dummy) =>
                 {
                     return GetDeltaYawIntendedFacing();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("DeltaYawIntendedBackwards",
+            dictionary.Add("DeltaYawIntendedBackwards",
                 ((uint dummy) =>
                 {
                     return GetDeltaYawIntendedBackwards();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("MarioInGameDeltaYaw",
+            dictionary.Add("MarioInGameDeltaYaw",
                 ((uint dummy) =>
                 {
                     ushort marioAngle = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
                     return GetDeltaInGameAngle(marioAngle);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("FallHeight",
+            dictionary.Add("FallHeight",
                 ((uint dummy) =>
                 {
                     float peakHeight = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.PeakHeightOffset);
                     float floorY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.FloorYOffset);
                     float fallHeight = peakHeight - floorY;
                     return fallHeight;
-                },
+                }
+            ,
                 (double fallHeight, uint dummy) =>
                 {
                     float floorY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.FloorYOffset);
                     double newPeakHeight = floorY + fallHeight;
                     return Config.Stream.SetValue((float)newPeakHeight, MarioConfig.StructAddress + MarioConfig.PeakHeightOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("FSDistPointToSelf",
+            dictionary.Add("FSDistPointToSelf",
                 ((uint dummy) =>
                 {
                     double fDist = PositionAngle.GetFDistance(SpecialConfig.PointPA, SpecialConfig.SelfPA);
                     double sDist = PositionAngle.GetSDistance(SpecialConfig.PointPA, SpecialConfig.SelfPA);
                     return "(" + fDist + "," + sDist + ")";
-                },
+                }
+            ,
                 (string value, uint dummy) =>
                 {
                     List<double?> values = ParsingUtilities.ParseDoubleList(value);
@@ -2622,18 +2707,20 @@ namespace STROOP.Structs
                     SpecialConfig.SelfPA.SetX(SpecialConfig.PointX + relX);
                     SpecialConfig.SelfPA.SetZ(SpecialConfig.PointZ + relZ);
                     return true;
-                }));
+                }
+            ));
 
-            _dictionary.Add("PitchSelfToPoint",
+            dictionary.Add("PitchSelfToPoint",
                 ((uint dummy) =>
                 {
                     return MoreMath.GetPitch(
                         SpecialConfig.SelfX, SpecialConfig.SelfY, SpecialConfig.SelfZ,
                         SpecialConfig.PointX, SpecialConfig.PointY, SpecialConfig.PointZ);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("WalkingDistance",
+            dictionary.Add("WalkingDistance",
                 ((uint dummy) =>
                 {
                     float hSpeed = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.HSpeedOffset);
@@ -2642,34 +2729,38 @@ namespace STROOP.Structs
                     float sum = (hSpeed + remainder) * numFrames / 2;
                     float distance = sum - hSpeed;
                     return distance;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("WalkingDistanceDifferenceMarioToPoint",
+            dictionary.Add("WalkingDistanceDifferenceMarioToPoint",
                 ((uint dummy) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
                     PositionAngle pointPos = SpecialConfig.PointPA;
-                    float walkingDistance = (float)_dictionary.Get("WalkingDistance").Item1(0);
+                    float walkingDistance = (float)dictionary.Get("WalkingDistance").Item1(0);
                     double diff = walkingDistance - PositionAngle.GetHDistance(marioPos, pointPos);
                     return diff;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("ScheduleOffset",
+            dictionary.Add("ScheduleOffset",
                 ((uint dummy) =>
                 {
                     return PositionAngle.ScheduleOffset;
-                },
+                }
+            ,
                 (int value, uint dummy) =>
                 {
                     PositionAngle.ScheduleOffset = value;
                     return true;
-                }));
+                }
+            ));
 
             // HUD vars
 
-            _dictionary.Add("HudTimeText",
+            dictionary.Add("HudTimeText",
                 ((uint dummy) =>
                 {
                     ushort time = Config.Stream.GetUInt16(MarioConfig.StructAddress + HudConfig.TimeOffset);
@@ -2678,7 +2769,8 @@ namespace STROOP.Structs
                     int secondComponent = (totalDeciSeconds / 10) % 60;
                     int minuteComponent = (totalDeciSeconds / 600);
                     return minuteComponent + "'" + secondComponent.ToString("D2") + "\"" + deciSecondComponent;
-                },
+                }
+            ,
                 (string timerString, uint dummy) =>
                 {
                     if (timerString.Length == 0) timerString = "0" + timerString;
@@ -2713,144 +2805,162 @@ namespace STROOP.Structs
                     int time = totalDeciSeconds * 3;
                     ushort timeUShort = ParsingUtilities.ParseUShortRoundingCapping(time);
                     return Config.Stream.SetValue(timeUShort, MarioConfig.StructAddress + HudConfig.TimeOffset);
-                }));
+                }
+            ));
 
             // Triangle vars
 
-            _dictionary.Add("Classification",
+            dictionary.Add("Classification",
                 ((uint triAddress) =>
                 {
                     TriangleDataModel triStruct = TriangleDataModel.Create(triAddress);
                     return triStruct.Classification.ToString();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("TriangleTypeDescription",
+            dictionary.Add("TriangleTypeDescription",
                 ((uint triAddress) =>
                 {
                     TriangleDataModel triStruct = TriangleDataModel.Create(triAddress);
                     return triStruct.Description;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("TriangleSlipperiness",
+            dictionary.Add("TriangleSlipperiness",
                 ((uint triAddress) =>
                 {
                     TriangleDataModel triStruct = TriangleDataModel.Create(triAddress);
                     return triStruct.Slipperiness;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("TriangleSlipperinessDescription",
+            dictionary.Add("TriangleSlipperinessDescription",
                 ((uint triAddress) =>
                 {
                     TriangleDataModel triStruct = TriangleDataModel.Create(triAddress);
                     return triStruct.SlipperinessDescription;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("TriangleFrictionMultiplier",
+            dictionary.Add("TriangleFrictionMultiplier",
                 ((uint triAddress) =>
                 {
                     TriangleDataModel triStruct = TriangleDataModel.Create(triAddress);
                     return triStruct.FrictionMultiplier;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("TriangleExertion",
+            dictionary.Add("TriangleExertion",
                 ((uint triAddress) =>
                 {
                     TriangleDataModel triStruct = TriangleDataModel.Create(triAddress);
                     return triStruct.Exertion ? 1 : 0;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("TriangleHorizontalNormal",
+            dictionary.Add("TriangleHorizontalNormal",
                 ((uint triAddress) =>
                 {
                     float normalX = Config.Stream.GetSingle(triAddress + TriangleOffsetsConfig.NormX);
                     float normalZ = Config.Stream.GetSingle(triAddress + TriangleOffsetsConfig.NormZ);
-                    float normalH = (float) Math.Sqrt(normalX * normalX + normalZ * normalZ);
+                    float normalH = (float)Math.Sqrt(normalX * normalX + normalZ * normalZ);
                     return normalH;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("ClosestVertexIndex",
+            dictionary.Add("ClosestVertexIndex",
                 ((uint triAddress) =>
                 {
                     return GetClosestTriangleVertexIndex(triAddress);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("ClosestVertexX",
+            dictionary.Add("ClosestVertexX",
                 ((uint triAddress) =>
                 {
                     return GetClosestTriangleVertexPosition(triAddress).X;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("ClosestVertexY",
+            dictionary.Add("ClosestVertexY",
                 ((uint triAddress) =>
                 {
                     return GetClosestTriangleVertexPosition(triAddress).Y;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("ClosestVertexZ",
+            dictionary.Add("ClosestVertexZ",
                 ((uint triAddress) =>
                 {
                     return GetClosestTriangleVertexPosition(triAddress).Z;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("Steepness",
+            dictionary.Add("Steepness",
                 ((uint triAddress) =>
                 {
                     TriangleDataModel triStruct = TriangleDataModel.Create(triAddress);
                     double steepness = MoreMath.RadiansToAngleUnits(Math.Acos(triStruct.NormY));
                     return steepness;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("UpHillAngle",
+            dictionary.Add("UpHillAngle",
                 ((uint triAddress) =>
                 {
                     return GetTriangleUphillAngle(triAddress);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("DownHillAngle",
+            dictionary.Add("DownHillAngle",
                 ((uint triAddress) =>
                 {
                     double uphillAngle = GetTriangleUphillAngle(triAddress);
                     return MoreMath.ReverseAngle(uphillAngle);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("LeftHillAngle",
+            dictionary.Add("LeftHillAngle",
                 ((uint triAddress) =>
                 {
                     double uphillAngle = GetTriangleUphillAngle(triAddress);
                     return MoreMath.RotateAngleCCW(uphillAngle, 16384);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("RightHillAngle",
+            dictionary.Add("RightHillAngle",
                 ((uint triAddress) =>
                 {
                     double uphillAngle = GetTriangleUphillAngle(triAddress);
                     return MoreMath.RotateAngleCW(uphillAngle, 16384);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("UpHillDeltaAngle",
+            dictionary.Add("UpHillDeltaAngle",
                 ((uint triAddress) =>
                 {
                     ushort marioAngle = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
                     double uphillAngle = GetTriangleUphillAngle(triAddress);
                     double angleDiff = marioAngle - uphillAngle;
                     return MoreMath.NormalizeAngleDoubleSigned(angleDiff);
-                },
+                }
+            ,
                 (double angleDiff, uint triAddress) =>
                 {
                     double uphillAngle = GetTriangleUphillAngle(triAddress);
@@ -2858,9 +2968,10 @@ namespace STROOP.Structs
                     ushort newMarioAngleUShort = MoreMath.NormalizeAngleUshort(newMarioAngleDouble);
                     return Config.Stream.SetValue(
                         newMarioAngleUShort, MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("DownHillDeltaAngle",
+            dictionary.Add("DownHillDeltaAngle",
                 ((uint triAddress) =>
                 {
                     ushort marioAngle = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
@@ -2868,7 +2979,8 @@ namespace STROOP.Structs
                     double downhillAngle = MoreMath.ReverseAngle(uphillAngle);
                     double angleDiff = marioAngle - downhillAngle;
                     return MoreMath.NormalizeAngleDoubleSigned(angleDiff);
-                },
+                }
+            ,
                 (double angleDiff, uint triAddress) =>
                 {
                     double uphillAngle = GetTriangleUphillAngle(triAddress);
@@ -2877,9 +2989,10 @@ namespace STROOP.Structs
                     ushort newMarioAngleUShort = MoreMath.NormalizeAngleUshort(newMarioAngleDouble);
                     return Config.Stream.SetValue(
                         newMarioAngleUShort, MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("LeftHillDeltaAngle",
+            dictionary.Add("LeftHillDeltaAngle",
                 ((uint triAddress) =>
                 {
                     ushort marioAngle = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
@@ -2887,7 +3000,8 @@ namespace STROOP.Structs
                     double lefthillAngle = MoreMath.RotateAngleCCW(uphillAngle, 16384);
                     double angleDiff = marioAngle - lefthillAngle;
                     return MoreMath.NormalizeAngleDoubleSigned(angleDiff);
-                },
+                }
+            ,
                 (double angleDiff, uint triAddress) =>
                 {
                     double uphillAngle = GetTriangleUphillAngle(triAddress);
@@ -2896,9 +3010,10 @@ namespace STROOP.Structs
                     ushort newMarioAngleUShort = MoreMath.NormalizeAngleUshort(newMarioAngleDouble);
                     return Config.Stream.SetValue(
                         newMarioAngleUShort, MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("RightHillDeltaAngle",
+            dictionary.Add("RightHillDeltaAngle",
                 ((uint triAddress) =>
                 {
                     ushort marioAngle = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
@@ -2906,7 +3021,8 @@ namespace STROOP.Structs
                     double righthillAngle = MoreMath.RotateAngleCW(uphillAngle, 16384);
                     double angleDiff = marioAngle - righthillAngle;
                     return MoreMath.NormalizeAngleDoubleSigned(angleDiff);
-                },
+                }
+            ,
                 (double angleDiff, uint triAddress) =>
                 {
                     double uphillAngle = GetTriangleUphillAngle(triAddress);
@@ -2915,9 +3031,10 @@ namespace STROOP.Structs
                     ushort newMarioAngleUShort = MoreMath.NormalizeAngleUshort(newMarioAngleDouble);
                     return Config.Stream.SetValue(
                         newMarioAngleUShort, MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("HillStatus",
+            dictionary.Add("HillStatus",
                 ((uint triAddress) =>
                 {
                     ushort marioAngle = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
@@ -2927,10 +3044,11 @@ namespace STROOP.Structs
                     angleDiff = MoreMath.NormalizeAngleDoubleSigned(angleDiff);
                     bool uphill = angleDiff >= -16384 && angleDiff <= 16384;
                     return uphill ? "Uphill" : "Downhill";
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("WallKickAngleAway",
+            dictionary.Add("WallKickAngleAway",
                 ((uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -2940,7 +3058,8 @@ namespace STROOP.Structs
                     int angleDiffAbs = Math.Abs(angleDiffShort);
                     int angleAway = angleDiffAbs - 8192;
                     return angleAway;
-                },
+                }
+            ,
                 (double angleAway, uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -2955,9 +3074,10 @@ namespace STROOP.Structs
                     ushort marioAngleUShort = MoreMath.NormalizeAngleUshort(marioAngleDouble);
 
                     return Config.Stream.SetValue(marioAngleUShort, MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("WallKickPostAngle",
+            dictionary.Add("WallKickPostAngle",
                 ((uint triAddress) =>
                 {
                     ushort marioAngle = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
@@ -2965,40 +3085,45 @@ namespace STROOP.Structs
                     float normZ = Config.Stream.GetSingle(triAddress + TriangleOffsetsConfig.NormZ);
                     ushort wallAngle = InGameTrigUtilities.InGameATan(normZ, normX);
                     return MoreMath.NormalizeAngleUshort(wallAngle - (marioAngle - wallAngle) + 32768);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("DistanceAboveFloor",
+            dictionary.Add("DistanceAboveFloor",
                 ((uint dummy) =>
                 {
                     float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
                     float floorY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.FloorYOffset);
                     float distAboveFloor = marioY - floorY;
                     return distAboveFloor;
-                },
+                }
+            ,
                 (double distAbove, uint dummy) =>
                 {
                     float floorY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.FloorYOffset);
                     double newMarioY = floorY + distAbove;
                     return Config.Stream.SetValue((float)newMarioY, MarioConfig.StructAddress + MarioConfig.YOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("DistanceBelowCeiling",
+            dictionary.Add("DistanceBelowCeiling",
                 ((uint dummy) =>
                 {
                     float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
                     float ceilingY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.CeilingYOffset);
                     float distBelowCeiling = ceilingY - marioY;
                     return distBelowCeiling;
-                },
+                }
+            ,
                 (double distBelow, uint dummy) =>
                 {
                     float ceilingY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.CeilingYOffset);
                     double newMarioY = ceilingY - distBelow;
                     return Config.Stream.SetValue((float)newMarioY, MarioConfig.StructAddress + MarioConfig.YOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("NormalDistAway",
+            dictionary.Add("NormalDistAway",
                 ((uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -3009,7 +3134,8 @@ namespace STROOP.Structs
                         marioPos.Z * triStruct.NormZ +
                         triStruct.NormOffset;
                     return normalDistAway;
-                },
+                }
+            ,
                 (double distAway, uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -3030,9 +3156,10 @@ namespace STROOP.Structs
                     double newMarioZ = marioPos.Z + zDiff;
 
                     return marioPos.SetValues(x: newMarioX, y: newMarioY, z: newMarioZ);
-                }));
+                }
+            ));
 
-            _dictionary.Add("VerticalDistAway",
+            dictionary.Add("VerticalDistAway",
                 ((uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -3040,26 +3167,29 @@ namespace STROOP.Structs
                     double verticalDistAway =
                         marioPos.Y + (marioPos.X * triStruct.NormX + marioPos.Z * triStruct.NormZ + triStruct.NormOffset) / triStruct.NormY;
                     return verticalDistAway;
-                },
+                }
+            ,
                 (double distAbove, uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
                     TriangleDataModel triStruct = TriangleDataModel.Create(triAddress);
                     double newMarioY = distAbove - (marioPos.X * triStruct.NormX + marioPos.Z * triStruct.NormZ + triStruct.NormOffset) / triStruct.NormY;
                     return Config.Stream.SetValue((float)newMarioY, MarioConfig.StructAddress + MarioConfig.YOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("HeightOnTriangle",
+            dictionary.Add("HeightOnTriangle",
                 ((uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
                     TriangleDataModel triStruct = TriangleDataModel.Create(triAddress);
                     double heightOnTriangle = triStruct.GetHeightOnTriangle(marioPos.X, marioPos.Z);
                     return heightOnTriangle;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("SelfNormalDistAway",
+            dictionary.Add("SelfNormalDistAway",
                 ((uint triAddress) =>
                 {
                     PositionAngle self = PositionAngle.Self;
@@ -3070,7 +3200,8 @@ namespace STROOP.Structs
                         self.Z * triStruct.NormZ +
                         triStruct.NormOffset;
                     return normalDistAway;
-                },
+                }
+            ,
                 (double distAway, uint triAddress) =>
                 {
                     PositionAngle self = PositionAngle.Self;
@@ -3094,7 +3225,7 @@ namespace STROOP.Structs
                 }
             ));
 
-            _dictionary.Add("SelfVerticalDistAway",
+            dictionary.Add("SelfVerticalDistAway",
                 ((uint triAddress) =>
                 {
                     PositionAngle selfPos = PositionAngle.Self;
@@ -3102,7 +3233,8 @@ namespace STROOP.Structs
                     double verticalDistAway =
                         selfPos.Y + (selfPos.X * triStruct.NormX + selfPos.Z * triStruct.NormZ + triStruct.NormOffset) / triStruct.NormY;
                     return verticalDistAway;
-                },
+                }
+            ,
                 (double distAbove, uint triAddress) =>
                 {
                     PositionAngle selfPos = PositionAngle.Self;
@@ -3113,45 +3245,50 @@ namespace STROOP.Structs
                 }
             ));
 
-            _dictionary.Add("SelfHeightOnTriangle",
+            dictionary.Add("SelfHeightOnTriangle",
                 ((uint triAddress) =>
                 {
                     PositionAngle selfPos = PositionAngle.Self;
                     TriangleDataModel triStruct = TriangleDataModel.Create(triAddress);
                     double heightOnTriangle = triStruct.GetHeightOnTriangle(selfPos.X, selfPos.Z);
                     return heightOnTriangle;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("MaxHSpeedUphill",
+            dictionary.Add("MaxHSpeedUphill",
                 ((uint triAddress) =>
                 {
                     return GetMaxHorizontalSpeedOnTriangle(triAddress, true, false);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("MaxHSpeedUphillAtAngle",
+            dictionary.Add("MaxHSpeedUphillAtAngle",
                 ((uint triAddress) =>
                 {
                     return GetMaxHorizontalSpeedOnTriangle(triAddress, true, true);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("MaxHSpeedDownhill",
+            dictionary.Add("MaxHSpeedDownhill",
                 ((uint triAddress) =>
                 {
                     return GetMaxHorizontalSpeedOnTriangle(triAddress, false, false);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("MaxHSpeedDownhillAtAngle",
+            dictionary.Add("MaxHSpeedDownhillAtAngle",
                 ((uint triAddress) =>
                 {
                     return GetMaxHorizontalSpeedOnTriangle(triAddress, false, true);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("TriangleCells",
+            dictionary.Add("TriangleCells",
                 ((uint triAddress) =>
                 {
                     TriangleDataModel tri = TriangleDataModel.Create(triAddress);
@@ -3161,28 +3298,31 @@ namespace STROOP.Structs
                     short maxCellZ = upper_cell_index(tri.GetMaxZ());
                     return string.Format("X:{0}-{1},Z:{2}-{3}",
                         minCellX, maxCellX, minCellZ, maxCellZ);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("MarioCell",
+            dictionary.Add("MarioCell",
                 ((uint dummy) =>
                 {
                     (int cellX, int cellZ) = GetMarioCell();
                     return string.Format("X:{0},Z:{1}", cellX, cellZ);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("ObjectTriCount",
+            dictionary.Add("ObjectTriCount",
                 ((uint dummy) =>
                 {
                     int totalTriangleCount = Config.Stream.GetInt32(TriangleConfig.TotalTriangleCountAddress);
                     int levelTriangleCount = Config.Stream.GetInt32(TriangleConfig.LevelTriangleCountAddress);
                     int objectTriangleCount = totalTriangleCount - levelTriangleCount;
                     return objectTriangleCount;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("CurrentTriangleIndex",
+            dictionary.Add("CurrentTriangleIndex",
                 ((uint triAddress) =>
                 {
                     uint triangleListStartAddress = Config.Stream.GetUInt32(TriangleConfig.TriangleListPointerAddress);
@@ -3193,17 +3333,20 @@ namespace STROOP.Structs
                     int indexGuess = (int)(addressDiff / structSize);
                     if (triangleListStartAddress + indexGuess * structSize == triAddress) return indexGuess;
                     return Double.NaN;
-                },
+                }
+            ,
                 (int index, uint triAddress) =>
                 {
                     uint triangleListStartAddress = Config.Stream.GetUInt32(TriangleConfig.TriangleListPointerAddress);
                     uint structSize = TriangleConfig.TriangleStructSize;
                     uint newTriAddress = (uint)(triangleListStartAddress + index * structSize);
-                    Config.TriangleManager.SetCustomTriangleAddresses(newTriAddress);
-                    return true;
-                }));
 
-            _dictionary.Add("CurrentTriangleObjectIndex",
+                    StroopMainForm.instance.trianglesTab.SetCustomTriangleAddresses(newTriAddress);
+                    return true;
+                }
+            ));
+
+            dictionary.Add("CurrentTriangleObjectIndex",
                 ((uint triAddress) =>
                 {
                     uint objAddress = Config.Stream.GetUInt32(triAddress + TriangleOffsetsConfig.AssociatedObject);
@@ -3214,130 +3357,148 @@ namespace STROOP.Structs
                         if (objTris[i].Address == triAddress) return i;
                     }
                     return double.NaN;
-                },
+                }
+            ,
                 (int index, uint triAddress) =>
                 {
                     return false;
                 }
             ));
 
-            _dictionary.Add("CurrentTriangleAddress",
+            dictionary.Add("CurrentTriangleAddress",
                 ((uint triAddress) =>
                 {
                     return triAddress;
-                },
+                }
+            ,
                 (uint address, uint triAddress) =>
                 {
-                    Config.TriangleManager.SetCustomTriangleAddresses(address);
+                    StroopMainForm.instance.trianglesTab.SetCustomTriangleAddresses(address);
                     return true;
-                }));
+                }
+            ));
 
-            _dictionary.Add("CurrentCellsTriangleAddress",
+            dictionary.Add("CurrentCellsTriangleAddress",
                 ((uint dummy) =>
                 {
-                    return Config.CellsManager.TriangleAddress;
-                },
+                    return StroopMainForm.instance.cellsTab.TriangleAddress;
+                }
+            ,
                 (uint address, uint dummy) =>
                 {
-                    Config.CellsManager.TriangleAddress = address;
+                    StroopMainForm.instance.cellsTab.TriangleAddress = address;
                     return true;
-                }));
+                }
+            ));
 
-            _dictionary.Add("ObjectNodeCount",
+            dictionary.Add("ObjectNodeCount",
                 ((uint dummy) =>
                 {
                     int totalNodeCount = Config.Stream.GetInt32(TriangleConfig.TotalNodeCountAddress);
                     int levelNodeCount = Config.Stream.GetInt32(TriangleConfig.LevelNodeCountAddress);
                     int objectNodeCount = totalNodeCount - levelNodeCount;
                     return objectNodeCount;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("TriMinX",
+            dictionary.Add("TriMinX",
                 ((uint triAddress) =>
                 {
                     return TriangleDataModel.Create(triAddress).GetMinX();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("TriMaxX",
+            dictionary.Add("TriMaxX",
                 ((uint triAddress) =>
                 {
                     return TriangleDataModel.Create(triAddress).GetMaxX();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("TriMinY",
+            dictionary.Add("TriMinY",
                 ((uint triAddress) =>
                 {
                     return TriangleDataModel.Create(triAddress).GetMinY();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("TriMaxY",
+            dictionary.Add("TriMaxY",
                 ((uint triAddress) =>
                 {
                     return TriangleDataModel.Create(triAddress).GetMaxY();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("TriMinZ",
+            dictionary.Add("TriMinZ",
                 ((uint triAddress) =>
                 {
                     return TriangleDataModel.Create(triAddress).GetMinZ();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("TriMaxZ",
+            dictionary.Add("TriMaxZ",
                 ((uint triAddress) =>
                 {
                     return TriangleDataModel.Create(triAddress).GetMaxZ();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("TriRangeX",
+            dictionary.Add("TriRangeX",
                 ((uint triAddress) =>
                 {
                     return TriangleDataModel.Create(triAddress).GetRangeX();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("TriRangeY",
+            dictionary.Add("TriRangeY",
                 ((uint triAddress) =>
                 {
                     return TriangleDataModel.Create(triAddress).GetRangeY();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("TriRangeZ",
+            dictionary.Add("TriRangeZ",
                 ((uint triAddress) =>
                 {
                     return TriangleDataModel.Create(triAddress).GetRangeZ();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("TriMidpointX",
+            dictionary.Add("TriMidpointX",
                 ((uint triAddress) =>
                 {
                     return TriangleDataModel.Create(triAddress).GetMidpointX();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("TriMidpointY",
+            dictionary.Add("TriMidpointY",
                 ((uint triAddress) =>
                 {
                     return TriangleDataModel.Create(triAddress).GetMidpointY();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("TriMidpointZ",
+            dictionary.Add("TriMidpointZ",
                 ((uint triAddress) =>
                 {
                     return TriangleDataModel.Create(triAddress).GetMidpointZ();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("DistanceToLine12",
+            dictionary.Add("DistanceToLine12",
                 ((uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -3349,7 +3510,8 @@ namespace STROOP.Structs
                         triStruct.X3, triStruct.Z3, 1, 2,
                         TriangleDataModel.Create(triAddress).Classification);
                     return signedDistToLine12;
-                },
+                }
+            ,
                 (double dist, uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -3370,9 +3532,10 @@ namespace STROOP.Structs
                     double newMarioX = marioPos.X + xDiff;
                     double newMarioZ = marioPos.Z + zDiff;
                     return marioPos.SetValues(x: newMarioX, z: newMarioZ);
-                }));
+                }
+            ));
 
-            _dictionary.Add("DistanceToLine23",
+            dictionary.Add("DistanceToLine23",
                 ((uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -3384,7 +3547,8 @@ namespace STROOP.Structs
                         triStruct.X3, triStruct.Z3, 2, 3,
                         TriangleDataModel.Create(triAddress).Classification);
                     return signedDistToLine23;
-                },
+                }
+            ,
                 (double dist, uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -3405,9 +3569,10 @@ namespace STROOP.Structs
                     double newMarioX = marioPos.X + xDiff;
                     double newMarioZ = marioPos.Z + zDiff;
                     return marioPos.SetValues(x: newMarioX, z: newMarioZ);
-                }));
+                }
+            ));
 
-            _dictionary.Add("DistanceToLine31",
+            dictionary.Add("DistanceToLine31",
                 ((uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -3419,7 +3584,8 @@ namespace STROOP.Structs
                         triStruct.X3, triStruct.Z3, 3, 1,
                         TriangleDataModel.Create(triAddress).Classification);
                     return signedDistToLine31;
-                },
+                }
+            ,
                 (double dist, uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -3440,9 +3606,10 @@ namespace STROOP.Structs
                     double newMarioX = marioPos.X + xDiff;
                     double newMarioZ = marioPos.Z + zDiff;
                     return marioPos.SetValues(x: newMarioX, z: newMarioZ);
-                }));
+                }
+            ));
 
-            _dictionary.Add("SelfDistanceToLine12",
+            dictionary.Add("SelfDistanceToLine12",
                 ((uint triAddress) =>
                 {
                     PositionAngle selfPos = PositionAngle.Self;
@@ -3454,7 +3621,8 @@ namespace STROOP.Structs
                         triStruct.X3, triStruct.Z3, 1, 2,
                         TriangleDataModel.Create(triAddress).Classification);
                     return signedDistToLine12;
-                },
+                }
+            ,
                 (double dist, uint triAddress) =>
                 {
                     PositionAngle selfPos = PositionAngle.Self;
@@ -3478,7 +3646,7 @@ namespace STROOP.Structs
                 }
             ));
 
-            _dictionary.Add("SelfDistanceToLine23",
+            dictionary.Add("SelfDistanceToLine23",
                 ((uint triAddress) =>
                 {
                     PositionAngle selfPos = PositionAngle.Self;
@@ -3490,7 +3658,8 @@ namespace STROOP.Structs
                         triStruct.X3, triStruct.Z3, 2, 3,
                         TriangleDataModel.Create(triAddress).Classification);
                     return signedDistToLine23;
-                },
+                }
+            ,
                 (double dist, uint triAddress) =>
                 {
                     PositionAngle selfPos = PositionAngle.Self;
@@ -3514,7 +3683,7 @@ namespace STROOP.Structs
                 }
             ));
 
-            _dictionary.Add("SelfDistanceToLine31",
+            dictionary.Add("SelfDistanceToLine31",
                 ((uint triAddress) =>
                 {
                     PositionAngle selfPos = PositionAngle.Self;
@@ -3526,7 +3695,8 @@ namespace STROOP.Structs
                         triStruct.X3, triStruct.Z3, 3, 1,
                         TriangleDataModel.Create(triAddress).Classification);
                     return signedDistToLine31;
-                },
+                }
+            ,
                 (double dist, uint triAddress) =>
                 {
                     PositionAngle selfPos = PositionAngle.Self;
@@ -3550,7 +3720,7 @@ namespace STROOP.Structs
                 }
             ));
 
-            _dictionary.Add("DeltaAngleLine12",
+            dictionary.Add("DeltaAngleLine12",
                 ((uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -3559,20 +3729,22 @@ namespace STROOP.Structs
                         triStruct.X1, triStruct.Z1, triStruct.X2, triStruct.Z2);
                     double angleDiff = marioPos.Angle - angleV1ToV2;
                     return MoreMath.NormalizeAngleDoubleSigned(angleDiff);
-                },
+                }
+            ,
                 (double angleDiff, uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
-                    TriangleDataModel triStruct = TriangleDataModel.Create(triAddress);;
+                    TriangleDataModel triStruct = TriangleDataModel.Create(triAddress); ;
                     double angleV1ToV2 = MoreMath.AngleTo_AngleUnits(
                         triStruct.X1, triStruct.Z1, triStruct.X2, triStruct.Z2);
                     double newMarioAngleDouble = angleV1ToV2 + angleDiff;
                     ushort newMarioAngleUShort = MoreMath.NormalizeAngleUshort(newMarioAngleDouble);
                     return Config.Stream.SetValue(
                         newMarioAngleUShort, MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("DeltaAngleLine21",
+            dictionary.Add("DeltaAngleLine21",
                 ((uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -3581,7 +3753,8 @@ namespace STROOP.Structs
                         triStruct.X2, triStruct.Z2, triStruct.X1, triStruct.Z1);
                     double angleDiff = marioPos.Angle - angleV2ToV1;
                     return MoreMath.NormalizeAngleDoubleSigned(angleDiff);
-                },
+                }
+            ,
                 (double angleDiff, uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -3592,9 +3765,10 @@ namespace STROOP.Structs
                     ushort newMarioAngleUShort = MoreMath.NormalizeAngleUshort(newMarioAngleDouble);
                     return Config.Stream.SetValue(
                         newMarioAngleUShort, MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("DeltaAngleLine23",
+            dictionary.Add("DeltaAngleLine23",
                 ((uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -3603,7 +3777,8 @@ namespace STROOP.Structs
                         triStruct.X2, triStruct.Z2, triStruct.X3, triStruct.Z3);
                     double angleDiff = marioPos.Angle - angleV2ToV3;
                     return MoreMath.NormalizeAngleDoubleSigned(angleDiff);
-                },
+                }
+            ,
                 (double angleDiff, uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -3614,9 +3789,10 @@ namespace STROOP.Structs
                     ushort newMarioAngleUShort = MoreMath.NormalizeAngleUshort(newMarioAngleDouble);
                     return Config.Stream.SetValue(
                         newMarioAngleUShort, MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("DeltaAngleLine32",
+            dictionary.Add("DeltaAngleLine32",
                 ((uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -3625,7 +3801,8 @@ namespace STROOP.Structs
                         triStruct.X3, triStruct.Z3, triStruct.X2, triStruct.Z2);
                     double angleDiff = marioPos.Angle - angleV3ToV2;
                     return MoreMath.NormalizeAngleDoubleSigned(angleDiff);
-                },
+                }
+            ,
                 (double angleDiff, uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -3636,9 +3813,10 @@ namespace STROOP.Structs
                     ushort newMarioAngleUShort = MoreMath.NormalizeAngleUshort(newMarioAngleDouble);
                     return Config.Stream.SetValue(
                         newMarioAngleUShort, MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("DeltaAngleLine31",
+            dictionary.Add("DeltaAngleLine31",
                 ((uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -3647,7 +3825,8 @@ namespace STROOP.Structs
                         triStruct.X3, triStruct.Z3, triStruct.X1, triStruct.Z1);
                     double angleDiff = marioPos.Angle - angleV3ToV1;
                     return MoreMath.NormalizeAngleDoubleSigned(angleDiff);
-                },
+                }
+            ,
                 (double angleDiff, uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -3658,9 +3837,10 @@ namespace STROOP.Structs
                     ushort newMarioAngleUShort = MoreMath.NormalizeAngleUshort(newMarioAngleDouble);
                     return Config.Stream.SetValue(
                         newMarioAngleUShort, MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("DeltaAngleLine13",
+            dictionary.Add("DeltaAngleLine13",
                 ((uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -3669,7 +3849,8 @@ namespace STROOP.Structs
                         triStruct.X1, triStruct.Z1, triStruct.X3, triStruct.Z3);
                     double angleDiff = marioPos.Angle - angleV1ToV3;
                     return MoreMath.NormalizeAngleDoubleSigned(angleDiff);
-                },
+                }
+            ,
                 (double angleDiff, uint triAddress) =>
                 {
                     PositionAngle marioPos = PositionAngle.Mario;
@@ -3680,191 +3861,221 @@ namespace STROOP.Structs
                     ushort newMarioAngleUShort = MoreMath.NormalizeAngleUshort(newMarioAngleDouble);
                     return Config.Stream.SetValue(
                         newMarioAngleUShort, MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("TriangleX1",
+            dictionary.Add("TriangleX1",
                 ((uint triAddress) =>
                 {
                     return TriangleOffsetsConfig.GetX1(triAddress);
-                },
+                }
+            ,
                 (short value, uint triAddress) =>
                 {
                     return TriangleOffsetsConfig.SetX1(value, triAddress);
-                }));
+                }
+            ));
 
-            _dictionary.Add("TriangleY1",
+            dictionary.Add("TriangleY1",
                 ((uint triAddress) =>
                 {
                     return TriangleOffsetsConfig.GetY1(triAddress);
-                },
+                }
+            ,
                 (short value, uint triAddress) =>
                 {
                     return TriangleOffsetsConfig.SetY1(value, triAddress);
-                }));
+                }
+            ));
 
-            _dictionary.Add("TriangleZ1",
+            dictionary.Add("TriangleZ1",
                 ((uint triAddress) =>
                 {
                     return TriangleOffsetsConfig.GetZ1(triAddress);
-                },
+                }
+            ,
                 (short value, uint triAddress) =>
                 {
                     return TriangleOffsetsConfig.SetZ1(value, triAddress);
-                }));
+                }
+            ));
 
-            _dictionary.Add("TriangleX2",
+            dictionary.Add("TriangleX2",
                 ((uint triAddress) =>
                 {
                     return TriangleOffsetsConfig.GetX2(triAddress);
-                },
+                }
+            ,
                 (short value, uint triAddress) =>
                 {
                     return TriangleOffsetsConfig.SetX2(value, triAddress);
-                }));
+                }
+            ));
 
-            _dictionary.Add("TriangleY2",
+            dictionary.Add("TriangleY2",
                 ((uint triAddress) =>
                 {
                     return TriangleOffsetsConfig.GetY2(triAddress);
-                },
+                }
+            ,
                 (short value, uint triAddress) =>
                 {
                     return TriangleOffsetsConfig.SetY2(value, triAddress);
-                }));
+                }
+            ));
 
-            _dictionary.Add("TriangleZ2",
+            dictionary.Add("TriangleZ2",
                 ((uint triAddress) =>
                 {
                     return TriangleOffsetsConfig.GetZ2(triAddress);
-                },
+                }
+            ,
                 (short value, uint triAddress) =>
                 {
                     return TriangleOffsetsConfig.SetZ2(value, triAddress);
-                }));
+                }
+            ));
 
-            _dictionary.Add("TriangleX3",
+            dictionary.Add("TriangleX3",
                 ((uint triAddress) =>
                 {
                     return TriangleOffsetsConfig.GetX3(triAddress);
-                },
+                }
+            ,
                 (short value, uint triAddress) =>
                 {
                     return TriangleOffsetsConfig.SetX3(value, triAddress);
-                }));
+                }
+            ));
 
-            _dictionary.Add("TriangleY3",
+            dictionary.Add("TriangleY3",
                 ((uint triAddress) =>
                 {
                     return TriangleOffsetsConfig.GetY3(triAddress);
-                },
+                }
+            ,
                 (short value, uint triAddress) =>
                 {
                     return TriangleOffsetsConfig.SetY3(value, triAddress);
-                }));
+                }
+            ));
 
-            _dictionary.Add("TriangleZ3",
+            dictionary.Add("TriangleZ3",
                 ((uint triAddress) =>
                 {
                     return TriangleOffsetsConfig.GetZ3(triAddress);
-                },
+                }
+            ,
                 (short value, uint triAddress) =>
                 {
                     return TriangleOffsetsConfig.SetZ3(value, triAddress);
-                }));
+                }
+            ));
 
             // File vars
 
-            _dictionary.Add("StarsInFile",
+            dictionary.Add("StarsInFile",
                 ((uint fileAddress) =>
                 {
-                    return Config.FileManager.CalculateNumStars(fileAddress);
-                },
+                    return StroopMainForm.instance.fileTab.CalculateNumStars(fileAddress);
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("FileChecksumCalculated",
+            dictionary.Add("FileChecksumCalculated",
                 ((uint fileAddress) =>
                 {
-                    return Config.FileManager.GetChecksum(fileAddress);
-                },
+                    return StroopMainForm.instance.fileTab.GetChecksum(fileAddress);
+                }
+            ,
                 DEFAULT_SETTER));
 
             // Main Save vars
 
-            _dictionary.Add("MainSaveChecksumCalculated",
+            dictionary.Add("MainSaveChecksumCalculated",
                 ((uint mainSaveAddress) =>
                 {
-                    return Config.MainSaveManager.GetChecksum(mainSaveAddress);
-                },
+                    return StroopMainForm.instance.mainSaveTab.GetChecksum(mainSaveAddress);
+                }
+            ,
                 DEFAULT_SETTER));
 
             // Action vars
 
-            _dictionary.Add("ActionDescription",
+            dictionary.Add("ActionDescription",
                 ((uint dummy) =>
                 {
                     return TableConfig.MarioActions.GetActionName();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("PrevActionDescription",
+            dictionary.Add("PrevActionDescription",
                 ((uint dummy) =>
                 {
                     return TableConfig.MarioActions.GetPrevActionName();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("ActionGroupDescription",
+            dictionary.Add("ActionGroupDescription",
                 ((uint dummy) =>
                 {
                     return TableConfig.MarioActions.GetGroupName();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("AnimationDescription",
+            dictionary.Add("AnimationDescription",
                 ((uint dummy) =>
                 {
                     return TableConfig.MarioAnimations.GetAnimationName();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
             // Water vars
 
-            _dictionary.Add("WaterAboveMedian",
+            dictionary.Add("WaterAboveMedian",
                 ((uint dummy) =>
                 {
                     short waterLevel = Config.Stream.GetInt16(MarioConfig.StructAddress + MarioConfig.WaterLevelOffset);
                     short waterLevelMedian = Config.Stream.GetInt16(MiscConfig.WaterLevelMedianAddress);
                     double waterAboveMedian = waterLevel - waterLevelMedian;
                     return waterAboveMedian;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("MarioAboveWater",
+            dictionary.Add("MarioAboveWater",
                 ((uint dummy) =>
                 {
                     short waterLevel = Config.Stream.GetInt16(MarioConfig.StructAddress + MarioConfig.WaterLevelOffset);
                     float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
                     float marioAboveWater = marioY - waterLevel;
                     return marioAboveWater;
-                },
+                }
+            ,
                 (double goalMarioAboveWater, uint dummy) =>
                 {
                     short waterLevel = Config.Stream.GetInt16(MarioConfig.StructAddress + MarioConfig.WaterLevelOffset);
                     float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
                     double goalMarioY = waterLevel + goalMarioAboveWater;
                     return Config.Stream.SetValue((float)goalMarioY, MarioConfig.StructAddress + MarioConfig.YOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("CurrentWater",
+            dictionary.Add("CurrentWater",
                 ((uint dummy) =>
                 {
                     return WaterUtilities.GetCurrentWater();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
             // Cam Hack Vars
 
-            _dictionary.Add("CamHackYaw",
+            dictionary.Add("CamHackYaw",
                 ((uint dummy) =>
                 {
                     float camX = Config.Stream.GetSingle(CamHackConfig.StructAddress + CamHackConfig.CameraXOffset);
@@ -3872,7 +4083,8 @@ namespace STROOP.Structs
                     float focusX = Config.Stream.GetSingle(CamHackConfig.StructAddress + CamHackConfig.FocusXOffset);
                     float focusZ = Config.Stream.GetSingle(CamHackConfig.StructAddress + CamHackConfig.FocusZOffset);
                     return MoreMath.AngleTo_AngleUnits(camX, camZ, focusX, focusZ);
-                },
+                }
+            ,
                 (double yaw, uint dummy) =>
                 {
                     float camX = Config.Stream.GetSingle(CamHackConfig.StructAddress + CamHackConfig.CameraXOffset);
@@ -3885,9 +4097,10 @@ namespace STROOP.Structs
                     success &= Config.Stream.SetValue((float)newFocusX, CamHackConfig.StructAddress + CamHackConfig.FocusXOffset);
                     success &= Config.Stream.SetValue((float)newFocusZ, CamHackConfig.StructAddress + CamHackConfig.FocusZOffset);
                     return success;
-                }));
+                }
+            ));
 
-            _dictionary.Add("CamHackPitch",
+            dictionary.Add("CamHackPitch",
                 ((uint dummy) =>
                 {
                     float camX = Config.Stream.GetSingle(CamHackConfig.StructAddress + CamHackConfig.CameraXOffset);
@@ -3898,7 +4111,8 @@ namespace STROOP.Structs
                     float focusZ = Config.Stream.GetSingle(CamHackConfig.StructAddress + CamHackConfig.FocusZOffset);
                     (double radius, double theta, double phi) = MoreMath.EulerToSpherical_AngleUnits(focusX - camX, focusY - camY, focusZ - camZ);
                     return phi;
-                },
+                }
+            ,
                 (double pitch, uint dummy) =>
                 {
                     float camX = Config.Stream.GetSingle(CamHackConfig.StructAddress + CamHackConfig.CameraXOffset);
@@ -3921,146 +4135,165 @@ namespace STROOP.Structs
 
             // PU vars
 
-            _dictionary.Add("MarioXQpuIndex",
+            dictionary.Add("MarioXQpuIndex",
                 ((uint dummy) =>
                 {
                     float marioX = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.XOffset);
                     int puXIndex = PuUtilities.GetPuIndex(marioX);
                     double qpuXIndex = puXIndex / 4d;
                     return qpuXIndex;
-                },
+                }
+            ,
                 (double newQpuXIndex, uint dummy) =>
                 {
                     int newPuXIndex = (int)Math.Round(newQpuXIndex * 4);
                     float marioX = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.XOffset);
                     double newMarioX = PuUtilities.GetCoordinateInPu(marioX, newPuXIndex);
                     return Config.Stream.SetValue((float)newMarioX, MarioConfig.StructAddress + MarioConfig.XOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("MarioYQpuIndex",
+            dictionary.Add("MarioYQpuIndex",
                 ((uint dummy) =>
                 {
                     float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
                     int puYIndex = PuUtilities.GetPuIndex(marioY);
                     double qpuYIndex = puYIndex / 4d;
                     return qpuYIndex;
-                },
+                }
+            ,
                 (double newQpuYIndex, uint dummy) =>
                 {
                     int newPuYIndex = (int)Math.Round(newQpuYIndex * 4);
                     float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
                     double newMarioY = PuUtilities.GetCoordinateInPu(marioY, newPuYIndex);
                     return Config.Stream.SetValue((float)newMarioY, MarioConfig.StructAddress + MarioConfig.YOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("MarioZQpuIndex",
+            dictionary.Add("MarioZQpuIndex",
                 ((uint dummy) =>
                 {
                     float marioZ = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.ZOffset);
                     int puZIndex = PuUtilities.GetPuIndex(marioZ);
                     double qpuZIndex = puZIndex / 4d;
                     return qpuZIndex;
-                },
+                }
+            ,
                 (double newQpuZIndex, uint dummy) =>
                 {
                     int newPuZIndex = (int)Math.Round(newQpuZIndex * 4);
                     float marioZ = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.ZOffset);
                     double newMarioZ = PuUtilities.GetCoordinateInPu(marioZ, newPuZIndex);
                     return Config.Stream.SetValue((float)newMarioZ, MarioConfig.StructAddress + MarioConfig.ZOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("MarioXPuIndex",
+            dictionary.Add("MarioXPuIndex",
                 ((uint dummy) =>
                 {
                     float marioX = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.XOffset);
                     int puXIndex = PuUtilities.GetPuIndex(marioX);
                     return puXIndex;
-                },
+                }
+            ,
                 (int newPuXIndex, uint dummy) =>
                 {
                     float marioX = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.XOffset);
                     double newMarioX = PuUtilities.GetCoordinateInPu(marioX, newPuXIndex);
                     return Config.Stream.SetValue((float)newMarioX, MarioConfig.StructAddress + MarioConfig.XOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("MarioYPuIndex",
+            dictionary.Add("MarioYPuIndex",
                 ((uint dummy) =>
                 {
                     float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
                     int puYIndex = PuUtilities.GetPuIndex(marioY);
                     return puYIndex;
-                },
+                }
+            ,
                 (int newPuYIndex, uint dummy) =>
                 {
                     float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
                     double newMarioY = PuUtilities.GetCoordinateInPu(marioY, newPuYIndex);
                     return Config.Stream.SetValue((float)newMarioY, MarioConfig.StructAddress + MarioConfig.YOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("MarioZPuIndex",
+            dictionary.Add("MarioZPuIndex",
                 ((uint dummy) =>
                 {
                     float marioZ = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.ZOffset);
                     int puZIndex = PuUtilities.GetPuIndex(marioZ);
                     return puZIndex;
-                },
+                }
+            ,
                 (int newPuZIndex, uint dummy) =>
                 {
                     float marioZ = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.ZOffset);
                     double newMarioZ = PuUtilities.GetCoordinateInPu(marioZ, newPuZIndex);
                     return Config.Stream.SetValue((float)newMarioZ, MarioConfig.StructAddress + MarioConfig.ZOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("MarioXPuRelative",
+            dictionary.Add("MarioXPuRelative",
                 ((uint dummy) =>
                 {
                     float marioX = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.XOffset);
                     double relX = PuUtilities.GetRelativeCoordinate(marioX);
                     return relX;
-                },
+                }
+            ,
                 (double newRelX, uint dummy) =>
                 {
                     float marioX = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.XOffset);
                     int puXIndex = PuUtilities.GetPuIndex(marioX);
                     double newMarioX = PuUtilities.GetCoordinateInPu(newRelX, puXIndex);
                     return Config.Stream.SetValue((float)newMarioX, MarioConfig.StructAddress + MarioConfig.XOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("MarioYPuRelative",
+            dictionary.Add("MarioYPuRelative",
                 ((uint dummy) =>
                 {
                     float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
                     double relY = PuUtilities.GetRelativeCoordinate(marioY);
                     return relY;
-                },
+                }
+            ,
                 (double newRelY, uint dummy) =>
                 {
                     float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
                     int puYIndex = PuUtilities.GetPuIndex(marioY);
                     double newMarioY = PuUtilities.GetCoordinateInPu(newRelY, puYIndex);
                     return Config.Stream.SetValue((float)newMarioY, MarioConfig.StructAddress + MarioConfig.YOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("MarioZPuRelative",
+            dictionary.Add("MarioZPuRelative",
                 ((uint dummy) =>
                 {
                     float marioZ = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.ZOffset);
                     double relZ = PuUtilities.GetRelativeCoordinate(marioZ);
                     return relZ;
-                },
+                }
+            ,
                 (double newRelZ, uint dummy) =>
                 {
                     float marioZ = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.ZOffset);
                     int puZIndex = PuUtilities.GetPuIndex(marioZ);
                     double newMarioZ = PuUtilities.GetCoordinateInPu(newRelZ, puZIndex);
                     return Config.Stream.SetValue((float)newMarioZ, MarioConfig.StructAddress + MarioConfig.ZOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("DeFactoMultiplier",
+            dictionary.Add("DeFactoMultiplier",
                 ((uint dummy) =>
                 {
                     return GetDeFactoMultiplier();
-                },
+                }
+            ,
                 (double newDeFactoMultiplier, uint dummy) =>
                 {
                     float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
@@ -4071,13 +4304,15 @@ namespace STROOP.Structs
                     uint floorTri = Config.Stream.GetUInt32(MarioConfig.StructAddress + MarioConfig.FloorTriangleOffset);
                     if (floorTri == 0) return false;
                     return Config.Stream.SetValue((float)newDeFactoMultiplier, floorTri + TriangleOffsetsConfig.NormY);
-                }));
+                }
+            ));
 
-            _dictionary.Add("SyncingSpeed",
+            dictionary.Add("SyncingSpeed",
                 ((uint dummy) =>
                 {
                     return GetSyncingSpeed();
-                },
+                }
+            ,
                 (double newSyncingSpeed, uint dummy) =>
                 {
                     float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
@@ -4089,235 +4324,279 @@ namespace STROOP.Structs
                     if (floorTri == 0) return false;
                     double newYnorm = PuUtilities.QpuSpeed / newSyncingSpeed * SpecialConfig.PuHypotenuse;
                     return Config.Stream.SetValue((float)newYnorm, floorTri + TriangleOffsetsConfig.NormY);
-                }));
+                }
+            ));
 
-            _dictionary.Add("QpuSpeed",
+            dictionary.Add("QpuSpeed",
                 ((uint dummy) =>
                 {
                     return GetQpuSpeed();
-                },
+                }
+            ,
                 (double newQpuSpeed, uint dummy) =>
                 {
                     double newHSpeed = newQpuSpeed * GetSyncingSpeed();
                     return Config.Stream.SetValue((float)newHSpeed, MarioConfig.StructAddress + MarioConfig.HSpeedOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("PuSpeed",
+            dictionary.Add("PuSpeed",
                 ((uint dummy) =>
                 {
                     double puSpeed = GetQpuSpeed() * 4;
                     return puSpeed;
-                },
+                }
+            ,
                 (double newPuSpeed, uint dummy) =>
                 {
                     double newQpuSpeed = newPuSpeed / 4;
                     double newHSpeed = newQpuSpeed * GetSyncingSpeed();
                     return Config.Stream.SetValue((float)newHSpeed, MarioConfig.StructAddress + MarioConfig.HSpeedOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("QpuSpeedComponent",
+            dictionary.Add("QpuSpeedComponent",
                 ((uint dummy) =>
                 {
                     return Math.Round(GetQpuSpeed());
-                },
+                }
+            ,
                 (int newQpuSpeedComp, uint dummy) =>
                 {
                     double relativeSpeed = GetRelativePuSpeed();
                     double newHSpeed = newQpuSpeedComp * GetSyncingSpeed() + relativeSpeed / GetDeFactoMultiplier();
                     return Config.Stream.SetValue((float)newHSpeed, MarioConfig.StructAddress + MarioConfig.HSpeedOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("PuSpeedComponent",
+            dictionary.Add("PuSpeedComponent",
                 ((uint dummy) =>
                 {
                     return Math.Round(GetQpuSpeed() * 4);
-                },
+                }
+            ,
                 (int newPuSpeedComp, uint dummy) =>
                 {
                     double newQpuSpeedComp = newPuSpeedComp / 4d;
                     double relativeSpeed = GetRelativePuSpeed();
                     double newHSpeed = newQpuSpeedComp * GetSyncingSpeed() + relativeSpeed / GetDeFactoMultiplier();
                     return Config.Stream.SetValue((float)newHSpeed, MarioConfig.StructAddress + MarioConfig.HSpeedOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("RelativeSpeed",
+            dictionary.Add("RelativeSpeed",
                 ((uint dummy) =>
                 {
                     return GetRelativePuSpeed();
-                },
+                }
+            ,
                 (double newRelativeSpeed, uint dummy) =>
                 {
                     double puSpeed = GetQpuSpeed() * 4;
                     double puSpeedRounded = Math.Round(puSpeed);
                     double newHSpeed = (puSpeedRounded / 4) * GetSyncingSpeed() + newRelativeSpeed / GetDeFactoMultiplier();
                     return Config.Stream.SetValue((float)newHSpeed, MarioConfig.StructAddress + MarioConfig.HSpeedOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("Qs1RelativeXSpeed",
+            dictionary.Add("Qs1RelativeXSpeed",
                 ((uint dummy) =>
                 {
                     return GetQsRelativeSpeed(1 / 4d, true);
-                },
+                }
+            ,
                 (double newValue, uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(newValue, 1 / 4d, true, true);
-                }));
+                }
+            ));
 
-            _dictionary.Add("Qs1RelativeZSpeed",
+            dictionary.Add("Qs1RelativeZSpeed",
                 ((uint dummy) =>
                 {
                     return GetQsRelativeSpeed(1 / 4d, false);
-                },
+                }
+            ,
                 (double newValue, uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(newValue, 1 / 4d, false, true);
-                }));
+                }
+            ));
 
-            _dictionary.Add("Qs1RelativeIntendedNextX",
+            dictionary.Add("Qs1RelativeIntendedNextX",
                 ((uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(1 / 4d, true);
-                },
+                }
+            ,
                 (double newValue, uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(newValue, 1 / 4d, true, false);
-                }));
+                }
+            ));
 
-            _dictionary.Add("Qs1RelativeIntendedNextZ",
+            dictionary.Add("Qs1RelativeIntendedNextZ",
                 ((uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(1 / 4d, false);
-                },
+                }
+            ,
                 (double newValue, uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(newValue, 1 / 4d, false, false);
-                }));
+                }
+            ));
 
-            _dictionary.Add("Qs2RelativeXSpeed",
+            dictionary.Add("Qs2RelativeXSpeed",
                 ((uint dummy) =>
                 {
                     return GetQsRelativeSpeed(2 / 4d, true);
-                },
+                }
+            ,
                 (double newValue, uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(newValue, 2 / 4d, true, true);
-                }));
+                }
+            ));
 
-            _dictionary.Add("Qs2RelativeZSpeed",
+            dictionary.Add("Qs2RelativeZSpeed",
                 ((uint dummy) =>
                 {
                     return GetQsRelativeSpeed(2 / 4d, false);
-                },
+                }
+            ,
                 (double newValue, uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(newValue, 2 / 4d, false, true);
-                }));
+                }
+            ));
 
-            _dictionary.Add("Qs2RelativeIntendedNextX",
+            dictionary.Add("Qs2RelativeIntendedNextX",
                 ((uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(2 / 4d, true);
-                },
+                }
+            ,
                 (double newValue, uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(newValue, 2 / 4d, true, false);
-                }));
+                }
+            ));
 
-            _dictionary.Add("Qs2RelativeIntendedNextZ",
+            dictionary.Add("Qs2RelativeIntendedNextZ",
                 ((uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(2 / 4d, false);
-                },
+                }
+            ,
                 (double newValue, uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(newValue, 2 / 4d, false, false);
-                }));
+                }
+            ));
 
-            _dictionary.Add("Qs3RelativeXSpeed",
+            dictionary.Add("Qs3RelativeXSpeed",
                 ((uint dummy) =>
                 {
                     return GetQsRelativeSpeed(3 / 4d, true);
-                },
+                }
+            ,
                 (double newValue, uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(newValue, 3 / 4d, true, true);
-                }));
+                }
+            ));
 
-            _dictionary.Add("Qs3RelativeZSpeed",
+            dictionary.Add("Qs3RelativeZSpeed",
                 ((uint dummy) =>
                 {
                     return GetQsRelativeSpeed(3 / 4d, false);
-                },
+                }
+            ,
                 (double newValue, uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(newValue, 3 / 4d, false, true);
-                }));
+                }
+            ));
 
-            _dictionary.Add("Qs3RelativeIntendedNextX",
+            dictionary.Add("Qs3RelativeIntendedNextX",
                 ((uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(3 / 4d, true);
-                },
+                }
+            ,
                 (double newValue, uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(newValue, 3 / 4d, true, false);
-                }));
+                }
+            ));
 
-            _dictionary.Add("Qs3RelativeIntendedNextZ",
+            dictionary.Add("Qs3RelativeIntendedNextZ",
                 ((uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(3 / 4d, false);
-                },
+                }
+            ,
                 (double newValue, uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(newValue, 3 / 4d, false, false);
-                }));
+                }
+            ));
 
-            _dictionary.Add("Qs4RelativeXSpeed",
+            dictionary.Add("Qs4RelativeXSpeed",
                 ((uint dummy) =>
                 {
                     return GetQsRelativeSpeed(4 / 4d, true);
-                },
+                }
+            ,
                 (double newValue, uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(newValue, 4 / 4d, true, true);
-                }));
+                }
+            ));
 
-            _dictionary.Add("Qs4RelativeZSpeed",
+            dictionary.Add("Qs4RelativeZSpeed",
                 ((uint dummy) =>
                 {
                     return GetQsRelativeSpeed(4 / 4d, false);
-                },
+                }
+            ,
                 (double newValue, uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(newValue, 4 / 4d, false, true);
-                }));
+                }
+            ));
 
-            _dictionary.Add("Qs4RelativeIntendedNextX",
+            dictionary.Add("Qs4RelativeIntendedNextX",
                 ((uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(4 / 4d, true);
-                },
+                }
+            ,
                 (double newValue, uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(newValue, 4 / 4d, true, false);
-                }));
+                }
+            ));
 
-            _dictionary.Add("Qs4RelativeIntendedNextZ",
+            dictionary.Add("Qs4RelativeIntendedNextZ",
                 ((uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(4 / 4d, false);
-                },
+                }
+            ,
                 (double newValue, uint dummy) =>
                 {
                     return GetQsRelativeIntendedNextComponent(newValue, 4 / 4d, false, false);
-                }));
+                }
+            ));
 
-            _dictionary.Add("PuParams",
+            dictionary.Add("PuParams",
                 ((uint dummy) =>
                 {
                     return "(" + SpecialConfig.PuParam1 + "," + SpecialConfig.PuParam2 + ")";
-                },
+                }
+            ,
                 (string puParamsString, uint dummy) =>
                 {
                     List<string> stringList = ParsingUtilities.ParseStringList(puParamsString);
@@ -4328,131 +4607,150 @@ namespace STROOP.Structs
                     SpecialConfig.PuParam1 = intList[0].Value;
                     SpecialConfig.PuParam2 = intList[1].Value;
                     return true;
-                }));
+                }
+            ));
 
             // Misc vars
 
-            _dictionary.Add("GlobalTimerMod64",
+            dictionary.Add("GlobalTimerMod64",
                 ((uint dummy) =>
                 {
                     uint globalTimer = Config.Stream.GetUInt32(MiscConfig.GlobalTimerAddress);
                     return globalTimer % 64;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("RngIndex",
+            dictionary.Add("RngIndex",
                 ((uint dummy) =>
                 {
                     ushort rngValue = Config.Stream.GetUInt16(MiscConfig.RngAddress);
                     return RngIndexer.GetRngIndex(rngValue);
-                },
+                }
+            ,
                 (int rngIndex, uint dummy) =>
                 {
                     ushort rngValue = RngIndexer.GetRngValue(rngIndex);
                     return Config.Stream.SetValue(rngValue, MiscConfig.RngAddress);
-                }));
+                }
+            ));
 
-            _dictionary.Add("RngIndexMod4",
+            dictionary.Add("RngIndexMod4",
                 ((uint dummy) =>
                 {
                     ushort rngValue = Config.Stream.GetUInt16(MiscConfig.RngAddress);
                     int rngIndex = RngIndexer.GetRngIndex();
                     return rngIndex % 4;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("LastCoinRngIndex",
+            dictionary.Add("LastCoinRngIndex",
                 ((uint coinAddress) =>
                 {
                     ushort coinRngValue = Config.Stream.GetUInt16(coinAddress + ObjectConfig.YawMovingOffset);
                     int coinRngIndex = RngIndexer.GetRngIndex(coinRngValue);
                     return coinRngIndex;
-                },
+                }
+            ,
                 (int rngIndex, uint coinAddress) =>
                 {
                     ushort coinRngValue = RngIndexer.GetRngValue(rngIndex);
                     return Config.Stream.SetValue(coinRngValue, coinAddress + ObjectConfig.YawMovingOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("LastCoinRngIndexDiff",
+            dictionary.Add("LastCoinRngIndexDiff",
                 ((uint coinAddress) =>
                 {
                     ushort coinRngValue = Config.Stream.GetUInt16(coinAddress + ObjectConfig.YawMovingOffset);
                     int coinRngIndex = RngIndexer.GetRngIndex(coinRngValue);
                     int rngIndexDiff = coinRngIndex - SpecialConfig.GoalRngIndex;
                     return rngIndexDiff;
-                },
+                }
+            ,
                 (int rngIndexDiff, uint coinAddress) =>
                 {
                     int coinRngIndex = SpecialConfig.GoalRngIndex + rngIndexDiff;
                     ushort coinRngValue = RngIndexer.GetRngValue(coinRngIndex);
                     return Config.Stream.SetValue(coinRngValue, coinAddress + ObjectConfig.YawMovingOffset);
-                }));
-            
-            _dictionary.Add("GoalRngValue",
+                }
+            ));
+
+            dictionary.Add("GoalRngValue",
                 ((uint dummy) =>
                 {
                     return SpecialConfig.GoalRngValue;
-                },
+                }
+            ,
                 (ushort goalRngValue, uint coinAddress) =>
                 {
                     SpecialConfig.GoalRngValue = goalRngValue;
                     return true;
-                }));
+                }
+            ));
 
-            _dictionary.Add("GoalRngIndex",
+            dictionary.Add("GoalRngIndex",
                 ((uint dummy) =>
                 {
                     return SpecialConfig.GoalRngIndex;
-                },
+                }
+            ,
                 (ushort goalRngIndex, uint coinAddress) =>
                 {
                     SpecialConfig.GoalRngIndex = goalRngIndex;
                     return true;
-                }));
+                }
+            ));
 
-            _dictionary.Add("GoalRngIndexDiff",
+            dictionary.Add("GoalRngIndexDiff",
                 ((uint dummy) =>
                 {
                     ushort rngValue = Config.Stream.GetUInt16(MiscConfig.RngAddress);
                     int rngIndex = RngIndexer.GetRngIndex(rngValue);
                     int rngIndexDiff = rngIndex - SpecialConfig.GoalRngIndex;
                     return rngIndexDiff;
-                },
+                }
+            ,
                 (int rngIndexDiff, uint dummy) =>
                 {
                     int rngIndex = SpecialConfig.GoalRngIndex + rngIndexDiff;
                     ushort rngValue = RngIndexer.GetRngValue(rngIndex);
                     return Config.Stream.SetValue(rngValue, MiscConfig.RngAddress);
-                }));
+                }
+            ));
 
-            _dictionary.Add("NumRngCalls",
+            dictionary.Add("NumRngCalls",
                 ((uint dummy) =>
                 {
                     return ObjectRngUtilities.GetNumRngUsages();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("NumberOfLoadedObjects",
+            dictionary.Add("NumberOfLoadedObjects",
                 ((uint dummy) =>
                 {
                     return DataModels.ObjectProcessor.ActiveObjectCount;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("PlayTime",
+            dictionary.Add("PlayTime",
                 ((uint dummy) =>
                 {
                     uint totalFrames = Config.Stream.GetUInt32(MiscConfig.GlobalTimerAddress);
                     return GetRealTime(totalFrames);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("DemoCounterDescription",
+            dictionary.Add("DemoCounterDescription",
                 ((uint dummy) =>
                 {
                     return DemoCounterUtilities.GetDemoCounterDescription();
-                },
+                }
+            ,
                 (string description, uint dummy) =>
                 {
                     short? demoCounterNullable = DemoCounterUtilities.GetDemoCounter(description);
@@ -4461,23 +4759,26 @@ namespace STROOP.Structs
                 }
             ));
 
-            _dictionary.Add("TtcSpeedSettingDescription",
+            dictionary.Add("TtcSpeedSettingDescription",
                 ((uint dummy) =>
                 {
                     return TtcSpeedSettingUtilities.GetTtcSpeedSettingDescription();
-                },
+                }
+            ,
                 (string description, uint dummy) =>
                 {
                     short? ttcSpeedSettingNullable = TtcSpeedSettingUtilities.GetTtcSpeedSetting(description);
                     if (!ttcSpeedSettingNullable.HasValue) return false;
                     return Config.Stream.SetValue(ttcSpeedSettingNullable.Value, MiscConfig.TtcSpeedSettingAddress);
-                }));
+                }
+            ));
 
-            _dictionary.Add("TtcSaveState",
+            dictionary.Add("TtcSaveState",
                 ((uint dummy) =>
                 {
                     return new TtcSaveState().ToString();
-                },
+                }
+            ,
                 (string saveStateString, uint dummy) =>
                 {
                     TtcSaveState saveState = new TtcSaveState(saveStateString);
@@ -4486,390 +4787,453 @@ namespace STROOP.Structs
                 }
             ));
 
-            _dictionary.Add("GfxBufferSpace",
+            dictionary.Add("GfxBufferSpace",
                 ((uint dummy) =>
                 {
-                    uint gfxBufferStart = Config.Stream.GetUInt32(MiscConfig.GfxBufferStartAddress);
-                    uint gfxBufferEnd = Config.Stream.GetUInt32(MiscConfig.GfxBufferEndAddress);
+                    uint gfxBufferStart = Config.Stream.GetUInt32(0x8033B06C);
+                    uint gfxBufferEnd = Config.Stream.GetUInt32(0x8033B070);
                     return gfxBufferEnd - gfxBufferStart;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("SegmentedToVirtualAddress",
+            dictionary.Add("SegmentedToVirtualAddress",
                 ((uint dummy) =>
                 {
                     return SpecialConfig.SegmentedToVirtualAddress;
-                },
+                }
+            ,
                 (uint value, uint dummy) =>
                 {
                     SpecialConfig.SegmentedToVirtualAddress = value;
                     return true;
-                }));
+                }
+            ));
 
-            _dictionary.Add("SegmentedToVirtualOutput",
+            dictionary.Add("SegmentedToVirtualOutput",
                 ((uint dummy) =>
                 {
                     return SpecialConfig.SegmentedToVirtualOutput;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("VirtualToSegmentedSegment",
+            dictionary.Add("VirtualToSegmentedSegment",
                 ((uint dummy) =>
                 {
                     return SpecialConfig.VirtualToSegmentedSegment;
-                },
+                }
+            ,
                 (uint value, uint dummy) =>
                 {
                     SpecialConfig.VirtualToSegmentedSegment = value;
                     return true;
-                }));
+                }
+            ));
 
-            _dictionary.Add("VirtualToSegmentedAddress",
+            dictionary.Add("VirtualToSegmentedAddress",
                 ((uint dummy) =>
                 {
                     return SpecialConfig.VirtualToSegmentedAddress;
-                },
+                }
+            ,
                 (uint value, uint dummy) =>
                 {
                     SpecialConfig.VirtualToSegmentedAddress = value;
                     return true;
-                }));
+                }
+            ));
 
-            _dictionary.Add("VirtualToSegmentedOutput",
+            dictionary.Add("VirtualToSegmentedOutput",
                 ((uint dummy) =>
                 {
                     return SpecialConfig.VirtualToSegmentedOutput;
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
             // Options vars
 
-            _dictionary.Add("GotoAboveOffset",
+            dictionary.Add("GotoAboveOffset",
                 ((uint dummy) =>
                 {
                     return GotoRetrieveConfig.GotoAboveOffset;
-                },
+                }
+            ,
                 (float value, uint dummy) =>
                 {
                     GotoRetrieveConfig.GotoAboveOffset = value;
                     return true;
-                }));
+                }
+            ));
 
-            _dictionary.Add("GotoInfrontOffset",
+            dictionary.Add("GotoInfrontOffset",
                 ((uint dummy) =>
                 {
                     return GotoRetrieveConfig.GotoInfrontOffset;
-                },
+                }
+            ,
                 (float value, uint dummy) =>
                 {
                     GotoRetrieveConfig.GotoInfrontOffset = value;
                     return true;
-                }));
+                }
+            ));
 
-            _dictionary.Add("RetrieveAboveOffset",
+            dictionary.Add("RetrieveAboveOffset",
                 ((uint dummy) =>
                 {
                     return GotoRetrieveConfig.RetrieveAboveOffset;
-                },
+                }
+            ,
                 (float value, uint dummy) =>
                 {
                     GotoRetrieveConfig.RetrieveAboveOffset = value;
                     return true;
-                }));
+                }
+            ));
 
-            _dictionary.Add("RetrieveInfrontOffset",
+            dictionary.Add("RetrieveInfrontOffset",
                 ((uint dummy) =>
                 {
                     return GotoRetrieveConfig.RetrieveInfrontOffset;
-                },
+                }
+            ,
                 (float value, uint dummy) =>
                 {
                     GotoRetrieveConfig.RetrieveInfrontOffset = value;
                     return true;
-                }));
+                }
+            ));
 
-            _dictionary.Add("FramesPerSecond",
+            dictionary.Add("FramesPerSecond",
                 ((uint dummy) =>
                 {
                     return RefreshRateConfig.RefreshRateFreq;
-                },
+                }
+            ,
                 (uint value, uint dummy) =>
                 {
                     RefreshRateConfig.RefreshRateFreq = value;
                     return true;
-                }));
+                }
+            ));
 
-            _dictionary.Add("PositionControllerRelativity",
+            dictionary.Add("PositionControllerRelativity",
                 ((uint dummy) =>
                 {
                     return PositionControllerRelativityConfig.RelativityPA.ToString();
-                },
+                }
+            ,
                 (PositionAngle value, uint dummy) =>
                 {
                     PositionControllerRelativityConfig.RelativityPA = value;
                     return true;
-                }));
+                }
+            ));
 
-            _dictionary.Add("CustomReleaseStatus",
+            dictionary.Add("CustomReleaseStatus",
                 ((uint dummy) =>
                 {
                     return SpecialConfig.CustomReleaseStatus;
-                },
+                }
+            ,
                 (uint value, uint dummy) =>
                 {
                     SpecialConfig.CustomReleaseStatus = value;
                     return true;
-                }));
+                }
+            ));
 
             // Area vars
 
-            _dictionary.Add("CurrentAreaIndexMario",
+            dictionary.Add("CurrentAreaIndexMario",
                 ((uint dummy) =>
                 {
                     uint currentAreaMario = Config.Stream.GetUInt32(
                         MarioConfig.StructAddress + MarioConfig.AreaPointerOffset);
                     double currentAreaIndexMario = AreaUtilities.GetAreaIndex(currentAreaMario) ?? Double.NaN;
                     return currentAreaIndexMario;
-                },
+                }
+            ,
                 (int currentAreaIndexMario, uint dummy) =>
                 {
                     if (currentAreaIndexMario < 0 || currentAreaIndexMario >= 8) return false;
                     uint currentAreaAddressMario = AreaUtilities.GetAreaAddress(currentAreaIndexMario);
                     return Config.Stream.SetValue(
                         currentAreaAddressMario, MarioConfig.StructAddress + MarioConfig.AreaPointerOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("CurrentAreaIndex",
+            dictionary.Add("CurrentAreaIndex",
                 ((uint dummy) =>
                 {
                     uint currentArea = Config.Stream.GetUInt32(AreaConfig.CurrentAreaPointerAddress);
                     double currentAreaIndex = AreaUtilities.GetAreaIndex(currentArea) ?? Double.NaN;
                     return currentAreaIndex;
-                },
+                }
+            ,
                 (int currentAreaIndex, uint dummy) =>
                 {
                     if (currentAreaIndex < 0 || currentAreaIndex >= 8) return false;
                     uint currentAreaAddress = AreaUtilities.GetAreaAddress(currentAreaIndex);
                     return Config.Stream.SetValue(currentAreaAddress, AreaConfig.CurrentAreaPointerAddress);
-                }));
+                }
+            ));
 
-            _dictionary.Add("AreaTerrainDescription",
+            dictionary.Add("AreaTerrainDescription",
                 ((uint dummy) =>
                 {
                     short terrainType = Config.Stream.GetInt16(
-                        Config.AreaManager.SelectedAreaAddress + AreaConfig.TerrainTypeOffset);
+                        AreaConfig.SelectedAreaAddress + AreaConfig.TerrainTypeOffset);
                     string terrainDescription = AreaUtilities.GetTerrainDescription(terrainType);
                     return terrainDescription;
-                },
+                }
+            ,
                 (short terrainType, uint dummy) =>
                 {
                     return Config.Stream.SetValue(
-                        terrainType, Config.AreaManager.SelectedAreaAddress + AreaConfig.TerrainTypeOffset);
-                }));
+                        terrainType, AreaConfig.SelectedAreaAddress + AreaConfig.TerrainTypeOffset);
+                }
+            ));
 
             // Warp vars
 
-            _dictionary.Add("WarpNodesAddress",
+            dictionary.Add("WarpNodesAddress",
                 ((uint dummy) =>
                 {
                     return GetWarpNodesAddress();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("NumWarpNodes",
+            dictionary.Add("NumWarpNodes",
                 ((uint dummy) =>
                 {
                     return GetNumWarpNodes();
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
             // Custom point
 
-            _dictionary.Add("SelfPosType",
+            dictionary.Add("SelfPosType",
                 ((uint dummy) =>
                 {
                     return SpecialConfig.SelfPosPA.ToString();
-                },
+                }
+            ,
                 (PositionAngle posAngle, uint dummy) =>
                 {
                     if (posAngle.DependsOnSelf()) return false;
                     SpecialConfig.SelfPosPA = posAngle;
                     return true;
-                }));
+                }
+            ));
 
-            _dictionary.Add("SelfX",
+            dictionary.Add("SelfX",
                 ((uint dummy) =>
                 {
                     return SpecialConfig.SelfX;
-                },
+                }
+            ,
                 (double doubleValue, uint dummy) =>
                 {
                     return SpecialConfig.SelfPosPA.SetX(doubleValue);
-                }));
+                }
+            ));
 
-            _dictionary.Add("SelfY",
+            dictionary.Add("SelfY",
                 ((uint dummy) =>
                 {
                     return SpecialConfig.SelfY;
-                },
+                }
+            ,
                 (double doubleValue, uint dummy) =>
                 {
                     return SpecialConfig.SelfPosPA.SetY(doubleValue);
-                }));
+                }
+            ));
 
-            _dictionary.Add("SelfZ",
+            dictionary.Add("SelfZ",
                 ((uint dummy) =>
                 {
                     return SpecialConfig.SelfZ;
-                },
+                }
+            ,
                 (double doubleValue, uint dummy) =>
                 {
                     return SpecialConfig.SelfPosPA.SetZ(doubleValue);
-                }));
+                }
+            ));
 
-            _dictionary.Add("SelfAngleType",
+            dictionary.Add("SelfAngleType",
                 ((uint dummy) =>
                 {
                     return SpecialConfig.SelfAnglePA.ToString();
-                },
+                }
+            ,
                 (PositionAngle posAngle, uint dummy) =>
                 {
                     if (posAngle.DependsOnSelf()) return false;
                     SpecialConfig.SelfAnglePA = posAngle;
                     return true;
-                }));
+                }
+            ));
 
-            _dictionary.Add("SelfAngle",
+            dictionary.Add("SelfAngle",
                 ((uint dummy) =>
                 {
                     return SpecialConfig.SelfAngle;
-                },
+                }
+            ,
                 (double doubleValue, uint dummy) =>
                 {
                     return SpecialConfig.SelfAnglePA.SetAngle(doubleValue);
-                }));
+                }
+            ));
 
-            _dictionary.Add("PointPosType",
+            dictionary.Add("PointPosType",
                 ((uint dummy) =>
                 {
                     return SpecialConfig.PointPosPA.ToString();
-                },
+                }
+            ,
                 (PositionAngle posAngle, uint dummy) =>
                 {
                     SpecialConfig.PointPosPA = posAngle;
                     return true;
-                }));
+                }
+            ));
 
-            _dictionary.Add("PointX",
+            dictionary.Add("PointX",
                 ((uint dummy) =>
                 {
                     return SpecialConfig.PointX;
-                },
+                }
+            ,
                 (double doubleValue, uint dummy) =>
                 {
                     return SpecialConfig.PointPosPA.SetX(doubleValue);
-                }));
+                }
+            ));
 
-            _dictionary.Add("PointY",
+            dictionary.Add("PointY",
                 ((uint dummy) =>
                 {
                     return SpecialConfig.PointY;
-                },
+                }
+            ,
                 (double doubleValue, uint dummy) =>
                 {
                     return SpecialConfig.PointPosPA.SetY(doubleValue);
-                }));
+                }
+            ));
 
-            _dictionary.Add("PointZ",
+            dictionary.Add("PointZ",
                 ((uint dummy) =>
                 {
                     return SpecialConfig.PointZ;
-                },
+                }
+            ,
                 (double doubleValue, uint dummy) =>
                 {
                     return SpecialConfig.PointPosPA.SetZ(doubleValue);
-                }));
+                }
+            ));
 
-            _dictionary.Add("PointAngleType",
+            dictionary.Add("PointAngleType",
                 ((uint dummy) =>
                 {
                     return SpecialConfig.PointAnglePA.ToString();
-                },
+                }
+            ,
                 (PositionAngle posAngle, uint dummy) =>
                 {
                     SpecialConfig.PointAnglePA = posAngle;
                     return true;
-                }));
+                }
+            ));
 
-            _dictionary.Add("PointAngle",
+            dictionary.Add("PointAngle",
                 ((uint dummy) =>
                 {
                     return SpecialConfig.PointAngle;
-                },
+                }
+            ,
                 (double doubleValue, uint dummy) =>
                 {
                     return SpecialConfig.PointAnglePA.SetAngle(doubleValue);
-                }));
+                }
+            ));
 
             // Ghost vars
 
-            _dictionary.Add("GhostActionDescription",
+            dictionary.Add("GhostActionDescription",
                 ((uint dummy) =>
                 {
                     uint action = Config.Stream.GetUInt32(GhostHackConfig.CurrentGhostStruct + GhostHackConfig.ActionOffset);
                     return TableConfig.MarioActions.GetActionName(action);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
-            _dictionary.Add("GhostDeltaHSpeed",
+            dictionary.Add("GhostDeltaHSpeed",
                 ((uint dummy) =>
                 {
                     float marioHSpeed = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.HSpeedOffset);
                     float ghostHSpeed = Config.Stream.GetSingle(GhostHackConfig.CurrentGhostStruct + GhostHackConfig.HSpeedOffset);
                     return marioHSpeed - ghostHSpeed;
-                },
+                }
+            ,
                 (float deltaHSpeed, uint dummy) =>
                 {
                     float ghostHSpeed = Config.Stream.GetSingle(GhostHackConfig.CurrentGhostStruct + GhostHackConfig.HSpeedOffset);
                     float newMarioHSpeed = ghostHSpeed + deltaHSpeed;
                     return Config.Stream.SetValue(newMarioHSpeed, MarioConfig.StructAddress + MarioConfig.HSpeedOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("GhostDeltaYSpeed",
+            dictionary.Add("GhostDeltaYSpeed",
                 ((uint dummy) =>
                 {
                     float marioYSpeed = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YSpeedOffset);
                     float ghostYSpeed = Config.Stream.GetSingle(GhostHackConfig.CurrentGhostStruct + GhostHackConfig.YSpeedOffset);
                     return marioYSpeed - ghostYSpeed;
-                },
+                }
+            ,
                 (float deltaYSpeed, uint dummy) =>
                 {
                     float ghostYSpeed = Config.Stream.GetSingle(GhostHackConfig.CurrentGhostStruct + GhostHackConfig.YSpeedOffset);
                     float newMarioYSpeed = ghostYSpeed + deltaYSpeed;
                     return Config.Stream.SetValue(newMarioYSpeed, MarioConfig.StructAddress + MarioConfig.YSpeedOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("GhostDeltaYawFacing",
+            dictionary.Add("GhostDeltaYawFacing",
                 ((uint dummy) =>
                 {
                     ushort marioYawFacing = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
                     ushort ghostYawFacing = Config.Stream.GetUInt16(GhostHackConfig.CurrentGhostStruct + GhostHackConfig.YawFacingOffset);
                     return MoreMath.NormalizeAngleShort(marioYawFacing - ghostYawFacing);
-                },
+                }
+            ,
                 (short deltaYawFacing, uint dummy) =>
                 {
                     ushort ghostYawFacing = Config.Stream.GetUInt16(GhostHackConfig.CurrentGhostStruct + GhostHackConfig.YawFacingOffset);
                     ushort newMarioYawFacing = MoreMath.NormalizeAngleUshort(ghostYawFacing + deltaYawFacing);
                     return Config.Stream.SetValue(newMarioYawFacing, MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
-                }));
+                }
+            ));
 
-            _dictionary.Add("GhostDeltaYawIntended",
+            dictionary.Add("GhostDeltaYawIntended",
                 ((uint dummy) =>
                 {
                     ushort marioYawIntended = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.IntendedYawOffset);
                     ushort ghostYawIntended = Config.Stream.GetUInt16(GhostHackConfig.CurrentGhostStruct + GhostHackConfig.YawIntendedOffset);
                     return MoreMath.NormalizeAngleShort(marioYawIntended - ghostYawIntended);
-                },
+                }
+            ,
                 (short deltaYawIntended, uint dummy) =>
                 {
                     ushort ghostYawIntended = Config.Stream.GetUInt16(GhostHackConfig.CurrentGhostStruct + GhostHackConfig.YawIntendedOffset);
@@ -4878,7 +5242,7 @@ namespace STROOP.Structs
                 }
             ));
 
-            _dictionary.Add("HorizontalMovement",
+            dictionary.Add("HorizontalMovement",
                 ((uint dummy) =>
                 {
                     float pos01X = Config.Stream.GetSingle(0x80372F00);
@@ -4886,18 +5250,20 @@ namespace STROOP.Structs
                     float pos15X = Config.Stream.GetSingle(0x80372FE0);
                     float pos15Z = Config.Stream.GetSingle(0x80372FE8);
                     return MoreMath.GetDistanceBetween(pos01X, pos01Z, pos15X, pos15Z);
-                },
+                }
+            ,
                 DEFAULT_SETTER));
 
             // Mupen vars
 
-            _dictionary.Add("MupenLag",
+            dictionary.Add("MupenLag",
                 ((uint objAddress) =>
                 {
                     if (!MupenUtilities.IsUsingMupen()) return Double.NaN;
                     int lag = MupenUtilities.GetLagCount() + SpecialConfig.MupenLagOffset;
                     return lag;
-                },
+                }
+            ,
                 (string stringValue, uint dummy) =>
                 {
                     if (!MupenUtilities.IsUsingMupen()) return false;
@@ -4914,7 +5280,8 @@ namespace STROOP.Structs
                     int newLagOffset = newLag - MupenUtilities.GetLagCount();
                     SpecialConfig.MupenLagOffset = newLagOffset;
                     return true;
-                }));
+                }
+            ));
         }
 
         // Triangle utilitiy methods
@@ -5362,7 +5729,7 @@ namespace STROOP.Structs
             double compDiff = relIntendedComp - relCurrentComp;
             return compDiff;
         }
-        
+
         private static double GetQsRelativeIntendedNextComponent(double numFrames, bool xComp)
         {
             (double intendedX, double intendedZ) = GetIntendedNextPosition(numFrames);
@@ -5370,7 +5737,7 @@ namespace STROOP.Structs
             double relIntendedComp = PuUtilities.GetRelativeCoordinate(intendedComp);
             return relIntendedComp;
         }
-        
+
         private static bool GetQsRelativeIntendedNextComponent(double newValue, double numFrames, bool xComp, bool relativePosition)
         {
             float currentX = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.XOffset);
@@ -5427,7 +5794,7 @@ namespace STROOP.Structs
 
         public static double ComputeHeightChangeFromInitialVerticalSpeed(double initialVSpeed)
         {
-            int numFrames = (int) Math.Ceiling(initialVSpeed / 4);
+            int numFrames = (int)Math.Ceiling(initialVSpeed / 4);
             double finalVSpeed = initialVSpeed - (numFrames - 1) * 4;
             double heightChange = numFrames * (initialVSpeed + finalVSpeed) / 2;
             return heightChange;
@@ -5435,7 +5802,7 @@ namespace STROOP.Structs
 
         public static double ComputeInitialVerticalSpeedFromHeightChange(double heightChange)
         {
-            int numFrames = (int) Math.Ceiling((-2 + Math.Sqrt(4 + 8 * heightChange)) / 4);
+            int numFrames = (int)Math.Ceiling((-2 + Math.Sqrt(4 + 8 * heightChange)) / 4);
             double triangleConstant = 2 * numFrames * (numFrames - 1);
             double initialSpeed = (heightChange + triangleConstant) / numFrames;
             return initialSpeed;
@@ -5493,7 +5860,7 @@ namespace STROOP.Structs
                 (short)(platformFacingAngle[2] - platformAngularVelocity[2]),
             };
 
-            float[,] displaceMatrix = new float[4,4];
+            float[,] displaceMatrix = new float[4, 4];
             float[] relativeOffset = new float[3];
             float[] newObjectOffset = new float[3];
 
@@ -5528,30 +5895,30 @@ namespace STROOP.Structs
             float sz = InGameTrigUtilities.InGameSine(rotate[2]);
             float cz = InGameTrigUtilities.InGameCosine(rotate[2]);
 
-            dest[0,0] = cy * cz + sx * sy * sz;
-            dest[1,0] = -cy * sz + sx * sy * cz;
-            dest[2,0] = cx * sy;
-            dest[3,0] = translate[0];
+            dest[0, 0] = cy * cz + sx * sy * sz;
+            dest[1, 0] = -cy * sz + sx * sy * cz;
+            dest[2, 0] = cx * sy;
+            dest[3, 0] = translate[0];
 
-            dest[0,1] = cx * sz;
-            dest[1,1] = cx * cz;
-            dest[2,1] = -sx;
-            dest[3,1] = translate[1];
+            dest[0, 1] = cx * sz;
+            dest[1, 1] = cx * cz;
+            dest[2, 1] = -sx;
+            dest[3, 1] = translate[1];
 
-            dest[0,2] = -sy * cz + sx * cy * sz;
-            dest[1,2] = sy * sz + sx * cy * cz;
-            dest[2,2] = cx * cy;
-            dest[3,2] = translate[2];
+            dest[0, 2] = -sy * cz + sx * cy * sz;
+            dest[1, 2] = sy * sz + sx * cy * cz;
+            dest[2, 2] = cx * cy;
+            dest[3, 2] = translate[2];
 
-            dest[0,3] = dest[1,3] = dest[2,3] = 0.0f;
-            dest[3,3] = 1.0f;
+            dest[0, 3] = dest[1, 3] = dest[2, 3] = 0.0f;
+            dest[3, 3] = 1.0f;
         }
 
         private static void linear_mtxf_transpose_mul_vec3f(float[,] m, float[] dst, float[] v)
         {
             for (int i = 0; i < 3; i++)
             {
-                dst[i] = m[i,0] * v[0] + m[i,1] * v[1] + m[i,2] * v[2];
+                dst[i] = m[i, 0] * v[0] + m[i, 1] * v[1] + m[i, 2] * v[2];
             }
         }
 
@@ -5698,37 +6065,6 @@ namespace STROOP.Structs
             if (numValuesToShow >= 2) builder.Append(seconds + "s ");
             if (numValuesToShow >= 1) builder.Append(String.Format("{0:D2}", frames) + "f");
             return builder.ToString();
-        }
-
-        // Hitbox vars
-
-        public static int IsMarioHitboxOverlapping(uint objAddress)
-        {
-            uint marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
-            float mObjX = Config.Stream.GetSingle(marioObjRef + ObjectConfig.XOffset);
-            float mObjY = Config.Stream.GetSingle(marioObjRef + ObjectConfig.YOffset);
-            float mObjZ = Config.Stream.GetSingle(marioObjRef + ObjectConfig.ZOffset);
-            float mObjHitboxRadius = Config.Stream.GetSingle(marioObjRef + ObjectConfig.HitboxRadiusOffset);
-            float mObjHitboxHeight = Config.Stream.GetSingle(marioObjRef + ObjectConfig.HitboxHeightOffset);
-            float mObjHitboxDownOffset = Config.Stream.GetSingle(marioObjRef + ObjectConfig.HitboxDownOffsetOffset);
-            float mObjHitboxBottom = mObjY - mObjHitboxDownOffset;
-            float mObjHitboxTop = mObjY + mObjHitboxHeight - mObjHitboxDownOffset;
-
-            float objX = Config.Stream.GetSingle(objAddress + ObjectConfig.XOffset);
-            float objY = Config.Stream.GetSingle(objAddress + ObjectConfig.YOffset);
-            float objZ = Config.Stream.GetSingle(objAddress + ObjectConfig.ZOffset);
-            float objHitboxRadius = Config.Stream.GetSingle(objAddress + ObjectConfig.HitboxRadiusOffset);
-            float objHitboxHeight = Config.Stream.GetSingle(objAddress + ObjectConfig.HitboxHeightOffset);
-            float objHitboxDownOffset = Config.Stream.GetSingle(objAddress + ObjectConfig.HitboxDownOffsetOffset);
-            float objHitboxBottom = objY - objHitboxDownOffset;
-            float objHitboxTop = objY + objHitboxHeight - objHitboxDownOffset;
-
-            double marioHitboxAwayFromObject = MoreMath.GetDistanceBetween(mObjX, mObjZ, objX, objZ) - mObjHitboxRadius - objHitboxRadius;
-            double marioHitboxAboveObject = mObjHitboxBottom - objHitboxTop;
-            double marioHitboxBelowObject = objHitboxBottom - mObjHitboxTop;
-
-            bool overlap = marioHitboxAwayFromObject < 0 && marioHitboxAboveObject <= 0 && marioHitboxBelowObject <= 0;
-            return overlap ? 1 : 0;
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using STROOP.Forms;
-using STROOP.Managers;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
@@ -7,16 +6,16 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using System.ComponentModel;
 
 namespace STROOP.Controls
 {
-    public class WatchVariableFlowLayoutPanel : NoTearFlowLayoutPanel
+    public class WatchVariableFlowLayoutPanel : NoTearFlowLayoutPanel, Managers.IVariableAdder
     {
-        public bool IsInitialized { get; private set; }
+        public bool initialized = false;
+        Dictionary<string, Action> deferredActions = new Dictionary<string, Action>();
 
         private string _varFilePath;
 
@@ -32,10 +31,13 @@ namespace STROOP.Controls
 
         private List<ToolStripItem> _selectionToolStripItems;
 
+
+        string _dataPath;
+        [Category("Data"), Browsable(true)]
+        public string DataPath { get { return _dataPath; } set { Initialize(_dataPath = value); } }
+
         public WatchVariableFlowLayoutPanel()
         {
-            IsInitialized = false;
-
             _objectLock = new Object();
             _watchVarControls = new List<WatchVariableControl>();
             _allGroups = new List<VariableGroup>();
@@ -55,56 +57,64 @@ namespace STROOP.Controls
             ContextMenuStrip.Opening += (sender, e) => UnselectAllVariables();
         }
 
-        public void Initialize(
-            string varFilePath = null,
-            List<VariableGroup> allVariableGroupsNullable = null,
-            List<VariableGroup> visibleVariableGroupsNullable = null)
+        List<VariableGroup> allVariableGroups, visibleVariableGroups;
+
+        public void SetGroups(
+            List<VariableGroup> allVariableGroupsNullable,
+            List<VariableGroup> visibleVariableGroupsNullable)
         {
-            if (IsInitialized)
+            if (Program.IsVisualStudioHostProcess()) return;
+
+            DeferAction(nameof(SetGroups), () =>
             {
-                throw new ArgumentOutOfRangeException("WatchVariableFlowLayoutPanel already initialized");
-            }
+                allVariableGroups = allVariableGroupsNullable != null ? new List<VariableGroup>(allVariableGroupsNullable) : new List<VariableGroup>();
+                if (allVariableGroups.Contains(VariableGroup.Custom)) throw new ArgumentOutOfRangeException();
+                allVariableGroups.Add(VariableGroup.Custom);
 
-            List<VariableGroup> allVariableGroups = allVariableGroupsNullable ?? new List<VariableGroup>();
-            if (allVariableGroups.Contains(VariableGroup.Custom)) throw new ArgumentOutOfRangeException();
-            allVariableGroups.Add(VariableGroup.Custom);
+                visibleVariableGroups = visibleVariableGroupsNullable != null ? new List<VariableGroup>(visibleVariableGroupsNullable) : new List<VariableGroup>();
+                if (visibleVariableGroups.Contains(VariableGroup.Custom)) throw new ArgumentOutOfRangeException();
+                visibleVariableGroups.Add(VariableGroup.Custom);
 
-            List<VariableGroup> visibleVariableGroups = visibleVariableGroupsNullable ?? new List<VariableGroup>();
-            if (visibleVariableGroups.Contains(VariableGroup.Custom)) throw new ArgumentOutOfRangeException();
-            visibleVariableGroups.Add(VariableGroup.Custom);
+                _allGroups.AddRange(allVariableGroups);
+                _initialVisibleGroups.AddRange(visibleVariableGroups);
+                _visibleGroups.AddRange(visibleVariableGroups);
+            });
+        }
 
+        public void Initialize(string varFilePath = null)
+        {
             _varFilePath = varFilePath;
-            _allGroups.AddRange(allVariableGroups);
-            _initialVisibleGroups.AddRange(visibleVariableGroups);
-            _visibleGroups.AddRange(visibleVariableGroups);
-
-            _selectionToolStripItems =
-                WatchVariableSelectionUtilities.CreateSelectionToolStripItems(
-                    () => new List<WatchVariableControl>(_selectedWatchVarControls), this);
-
-            List<WatchVariableControlPrecursor> precursors = new List<WatchVariableControlPrecursor>();
-            if (_varFilePath != null)
+            if (!System.IO.File.Exists(varFilePath))
+                return;
+            SetGroups(null, null);
+            DeferAction(nameof(Initialize), () =>
             {
-                precursors = XmlConfigParser.OpenWatchVariableControlPrecursors(_varFilePath);
-                //precursors = WatchVariableData.GetPrecursors(_varFilePath);
+
+                _selectionToolStripItems =
+                    WatchVariableSelectionUtilities.CreateSelectionToolStripItems(
+                        () => new List<WatchVariableControl>(_selectedWatchVarControls), this);
+
+                List<WatchVariableControlPrecursor> precursors = _varFilePath == null
+                    ? new List<WatchVariableControlPrecursor>()
+                    : XmlConfigParser.OpenWatchVariableControlPrecursors(_varFilePath);
+                AddVariables(precursors.ConvertAll(precursor => precursor.CreateWatchVariableControl()));
+                AddItemsToContextMenuStrip();
+            });
+        }
+
+        public void DeferredInitialize()
+        {
+            if (!initialized)
+            {
+                initialized = true;
+                foreach (var action in deferredActions)
+                    action.Value?.Invoke();
             }
+        }
 
-            AddVariables(precursors.ConvertAll(precursor => precursor.CreateWatchVariableControl()));
-            AddItemsToContextMenuStrip();
-
-            IsInitialized = true;
-
-            ///////////////////////////////FOR DEBUGGING///////////////////////////////////////
-            //Config.Print();
-            //Config.Print("[@\"" + varFilePath + "\"] = new List<WatchVariableControlPrecursor>()");
-            //Config.Print("{");
-            //foreach (WatchVariableControlPrecursor precursor in precursors)
-            //{
-            //    Config.Print("    " + precursor.ToStringForCode() + ",");
-            //}
-            //Config.Print("},");
-            //Config.Print();
-            ///////////////////////////////////////////////////////////////////////////////////
+        private void DeferAction(string name, Action action)
+        {
+            deferredActions[name] = action;
         }
 
         private void AddItemsToContextMenuStrip()
@@ -403,7 +413,7 @@ namespace STROOP.Controls
         private void AddAllVariablesToCustomTab()
         {
             GetCurrentVariableControls().ForEach(varControl =>
-                varControl.AddToTab(Config.CustomManager));
+                varControl.AddToTab(StroopMainForm.instance.customTab.watchVariablePanelCustom));
         }
 
         private List<XElement> GetCurrentVarXmlElements(bool useCurrentState = true)
@@ -516,7 +526,7 @@ namespace STROOP.Controls
             }
             else
             {
-                bool toggle = ctrlHeld ||(_selectedWatchVarControls.Count == 1 && _selectedWatchVarControls[0] == clickedControl);
+                bool toggle = ctrlHeld || (_selectedWatchVarControls.Count == 1 && _selectedWatchVarControls[0] == clickedControl);
                 if (!toggle) UnselectAllVariables();
                 if (clickedControl.IsSelected)
                 {
@@ -597,16 +607,6 @@ namespace STROOP.Controls
             foreach (WatchVariableControl control in _watchVarControls)
             {
                 control.BaseColor = getColor(control);
-            }
-        }
-
-        public void MakeYawVariablesBeTruncated()
-        {
-            WatchVariableControlSettings settings =
-                new WatchVariableControlSettings(doTruncateIfYaw: true);
-            foreach (WatchVariableControl control in GetCurrentVariableControls())
-            {
-                control.ApplySettings(settings);
             }
         }
     }

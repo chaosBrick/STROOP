@@ -27,7 +27,7 @@ namespace STROOP.Map
             OutlineColor = Color.Red;
         }
 
-        protected override List<(float x, float y, float z)> GetVerticesTopDownView()
+        protected override List<(float x, float y, float z)> GetVertices()
         {
             (float x, float y, float z, float angle) = ((float, float, float, float))_posAngle.GetValues();
 

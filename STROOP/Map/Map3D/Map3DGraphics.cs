@@ -23,13 +23,13 @@ namespace STROOP.Map.Map3D
         const string FragmentShaderPath = @"Resources\Shaders\FragmentShader.glsl";
         const string ShaderLogPath = @"Resources\Shaders\ShaderLog.txt";
 
-        public float AspectRatio => Config.MapGui.GLControlMap3D.AspectRatio;
-        public float NormalizedWidth => AspectRatio <= 1.0f ? 1.0f : (float)Config.MapGui.GLControlMap3D.Width / Config.MapGui.GLControlMap3D.Height;
-        public float NormalizedHeight => AspectRatio >= 1.0f ? 1.0f : (float)Config.MapGui.GLControlMap3D.Height / Config.MapGui.GLControlMap3D.Width;
-        public Size Size => Config.MapGui.GLControlMap3D.Size;
-        public float Width => Config.MapGui.GLControlMap3D.Width;
-        public float Height => Config.MapGui.GLControlMap3D.Height;
-        public bool Visible { get => Config.MapGui.GLControlMap3D.Visible; set => Config.MapGui.GLControlMap3D.Visible = value; }
+        public float AspectRatio => StroopMainForm.instance.mapTab.glControlMap3D.AspectRatio;
+        public float NormalizedWidth => AspectRatio <= 1.0f ? 1.0f : (float)StroopMainForm.instance.mapTab.glControlMap3D.Width / StroopMainForm.instance.mapTab.glControlMap3D.Height;
+        public float NormalizedHeight => AspectRatio >= 1.0f ? 1.0f : (float)StroopMainForm.instance.mapTab.glControlMap3D.Height / StroopMainForm.instance.mapTab.glControlMap3D.Width;
+        public Size Size => StroopMainForm.instance.mapTab.glControlMap3D.Size;
+        public float Width => StroopMainForm.instance.mapTab.glControlMap3D.Width;
+        public float Height => StroopMainForm.instance.mapTab.glControlMap3D.Height;
+        public bool Visible { get => StroopMainForm.instance.mapTab.glControlMap3D.Visible; set => StroopMainForm.instance.mapTab.glControlMap3D.Visible = value; }
 
         public event EventHandler OnSizeChanged;
 
@@ -53,8 +53,8 @@ namespace STROOP.Map.Map3D
         {
             Config.Map3DCamera = new Map3DCamera();
 
-            Config.MapGui.GLControlMap3D.MakeCurrent();
-            Config.MapGui.GLControlMap3D.Context.LoadAll();
+            StroopMainForm.instance.mapTab.glControlMap3D.MakeCurrent();
+            StroopMainForm.instance.mapTab.glControlMap3D.Context.LoadAll();
 
             CheckVersion();
             if (_error)
@@ -71,24 +71,24 @@ namespace STROOP.Map.Map3D
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
             // Set viewport
-            GL.Viewport(Config.MapGui.GLControlMap3D.DisplayRectangle);
+            GL.Viewport(StroopMainForm.instance.mapTab.glControlMap3D.DisplayRectangle);
 
-            Config.MapGui.GLControlMap3D.Paint += OnPaint;
-            Config.MapGui.GLControlMap3D.Resize += OnResize;
+            StroopMainForm.instance.mapTab.glControlMap3D.Paint += OnPaint;
+            StroopMainForm.instance.mapTab.glControlMap3D.Resize += OnResize;
 
-            Config.MapGui.GLControlMap3D.MouseDown += OnMouseDown;
-            Config.MapGui.GLControlMap3D.MouseUp += OnMouseUp;
-            Config.MapGui.GLControlMap3D.MouseMove += OnMouseMove;
-            Config.MapGui.GLControlMap3D.MouseWheel += OnScroll;
-            Config.MapGui.GLControlMap3D.DoubleClick += OnDoubleClick;
-            Config.MapGui.GLControlMap3D.Cursor = Cursors.Hand;
+            StroopMainForm.instance.mapTab.glControlMap3D.MouseDown += OnMouseDown;
+            StroopMainForm.instance.mapTab.glControlMap3D.MouseUp += OnMouseUp;
+            StroopMainForm.instance.mapTab.glControlMap3D.MouseMove += OnMouseMove;
+            StroopMainForm.instance.mapTab.glControlMap3D.MouseWheel += OnScroll;
+            StroopMainForm.instance.mapTab.glControlMap3D.DoubleClick += OnDoubleClick;
+            StroopMainForm.instance.mapTab.glControlMap3D.Cursor = Cursors.Hand;
         }
 
         public void OnPaint(object sender, EventArgs e)
         {
             UpdateCamera();
 
-            Config.MapGui.GLControlMap3D.MakeCurrent();
+            StroopMainForm.instance.mapTab.glControlMap3D.MakeCurrent();
 
             // Set default background color (clear drawing area)
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
@@ -97,7 +97,7 @@ namespace STROOP.Map.Map3D
             // Make sure we have a camera
             if (_error || Config.Map3DCamera == null)
             {
-                Config.MapGui.GLControlMap3D.SwapBuffers();
+                StroopMainForm.instance.mapTab.glControlMap3D.SwapBuffers();
                 return;
             }
             
@@ -105,14 +105,14 @@ namespace STROOP.Map.Map3D
             GL.Disable(EnableCap.DepthTest);
 
             // Draw background
-            Config.MapGui.flowLayoutPanelMapTrackers.DrawOn3DControl(MapDrawType.Background);
+            StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.DrawOn3DControl(MapDrawType.Background);
 
             // Setup 3D
             GL.Enable(EnableCap.DepthTest);
             GL.DepthMask(true);
 
             // Draw 3D
-            Config.MapGui.flowLayoutPanelMapTrackers.DrawOn3DControl(MapDrawType.Perspective);
+            StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.DrawOn3DControl(MapDrawType.Perspective);
 
             // Setup 2D
             GL.Disable(EnableCap.DepthTest);
@@ -122,7 +122,7 @@ namespace STROOP.Map.Map3D
                 Debugger.Break();
 
             // Draw 2D
-            Config.MapGui.flowLayoutPanelMapTrackers.DrawOn3DControl(MapDrawType.Overlay);
+            StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.DrawOn3DControl(MapDrawType.Overlay);
 
             error = GL.GetError();
             if (error != ErrorCode.NoError)
@@ -137,7 +137,7 @@ namespace STROOP.Map.Map3D
             if (error != ErrorCode.NoError)
                 Debugger.Break();
 
-            Config.MapGui.GLControlMap3D.SwapBuffers();
+            StroopMainForm.instance.mapTab.glControlMap3D.SwapBuffers();
         }
 
         public void BindVertices()
@@ -152,14 +152,14 @@ namespace STROOP.Map.Map3D
 
         void OnResize(object sender, EventArgs e)
         {
-            GL.Viewport(Config.MapGui.GLControlMap3D.DisplayRectangle);
+            GL.Viewport(StroopMainForm.instance.mapTab.glControlMap3D.DisplayRectangle);
             OnSizeChanged?.Invoke(sender, e);
             Invalidate();
         }
 
         public void Invalidate()
         {
-            Config.MapGui.GLControlMap3D.Invalidate();
+            StroopMainForm.instance.mapTab.glControlMap3D.Invalidate();
         }
 
         private void CheckVersion()

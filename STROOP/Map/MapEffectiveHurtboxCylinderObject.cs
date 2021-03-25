@@ -16,37 +16,43 @@ namespace STROOP.Map
     public class MapEffectiveHurtboxCylinderObject : MapCylinderObject
     {
         private readonly PositionAngle _posAngle;
+        private readonly PositionAngleProvider _provider;
+        private readonly string name;
+        private MapEffectiveHurtboxCylinderObject() : base() { Color = Color.Green; }
 
         public MapEffectiveHurtboxCylinderObject(PositionAngle posAngle)
-            : base()
+            : this()
         {
             _posAngle = posAngle;
-
-            Color = Color.Purple;
+        }
+        public MapEffectiveHurtboxCylinderObject(string name, PositionAngleProvider provider)
+            : this()
+        {
+            _provider = provider;
+            this.name = name;
         }
 
         protected override List<(float centerX, float centerZ, float radius, float minY, float maxY)> Get3DDimensions()
         {
-            uint objAddress = _posAngle.GetObjAddress();
-            float objY = Config.Stream.GetSingle(objAddress + ObjectConfig.YOffset);
-            float hurtboxRadius = Config.Stream.GetSingle(objAddress + ObjectConfig.HurtboxRadiusOffset);
-            float hurtboxHeight = Config.Stream.GetSingle(objAddress + ObjectConfig.HurtboxHeightOffset);
-            float hitboxDownOffset = Config.Stream.GetSingle(objAddress + ObjectConfig.HitboxDownOffsetOffset);
-            float hurtboxMinY = objY - hitboxDownOffset;
-            float hurtboxMaxY = hurtboxMinY + hurtboxHeight;
-
-            uint marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
-            float marioHurtboxRadius = Config.Stream.GetSingle(marioObjRef + ObjectConfig.HurtboxRadiusOffset);
-            float marioHitboxHeight = Config.Stream.GetSingle(marioObjRef + ObjectConfig.HitboxHeightOffset);
-
-            float effectiveRadius = hurtboxRadius + marioHurtboxRadius;
-            float effectiveMinY = hurtboxMinY - marioHitboxHeight;
-            float effectiveMaxY = hurtboxMaxY;
-
-            return new List<(float centerX, float centerZ, float radius, float minY, float maxY)>()
+            var lst = new List<(float centerX, float centerZ, float radius, float minY, float maxY)>();
+            var posAngles = _provider != null ? _provider() : new[] { _posAngle };
+            foreach (var posAngle in posAngles)
             {
-                ((float)_posAngle.X, (float)_posAngle.Z, effectiveRadius, effectiveMinY, effectiveMaxY)
-            };
+                uint objAddress = posAngle.GetObjAddress();
+                float objY = Config.Stream.GetSingle(objAddress + ObjectConfig.YOffset);
+                float hurtboxRadius = Config.Stream.GetSingle(objAddress + ObjectConfig.HurtboxRadiusOffset);
+                float hurtboxHeight = Config.Stream.GetSingle(objAddress + ObjectConfig.HurtboxHeightOffset);
+                float hitboxDownOffset = Config.Stream.GetSingle(objAddress + ObjectConfig.HitboxDownOffsetOffset);
+                float hurtboxMinY = objY - hitboxDownOffset;
+                float hurtboxMaxY = hurtboxMinY + hurtboxHeight;
+
+                uint marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
+                float marioHurtboxRadius = Config.Stream.GetSingle(marioObjRef + ObjectConfig.HurtboxRadiusOffset);
+                float effectiveRadius = hurtboxRadius + marioHurtboxRadius;
+
+                lst.Add(((float)posAngle.X, (float)posAngle.Z, effectiveRadius, hurtboxMinY, hurtboxMaxY));
+            }
+            return lst;
         }
 
         public override Image GetInternalImage()
@@ -56,7 +62,7 @@ namespace STROOP.Map
 
         public override string GetName()
         {
-            return "Effective Hurtbox Cylinder for " + _posAngle.GetMapName();
+            return "Effective Hurtbox Cylinder for " + name ?? _posAngle.GetMapName();
         }
 
         public override PositionAngle GetPositionAngle()

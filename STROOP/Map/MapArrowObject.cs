@@ -17,34 +17,27 @@ namespace STROOP.Map
     {
         private bool _useRecommendedArrowLength;
         private float _arrowHeadSideLength;
-        private float _angleOffset;
 
         private ToolStripMenuItem _itemUseSpeedForArrowLength;
-        private ToolStripMenuItem _itemSetArrowHeadSideLength;
-        private ToolStripMenuItem _itemSetAngleOffset;
-
-        private static readonly string SET_ARROW_HEAD_SIDE_LENGTH_TEXT = "Set Arrow Head Side Length";
-        private static readonly string SET_ANGLE_OFFSET_TEXT = "Set Angle Offset";
 
         public MapArrowObject()
             : base()
         {
             _useRecommendedArrowLength = false;
             _arrowHeadSideLength = 100;
-            _angleOffset = 0;
 
             Size = 300;
             OutlineWidth = 3;
             OutlineColor = Color.Yellow;
         }
 
-        protected override List<(float x, float y, float z)> GetVerticesTopDownView()
+        protected override List<(float x, float y, float z)> GetVertices()
         {
             PositionAngle posAngle = GetPositionAngle();
             float x = (float)posAngle.X;
             float y = (float)posAngle.Y;
             float z = (float)posAngle.Z;
-            float yaw = (float)GetYaw() + _angleOffset;
+            float yaw = (float)GetYaw();
             float size = _useRecommendedArrowLength ? (float)GetRecommendedSize() : Size;
             (float arrowHeadX, float arrowHeadZ) =
                 ((float, float))MoreMath.AddVectorToPoint(size, yaw, x, z);
@@ -91,9 +84,8 @@ namespace STROOP.Map
                 };
                 _itemUseSpeedForArrowLength.Checked = _useRecommendedArrowLength;
 
-                string suffix1 = string.Format(" ({0})", _arrowHeadSideLength);
-                _itemSetArrowHeadSideLength = new ToolStripMenuItem(SET_ARROW_HEAD_SIDE_LENGTH_TEXT + suffix1);
-                _itemSetArrowHeadSideLength.Click += (sender, e) =>
+                ToolStripMenuItem itemSetArrowHeadSideLength = new ToolStripMenuItem("Set Arrow Head Side Length");
+                itemSetArrowHeadSideLength.Click += (sender, e) =>
                 {
                     string text = DialogUtilities.GetStringFromDialog(labelText: "Enter the side length of the arrow head:");
                     float? arrowHeadSideLength = ParsingUtilities.ParseFloatNullable(text);
@@ -103,22 +95,9 @@ namespace STROOP.Map
                     GetParentMapTracker().ApplySettings(settings);
                 };
 
-                string suffix2 = string.Format(" ({0})", _angleOffset);
-                _itemSetAngleOffset = new ToolStripMenuItem(SET_ANGLE_OFFSET_TEXT + suffix2);
-                _itemSetAngleOffset.Click += (sender, e) =>
-                {
-                    string text = DialogUtilities.GetStringFromDialog(labelText: "Enter the angle offset:");
-                    float? angleOffsetNullable = ParsingUtilities.ParseFloatNullable(text);
-                    if (!angleOffsetNullable.HasValue) return;
-                    MapObjectSettings settings = new MapObjectSettings(
-                        arrowChangeAngleOffset: true, arrowNewAngleOffset: angleOffsetNullable.Value);
-                    GetParentMapTracker().ApplySettings(settings);
-                };
-
                 _contextMenuStrip = new ContextMenuStrip();
                 _contextMenuStrip.Items.Add(_itemUseSpeedForArrowLength);
-                _contextMenuStrip.Items.Add(_itemSetArrowHeadSideLength);
-                _contextMenuStrip.Items.Add(_itemSetAngleOffset);
+                _contextMenuStrip.Items.Add(itemSetArrowHeadSideLength);
             }
 
             return _contextMenuStrip;
@@ -137,15 +116,6 @@ namespace STROOP.Map
             if (settings.ArrowChangeHeadSideLength)
             {
                 _arrowHeadSideLength = settings.ArrowNewHeadSideLength;
-                string suffix = string.Format(" ({0})", _arrowHeadSideLength);
-                _itemSetArrowHeadSideLength.Text = SET_ARROW_HEAD_SIDE_LENGTH_TEXT + suffix;
-            }
-
-            if (settings.ArrowChangeAngleOffset)
-            {
-                _angleOffset = settings.ArrowNewAngleOffset;
-                string suffix = string.Format(" ({0})", _angleOffset);
-                _itemSetAngleOffset.Text = SET_ANGLE_OFFSET_TEXT + suffix;
             }
         }
     }

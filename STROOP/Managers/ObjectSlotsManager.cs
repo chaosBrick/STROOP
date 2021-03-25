@@ -33,8 +33,6 @@ namespace STROOP.Managers
 
         public List<ObjectSlot> ObjectSlots;
 
-        ObjectSlotManagerGui _gui;
-
         Dictionary<uint, Tuple<int?, int?>> _lockedSlotIndices = new Dictionary<uint, Tuple<int?, int?>>();
         public bool LabelsLocked = false;
 
@@ -53,26 +51,24 @@ namespace STROOP.Managers
         public SortMethodType SortMethod = SortMethodType.ProcessingOrder;
         public SlotLabelType LabelMethod = SlotLabelType.Recommended;
 
-        public ObjectSlotsManager(ObjectSlotManagerGui gui, TabControl tabControlMain)
+        public ObjectSlotsManager(TabControl tabControlMain)
         {
-            _gui = gui;
-
             // Add SortMethods adn LabelMethods
-            _gui.SortMethodComboBox.DataSource = Enum.GetValues(typeof(SortMethodType));
-            _gui.LabelMethodComboBox.DataSource = Enum.GetValues(typeof(SlotLabelType));
-            _gui.SelectionMethodComboBox.DataSource = Enum.GetValues(typeof(SelectionMethodType));
+            StroopMainForm.instance.comboBoxSortMethod.DataSource = Enum.GetValues(typeof(SortMethodType));
+            StroopMainForm.instance.comboBoxLabelMethod.DataSource = Enum.GetValues(typeof(SlotLabelType));
+            StroopMainForm.instance.comboBoxSelectionMethod.DataSource = Enum.GetValues(typeof(SelectionMethodType));
 
-            _gui.TabControl.Selected += TabControl_Selected;
-            TabControl_Selected(this, new TabControlEventArgs(_gui.TabControl.SelectedTab, -1, TabControlAction.Selected));
+            StroopMainForm.instance.tabControlMain.Selected += TabControl_Selected;
+            TabControl_Selected(this, new TabControlEventArgs(StroopMainForm.instance.tabControlMain.SelectedTab, -1, TabControlAction.Selected));
 
             // Create and setup object slots
             ObjectSlots = new List<ObjectSlot>();
             foreach (int i in Enumerable.Range(0, ObjectSlotsConfig.MaxSlots))
             {
-                var objectSlot = new ObjectSlot(this, i, _gui, new Size(DefaultSlotSize, DefaultSlotSize));
+                var objectSlot = new ObjectSlot(this, i, new Size(DefaultSlotSize, DefaultSlotSize));
                 objectSlot.Click += (sender, e) => OnSlotClick(sender, e);
                 ObjectSlots.Add(objectSlot);
-                _gui.FlowLayoutContainer.Controls.Add(objectSlot);
+                StroopMainForm.instance.WatchVariablePanelObjects.Controls.Add(objectSlot);
             };
 
             SlotLabelsForObjects = new ReadOnlyDictionary<ObjectDataModel, string>(_slotLabels);
@@ -107,7 +103,7 @@ namespace STROOP.Managers
         private void OnSlotClick(object sender, EventArgs e)
         {
             // Make sure the tab has loaded
-            if (_gui.TabControl.SelectedTab == null)
+            if (StroopMainForm.instance.tabControlMain.SelectedTab == null)
                 return;
 
             ObjectSlot selectedSlot = sender as ObjectSlot;
@@ -181,8 +177,8 @@ namespace STROOP.Managers
         private TabPage GetTabDestination(bool isMarking)
         {
             if (isMarking) return null;
-            if (ActiveTab == TabType.Other) return Config.ObjectManager.Tab;
-            if (ActiveTab == TabType.TAS && !SpecialConfig.IsSelectedPA) return Config.ObjectManager.Tab;
+            if (ActiveTab == TabType.Other) return StroopMainForm.instance.objectTab.Tab;
+            if (ActiveTab == TabType.TAS && !SpecialConfig.IsSelectedPA) return StroopMainForm.instance.objectTab.Tab;
             return null;
         }
 
@@ -194,16 +190,16 @@ namespace STROOP.Managers
 
             if (click == ClickType.ObjectClick)
             {
-                _gui.SelectionMethodComboBox.SelectedItem = SelectionMethodType.Clicked;
+                StroopMainForm.instance.comboBoxSelectionMethod.SelectedItem = SelectionMethodType.Clicked;
             }
 
             if (click == ClickType.ModelClick)
             {
-                uint currentModelObjectAddress = Config.ModelManager.ModelObjectAddress;
+                uint currentModelObjectAddress = StroopMainForm.instance.modelTab.ModelObjectAddress;
                 uint newModelObjectAddress = currentModelObjectAddress == selectedSlot.CurrentObject.Address ? 0 
                     : selectedSlot.CurrentObject.Address;
-                Config.ModelManager.ModelObjectAddress = newModelObjectAddress;
-                Config.ModelManager.ManualMode = false;
+                StroopMainForm.instance.modelTab.ModelObjectAddress = newModelObjectAddress;
+                StroopMainForm.instance.modelTab.ManualMode = false;
             }
             else if (click == ClickType.CamHackClick)
             {
@@ -307,8 +303,8 @@ namespace STROOP.Managers
 
             if (click == ClickType.MemoryClick)
             {
-                Config.MemoryManager.SetObjectAddress(selectedSlot.CurrentObject?.Address);
-                Config.MemoryManager.UpdateHexDisplay();
+                StroopMainForm.instance.memoryTab.SetObjectAddress(selectedSlot.CurrentObject?.Address);
+                StroopMainForm.instance.memoryTab.UpdateHexDisplay();
             }
         }
 
@@ -340,11 +336,11 @@ namespace STROOP.Managers
         {
             UpdateSelectionMethod();
 
-            LabelMethod = (SlotLabelType)_gui.LabelMethodComboBox.SelectedItem;
-            SortMethod = (SortMethodType) _gui.SortMethodComboBox.SelectedItem;
+            LabelMethod = (SlotLabelType)StroopMainForm.instance.comboBoxLabelMethod.SelectedItem;
+            SortMethod = (SortMethodType) StroopMainForm.instance.comboBoxSortMethod.SelectedItem;
 
             // Lock label update
-            LabelsLocked = _gui.LockLabelsCheckbox.Checked;
+            LabelsLocked = StroopMainForm.instance.checkBoxObjLockLabels.Checked;
 
             // Processing sort order
             IEnumerable<ObjectDataModel> sortedObjects;
@@ -382,7 +378,7 @@ namespace STROOP.Managers
 
         private void UpdateSelectionMethod()
         {
-            SelectionMethodType selectionMethodType = (SelectionMethodType)_gui.SelectionMethodComboBox.SelectedItem;
+            SelectionMethodType selectionMethodType = (SelectionMethodType)StroopMainForm.instance.comboBoxSelectionMethod.SelectedItem;
             switch (selectionMethodType)
             {
                 case SelectionMethodType.Clicked:

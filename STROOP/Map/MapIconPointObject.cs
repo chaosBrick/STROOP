@@ -20,22 +20,14 @@ namespace STROOP.Map
         {
         }
 
-        public override void DrawOn2DControlTopDownView()
+        public override void DrawOn2DControl()
         {
+            // Update map object
             (double x, double y, double z, double angle) = GetPositionAngle().GetValues();
-            (float xPosPixels, float zPosPixels) = MapUtilities.ConvertCoordsForControlTopDownView((float)x, (float)z);
+            (float xPosPixels, float zPosPixels) = MapUtilities.ConvertCoordsForControl((float)x, (float)z);
             float angleDegrees = Rotates ? MapUtilities.ConvertAngleForControl(angle) : 0;
             SizeF size = MapUtilities.ScaleImageSizeForControl(Image.Size, Size);
             MapUtilities.DrawTexture(TextureId, new PointF(xPosPixels, zPosPixels), size, angleDegrees, Opacity);
-        }
-
-        public override void DrawOn2DControlOrthographicView()
-        {
-            (double x, double y, double z, double angle) = GetPositionAngle().GetValues();
-            (float xPosPixels, float yPosPixels) = MapUtilities.ConvertCoordsForControlOrthographicView((float)x, (float)y, (float)z);
-            float angleDegrees = Rotates ? MapUtilities.ConvertAngleForControl(angle) : 0;
-            SizeF size = MapUtilities.ScaleImageSizeForControl(Image.Size, Size);
-            MapUtilities.DrawTexture(TextureId, new PointF(xPosPixels, yPosPixels), size, angleDegrees, Opacity);
         }
 
         public override bool ParticipatesInGlobalIconSize()

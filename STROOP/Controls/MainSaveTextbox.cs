@@ -53,12 +53,12 @@ namespace STROOP
 
         private uint GetValueFromMemory()
         {
-            return Config.Stream.GetUInt32(Config.MainSaveManager.CurrentMainSaveAddress + _offset, false, _mask, _shift);
+            return Config.Stream.GetUInt32(MainSaveConfig.CurrentMainSaveAddress + _offset, false, _mask, _shift);
         }
 
         private void SetValueInMemory(uint value)
         {
-            Config.Stream.SetValue(value, Config.MainSaveManager.CurrentMainSaveAddress + _offset, false, _mask, _shift);
+            Config.Stream.SetValue(value, MainSaveConfig.CurrentMainSaveAddress + _offset, false, _mask, _shift);
         }
 
         private void SubmitValue()

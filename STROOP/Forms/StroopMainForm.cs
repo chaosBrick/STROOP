@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
@@ -16,30 +15,32 @@ using STROOP.Structs.Configurations;
 using STROOP.Controls;
 using STROOP.Forms;
 using STROOP.Models;
-using STROOP.Structs.Gui;
-using STROOP.Map;
 using System.IO;
 
 namespace STROOP
 {
     public partial class StroopMainForm : Form
     {
-        const string _version = "v1.0.3";
-        
-        List<InputImageGui> _inputImageGuiList = new List<Structs.InputImageGui>();
-        FileImageGui _fileImageGui = new FileImageGui();
+        public static StroopMainForm instance { get; private set; }
+
+        const string _version = "Refactor 0.1";
+
         ScriptParser _scriptParser;
-        List<RomHack> _romHacks;
 
         DataTable _tableOtherData = new DataTable();
         Dictionary<int, DataRow> _otherDataRowAssoc = new Dictionary<int, DataRow>();
 
-        bool _resizing = true, _objSlotResizing = false;
-        int _resizeTimeLeft = 0, _resizeObjSlotTime = 0;
+        bool _objSlotResizing = false;
+        int _resizeObjSlotTime = 0;
 
         public StroopMainForm()
         {
+            instance = this;
+            while (LoadingHandler.LoadingForm == null)
+                System.Threading.Thread.Sleep(10);
+            LoadConfig(LoadingHandler.LoadingForm);
             InitializeComponent();
+            CreateManagers();
         }
 
         private bool AttachToProcess(Process process)
@@ -77,10 +78,7 @@ namespace STROOP
             Config.TabControlMain.SelectedIndex = 0;
             InitializeTabRemoval();
             SavedSettingsConfig.InvokeInitiallySavedRemovedTabs();
-
-            SetupViews();
-
-            _resizing = false;
+            
             labelVersionNumber.Text = _version;
 
             // Collect garbage, we are fully loaded now!
@@ -145,10 +143,10 @@ namespace STROOP
                 {
                     () => MappingConfig.OpenMapping(),
                     () => MappingConfig.ClearMapping(),
-                    () => Config.GfxManager.InjectHitboxViewCode(),
+                    () => gfxTab.InjectHitboxViewCode(),
                     () => Config.Stream.SetValue(MarioConfig.FreeMovementAction, MarioConfig.StructAddress + MarioConfig.ActionOffset),
-                    () => Config.FileManager.DoEverything(),
-                    () => Config.TriangleManager.GoToClosestVertex(),
+                    () => fileTab.DoEverything(),
+                    () => trianglesTab.GoToClosestVertex(),
                     () => saveAsSavestate(),
                     () =>
                     {
@@ -166,12 +164,7 @@ namespace STROOP
                     () => HelpfulHintUtilities.ShowAllHelpfulHints(),
                     () =>
                     {
-                        SavedSettingsConfig.UseExpandedRamSize = true;
-                        SpecialConfig.Map2DScrollSpeed = 1.5;
-                        splitContainerTas.Panel1Collapsed = true;
-                        splitContainerTas.Panel2Collapsed = false;
-                        Config.TasManager.ShowTaserVariables();
-                        Config.TasManager.MakeYawVariablesBeTruncated();
+                        tasTab.EnableTASerSettings();
                         tabControlMain.SelectedTab = tabPageTas;
                     },
                     () => TestUtilities.AddGraphicsTriangleVerticesToTriangleTab(),
@@ -237,246 +230,41 @@ namespace STROOP
 
         private void CreateManagers()
         {
-            Config.MapGui = new MapGui()
-            {
-                GLControlMap2D = glControlMap2D,
-                GLControlMap3D = glControlMap3D,
-                flowLayoutPanelMapTrackers = flowLayoutPanelMapTrackers,
-
-                checkBoxMapOptionsTrackMario = checkBoxMapOptionsTrackMario,
-                checkBoxMapOptionsTrackHolp = checkBoxMapOptionsTrackHolp,
-                checkBoxMapOptionsTrackCamera = checkBoxMapOptionsTrackCamera,
-                checkBoxMapOptionsTrackGhost = checkBoxMapOptionsTrackGhost,
-                checkBoxMapOptionsTrackSelf = checkBoxMapOptionsTrackSelf,
-                checkBoxMapOptionsTrackPoint = checkBoxMapOptionsTrackPoint,
-                checkBoxMapOptionsTrackFloorTri = checkBoxMapOptionsTrackFloorTri,
-                checkBoxMapOptionsTrackWallTri = checkBoxMapOptionsTrackWallTri,
-                checkBoxMapOptionsTrackCeilingTri = checkBoxMapOptionsTrackCeilingTri,
-                checkBoxMapOptionsTrackUnitGridlines = checkBoxMapOptionsTrackUnitGridlines,
-
-                checkBoxMapOptionsEnable3D = checkBoxMapOptionsEnable3D,
-                checkBoxMapOptionsDisableHitboxHackTris = checkBoxMapOptionsDisableHitboxHackTris,
-                checkBoxMapOptionsEnableOrthographicView = checkBoxMapOptionsEnableOrthographicView,
-                checkBoxMapOptionsEnableCrossSection = checkBoxMapOptionsEnableCrossSection,
-                checkBoxMapOptionsEnablePuView = checkBoxMapOptionsEnablePuView,
-                checkBoxMapOptionsReverseDragging = checkBoxMapOptionsReverseDragging,
-                checkBoxMapOptionsScaleIconSizes = checkBoxMapOptionsScaleIconSizes,
-
-                labelMapOptionsGlobalIconSize = labelMapOptionsGlobalIconSize,
-                textBoxMapOptionsGlobalIconSize = textBoxMapOptionsGlobalIconSize,
-                trackBarMapOptionsGlobalIconSize = trackBarMapOptionsGlobalIconSize,
-
-                buttonMapOptionsAddNewTracker = buttonMapOptionsAddNewTracker,
-                buttonMapOptionsClearAllTrackers = buttonMapOptionsClearAllTrackers,
-
-                comboBoxMapOptionsLevel = comboBoxMapOptionsLevel,
-                comboBoxMapOptionsBackground = comboBoxMapOptionsBackground,
-
-                groupBoxMapControllersScale = groupBoxMapControllersScale,
-                groupBoxMapControllersCenter = groupBoxMapControllersCenter,
-                groupBoxMapControllersAngle = groupBoxMapControllersAngle,
-
-                radioButtonMapControllersScaleCourseDefault = radioButtonMapControllersScaleCourseDefault,
-                radioButtonMapControllersScaleMaxCourseSize = radioButtonMapControllersScaleMaxCourseSize,
-                radioButtonMapControllersScaleCustom = radioButtonMapControllersScaleCustom,
-                textBoxMapControllersScaleCustom = textBoxMapControllersScaleCustom,
-
-                textBoxMapControllersScaleChange = textBoxMapControllersScaleChange,
-                buttonMapControllersScaleMinus = buttonMapControllersScaleMinus,
-                buttonMapControllersScalePlus = buttonMapControllersScalePlus,
-                textBoxMapControllersScaleChange2 = textBoxMapControllersScaleChange2,
-                buttonMapControllersScaleDivide = buttonMapControllersScaleDivide,
-                buttonMapControllersScaleTimes = buttonMapControllersScaleTimes,
-
-                radioButtonMapControllersCenterBestFit = radioButtonMapControllersCenterBestFit,
-                radioButtonMapControllersCenterOrigin = radioButtonMapControllersCenterOrigin,
-                radioButtonMapControllersCenterMario = radioButtonMapControllersCenterMario,
-                radioButtonMapControllersCenterCustom = radioButtonMapControllersCenterCustom,
-                textBoxMapControllersCenterCustom = textBoxMapControllersCenterCustom,
-
-                checkBoxMapControllersCenterChangeByPixels = checkBoxMapControllersCenterChangeByPixels,
-                checkBoxMapControllersCenterUseMarioDepth = checkBoxMapControllersCenterUseMarioDepth,
-                textBoxMapControllersCenterChange = textBoxMapControllersCenterChange,
-                buttonMapControllersCenterUp = buttonMapControllersCenterUp,
-                buttonMapControllersCenterUpRight = buttonMapControllersCenterUpRight,
-                buttonMapControllersCenterRight = buttonMapControllersCenterRight,
-                buttonMapControllersCenterDownRight = buttonMapControllersCenterDownRight,
-                buttonMapControllersCenterDown = buttonMapControllersCenterDown,
-                buttonMapControllersCenterDownLeft = buttonMapControllersCenterDownLeft,
-                buttonMapControllersCenterLeft = buttonMapControllersCenterLeft,
-                buttonMapControllersCenterUpLeft = buttonMapControllersCenterUpLeft,
-                buttonMapControllersCenterIn = buttonMapControllersCenterIn,
-                buttonMapControllersCenterOut = buttonMapControllersCenterOut,
-
-                radioButtonMapControllersAngle0 = radioButtonMapControllersAngle0,
-                radioButtonMapControllersAngle16384 = radioButtonMapControllersAngle16384,
-                radioButtonMapControllersAngle32768 = radioButtonMapControllersAngle32768,
-                radioButtonMapControllersAngle49152 = radioButtonMapControllersAngle49152,
-                radioButtonMapControllersAngleMario = radioButtonMapControllersAngleMario,
-                radioButtonMapControllersAngleCamera = radioButtonMapControllersAngleCamera,
-                radioButtonMapControllersAngleCentripetal = radioButtonMapControllersAngleCentripetal,
-                radioButtonMapControllersAngleCustom = radioButtonMapControllersAngleCustom,
-                textBoxMapControllersAngleCustom = textBoxMapControllersAngleCustom,
-
-                textBoxMapControllersAngleChange = textBoxMapControllersAngleChange,
-                buttonMapControllersAngleCCW = buttonMapControllersAngleCCW,
-                buttonMapControllersAngleCW = buttonMapControllersAngleCW,
-                buttonMapControllersAngleUp = buttonMapControllersAngleUp,
-                buttonMapControllersAngleDown = buttonMapControllersAngleDown,
-
-                labelMapDataMapName = labelMapDataMapName,
-                labelMapDataMapSubName = labelMapDataMapSubName,
-                labelMapDataPuCoordinateValues = labelMapDataPuCoordinateValues,
-                labelMapDataQpuCoordinateValues = labelMapDataQpuCoordinateValues,
-                labelMapDataIdValues = labelMapDataIdValues,
-                labelMapDataYNormValue = labelMapDataYNormValue,
-
-                watchVariablePanelMapVars = watchVariablePanelMapVars,
-
-                groupBoxMapCameraPosition = groupBoxMapCameraPosition,
-                groupBoxMapFocusPosition = groupBoxMapFocusPosition,
-                groupBoxMapCameraSpherical = groupBoxMapCameraSpherical,
-                groupBoxMapFocusSpherical = groupBoxMapFocusSpherical,
-                groupBoxMapCameraFocus = groupBoxMapCameraFocus,
-
-                textBoxMapFov = textBoxMapFov,
-                trackBarMapFov = trackBarMapFov,
-            };
-
-
-            M64Gui m64Gui = new M64Gui()
-            {
-                LabelFileName = labelM64FileName,
-                LabelNumInputsValue = labelM64NumInputsValue,
-
-                ComboBoxFrameInputRelation = comboBoxM64FrameInputRelation,
-                CheckBoxMaxOutViCount = checkBoxMaxOutViCount,
-
-                ButtonSave = buttonM64Save,
-                ButtonSaveAs = buttonM64SaveAs,
-                ButtonResetChanges = buttonM64ResetChanges,
-                ButtonOpen = buttonM64Open,
-                ButtonClose = buttonM64Close,
-                ButtonGoto = buttonM64Goto,
-                TextBoxGoto = textBoxM64Goto,
-
-                DataGridViewInputs = dataGridViewM64Inputs,
-                PropertyGridHeader = propertyGridM64Header,
-                PropertyGridStats = propertyGridM64Stats,
-
-                TabControlDetails = tabControlM64Details,
-                TabPageInputs = tabPageM64Inputs,
-                TabPageHeader = tabPageM64Header,
-                TabPageStats = tabPageM64Stats,
-
-                ProgressBar = progressBarM64,
-                LabelProgressBar = labelM64ProgressBar,
-
-                ButtonSetUsRom = buttonM64SetUsRom,
-                ButtonSetJpRom = buttonM64SetJpRom,
-                ButtonCopyRom = buttonM64CopyRom,
-                ButtonPasteRom = buttonM64PasteRom,
-
-                TextBoxOnValue = textBoxM64OnValue,
-
-                TextBoxSelectionStartFrame = textBoxM64SelectionStartFrame,
-                TextBoxSelectionEndFrame = textBoxM64SelectionEndFrame,
-                TextBoxSelectionInputs = textBoxM64SelectionInputs,
-
-                ButtonTurnOffRowRange = buttonM64TurnOffRowRange,
-                ButtonTurnOffInputRange = buttonM64TurnOffInputRange,
-                ButtonTurnOffCells = buttonM64TurnOffCells,
-                ButtonDeleteRowRange = buttonM64DeleteRowRange,
-                ButtonTurnOnInputRange = buttonM64TurnOnInputRange,
-                ButtonTurnOnCells = buttonM64TurnOnCells,
-                ButtonCopyRowRange = buttonM64CopyRowRange,
-                ButtonCopyInputRange = buttonM64CopyInputRange,
-
-                ListBoxCopied = listBoxM64Copied,
-                ButtonPasteInsert = buttonM64PasteInsert,
-                ButtonPasteOverwrite = buttonM64PasteOverwrite,
-                TextBoxPasteMultiplicity = textBoxM64PasteMultiplicity,
-
-                TextBoxQuickDuplication1stIterationStart = textBoxM64QuickDuplication1stIterationStart,
-                TextBoxQuickDuplication2ndIterationStart = textBoxM64QuickDuplication2ndIterationStart,
-                TextBoxQuickDuplicationTotalIterations = textBoxM64QuickDuplicationTotalIterations,
-                ButtonQuickDuplicationDuplicate = buttonM64QuickDuplicationDuplicate,
-
-                ButtonAddPauseBufferFrames = buttonM64AddPauseBufferFrames,
-            };
-
             // Create managers
-            Config.MapManager = new MapManager(@"Config/MapVars.xml");
-
-            Config.ModelManager = new ModelManager(tabPageModel);
-            Config.ActionsManager = new ActionsManager(@"Config/ActionsData.xml", watchVariablePanelActions, tabPageActions);
-            Config.WaterManager = new WaterManager(@"Config/WaterData.xml", watchVariablePanelWater);
-            Config.SnowManager = new SnowManager(@"Config/SnowData.xml", watchVariablePanelSnow, tabPageSnow);
-            Config.InputManager = new InputManager(@"Config/InputData.xml", tabPageInput, watchVariablePanelInput, _inputImageGuiList);
-            Config.MarioManager = new MarioManager(@"Config/MarioData.xml", tabPageMario, WatchVariablePanelMario);
-            Config.HudManager = new HudManager(@"Config/HudData.xml", tabPageHud, watchVariablePanelHud);
-            Config.MiscManager = new MiscManager(@"Config/MiscData.xml", watchVariablePanelMisc, tabPageMisc);
-            Config.CameraManager = new CameraManager(@"Config/CameraData.xml", tabPageCamera, watchVariablePanelCamera);
-            Config.TriangleManager = new TriangleManager(tabPageTriangles, @"Config/TrianglesData.xml", watchVariablePanelTriangles);
-            Config.DebugManager = new DebugManager(@"Config/DebugData.xml", tabPageDebug, watchVariablePanelDebug);
-            Config.PuManager = new PuManager(@"Config/PuData.xml", tabPagePu, watchVariablePanelPu);
-            Config.TasManager = new TasManager(@"Config/TasData.xml", tabPageTas, watchVariablePanelTas);
-            Config.FileManager = new FileManager(@"Config/FileData.xml", tabPageFile, watchVariablePanelFile, _fileImageGui);
-            Config.MainSaveManager = new MainSaveManager(@"Config/MainSaveData.xml", tabPageMainSave, watchVariablePanelMainSave);
-            Config.AreaManager = new AreaManager(tabPageArea, @"Config/AreaData.xml", watchVariablePanelArea);
-            Config.QuarterFrameManager = new QuarterFrameManager(@"Config/QuarterFrameData.xml", watchVariablePanelQuarterFrame);
-            Config.CustomManager = new CustomManager(@"Config/CustomData.xml", tabPageCustom, watchVariablePanelCustom);
-            Config.VarHackManager = new VarHackManager(tabPageVarHack, varHackPanel);
-            Config.CamHackManager = new CamHackManager(@"Config/CamHackData.xml", tabPageCamHack, watchVariablePanelCamHack);
-            Config.ObjectManager = new ObjectManager(@"Config/ObjectData.xml", tabPageObject, WatchVariablePanelObject);
-            Config.OptionsManager = new OptionsManager(@"Config/OptionsData.xml", tabPageOptions, watchVariablePanelOptions, pictureBoxCog);
-            Config.TestingManager = new TestingManager(tabPageTesting);
-            Config.MemoryManager = new MemoryManager(tabPageMemory, watchVariablePanelMemory, @"Config/ObjectData.xml");
-            Config.SearchManager = new SearchManager(tabPageSearch, watchVariablePanelSearch);
-            Config.CellsManager = new CellsManager(@"Config/CellsData.xml", tabPageCells, watchVariablePanelCells);
-            Config.CoinManager = new CoinManager(tabPageCoin);
-            Config.GfxManager = new GfxManager(tabPageGfx, watchVariablePanelGfx);
-            Config.PaintingManager = new PaintingManager(@"Config/PaintingData.xml", watchVariablePanelPainting, tabPagePainting);
-            Config.MusicManager = new MusicManager(@"Config/MusicData2.xml", watchVariablePanelMusic, tabPageMusic);
-            Config.ScriptManager = new ScriptManager(@"Config/ScriptData.xml", tabPageScript, watchVariablePanelScript);
-            Config.SoundManager = new SoundManager(tabPageSound);
-            Config.WarpManager = new WarpManager(@"Config/WarpData.xml", tabPageWarp, watchVariablePanelWarp);
-
-            Config.DisassemblyManager = new DisassemblyManager(tabPageDisassembly);
-            Config.InjectionManager = new InjectionManager(_scriptParser, checkBoxUseRomHack);
-            Config.HackManager = new HackManager(_romHacks, Config.ObjectAssociations.SpawnHacks, tabPageHacks);
-            Config.M64Manager = new M64Manager(m64Gui);
+            Config.InjectionManager = new InjectionManager(_scriptParser, optionsTab.checkBoxUseRomHack);
 
             // Create Object Slots
-            Config.ObjectSlotsManager = new ObjectSlotsManager(Config.ObjectSlotManagerGui, tabControlMain);
+            Config.ObjectSlotsManager = new ObjectSlotsManager(tabControlMain);
+            optionsTab.AddCogContextMenu(pictureBoxCog);
         }
 
         private void _sm64Stream_WarnReadonlyOff(object sender, EventArgs e)
         {
             this.TryInvoke(new Action(() =>
                 {
-                var dr = MessageBox.Show("Warning! Editing variables and enabling hacks may cause the emulator to freeze. Turn off read-only mode?", 
-                    "Turn Off Read-only Mode?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
-                switch (dr)
-                {
-                    case DialogResult.Yes:
-                        Config.Stream.Readonly = false;
-                        Config.Stream.ShowWarning = false;
-                        break;
+                    var dr = MessageBox.Show("Warning! Editing variables and enabling hacks may cause the emulator to freeze. Turn off read-only mode?",
+                        "Turn Off Read-only Mode?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+                    switch (dr)
+                    {
+                        case DialogResult.Yes:
+                            Config.Stream.Readonly = false;
+                            Config.Stream.ShowWarning = false;
+                            break;
 
-                    case DialogResult.No:
-                        Config.Stream.ShowWarning = false;
-                        break;
+                        case DialogResult.No:
+                            Config.Stream.ShowWarning = false;
+                            break;
 
-                    case DialogResult.Cancel:
-                        break;
-                }
-            }));
+                        case DialogResult.Cancel:
+                            break;
+                    }
+                }));
         }
 
         private void _sm64Stream_OnDisconnect(object sender, EventArgs e)
         {
-            this.BeginInvoke(new Action(() => {
+            this.BeginInvoke(new Action(() =>
+            {
                 buttonRefresh_Click(this, new EventArgs());
                 panelConnect.Size = this.Size;
                 panelConnect.Visible = true;
@@ -485,16 +273,6 @@ namespace STROOP
 
         public void LoadConfig(MainLoadingForm loadingForm)
         {
-            Config.ObjectSlotManagerGui = new ObjectSlotManagerGui()
-            {
-                TabControl = tabControlMain,
-                LockLabelsCheckbox = checkBoxObjLockLabels,
-                FlowLayoutContainer = WatchVariablePanelObjects,
-                SortMethodComboBox = comboBoxSortMethod,
-                LabelMethodComboBox = comboBoxLabelMethod,
-                SelectionMethodComboBox = comboBoxSelectionMethod,
-            };
-
             int statusNum = 0;
 
             // Read configuration
@@ -504,17 +282,16 @@ namespace STROOP
             loadingForm.UpdateStatus("Loading Miscellaneous Data", statusNum++);
             loadingForm.UpdateStatus("Loading Object Data", statusNum++);
             loadingForm.UpdateStatus("Loading Object Associations", statusNum++);
-            Config.ObjectAssociations = XmlConfigParser.OpenObjectAssoc(@"Config/ObjectAssociations.xml", Config.ObjectSlotManagerGui);
+            Config.ObjectAssociations = XmlConfigParser.OpenObjectAssoc(@"Config/ObjectAssociations.xml");
             loadingForm.UpdateStatus("Loading Mario Data", statusNum++);
             loadingForm.UpdateStatus("Loading Camera Data", statusNum++);
             loadingForm.UpdateStatus("Loading Actions Data", statusNum++);
             loadingForm.UpdateStatus("Loading Water Data", statusNum++);
             loadingForm.UpdateStatus("Loading Input Data", statusNum++);
             loadingForm.UpdateStatus("Loading Input Image Associations", statusNum++);
-            _inputImageGuiList = XmlConfigParser.CreateInputImageAssocList(@"Config/InputImageAssociations.xml");
             loadingForm.UpdateStatus("Loading File Data", statusNum++);
             loadingForm.UpdateStatus("Loading File Image Associations", statusNum++);
-            XmlConfigParser.OpenFileImageAssoc(@"Config/FileImageAssociations.xml", _fileImageGui);
+            XmlConfigParser.OpenFileImageAssoc(@"Config/FileImageAssociations.xml", Config.FileImageGui);
             loadingForm.UpdateStatus("Loading Area Data", statusNum++);
             loadingForm.UpdateStatus("Loading Quarter Frame Data", statusNum++);
             loadingForm.UpdateStatus("Loading Camera Hack Data", statusNum++);
@@ -526,7 +303,6 @@ namespace STROOP
             loadingForm.UpdateStatus("Loading Scripts", statusNum++);
             _scriptParser = XmlConfigParser.OpenScripts(@"Config/Scripts.xml");
             loadingForm.UpdateStatus("Loading Hacks", statusNum++);
-            _romHacks = XmlConfigParser.OpenHacks(@"Config/Hacks.xml");
             loadingForm.UpdateStatus("Loading Mario Actions", statusNum++);
 
             TableConfig.MarioActions = XmlConfigParser.OpenActionTable(@"Config/MarioActions.xml");
@@ -537,7 +313,6 @@ namespace STROOP
             TableConfig.KoopaTheQuick1Waypoints = XmlConfigParser.OpenWaypointTable(@"Config/KoopaTheQuick1Waypoints.xml");
             TableConfig.KoopaTheQuick2Waypoints = XmlConfigParser.OpenWaypointTable(@"Config/KoopaTheQuick2Waypoints.xml");
             TableConfig.TtmBowlingBallPoints = XmlConfigParser.OpenPointTable(@"Config/TtmBowlingBallPoints.xml");
-            TableConfig.MusicData = XmlConfigParser.OpenMusicTable(@"Config/MusicData.xml");
             TableConfig.Missions = XmlConfigParser.OpenMissionTable(@"Config/Missions.xml");
             TableConfig.CourseData = XmlConfigParser.OpenCourseDataTable(@"Config/CourseData.xml");
             TableConfig.FlyGuyData = new FlyGuyDataTable();
@@ -545,7 +320,6 @@ namespace STROOP
             TableConfig.ElevatorAxleTable = new ObjectAngleTable(400);
 
             loadingForm.UpdateStatus("Creating Managers", statusNum++);
-            CreateManagers();
 
             loadingForm.UpdateStatus("Finishing", statusNum);
         }
@@ -582,43 +356,28 @@ namespace STROOP
                 DataModels.Update();
                 FormManager.Update();
                 Config.ObjectSlotsManager.Update();
-                Config.ObjectManager.Update(tabControlMain.SelectedTab == tabPageObject);
-                Config.MarioManager.Update(tabControlMain.SelectedTab == tabPageMario);
-                Config.CameraManager.Update(tabControlMain.SelectedTab == tabPageCamera);
-                Config.HudManager.Update(tabControlMain.SelectedTab == tabPageHud);
-                Config.ActionsManager.Update(tabControlMain.SelectedTab == tabPageActions);
-                Config.WaterManager.Update(tabControlMain.SelectedTab == tabPageWater);
-                Config.SnowManager.Update(tabControlMain.SelectedTab == tabPageSnow);
-                Config.InputManager.Update(tabControlMain.SelectedTab == tabPageInput);
-                Config.FileManager.Update(tabControlMain.SelectedTab == tabPageFile);
-                Config.MainSaveManager.Update(tabControlMain.SelectedTab == tabPageMainSave);
-                Config.QuarterFrameManager.Update(tabControlMain.SelectedTab == tabPageQuarterFrame);
-                Config.CustomManager.Update(tabControlMain.SelectedTab == tabPageCustom);
-                Config.VarHackManager.Update(tabControlMain.SelectedTab == tabPageVarHack);
-                Config.CamHackManager.Update(tabControlMain.SelectedTab == tabPageCamHack);
-                Config.MiscManager.Update(tabControlMain.SelectedTab == tabPageMisc);
-                Config.TriangleManager.Update(tabControlMain.SelectedTab == tabPageTriangles);
-                Config.AreaManager.Update(tabControlMain.SelectedTab == tabPageArea);
-                Config.DebugManager.Update(tabControlMain.SelectedTab == tabPageDebug);
-                Config.PuManager.Update(tabControlMain.SelectedTab == tabPagePu);
-                Config.TasManager.Update(tabControlMain.SelectedTab == tabPageTas);
-                Config.TestingManager.Update(tabControlMain.SelectedTab == tabPageTesting);
-                Config.GfxManager.Update(tabControlMain.SelectedTab == tabPageGfx);
-                Config.PaintingManager.Update(tabControlMain.SelectedTab == tabPagePainting);
-                Config.MusicManager.Update(tabControlMain.SelectedTab == tabPageMusic);
-                Config.SoundManager.Update(tabControlMain.SelectedTab == tabPageSound);
-                Config.OptionsManager.Update(tabControlMain.SelectedTab == tabPageOptions);
-                Config.MemoryManager.Update(tabControlMain.SelectedTab == tabPageMemory);
-                Config.SearchManager.Update(tabControlMain.SelectedTab == tabPageSearch);
-                Config.CellsManager.Update(tabControlMain.SelectedTab == tabPageCells);
-                Config.CoinManager.Update(tabControlMain.SelectedTab == tabPageCoin);
-                Config.M64Manager.Update(tabControlMain.SelectedTab == tabPageM64);
-                Config.MapManager.Update(tabControlMain.SelectedTab == tabPageMap);
-                Config.ScriptManager.Update(tabControlMain.SelectedTab == tabPageScript);
-                Config.WarpManager.Update(tabControlMain.SelectedTab == tabPageWarp);
-                Config.ModelManager?.Update();
                 Config.InjectionManager.Update();
-                Config.HackManager.Update();
+
+                foreach (TabPage page in tabControlMain.TabPages)
+                {
+                    bool active = tabControlMain.SelectedTab == page;
+                    foreach (var pageControl in page.Controls)
+                        if (pageControl is Tabs.STROOPTab stroopTab)
+                        {
+                            if (stroopTab.Size != page.Size)
+                                stroopTab.Size = page.Size;
+                            stroopTab.UpdateOrInitialize(active);
+                        }
+                        else if (active && pageControl is WatchVariableFlowLayoutPanel watchVariablePanel)
+                        {
+                            if (watchVariablePanel.Size != page.Size)
+                                watchVariablePanel.Size = page.Size;
+                            if (!watchVariablePanel.initialized)
+                                watchVariablePanel.DeferredInitialize();
+                            watchVariablePanel.UpdatePanel();
+                        }
+                }
+
                 WatchVariableLockManager.Update();
                 TestUtilities.Update();
                 TriangleDataModel.ClearCache();
@@ -640,68 +399,6 @@ namespace STROOP
             {
                 labelFpsCounter.Text = "FPS: " + (int)Config.Stream.FpsInPractice;
             }));
-        }
-
-        private void SetupViews()
-        {
-            // Mario Image
-            pictureBoxMario.Image = Config.ObjectAssociations.MarioImage;
-            panelMarioBorder.BackColor = Config.ObjectAssociations.MarioColor;
-            pictureBoxMario.BackColor = Config.ObjectAssociations.MarioColor.Lighten(0.5);
-
-            // Camera Image
-            pictureBoxCamera.Image = Config.ObjectAssociations.CameraImage;
-            panelCameraBorder.BackColor = Config.ObjectAssociations.CameraColor;
-            pictureBoxCamera.BackColor = Config.ObjectAssociations.CameraColor.Lighten(0.5);
-
-            // Hud Image
-            pictureBoxHud.Image = Config.ObjectAssociations.HudImage;
-            panelHudBorder.BackColor = Config.ObjectAssociations.HudColor;
-            pictureBoxHud.BackColor = Config.ObjectAssociations.HudColor.Lighten(0.5);
-
-            // Debug Image
-            pictureBoxDebug.Image = Config.ObjectAssociations.DebugImage;
-            panelDebugBorder.BackColor = Config.ObjectAssociations.DebugColor;
-            pictureBoxDebug.BackColor = Config.ObjectAssociations.DebugColor.Lighten(0.5);
-
-            // Misc Image
-            pictureBoxMisc.Image = Config.ObjectAssociations.MiscImage;
-            panelMiscBorder.BackColor = Config.ObjectAssociations.MiscColor;
-            pictureBoxMisc.BackColor = Config.ObjectAssociations.MiscColor.Lighten(0.5);
-
-        }
-
-        private async void glControlMap2D_Load(object sender, EventArgs e)
-        {
-            await Task.Run(() => {
-                while (Config.MapManager == null)
-                {
-                    Task.Delay(1).Wait();
-                }
-            });
-            Config.MapManager.Load2D();
-        }
-
-        private async void glControlMap3D_Load(object sender, EventArgs e)
-        {
-            await Task.Run(() => {
-                while (Config.MapManager == null)
-                {
-                    Task.Delay(1).Wait();
-                }
-            });
-            Config.MapManager.Load3D();
-        }
-
-        private async void glControlModelView_Load(object sender, EventArgs e)
-        {
-            await Task.Run(() => {
-                while (Config.ModelManager == null)
-                {
-                    Task.Delay(1).Wait();
-                }
-            });
-            Config.ModelManager.Load();
         }
 
         private void buttonShowTopPanel_Click(object sender, EventArgs e)
@@ -819,7 +516,7 @@ namespace STROOP
 
             // Select the only process if there is one
             if (!selectedProcess.HasValue && listBoxProcessesList.Items.Count == 1 && AttachToProcess(selectedProcess.Value.Process))
-                    selectedProcess = (ProcessSelection)listBoxProcessesList.Items[0];
+                selectedProcess = (ProcessSelection)listBoxProcessesList.Items[0];
 
             if (!selectedProcess.HasValue || !AttachToProcess(selectedProcess.Value.Process))
             {
@@ -838,7 +535,7 @@ namespace STROOP
             var processes = GetAvailableProcesses().OrderBy(p => p.StartTime).ToList();
             for (int i = 0; i < processes.Count; i++)
                 listBoxProcessesList.Items.Add(new ProcessSelection(processes[i], i + 1));
-            
+
             // Pre-select the first process
             if (listBoxProcessesList.Items.Count != 0)
                 listBoxProcessesList.SelectedIndex = 0;
@@ -896,19 +593,19 @@ namespace STROOP
             if (openFileDialogSt.ShowDialog() != DialogResult.OK)
                 return;
             string stextension = Path.GetExtension(openFileDialogSt.FileName);
-            if (openFileDialogSt.CheckFileExists && stextension == ".st")
+            if (openFileDialogSt.CheckFileExists == true && stextension != ".st")
             {
                 try
                 {
                     Config.Stream.OpenSTFile(openFileDialogSt.FileName);
-                    labelProcessSelect.Text = "Connected To: " + Config.Stream.ProcessName;
-                    panelConnect.Visible = false;
                 }
                 catch
                 {
-                    MessageBox.Show("Savestate is corrupted not a savestate or doesnt exist", "Invalid Savestate",MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Savestate is corrupted, not a savestate, or doesn't exist", "Invalid Savestate", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
+            labelProcessSelect.Text = "Connected To: " + Config.Stream.ProcessName;
+            panelConnect.Visible = false;
         }
 
         private void saveAsSavestate()
@@ -916,7 +613,7 @@ namespace STROOP
             StFileIO io = Config.Stream.IO as StFileIO;
             if (io == null)
             {
-                MessageBox.Show("The current connection is not an ST file. Open an savestate file to save the savestate.", "Connection not a savestate", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("The current connection is not an ST file. Open a savestate file to save the savestate.", "Connection not a savestate", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -945,7 +642,7 @@ namespace STROOP
                 Config.Stream.WarnReadonlyOff -= _sm64Stream_WarnReadonlyOff;
                 Config.Stream.Dispose();
                 Task.Run(async () =>
-                {       
+                {
                     await Config.Stream.WaitForDispose();
                     Config.Stream = null;
                     Invoke(new Action(() => Close()));
@@ -953,7 +650,7 @@ namespace STROOP
                 e.Cancel = true;
                 return;
             }
-            
+
             base.OnFormClosing(e);
         }
     }

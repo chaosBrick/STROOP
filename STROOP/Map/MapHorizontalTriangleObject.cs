@@ -22,12 +22,6 @@ namespace STROOP.Map
         private float? _maxHeight;
         protected bool _enableQuarterFrameLandings;
 
-        private ToolStripMenuItem _itemSetMinHeight;
-        private ToolStripMenuItem _itemSetMaxHeight;
-
-        private static readonly string SET_MIN_HEIGHT_TEXT = "Set Min Height";
-        private static readonly string SET_MAX_HEIGHT_TEXT = "Set Max Height";
-
         public MapHorizontalTriangleObject()
             : base()
         {
@@ -35,7 +29,7 @@ namespace STROOP.Map
             _maxHeight = null;
         }
 
-        public override void DrawOn2DControlTopDownView()
+        public override void DrawOn2DControl()
         {
             if (_enableQuarterFrameLandings)
             {
@@ -71,11 +65,11 @@ namespace STROOP.Map
                     Color color = colors[i % 4];
                     if (ShowTriUnits && MapUtilities.IsAbleToShowUnitPrecision())
                     {
-                        DrawOn2DControlTopDownViewWithUnits(yMin, yMax, color);
+                        DrawOn2DControlWithUnits(yMin, yMax, color);
                     }
                     else
                     {
-                        DrawOn2DControlTopDownViewWithoutUnits(yMin, MoreMath.GetPreviousFloat(yMax), color);
+                        DrawOn2DControlWithoutUnits(yMin, MoreMath.GetPreviousFloat(yMax), color);
                     }
                 }
             }
@@ -83,21 +77,21 @@ namespace STROOP.Map
             {
                 if (ShowTriUnits && MapUtilities.IsAbleToShowUnitPrecision())
                 {
-                    DrawOn2DControlTopDownViewWithUnits(_minHeight, _maxHeight, Color);
+                    DrawOn2DControlWithUnits(_minHeight, _maxHeight, Color);
                 }
                 else
                 {
-                    DrawOn2DControlTopDownViewWithoutUnits(_minHeight, _maxHeight, Color);
+                    DrawOn2DControlWithoutUnits(_minHeight, _maxHeight, Color);
                 }
             }
         }
 
-        private void DrawOn2DControlTopDownViewWithoutUnits(float? minHeight, float? maxHeight, Color color)
+        private void DrawOn2DControlWithoutUnits(float? minHeight, float? maxHeight, Color color)
         {
             List<List<(float x, float y, float z)>> vertexLists = GetVertexListsWithSplicing(minHeight, maxHeight);
             List<List<(float x, float y, float z)>> vertexListsForControl =
                 vertexLists.ConvertAll(vertexList => vertexList.ConvertAll(
-                    vertex => MapUtilities.ConvertCoordsForControlTopDownView(vertex.x, vertex.y, vertex.z)));
+                    vertex => MapUtilities.ConvertCoordsForControl(vertex.x, vertex.y, vertex.z)));
 
             GL.BindTexture(TextureTarget.Texture2D, -1);
             GL.MatrixMode(MatrixMode.Modelview);
@@ -134,15 +128,15 @@ namespace STROOP.Map
             GL.Color4(1, 1, 1, 1.0f);
         }
 
-        private void DrawOn2DControlTopDownViewWithUnits(float? minHeight, float? maxHeight, Color color)
+        private void DrawOn2DControlWithUnits(float? minHeight, float? maxHeight, Color color)
         {
-            List<TriangleDataModel> triangles = GetFilteredTriangles();
+            List<TriangleDataModel> triangles = GetTrianglesWithinDist();
             List<(int x, int z)> unitPoints = triangles.ConvertAll(triangle =>
             {
-                int xMin = (int)Math.Max(triangle.GetMinX(), Config.CurrentMapGraphics.MapViewXMin - 1);
-                int xMax = (int)Math.Min(triangle.GetMaxX(), Config.CurrentMapGraphics.MapViewXMax + 1);
-                int zMin = (int)Math.Max(triangle.GetMinZ(), Config.CurrentMapGraphics.MapViewZMin - 1);
-                int zMax = (int)Math.Min(triangle.GetMaxZ(), Config.CurrentMapGraphics.MapViewZMax + 1);
+                int xMin = (int)Math.Max(triangle.GetMinX(), Config.MapGraphics.MapViewXMin - 1);
+                int xMax = (int)Math.Min(triangle.GetMaxX(), Config.MapGraphics.MapViewXMax + 1);
+                int zMin = (int)Math.Max(triangle.GetMinZ(), Config.MapGraphics.MapViewZMin - 1);
+                int zMax = (int)Math.Min(triangle.GetMaxZ(), Config.MapGraphics.MapViewZMax + 1);
 
                 List<(int x, int z)> points = new List<(int x, int z)>();
                 for (int x = xMin; x <= xMax; x++)
@@ -164,7 +158,7 @@ namespace STROOP.Map
             List<List<(float x, float y, float z)>> quadList = MapUtilities.ConvertUnitPointsToQuads(unitPoints);
             List<List<(float x, float z)>> quadListForControl =
                 quadList.ConvertAll(quad => quad.ConvertAll(
-                    vertex => MapUtilities.ConvertCoordsForControlTopDownView(vertex.x, vertex.z)));
+                    vertex => MapUtilities.ConvertCoordsForControl(vertex.x, vertex.z)));
 
             GL.BindTexture(TextureTarget.Texture2D, -1);
             GL.MatrixMode(MatrixMode.Modelview);
@@ -270,8 +264,8 @@ namespace STROOP.Map
 
         protected List<ToolStripMenuItem> GetHorizontalTriangleToolStripMenuItems()
         {
-            _itemSetMinHeight = new ToolStripMenuItem(SET_MIN_HEIGHT_TEXT);
-            _itemSetMinHeight.Click += (sender, e) =>
+            ToolStripMenuItem itemSetMinHeight = new ToolStripMenuItem("Set Min Height");
+            itemSetMinHeight.Click += (sender, e) =>
             {
                 string text = DialogUtilities.GetStringFromDialog(labelText: "Enter the min height.");
                 float? minHeightNullable =
@@ -280,7 +274,7 @@ namespace STROOP.Map
                     ParsingUtilities.ParseFloatNullable(text);
                 if (!minHeightNullable.HasValue) return;
                 MapObjectSettings settings = new MapObjectSettings(
-                    horizontalTriangleChangeMinHeight: true, horizontalTriangleNewMinHeight: minHeightNullable.Value);
+                    triangleChangeMinHeight: true, triangleNewMinHeight: minHeightNullable.Value);
                 GetParentMapTracker().ApplySettings(settings);
             };
 
@@ -288,12 +282,12 @@ namespace STROOP.Map
             itemClearMinHeight.Click += (sender, e) =>
             {
                 MapObjectSettings settings = new MapObjectSettings(
-                    horizontalTriangleChangeMinHeight: true, horizontalTriangleNewMinHeight: null);
+                    triangleChangeMinHeight: true, triangleNewMinHeight: null);
                 GetParentMapTracker().ApplySettings(settings);
             };
 
-            _itemSetMaxHeight = new ToolStripMenuItem(SET_MAX_HEIGHT_TEXT);
-            _itemSetMaxHeight.Click += (sender, e) =>
+            ToolStripMenuItem itemSetMaxHeight = new ToolStripMenuItem("Set Max Height");
+            itemSetMaxHeight.Click += (sender, e) =>
             {
                 string text = DialogUtilities.GetStringFromDialog(labelText: "Enter the max height.");
                 float? maxHeightNullable =
@@ -302,7 +296,7 @@ namespace STROOP.Map
                     ParsingUtilities.ParseFloatNullable(text);
                 if (!maxHeightNullable.HasValue) return;
                 MapObjectSettings settings = new MapObjectSettings(
-                    horizontalTriangleChangeMaxHeight: true, horizontalTriangleNewMaxHeight: maxHeightNullable.Value);
+                    triangleChangeMaxHeight: true, triangleNewMaxHeight: maxHeightNullable.Value);
                 GetParentMapTracker().ApplySettings(settings);
             };
 
@@ -310,15 +304,15 @@ namespace STROOP.Map
             itemClearMaxHeight.Click += (sender, e) =>
             {
                 MapObjectSettings settings = new MapObjectSettings(
-                    horizontalTriangleChangeMaxHeight: true, horizontalTriangleNewMaxHeight: null);
+                    triangleChangeMaxHeight: true, triangleNewMaxHeight: null);
                 GetParentMapTracker().ApplySettings(settings);
             };
 
             return new List<ToolStripMenuItem>()
             {
-                _itemSetMinHeight,
+                itemSetMinHeight,
                 itemClearMinHeight,
-                _itemSetMaxHeight,
+                itemSetMaxHeight,
                 itemClearMaxHeight,
             };
         }
@@ -327,18 +321,14 @@ namespace STROOP.Map
         {
             base.ApplySettings(settings);
 
-            if (settings.HorizontalTriangleChangeMinHeight)
+            if (settings.TriangleChangeMinHeight)
             {
-                _minHeight = settings.HorizontalTriangleNewMinHeight;
-                string suffix = _minHeight.HasValue ? string.Format(" ({0})", _minHeight.Value) : "";
-                _itemSetMinHeight.Text = SET_MIN_HEIGHT_TEXT + suffix;
+                _minHeight = settings.TriangleNewMinHeight;
             }
 
-            if (settings.HorizontalTriangleChangeMaxHeight)
+            if (settings.TriangleChangeMaxHeight)
             {
-                _maxHeight = settings.HorizontalTriangleNewMaxHeight;
-                string suffix = _maxHeight.HasValue ? string.Format(" ({0})", _maxHeight.Value) : "";
-                _itemSetMaxHeight.Text = SET_MAX_HEIGHT_TEXT + suffix;
+                _maxHeight = settings.TriangleNewMaxHeight;
             }
         }
 

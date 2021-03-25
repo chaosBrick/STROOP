@@ -27,7 +27,7 @@ namespace STROOP.Map
             _objAddress = objAddress;
         }
 
-        protected override List<TriangleDataModel> GetUnfilteredTriangles()
+        protected override List<TriangleDataModel> GetTrianglesOfAnyDist()
         {
             return TriangleUtilities.GetObjectTrianglesForObject(_objAddress)
                 .FindAll(tri => tri.IsWall());

@@ -46,9 +46,6 @@ namespace STROOP.Structs
         LastCoin,
         WarpDestination,
 
-        Whirlpool1,
-        Whirlpool2,
-
         HackedArea,
         CamHack,
         GfxNode,

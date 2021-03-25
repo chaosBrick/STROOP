@@ -46,7 +46,7 @@ namespace STROOP.Script
 
         public void Run()
         {
-            List<(string, object)> inputData = Config.ScriptManager.GetCurrentVariableNamesAndValues();
+            List<(string, object)> inputData = StroopMainForm.instance.scriptTab.watchVariablePanelScript.GetCurrentVariableNamesAndValues();
             List<string> inputItems = new List<string>();
             foreach ((string name, object value) in inputData)
             {
@@ -61,7 +61,7 @@ namespace STROOP.Script
             {
                 string name = outputItems[i];
                 string value = outputItems[i + 1];
-                Config.ScriptManager.SetVariableValueByName(name, value);
+                StroopMainForm.instance.scriptTab.watchVariablePanelScript.SetVariableValueByName(name, value);
             }
         }
 

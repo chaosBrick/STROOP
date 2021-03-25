@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Globalization;
-using System.Xml;
 using System.Windows.Forms;
 using System.Drawing;
 using STROOP.Structs;
@@ -20,6 +16,46 @@ namespace STROOP.Utilities
         private static readonly string ADD_SYMBOL = "+";
         private static readonly string DIVIDE_SYMBOL = "÷";
         private static readonly string MULTIPLY_SYMBOL = "×";
+
+        //        Config.MapGui.groupBoxMapCameraSpherical.Controls["buttonMapCameraSphericalTn"] as Button,
+        //        Config.MapGui.groupBoxMapCameraSpherical.Controls["buttonMapCameraSphericalTp"] as Button,
+        //        Config.MapGui.groupBoxMapCameraSpherical.Controls["buttonMapCameraSphericalPn"] as Button,
+        //        Config.MapGui.groupBoxMapCameraSpherical.Controls["buttonMapCameraSphericalPp"] as Button,
+        //        Config.MapGui.groupBoxMapCameraSpherical.Controls["buttonMapCameraSphericalTnPn"] as Button,
+        //        Config.MapGui.groupBoxMapCameraSpherical.Controls["buttonMapCameraSphericalTnPp"] as Button,
+        //        Config.MapGui.groupBoxMapCameraSpherical.Controls["buttonMapCameraSphericalTpPn"] as Button,
+        //        Config.MapGui.groupBoxMapCameraSpherical.Controls["buttonMapCameraSphericalTpPp"] as Button,
+        //        Config.MapGui.groupBoxMapCameraSpherical.Controls["buttonMapCameraSphericalRn"] as Button,
+        //        Config.MapGui.groupBoxMapCameraSpherical.Controls["buttonMapCameraSphericalRp"] as Button,
+        //        Config.MapGui.groupBoxMapCameraSpherical.Controls["textBoxMapCameraSphericalTP"] as TextBox,
+        //        Config.MapGui.groupBoxMapCameraSpherical.Controls["textBoxMapCameraSphericalR"] as TextBox,
+        //
+
+        public static void InitializeThreeDimensionController(
+            CoordinateSystem coordinateSystem,
+            bool allowRelativeOptions,
+            GroupBox groupBox,
+            string identifierSubString,
+            Action<float, float, float, bool> actionMove)
+             => InitializeThreeDimensionController(
+                 coordinateSystem,
+                 allowRelativeOptions,
+                 groupBox,
+                 groupBox.Controls[$"button{identifierSubString}Xn"] as Button ?? groupBox.Controls[$"button{identifierSubString}Tn"] as Button,
+                 groupBox.Controls[$"button{identifierSubString}Xp"] as Button ?? groupBox.Controls[$"button{identifierSubString}Tp"] as Button,
+                 groupBox.Controls[$"button{identifierSubString}Zn"] as Button ?? groupBox.Controls[$"button{identifierSubString}Pn"] as Button,
+                 groupBox.Controls[$"button{identifierSubString}Zp"] as Button ?? groupBox.Controls[$"button{identifierSubString}Pp"] as Button,
+                 groupBox.Controls[$"button{identifierSubString}XnZn"] as Button ?? groupBox.Controls[$"button{identifierSubString}TnPn"] as Button,
+                 groupBox.Controls[$"button{identifierSubString}XnZp"] as Button ?? groupBox.Controls[$"button{identifierSubString}TnPp"] as Button,
+                 groupBox.Controls[$"button{identifierSubString}XpZn"] as Button ?? groupBox.Controls[$"button{identifierSubString}TpPn"] as Button,
+                 groupBox.Controls[$"button{identifierSubString}XpZp"] as Button ?? groupBox.Controls[$"button{identifierSubString}TpPp"] as Button,
+                 groupBox.Controls[$"button{identifierSubString}Yp"] as Button ?? groupBox.Controls[$"button{identifierSubString}Rn"] as Button,
+                 groupBox.Controls[$"button{identifierSubString}Yn"] as Button ?? groupBox.Controls[$"button{identifierSubString}Rp"] as Button,
+                 groupBox.Controls[$"textBox{identifierSubString}XZ"] as TextBox ?? groupBox.Controls[$"textBox{identifierSubString}TP"] as TextBox,
+                 groupBox.Controls[$"textBox{identifierSubString}Y"] as TextBox ?? groupBox.Controls[$"textBox{identifierSubString}R"] as TextBox,
+                 groupBox.Controls[$"checkBox{identifierSubString}Relative"] as CheckBox,
+                 actionMove
+                 );
 
         public static void InitializeThreeDimensionController(
             CoordinateSystem coordinateSystem,

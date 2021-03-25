@@ -22,14 +22,14 @@ namespace STROOP.Map
             OutlineColor = Color.Black;
         }
 
-        protected override List<(float x, float y, float z)> GetVerticesTopDownView()
+        protected override List<(float x, float y, float z)> GetVertices()
         {
             float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
 
-            float xMin = Config.CurrentMapGraphics.MapViewXMin;
-            float xMax = Config.CurrentMapGraphics.MapViewXMax;
-            float zMin = Config.CurrentMapGraphics.MapViewZMin;
-            float zMax = Config.CurrentMapGraphics.MapViewZMax;
+            float xMin = Config.MapGraphics.MapViewXMin;
+            float xMax = Config.MapGraphics.MapViewXMax;
+            float zMin = Config.MapGraphics.MapViewZMin;
+            float zMax = Config.MapGraphics.MapViewZMax;
 
             List<(float x, float y, float z)> vertices = new List<(float x, float y, float z)>();
             int xCounter = 0;
@@ -50,8 +50,8 @@ namespace STROOP.Map
             }
 
             // failsafe to prevent filling the whole screen
-            if (xCounter > Config.MapGui.CurrentControl.Width ||
-                zCounter > Config.MapGui.CurrentControl.Height)
+            if (xCounter > StroopMainForm.instance.mapTab.glControlMap2D.Width ||
+                zCounter > StroopMainForm.instance.mapTab.glControlMap2D.Height)
             {
                 return new List<(float x, float y, float z)>();
             }

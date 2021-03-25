@@ -17,6 +17,8 @@ namespace STROOP.Map
 {
     public class MapIwerlipsesObject : MapObject
     {
+        private readonly static int NUM_POINTS = 256;
+
         private bool _lockPositions = false;
         private MarioState _marioState = null;
         private bool _showQuarterSteps = true;
@@ -29,7 +31,7 @@ namespace STROOP.Map
             Color = Color.Red;
         }
 
-        public override void DrawOn2DControlTopDownView()
+        public override void DrawOn2DControl()
         {
             for (int i = 1; i <= Size; i++)
             {
@@ -61,11 +63,11 @@ namespace STROOP.Map
             double forwardDist = MoreMath.GetDistanceBetween(cx, cz, fx, fz);
             double backwardDist = MoreMath.GetDistanceBetween(cx, cz, bx, bz);
 
-            (float controlCenterX, float controlCenterZ) = MapUtilities.ConvertCoordsForControlTopDownView(cx, cz);
-            List<(float pointX, float pointZ)> controlPoints = Enumerable.Range(0, SpecialConfig.MapCircleNumPoints2D).ToList()
-                .ConvertAll(index => (index / (float)SpecialConfig.MapCircleNumPoints2D) * 65536)
+            (float controlCenterX, float controlCenterZ) = MapUtilities.ConvertCoordsForControl(cx, cz);
+            List<(float pointX, float pointZ)> controlPoints = Enumerable.Range(0, NUM_POINTS).ToList()
+                .ConvertAll(index => (index / (float)NUM_POINTS) * 65536)
                 .ConvertAll(angle => GetEllipsePoint(cx, cz, sideDist, forwardDist, backwardDist, marioAngle, angle))
-                .ConvertAll(point => MapUtilities.ConvertCoordsForControlTopDownView((float)point.x, (float)point.z));
+                .ConvertAll(point => MapUtilities.ConvertCoordsForControl((float)point.x, (float)point.z));
 
             GL.BindTexture(TextureTarget.Texture2D, -1);
             GL.MatrixMode(MatrixMode.Modelview);
@@ -96,11 +98,6 @@ namespace STROOP.Map
             }
 
             GL.Color4(1, 1, 1, 1.0f);
-        }
-
-        public override void DrawOn2DControlOrthographicView()
-        {
-            // do nothing
         }
 
         public override void DrawOn3DControl()
@@ -135,8 +132,8 @@ namespace STROOP.Map
             double forwardDist = MoreMath.GetDistanceBetween(cx, cz, fx, fz);
             double backwardDist = MoreMath.GetDistanceBetween(cx, cz, bx, bz);
 
-            List<(float x, float y, float z)> points = Enumerable.Range(0, SpecialConfig.MapCircleNumPoints2D).ToList()
-                .ConvertAll(index => (index / (float)SpecialConfig.MapCircleNumPoints2D) * 65536)
+            List<(float x, float y, float z)> points = Enumerable.Range(0, NUM_POINTS).ToList()
+                .ConvertAll(index => (index / (float)NUM_POINTS) * 65536)
                 .ConvertAll(angle => GetEllipsePoint(cx, cz, sideDist, forwardDist, backwardDist, marioAngle, angle))
                 .ConvertAll(point => ((float)point.x, (float)marioStateCenter.Y, (float)point.z));
 

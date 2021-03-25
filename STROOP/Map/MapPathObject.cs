@@ -26,18 +26,10 @@ namespace STROOP.Map
         private bool _isPaused;
         private uint _highestGlobalTimerValue;
         private int _modulo;
-        private Image _image;
-        private int _tex;
-        private float _imageSize;
 
         private ToolStripMenuItem _itemResetPathOnLevelChange;
         private ToolStripMenuItem _itemUseBlending;
         private ToolStripMenuItem _itemPause;
-        private ToolStripMenuItem _itemSetModulo;
-        private ToolStripMenuItem _itemSetIconSize;
-
-        private static readonly string SET_MODULO_TEXT = "Set Modulo";
-        private static readonly string SET_ICON_SIZE_TEXT = "Set Icon Size";
 
         public MapPathObject(PositionAngle posAngle)
             : base()
@@ -52,9 +44,6 @@ namespace STROOP.Map
             _isPaused = false;
             _highestGlobalTimerValue = 0;
             _modulo = 1;
-            _image = null;
-            _tex = -1;
-            _imageSize = 10;
 
             Size = 300;
             OutlineWidth = 3;
@@ -76,15 +65,15 @@ namespace STROOP.Map
             if (OutlineWidth == 0) return segments;
 
             List<(float x, float y, float z)> vertices = GetDictionaryValues();
-            List<(float x, float z)> verticesForControl =
-                vertices.ConvertAll(vertex => MapUtilities.ConvertCoordsForControlTopDownView(vertex.x, vertex.z));
+            List<(float x, float z)> veriticesForControl =
+                vertices.ConvertAll(vertex => MapUtilities.ConvertCoordsForControl(vertex.x, vertex.z));
 
-            for (int i = 0; i < verticesForControl.Count - 1; i++)
+            for (int i = 0; i < veriticesForControl.Count - 1; i++)
             {
                 Color color = OutlineColor;
                 if (_useBlending)
                 {
-                    int distFromEnd = verticesForControl.Count - i - 2;
+                    int distFromEnd = veriticesForControl.Count - i - 2;
                     if (distFromEnd < Size)
                     {
                         color = ColorUtilities.InterpolateColor(
@@ -95,8 +84,8 @@ namespace STROOP.Map
                         color = Color;
                     }
                 }
-                (float x1, float z1) = verticesForControl[i];
-                (float x2, float z2) = verticesForControl[i + 1];
+                (float x1, float z1) = veriticesForControl[i];
+                (float x2, float z2) = veriticesForControl[i + 1];
                 MapPathObjectSegment segment = new MapPathObjectSegment(
                     index: i,
                     startX: x1,
@@ -112,200 +101,91 @@ namespace STROOP.Map
             return segments;
         }
 
-        public override void DrawOn2DControlTopDownView()
+        public override void DrawOn2DControl()
         {
+            if (OutlineWidth == 0) return;
+
             List<(float x, float y, float z)> vertices = GetDictionaryValues();
-            List<(float x, float z)> verticesForControl =
-                vertices.ConvertAll(vertex => MapUtilities.ConvertCoordsForControlTopDownView(vertex.x, vertex.z));
+            List<(float x, float z)> veriticesForControl =
+                vertices.ConvertAll(vertex => MapUtilities.ConvertCoordsForControl(vertex.x, vertex.z));
 
-            if (OutlineWidth != 0)
+            GL.BindTexture(TextureTarget.Texture2D, -1);
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.LoadIdentity();
+            GL.LineWidth(OutlineWidth);
+            for (int i = 0; i < veriticesForControl.Count - 1; i++)
             {
-                GL.BindTexture(TextureTarget.Texture2D, -1);
-                GL.MatrixMode(MatrixMode.Modelview);
-                GL.LoadIdentity();
-                GL.LineWidth(OutlineWidth);
-                for (int i = 0; i < verticesForControl.Count - 1; i++)
+                Color color = OutlineColor;
+                if (_useBlending)
                 {
-                    Color color = OutlineColor;
-                    if (_useBlending)
+                    int distFromEnd = veriticesForControl.Count - i - 2;
+                    if (distFromEnd < Size)
                     {
-                        int distFromEnd = verticesForControl.Count - i - 2;
-                        if (distFromEnd < Size)
-                        {
-                            color = ColorUtilities.InterpolateColor(
-                                OutlineColor, Color, distFromEnd / (double)Size);
-                        }
-                        else
-                        {
-                            color = Color;
-                        }
+                        color = ColorUtilities.InterpolateColor(
+                            OutlineColor, Color, distFromEnd / (double)Size);
                     }
-                    (float x1, float z1) = verticesForControl[i];
-                    (float x2, float z2) = verticesForControl[i + 1];
-                    GL.Color4(color.R, color.G, color.B, OpacityByte);
-                    GL.Begin(PrimitiveType.Lines);
-                    GL.Vertex2(x1, z1);
-                    GL.Vertex2(x2, z2);
-                    GL.End();
-                }
-                GL.Color4(1, 1, 1, 1.0f);
-            }
-
-            if (_image != null)
-            {
-                foreach ((float x, float z) in verticesForControl)
-                {
-                    SizeF size = MapUtilities.ScaleImageSizeForControl(_image.Size, _imageSize);
-                    MapUtilities.DrawTexture(_tex, new PointF(x, z), size, 0, 1);
-                }
-            }
-        }
-
-        public override void DrawOn2DControlOrthographicView()
-        {
-            List<(float x, float y, float z)> vertices = GetDictionaryValues();
-            List<(float x, float z)> verticesForControl =
-                vertices.ConvertAll(vertex => MapUtilities.ConvertCoordsForControlOrthographicView(vertex.x, vertex.y, vertex.z));
-
-            if (OutlineWidth != 0)
-            {
-                GL.BindTexture(TextureTarget.Texture2D, -1);
-                GL.MatrixMode(MatrixMode.Modelview);
-                GL.LoadIdentity();
-                GL.LineWidth(OutlineWidth);
-                for (int i = 0; i < verticesForControl.Count - 1; i++)
-                {
-                    Color color = OutlineColor;
-                    if (_useBlending)
+                    else
                     {
-                        int distFromEnd = verticesForControl.Count - i - 2;
-                        if (distFromEnd < Size)
-                        {
-                            color = ColorUtilities.InterpolateColor(
-                                OutlineColor, Color, distFromEnd / (double)Size);
-                        }
-                        else
-                        {
-                            color = Color;
-                        }
+                        color = Color;
                     }
-                    (float x1, float z1) = verticesForControl[i];
-                    (float x2, float z2) = verticesForControl[i + 1];
-                    GL.Color4(color.R, color.G, color.B, OpacityByte);
-                    GL.Begin(PrimitiveType.Lines);
-                    GL.Vertex2(x1, z1);
-                    GL.Vertex2(x2, z2);
-                    GL.End();
                 }
-                GL.Color4(1, 1, 1, 1.0f);
+                (float x1, float z1) = veriticesForControl[i];
+                (float x2, float z2) = veriticesForControl[i + 1];
+                GL.Color4(color.R, color.G, color.B, OpacityByte);
+                GL.Begin(PrimitiveType.Lines);
+                GL.Vertex2(x1, z1);
+                GL.Vertex2(x2, z2);
+                GL.End();
             }
-
-            if (_image != null)
-            {
-                foreach ((float x, float z) in verticesForControl)
-                {
-                    SizeF size = MapUtilities.ScaleImageSizeForControl(_image.Size, _imageSize);
-                    MapUtilities.DrawTexture(_tex, new PointF(x, z), size, 0, 1);
-                }
-            }
+            GL.Color4(1, 1, 1, 1.0f);
         }
 
         public override void DrawOn3DControl()
         {
+            if (OutlineWidth == 0) return;
+
             List<(float x, float y, float z)> vertices = GetDictionaryValues();
-
-            if (OutlineWidth != 0)
+            List<Map3DVertex[]> vertexArrayList = new List<Map3DVertex[]>();
+            for (int i = 0; i < vertices.Count - 1; i++)
             {
-                List<Map3DVertex[]> vertexArrayList = new List<Map3DVertex[]>();
-                for (int i = 0; i < vertices.Count - 1; i++)
+                Color color = OutlineColor;
+                if (_useBlending)
                 {
-                    Color color = OutlineColor;
-                    if (_useBlending)
+                    int distFromEnd = vertices.Count - i - 2;
+                    if (distFromEnd < Size)
                     {
-                        int distFromEnd = vertices.Count - i - 2;
-                        if (distFromEnd < Size)
-                        {
-                            color = ColorUtilities.InterpolateColor(
-                                OutlineColor, Color, distFromEnd / (double)Size);
-                        }
-                        else
-                        {
-                            color = Color;
-                        }
+                        color = ColorUtilities.InterpolateColor(
+                            OutlineColor, Color, distFromEnd / (double)Size);
                     }
-                    (float x1, float y1, float z1) = vertices[i];
-                    (float x2, float y2, float z2) = vertices[i + 1];
-
-                    vertexArrayList.Add(new Map3DVertex[]
+                    else
                     {
+                        color = Color;
+                    }
+                }
+                (float x1, float y1, float z1) = vertices[i];
+                (float x2, float y2, float z2) = vertices[i + 1];
+
+                vertexArrayList.Add(new Map3DVertex[]
+                {
                     new Map3DVertex(new Vector3(x1, y1, z1), color),
                     new Map3DVertex(new Vector3(x2, y2, z2), color),
-                    });
-                }
-
-                Matrix4 viewMatrix = GetModelMatrix() * Config.Map3DCamera.Matrix;
-                GL.UniformMatrix4(Config.Map3DGraphics.GLUniformView, false, ref viewMatrix);
-
-                vertexArrayList.ForEach(vertexes =>
-                {
-                    int buffer = GL.GenBuffer();
-                    GL.BindTexture(TextureTarget.Texture2D, MapUtilities.WhiteTexture);
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
-                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexes.Length * Map3DVertex.Size), vertexes, BufferUsageHint.DynamicDraw);
-                    GL.LineWidth(OutlineWidth);
-                    Config.Map3DGraphics.BindVertices();
-                    GL.DrawArrays(PrimitiveType.Lines, 0, vertexes.Length);
-                    GL.DeleteBuffer(buffer);
                 });
             }
 
-            if (_image != null)
+            Matrix4 viewMatrix = GetModelMatrix() * Config.Map3DCamera.Matrix;
+            GL.UniformMatrix4(Config.Map3DGraphics.GLUniformView, false, ref viewMatrix);
+
+            vertexArrayList.ForEach(vertexes =>
             {
-                foreach ((float x, float y, float z) in vertices)
-                {
-                    Matrix4 viewMatrix = GetModelMatrix(x, y, z, 0);
-                    GL.UniformMatrix4(Config.Map3DGraphics.GLUniformView, false, ref viewMatrix);
-
-                    Map3DVertex[] vertices2 = GetVertices();
-                    int vertexBuffer = GL.GenBuffer();
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
-                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertices2.Length * Map3DVertex.Size),
-                        vertices2, BufferUsageHint.StaticDraw);
-                    GL.BindTexture(TextureTarget.Texture2D, _tex);
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
-                    Config.Map3DGraphics.BindVertices();
-                    GL.DrawArrays(PrimitiveType.Triangles, 0, vertices2.Length);
-                    GL.DeleteBuffer(vertexBuffer);
-                }
-            }
-        }
-
-        public Matrix4 GetModelMatrix(float x, float y, float z, float ang)
-        {
-            SizeF _imageNormalizedSize = new SizeF(
-                _image.Width >= _image.Height ? 1.0f : (float)_image.Width / _image.Height,
-                _image.Width <= _image.Height ? 1.0f : (float)_image.Height / _image.Width);
-
-            Vector3 pos = new Vector3(x, y, z);
-
-            float size = _imageSize / 200;
-            return Matrix4.CreateScale(size * _imageNormalizedSize.Width, size * _imageNormalizedSize.Height, 1)
-                * Matrix4.CreateRotationZ(0)
-                * Matrix4.CreateScale(1.0f / Config.Map3DGraphics.NormalizedWidth, 1.0f / Config.Map3DGraphics.NormalizedHeight, 1)
-                * Matrix4.CreateTranslation(MapUtilities.GetPositionOnViewFromCoordinate(pos));
-        }
-
-        private Map3DVertex[] GetVertices()
-        {
-            return new Map3DVertex[]
-            {
-                new Map3DVertex(new Vector3(-1, -1, 0), Color.White, new Vector2(0, 1)),
-                new Map3DVertex(new Vector3(1, -1, 0), Color.White, new Vector2(1, 1)),
-                new Map3DVertex(new Vector3(-1, 1, 0), Color.White, new Vector2(0, 0)),
-                new Map3DVertex(new Vector3(1, 1, 0), Color.White, new Vector2(1, 0)),
-                new Map3DVertex(new Vector3(-1, 1, 0), Color.White,  new Vector2(0, 0)),
-                new Map3DVertex(new Vector3(1, -1, 0), Color.White, new Vector2(1, 1)),
-            };
+                int buffer = GL.GenBuffer();
+                GL.BindTexture(TextureTarget.Texture2D, MapUtilities.WhiteTexture);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexes.Length * Map3DVertex.Size), vertexes, BufferUsageHint.DynamicDraw);
+                GL.LineWidth(OutlineWidth);
+                Config.Map3DGraphics.BindVertices();
+                GL.DrawArrays(PrimitiveType.Lines, 0, vertexes.Length);
+                GL.DeleteBuffer(buffer);
+            });
         }
 
         public override void Update()
@@ -368,15 +248,6 @@ namespace STROOP.Map
                     }
                 }
             }
-
-            if (_customImage != _image)
-            {
-                _image = _customImage;
-                if (_image != null)
-                {
-                    _tex = MapUtilities.LoadTexture(_image as Bitmap);
-                }
-            }
         }
 
         public override ContextMenuStrip GetContextMenuStrip()
@@ -420,9 +291,8 @@ namespace STROOP.Map
                 };
                 _itemPause.Checked = _isPaused;
 
-                string suffix1 = string.Format(" ({0})", _modulo);
-                _itemSetModulo = new ToolStripMenuItem(SET_MODULO_TEXT + suffix1);
-                _itemSetModulo.Click += (sender, e) =>
+                ToolStripMenuItem itemSetModulo = new ToolStripMenuItem("Set Modulo");
+                itemSetModulo.Click += (sender, e) =>
                 {
                     string text = DialogUtilities.GetStringFromDialog(labelText: "Enter modulo.");
                     int? moduloNullable = ParsingUtilities.ParseIntNullable(text);
@@ -432,41 +302,12 @@ namespace STROOP.Map
                     GetParentMapTracker().ApplySettings(settings);
                 };
 
-                string suffix2 = string.Format(" ({0})", _imageSize);
-                _itemSetIconSize = new ToolStripMenuItem(SET_ICON_SIZE_TEXT + suffix2);
-                _itemSetIconSize.Click += (sender, e) =>
-                {
-                    string text = DialogUtilities.GetStringFromDialog(labelText: "Enter icon size.");
-                    float? sizeNullable = ParsingUtilities.ParseFloatNullable(text);
-                    if (!sizeNullable.HasValue) return;
-                    MapObjectSettings settings = new MapObjectSettings(
-                        pathChangeIconSize: true, pathNewIconSize: sizeNullable.Value);
-                    GetParentMapTracker().ApplySettings(settings);
-                };
-
-                ToolStripMenuItem itemCopyPoints = new ToolStripMenuItem("Copy Points");
-                itemCopyPoints.Click += (sender, e) =>
-                {
-                    MapObjectSettings settings = new MapObjectSettings(pathDoCopyPoints: true);
-                    GetParentMapTracker().ApplySettings(settings);
-                };
-
-                ToolStripMenuItem itemPastePoints = new ToolStripMenuItem("Paste Points");
-                itemPastePoints.Click += (sender, e) =>
-                {
-                    MapObjectSettings settings = new MapObjectSettings(pathDoPastePoints: true);
-                    GetParentMapTracker().ApplySettings(settings);
-                };
-
                 _contextMenuStrip = new ContextMenuStrip();
                 _contextMenuStrip.Items.Add(itemResetPath);
                 _contextMenuStrip.Items.Add(_itemResetPathOnLevelChange);
                 _contextMenuStrip.Items.Add(_itemUseBlending);
                 _contextMenuStrip.Items.Add(_itemPause);
-                _contextMenuStrip.Items.Add(_itemSetModulo);
-                _contextMenuStrip.Items.Add(_itemSetIconSize);
-                _contextMenuStrip.Items.Add(itemCopyPoints);
-                _contextMenuStrip.Items.Add(itemPastePoints);
+                _contextMenuStrip.Items.Add(itemSetModulo);
             }
 
             return _contextMenuStrip;
@@ -502,87 +343,6 @@ namespace STROOP.Map
             if (settings.PathChangeModulo)
             {
                 _modulo = settings.PathNewModulo;
-                string suffix = string.Format(" ({0})", _modulo);
-                _itemSetModulo.Text = SET_MODULO_TEXT + suffix;
-            }
-
-            if (settings.PathChangeIconSize)
-            {
-                _imageSize = settings.PathNewIconSize;
-                string suffix = string.Format(" ({0})", _imageSize);
-                _itemSetIconSize.Text = SET_ICON_SIZE_TEXT + suffix;
-            }
-
-            if (settings.PathDoCopyPoints)
-            {
-                if (KeyboardUtilities.IsCtrlHeld()) // record q steps
-                {
-                    StringBuilder builder = new StringBuilder();
-                    uint globalTimerCounter = 0;
-                    List<uint> keys = _dictionary.Keys.ToList();
-                    for (int i = 0; i < keys.Count - 1; i++)
-                    {
-                        uint key1 = keys[i];
-                        uint key2 = keys[i + 1];
-                        (float x1, float y1, float z1) = _dictionary[key1];
-                        (float x2, float y2, float z2) = _dictionary[key2];
-                        if (i == 0)
-                        {
-                            builder.Append(
-                                string.Format(
-                                    "{0}\t{1}\t{2}\t{3}\r\n",
-                                    key1,
-                                    (double)x1,
-                                    (double)y1,
-                                    (double)z1));
-                            globalTimerCounter = key1;
-                        }
-                        for (int q = 1; q <= 4; q++)
-                        {
-                            float x = x1 + (q / 4f) * (x2 - x1);
-                            float y = y1 + (q / 4f) * (y2 - y1);
-                            float z = z1 + (q / 4f) * (z2 - z1);
-                            globalTimerCounter++;
-                            builder.Append(
-                                string.Format(
-                                    "{0}\t{1}\t{2}\t{3}\r\n",
-                                    globalTimerCounter,
-                                    (double)x,
-                                    (double)y,
-                                    (double)z));
-                        }
-                    }
-                    Clipboard.SetText(builder.ToString());
-                }
-                else
-                {
-                    StringBuilder builder = new StringBuilder();
-                    foreach (var entry in _dictionary)
-                    {
-                        builder.Append(
-                            string.Format(
-                                "{0}\t{1}\t{2}\t{3}\r\n",
-                                entry.Key,
-                                (double)entry.Value.x,
-                                (double)entry.Value.y,
-                                (double)entry.Value.z));
-                    }
-                    Clipboard.SetText(builder.ToString());
-                }
-            }
-
-            if (settings.PathDoPastePoints)
-            {
-                _dictionary.Clear();
-                List<double?> values = ParsingUtilities.ParseDoubleList(Clipboard.GetText());
-                for (int i = 0; i < values.Count - 3; i += 4)
-                {
-                    uint globalTimer = (uint)(values[i] ?? 0);
-                    float x = (float)(values[i + 1] ?? 0);
-                    float y = (float)(values[i + 2] ?? 0);
-                    float z = (float)(values[i + 3] ?? 0);
-                    _dictionary[globalTimer] = (x, y, z);
-                }
             }
         }
 

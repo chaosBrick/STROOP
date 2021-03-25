@@ -37,7 +37,7 @@ namespace STROOP.Map
             Color = Color.White;
         }
 
-        public override void DrawOn2DControlTopDownView()
+        public override void DrawOn2DControl()
         {
             List<CompassArrow> arrows = Enumerable.Range(0, 4).ToList().ConvertAll(index => new CompassArrow(16384 * index));
 
@@ -160,12 +160,7 @@ namespace STROOP.Map
         private (float x, float z) RotatePoint(float x, float z)
         {
             return ((float, float))MoreMath.RotatePointAboutPointAnAngularDistance(
-                x, z, SpecialConfig.CompassCenterX, SpecialConfig.CompassCenterZ, -1 * Config.CurrentMapGraphics.MapViewYawValue);
-        }
-
-        public override void DrawOn2DControlOrthographicView()
-        {
-            // do nothing
+                x, z, SpecialConfig.CompassCenterX, SpecialConfig.CompassCenterZ, -1 * Config.MapGraphics.MapViewAngleValue);
         }
 
         public override void DrawOn3DControl()

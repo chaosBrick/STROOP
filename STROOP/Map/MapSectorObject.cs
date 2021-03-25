@@ -16,12 +16,10 @@ namespace STROOP.Map
 {
     public class MapSectorObject : MapObject
     {
+        protected readonly static int NUM_POINTS_2D = 257;
+
         private readonly PositionAngle _posAngle;
         private float _angleRadius;
-
-        private ToolStripMenuItem _itemSetAngleRadius;
-
-        private static readonly string SET_ANGLE_RADIUS_TEXT = "Set Angle Radius";
 
         public MapSectorObject(PositionAngle posAngle)
             : base()
@@ -34,18 +32,17 @@ namespace STROOP.Map
             Color = Color.Yellow;
         }
 
-        public override void DrawOn2DControlTopDownView()
+        public override void DrawOn2DControl()
         {
             List<(float centerX, float centerZ, float radius, float angle, float angleRadius)> dimenstionList = GetDimensions();
 
             foreach ((float centerX, float centerZ, float radius, float angle, float angleRadius) in dimenstionList)
             {
-                (float controlCenterX, float controlCenterZ) = MapUtilities.ConvertCoordsForControlTopDownView(centerX, centerZ);
-                float controlAngle = angle + 32768 - Config.CurrentMapGraphics.MapViewYawValue;
-                float controlRadius = radius * Config.CurrentMapGraphics.MapViewScaleValue;
-                List <(float pointX, float pointZ)> outerPoints = Enumerable.Range(0, SpecialConfig.MapCircleNumPoints2D).ToList()
-                    .ConvertAll(index => (index - SpecialConfig.MapCircleNumPoints2D / 2) / (float)(SpecialConfig.MapCircleNumPoints2D / 2))
-                    .ConvertAll(proportion => controlAngle + proportion * angleRadius)
+                (float controlCenterX, float controlCenterZ) = MapUtilities.ConvertCoordsForControl(centerX, centerZ);
+                float controlRadius = radius * Config.MapGraphics.MapViewScaleValue;
+                List <(float pointX, float pointZ)> outerPoints = Enumerable.Range(0, NUM_POINTS_2D).ToList()
+                    .ConvertAll(index => (index - NUM_POINTS_2D / 2) / (float)(NUM_POINTS_2D / 2))
+                    .ConvertAll(proportion => angle + proportion * angleRadius)
                     .ConvertAll(ang => ((float, float))MoreMath.AddVectorToPoint(controlRadius, ang, controlCenterX, controlCenterZ));
 
                 GL.BindTexture(TextureTarget.Texture2D, -1);
@@ -81,11 +78,6 @@ namespace STROOP.Map
             GL.Color4(1, 1, 1, 1.0f);
         }
 
-        public override void DrawOn2DControlOrthographicView()
-        {
-            // do nothing
-        }
-
         public override void DrawOn3DControl()
         {
             // do nothing
@@ -119,9 +111,8 @@ namespace STROOP.Map
         {
             if (_contextMenuStrip == null)
             {
-                string suffix = string.Format(" ({0})", _angleRadius);
-                _itemSetAngleRadius = new ToolStripMenuItem(SET_ANGLE_RADIUS_TEXT + suffix);
-                _itemSetAngleRadius.Click += (sender, e) =>
+                ToolStripMenuItem itemSetAngleRadius = new ToolStripMenuItem("Set Angle Radius");
+                itemSetAngleRadius.Click += (sender, e) =>
                 {
                     string text = DialogUtilities.GetStringFromDialog(labelText: "Enter the angle radius for sector:");
                     float? angleRadius = ParsingUtilities.ParseFloatNullable(text);
@@ -132,7 +123,7 @@ namespace STROOP.Map
                 };
 
                 _contextMenuStrip = new ContextMenuStrip();
-                _contextMenuStrip.Items.Add(_itemSetAngleRadius);
+                _contextMenuStrip.Items.Add(itemSetAngleRadius);
             }
 
             return _contextMenuStrip;
@@ -145,8 +136,6 @@ namespace STROOP.Map
             if (settings.SectorChangeAngleRadius)
             {
                 _angleRadius = settings.SectorNewAngleRadius;
-                string suffix = string.Format(" ({0})", _angleRadius);
-                _itemSetAngleRadius.Text = SET_ANGLE_RADIUS_TEXT + suffix;
             }
         }
 

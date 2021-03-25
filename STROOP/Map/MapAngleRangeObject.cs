@@ -19,13 +19,8 @@ namespace STROOP.Map
 
         private bool _useRelativeAngles;
         private int _angleDiff;
-        private bool _useInGameAngles;
 
         private ToolStripMenuItem _itemUseRelativeAngles;
-        private ToolStripMenuItem _itemSetAngleDiff;
-        private ToolStripMenuItem _itemUseInGameAngles;
-
-        private static readonly string SET_ANGLE_DIFF_TEXT = "Set Angle Diff";
 
         public MapAngleRangeObject(PositionAngle posAngle)
             : base()
@@ -34,37 +29,22 @@ namespace STROOP.Map
 
             _useRelativeAngles = false;
             _angleDiff = 16;
-            _useInGameAngles = false;
 
             Size = 1000;
             OutlineWidth = 1;
             OutlineColor = Color.Black;
         }
 
-        protected override List<(float x, float y, float z)> GetVerticesTopDownView()
+        protected override List<(float x, float y, float z)> GetVertices()
         {
             List<(float x, float y, float z)> vertices = new List<(float x, float y, float z)>();
-            (double x1, double y1, double z1, double a) = _posAngle.GetValues();
-            int startingAngle = _useRelativeAngles ? MoreMath.NormalizeAngleTruncated(a) : 0;
-            void addPointUsingAngle(int angle)
+            int startingAngle = _useRelativeAngles ? MoreMath.NormalizeAngleTruncated(_posAngle.Angle) : 0;
+            for (int angle = startingAngle; angle < startingAngle + 65536; angle += _angleDiff)
             {
+                (double x1, double y1, double z1, double a) = _posAngle.GetValues();
                 (double x2, double z2) = MoreMath.AddVectorToPoint(Size, angle, x1, z1);
                 vertices.Add(((float)x1, (float)y1, (float)z1));
                 vertices.Add(((float)x2, (float)y1, (float)z2));
-            }
-            if (_useInGameAngles)
-            {
-                foreach (int angle in InGameTrigUtilities.GetInGameAngles())
-                {
-                    addPointUsingAngle(MoreMath.NormalizeAngleTruncated(angle));
-                }
-            }
-            else
-            {
-                for (int angle = startingAngle; angle < startingAngle + 65536; angle += _angleDiff)
-                {
-                    addPointUsingAngle(angle);
-                }
             }
             return vertices;
         }
@@ -97,9 +77,8 @@ namespace STROOP.Map
                     GetParentMapTracker().ApplySettings(settings);
                 };
 
-                string suffix = string.Format(" ({0})", _angleDiff);
-                _itemSetAngleDiff = new ToolStripMenuItem(SET_ANGLE_DIFF_TEXT + suffix);
-                _itemSetAngleDiff.Click += (sender, e) =>
+                ToolStripMenuItem itemSetAngleDiff = new ToolStripMenuItem("Set Angle Diff");
+                itemSetAngleDiff.Click += (sender, e) =>
                 {
                     string text = DialogUtilities.GetStringFromDialog(labelText: "Enter angle diff.");
                     int? angleDiff = ParsingUtilities.ParseIntNullable(text);
@@ -109,19 +88,9 @@ namespace STROOP.Map
                     GetParentMapTracker().ApplySettings(settings);
                 };
 
-                _itemUseInGameAngles = new ToolStripMenuItem("Use In-Game Angles");
-                _itemUseInGameAngles.Click += (sender, e) =>
-                {
-                    MapObjectSettings settings = new MapObjectSettings(
-                        angleRangeChangeUseInGameAngles: true,
-                        angleRangeNewUseInGameAngles: !_useInGameAngles);
-                    GetParentMapTracker().ApplySettings(settings);
-                };
-
                 _contextMenuStrip = new ContextMenuStrip();
                 _contextMenuStrip.Items.Add(_itemUseRelativeAngles);
-                _contextMenuStrip.Items.Add(_itemSetAngleDiff);
-                _contextMenuStrip.Items.Add(_itemUseInGameAngles);
+                _contextMenuStrip.Items.Add(itemSetAngleDiff);
             }
 
             return _contextMenuStrip;
@@ -140,14 +109,6 @@ namespace STROOP.Map
             if (settings.AngleRangeChangeAngleDiff)
             {
                 _angleDiff = settings.AngleRangeNewAngleDiff;
-                string suffix = string.Format(" ({0})", _angleDiff);
-                _itemSetAngleDiff.Text = SET_ANGLE_DIFF_TEXT + suffix;
-            }
-
-            if (settings.AngleRangeChangeUseInGameAngles)
-            {
-                _useInGameAngles = settings.AngleRangeNewUseInGameAngles;
-                _itemUseInGameAngles.Checked = settings.AngleRangeNewUseInGameAngles;
             }
         }
     }

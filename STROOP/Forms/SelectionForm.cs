@@ -129,7 +129,7 @@ namespace STROOP.Forms
                     short? triangleType = TableConfig.TriangleInfo.GetType(triangleTypeDescription);
                     if (triangleType.HasValue)
                     {
-                        foreach (uint triangleAddress in Config.TriangleManager.TriangleAddresses)
+                        foreach (uint triangleAddress in StroopMainForm.instance.trianglesTab.TriangleAddresses)
                         {
                             Config.Stream.SetValue(
                                 triangleType.Value,
@@ -190,7 +190,7 @@ namespace STROOP.Forms
                     {
                         Config.Stream.SetValue(
                             terrainType.Value,
-                            Config.AreaManager.SelectedAreaAddress + AreaConfig.TerrainTypeOffset);
+                            AreaConfig.SelectedAreaAddress + AreaConfig.TerrainTypeOffset);
                     }
                 });
             selectionForm.Show();

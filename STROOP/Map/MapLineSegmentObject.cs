@@ -20,8 +20,6 @@ namespace STROOP.Map
         private bool _useFixedSize;
         private float _backwardsSize;
 
-        private static readonly string SET_BACKWARDS_SIZE_TEXT = "Set Backwards Size";
-
         public MapLineSegmentObject(PositionAngle posAngle1, PositionAngle posAngle2)
             : base()
         {
@@ -43,7 +41,7 @@ namespace STROOP.Map
             return new MapLineSegmentObject(posAngle1, posAngle2);
         }
 
-        protected override List<(float x, float y, float z)> GetVerticesTopDownView()
+        protected override List<(float x, float y, float z)> GetVertices()
         {
             (double x1, double y1, double z1, double angle1) = _posAngle1.GetValues();
             (double x2, double y2, double z2, double angle2) = _posAngle2.GetValues();
@@ -68,17 +66,13 @@ namespace STROOP.Map
                     itemUseFixedSize.Checked = _useFixedSize;
                 };
 
-                string suffix = string.Format(" ({0})", _backwardsSize);
-                ToolStripMenuItem itemSetBackwardsSize = new ToolStripMenuItem(SET_BACKWARDS_SIZE_TEXT + suffix);
+                ToolStripMenuItem itemSetBackwardsSize = new ToolStripMenuItem("Set Backwards Size...");
                 itemSetBackwardsSize.Click += (sender, e) =>
                 {
                     string text = DialogUtilities.GetStringFromDialog(labelText: "Enter backwards size.");
-                    float? backwardsSizeNullable = ParsingUtilities.ParseFloatNullable(text);
+                    double? backwardsSizeNullable = ParsingUtilities.ParseDoubleNullable(text);
                     if (!backwardsSizeNullable.HasValue) return;
-                    float backwardsSize = backwardsSizeNullable.Value;
-                    _backwardsSize = backwardsSize;
-                    string suffix2 = string.Format(" ({0})", _backwardsSize);
-                    itemSetBackwardsSize.Text = SET_BACKWARDS_SIZE_TEXT + suffix2;
+                    _backwardsSize = (float)backwardsSizeNullable.Value;
                 };
 
                 _contextMenuStrip = new ContextMenuStrip();

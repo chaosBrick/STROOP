@@ -20,37 +20,6 @@ namespace STROOP.Utilities
     {
         public static void Update()
         {
-            //float marioX = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.XOffset);
-            //float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
-            //float marioZ = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.ZOffset);
-            //(TriangleDataModel tri, float y) = TriangleUtilities.FindCeilingAndY(marioX, marioY, marioZ);
-            //Config.SetDebugText("tri={0} y={1}", tri == null ? "NULL" : HexUtilities.FormatValue(tri.Address), y);
-
-            //if (Config.MapGraphics != null)
-            //{
-            //    double dist1 = MoreMath.GetPlaneDistanceToPoint(
-            //        Config.MapGraphics.MapViewCenterXValue,
-            //        Config.MapGraphics.MapViewCenterYValue,
-            //        Config.MapGraphics.MapViewCenterZValue,
-            //        Config.MapGraphics.MapViewYawValue,
-            //        Config.MapGraphics.MapViewPitchValue,
-            //        Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.XOffset),
-            //        Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset),
-            //        Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.ZOffset));
-
-            //    double dist2 = MoreMath.GetPlaneDistanceToPointSigned(
-            //        Config.MapGraphics.MapViewCenterXValue,
-            //        Config.MapGraphics.MapViewCenterYValue,
-            //        Config.MapGraphics.MapViewCenterZValue,
-            //        Config.MapGraphics.MapViewYawValue,
-            //        Config.MapGraphics.MapViewPitchValue,
-            //        Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.XOffset),
-            //        Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset),
-            //        Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.ZOffset));
-
-            //    Config.SetDebugText(dist1 + " vs " + dist2);
-            //}
-
             //byte level = Config.Stream.GetByte(MiscConfig.LevelAddress);
             //byte area = Config.Stream.GetByte(MiscConfig.AreaAddress);
 
@@ -105,13 +74,13 @@ namespace STROOP.Utilities
                 mapObjCylinder.Size = 1900;
                 mapObjCylinder.ApplySettings(new MapObjectSettings(customCylinderChangeRelativeMinY: true, customCylinderNewRelativeMinY: -5000));
 
-                Config.MapGui.flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(mapObjChuckya));
-                Config.MapGui.flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(mapObjHome));
-                Config.MapGui.flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(mapObjFacingArrow));
-                Config.MapGui.flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(mapObjSector));
-                Config.MapGui.flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(mapObjFacingDivider));
-                Config.MapGui.flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(mapObjSphere));
-                Config.MapGui.flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(mapObjCylinder));
+                StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(mapObjChuckya));
+                StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(mapObjHome));
+                StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(mapObjFacingArrow));
+                StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(mapObjSector));
+                StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(mapObjFacingDivider));
+                StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(mapObjSphere));
+                StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(mapObjCylinder));
             }
         }
 
@@ -1296,14 +1265,14 @@ namespace STROOP.Utilities
                 wIsX = true;
                 start = x1;
                 end = x2;
-                sign = MoreMath.Sign(x2 - x1);
+                sign = Math.Sign(x2 - x1);
             }
             else if (z1 != z2)
             {
                 wIsX = false;
                 start = z1;
                 end = z2;
-                sign = MoreMath.Sign(z2 - z1);
+                sign = Math.Sign(z2 - z1);
             }
             else
             {
@@ -1392,7 +1361,7 @@ namespace STROOP.Utilities
             {
                 int initialIndex = 305 + i;
                 int initialAngle = TableConfig.PendulumSwings.GetPendulumAmplitude(initialIndex);
-                TtcPendulum2 pendulum = new TtcPendulum2(new TtcRng(0), -1 * MoreMath.Sign(initialAngle), initialAngle, 0, 13, 0);
+                TtcPendulum2 pendulum = new TtcPendulum2(new TtcRng(0), -1 * Math.Sign(initialAngle), initialAngle, 0, 13, 0);
                 for (int j = 0; j < range2; j++)
                 {
                     pendulum.Update();
@@ -1598,7 +1567,7 @@ namespace STROOP.Utilities
             }
             InfoForm.ShowValue(output);
         }
-
+        
         public static void TestSomething15()
         {
             string clipboard = Clipboard.GetText();
@@ -1651,6 +1620,29 @@ namespace STROOP.Utilities
             uint absoluteAddress = (uint)SpecialConfig.CustomX;
             uint relativeAddress = TypeUtilities.GetRelativeAddressFromAbsoluteAddress(absoluteAddress, 4);
             InfoForm.ShowValue(HexUtilities.FormatValue(relativeAddress));
+        }
+
+        public static void TestSomething12()
+        {
+            uint triAddress = Config.Stream.GetUInt32(MarioConfig.StructAddress + MarioConfig.FloorTriangleOffset);
+            if (triAddress == 0) return;
+            TriangleDataModel triDataModel = TriangleDataModel.Create(triAddress);
+            TriangleShape triShape =
+                new TriangleShape(
+                    triDataModel.X1, triDataModel.Y1, triDataModel.Z1,
+                    triDataModel.X2, triDataModel.Y2, triDataModel.Z2,
+                    triDataModel.X3, triDataModel.Y3, triDataModel.Z3);
+            /*
+            InfoForm.ShowValue(
+                String.Format(
+                    "NormX:{0}, NormY:{1}, NormZ:{2}, NormOffset:{3}",
+                    triShape.NormX, triShape.NormY, triShape.NormZ, triShape.NormOffset));
+            */
+
+            float marioX = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.XOffset);
+            float marioZ = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.ZOffset);
+
+            InfoForm.ShowValue(triShape.GetY(marioX, marioZ));
         }
 
         public static void TestSomething10()
@@ -1716,7 +1708,7 @@ namespace STROOP.Utilities
             if (KeyboardUtilities.IsCtrlHeld()) numVertices = 4;
             if (KeyboardUtilities.IsNumberHeld()) numVertices = KeyboardUtilities.GetCurrentlyInputtedNumber().Value;
 
-            uint triangleAddress = Config.TriangleManager.TriangleAddresses[0];
+            uint triangleAddress = StroopMainForm.instance.trianglesTab.TriangleAddresses[0];
             if (triangleAddress == 0) return;
             TriangleDataModel triangle = TriangleDataModel.Create(triangleAddress);
             List<List<short>> triangleVertices = new List<List<short>>()
@@ -1788,7 +1780,7 @@ namespace STROOP.Utilities
                             precursors.Add(precursor);
                         }
 
-                        Config.TriangleManager.AddVariables(
+                        StroopMainForm.instance.trianglesTab.AddVariables(
                             precursors.ConvertAll(precursor => precursor.CreateWatchVariableControl()));
                     }
                 }

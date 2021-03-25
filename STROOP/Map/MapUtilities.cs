@@ -37,99 +37,56 @@ namespace STROOP.Map
         }
 
         /** Takes in in-game coordinates, outputs control coordinates. */
-        public static (float x, float z) ConvertCoordsForControlTopDownView(float x, float z)
+        public static (float x, float z) ConvertCoordsForControl(float x, float z)
         {
-            x = Config.MapGui.checkBoxMapOptionsEnablePuView.Checked ? x : (float)PuUtilities.GetRelativeCoordinate(x);
-            z = Config.MapGui.checkBoxMapOptionsEnablePuView.Checked ? z : (float)PuUtilities.GetRelativeCoordinate(z);
-            float xOffset = x - Config.CurrentMapGraphics.MapViewCenterXValue;
-            float zOffset = z - Config.CurrentMapGraphics.MapViewCenterZValue;
+            x = Config.MapGraphics.MapViewEnablePuView ? x : (float)PuUtilities.GetRelativeCoordinate(x);
+            z = Config.MapGraphics.MapViewEnablePuView ? z : (float)PuUtilities.GetRelativeCoordinate(z);
+            float xOffset = x - Config.MapGraphics.MapViewCenterXValue;
+            float zOffset = z - Config.MapGraphics.MapViewCenterZValue;
             (float xOffsetRotated, float zOffsetRotated) =
                 ((float, float))MoreMath.RotatePointAboutPointAnAngularDistance(
                     xOffset,
                     zOffset,
                     0,
                     0,
-                    -1 * Config.CurrentMapGraphics.MapViewYawValue);
-            float xOffsetPixels = xOffsetRotated * Config.CurrentMapGraphics.MapViewScaleValue;
-            float zOffsetPixels = zOffsetRotated * Config.CurrentMapGraphics.MapViewScaleValue;
-            float centerX = Config.MapGui.CurrentControl.Width / 2 + xOffsetPixels;
-            float centerZ = Config.MapGui.CurrentControl.Height / 2 + zOffsetPixels;
+                    -1 * Config.MapGraphics.MapViewAngleValue);
+            float xOffsetPixels = xOffsetRotated * Config.MapGraphics.MapViewScaleValue;
+            float zOffsetPixels = zOffsetRotated * Config.MapGraphics.MapViewScaleValue;
+            float centerX = StroopMainForm.instance.mapTab.glControlMap2D.Width / 2 + xOffsetPixels;
+            float centerZ = StroopMainForm.instance.mapTab.glControlMap2D.Height / 2 + zOffsetPixels;
             return (centerX, centerZ);
         }
 
         /** Takes in control coordinates, outputs in-game coordinates. */
         public static (float x, float z) ConvertCoordsForInGame(float x, float z)
         {
-            float xOffset = x - Config.MapGui.CurrentControl.Width / 2;
-            float zOffset = z - Config.MapGui.CurrentControl.Height / 2;
-            float xOffsetScaled = xOffset / Config.CurrentMapGraphics.MapViewScaleValue;
-            float zOffsetScaled = zOffset / Config.CurrentMapGraphics.MapViewScaleValue;
+            float xOffset = x - StroopMainForm.instance.mapTab.glControlMap2D.Width / 2;
+            float zOffset = z - StroopMainForm.instance.mapTab.glControlMap2D.Height / 2;
+            float xOffsetScaled = xOffset / Config.MapGraphics.MapViewScaleValue;
+            float zOffsetScaled = zOffset / Config.MapGraphics.MapViewScaleValue;
             (float xOffsetScaledRotated, float zOffsetScaledRotated) =
                 ((float, float))MoreMath.RotatePointAboutPointAnAngularDistance(
                     xOffsetScaled,
                     zOffsetScaled,
                     0,
                     0,
-                    Config.CurrentMapGraphics.MapViewYawValue);
-            float centerX = xOffsetScaledRotated + Config.CurrentMapGraphics.MapViewCenterXValue;
-            float centerZ = zOffsetScaledRotated + Config.CurrentMapGraphics.MapViewCenterZValue;
+                    Config.MapGraphics.MapViewAngleValue);
+            float centerX = xOffsetScaledRotated + Config.MapGraphics.MapViewCenterXValue;
+            float centerZ = zOffsetScaledRotated + Config.MapGraphics.MapViewCenterZValue;
             return (centerX, centerZ);
         }
 
-        public static (float x, float z) ConvertCoordsForControlOrthographicView(float x, float y, float z)
-        {
-            x = Config.MapGui.checkBoxMapOptionsEnablePuView.Checked ? x : (float)PuUtilities.GetRelativeCoordinate(x);
-            y = Config.MapGui.checkBoxMapOptionsEnablePuView.Checked ? y : (float)PuUtilities.GetRelativeCoordinate(y);
-            z = Config.MapGui.checkBoxMapOptionsEnablePuView.Checked ? z : (float)PuUtilities.GetRelativeCoordinate(z);
-            float xOffset = x - Config.CurrentMapGraphics.MapViewCenterXValue;
-            float yOffset = y - Config.CurrentMapGraphics.MapViewCenterYValue;
-            float zOffset = z - Config.CurrentMapGraphics.MapViewCenterZValue;
-            double angleRadians = MoreMath.AngleUnitsToRadians(Config.CurrentMapGraphics.MapViewYawValue);
-            float hOffset = (float)(Math.Sin(angleRadians) * zOffset - Math.Cos(angleRadians) * xOffset);
-
-            (double x0, double y0, double z0, double t0) =
-                MoreMath.GetPlaneLineIntersection(
-                    Config.CurrentMapGraphics.MapViewCenterXValue,
-                    Config.CurrentMapGraphics.MapViewCenterYValue,
-                    Config.CurrentMapGraphics.MapViewCenterZValue,
-                    Config.CurrentMapGraphics.MapViewYawValue,
-                    Config.CurrentMapGraphics.MapViewPitchValue,
-                    x, y, z,
-                    Config.CurrentMapGraphics.MapViewYawValue,
-                    Config.CurrentMapGraphics.MapViewPitchValue);
-            double rightYaw = MoreMath.RotateAngleCW(
-                Config.CurrentMapGraphics.MapViewYawValue, 16384);
-            (double x1, double y1, double z1, double t1) =
-                MoreMath.GetPlaneLineIntersection(
-                    x0, y0, z0, rightYaw, 0,
-                    Config.CurrentMapGraphics.MapViewCenterXValue,
-                    Config.CurrentMapGraphics.MapViewCenterYValue,
-                    Config.CurrentMapGraphics.MapViewCenterZValue,
-                    rightYaw, 0);
-            double hDiff = MoreMath.GetDistanceBetween(x1, z1, x0, z0);
-            double yDiff = y1 - y0;
-            double yDiffSign = yDiff >= 0 ? 1 : -1;
-            double vOffsetMagnitude = MoreMath.GetHypotenuse(hDiff, yDiff);
-            float vOffset = (float)(vOffsetMagnitude * yDiffSign);
-
-            float hOffsetPixels = hOffset * Config.CurrentMapGraphics.MapViewScaleValue;
-            float vOffsetPixels = vOffset * Config.CurrentMapGraphics.MapViewScaleValue;
-            float centerH = Config.MapGui.CurrentControl.Width / 2 + hOffsetPixels;
-            float centerV = Config.MapGui.CurrentControl.Height / 2 + vOffsetPixels;
-            return (centerH, centerV);
-        }
-
         /** Takes in in-game coordinates, outputs control coordinates. */
-        public static (float x, float y, float z) ConvertCoordsForControlTopDownView(float x, float y, float z)
+        public static (float x, float y, float z) ConvertCoordsForControl(float x, float y, float z)
         {
-            (float convertedX, float convertedZ) = ConvertCoordsForControlTopDownView(x, z);
+            (float convertedX, float convertedZ) = ConvertCoordsForControl(x, z);
             return (convertedX, y, convertedZ);
         }
 
         /** Takes in in-game angle, outputs control angle. */
         public static float ConvertAngleForControl(double angle)
         {
-            angle += 32768 - Config.CurrentMapGraphics.MapViewYawValue;
+            angle += 32768 - Config.MapGraphics.MapViewAngleValue;
             if (double.IsNaN(angle)) angle = 0;
             return (float)MoreMath.AngleUnitsToDegrees(angle);
         }
@@ -137,14 +94,14 @@ namespace STROOP.Map
         public static SizeF ScaleImageSizeForControl(Size imageSize, float desiredRadius)
         {
             float desiredDiameter = desiredRadius * 2;
-            if (Config.MapGui.checkBoxMapOptionsScaleIconSizes.Checked) desiredDiameter *= Config.CurrentMapGraphics.MapViewScaleValue;
+            if (Config.MapGraphics.MapViewScaleIconSizes) desiredDiameter *= Config.MapGraphics.MapViewScaleValue;
             float scale = Math.Max(imageSize.Height / desiredDiameter, imageSize.Width / desiredDiameter);
             return new SizeF(imageSize.Width / scale, imageSize.Height / scale);
         }
 
         public static MapLayout GetMapLayout(object mapLayoutChoice = null)
         {
-            mapLayoutChoice = mapLayoutChoice ?? Config.MapGui.comboBoxMapOptionsLevel.SelectedItem;
+            mapLayoutChoice = mapLayoutChoice ?? StroopMainForm.instance.mapTab.comboBoxMapOptionsLevel.SelectedItem;
             if (mapLayoutChoice is MapLayout mapLayout)
             {
                 return mapLayout;
@@ -157,7 +114,7 @@ namespace STROOP.Map
 
         public static Image GetBackgroundImage(object backgroundChoice = null)
         {
-            backgroundChoice = backgroundChoice ?? Config.MapGui.comboBoxMapOptionsBackground.SelectedItem;
+            backgroundChoice = backgroundChoice ?? StroopMainForm.instance.mapTab.comboBoxMapOptionsBackground.SelectedItem;
             if (backgroundChoice is BackgroundImage background)
             {
                 return background.Image;
@@ -170,10 +127,10 @@ namespace STROOP.Map
 
         public static List<(float x, float z)> GetPuCenters()
         {
-            int xMin = ((((int)Config.CurrentMapGraphics.MapViewXMin) / 65536) - 1) * 65536;
-            int xMax = ((((int)Config.CurrentMapGraphics.MapViewXMax) / 65536) + 1) * 65536;
-            int zMin = ((((int)Config.CurrentMapGraphics.MapViewZMin) / 65536) - 1) * 65536;
-            int zMax = ((((int)Config.CurrentMapGraphics.MapViewZMax) / 65536) + 1) * 65536;
+            int xMin = ((((int)Config.MapGraphics.MapViewXMin) / 65536) - 1) * 65536;
+            int xMax = ((((int)Config.MapGraphics.MapViewXMax) / 65536) + 1) * 65536;
+            int zMin = ((((int)Config.MapGraphics.MapViewZMin) / 65536) - 1) * 65536;
+            int zMax = ((((int)Config.MapGraphics.MapViewZMax) / 65536) + 1) * 65536;
             List<(float x, float z)> centers = new List<(float x, float z)>();
             for (int x = xMin; x <= xMax; x += 65536)
             {
@@ -270,17 +227,17 @@ namespace STROOP.Map
                 }
                 else if (x == 0)
                 {
-                    addQuad(x, z, 1, MoreMath.Sign(z));
-                    addQuad(x, z, -1, MoreMath.Sign(z));
+                    addQuad(x, z, 1, Math.Sign(z));
+                    addQuad(x, z, -1, Math.Sign(z));
                 }
                 else if (z == 0)
                 {
-                    addQuad(x, z, MoreMath.Sign(x), 1);
-                    addQuad(x, z, MoreMath.Sign(x), -1);
+                    addQuad(x, z, Math.Sign(x), 1);
+                    addQuad(x, z, Math.Sign(x), -1);
                 }
                 else
                 {
-                    addQuad(x, z, MoreMath.Sign(x), MoreMath.Sign(z));
+                    addQuad(x, z, Math.Sign(x), Math.Sign(z));
                 }
             }
             return quadList;
@@ -314,9 +271,9 @@ namespace STROOP.Map
             }
 
             float height = heightNullable.Value;
-            (float pointAX, float pointAZ) = GetYOnLine(height, tri.X1, tri.Y1, tri.Z1, tri.X2, tri.Y2, tri.Z2);
-            (float pointBX, float pointBZ) = GetYOnLine(height, tri.X1, tri.Y1, tri.Z1, tri.X3, tri.Y3, tri.Z3);
-            (float pointCX, float pointCZ) = GetYOnLine(height, tri.X2, tri.Y2, tri.Z2, tri.X3, tri.Y3, tri.Z3);
+            (float pointAX, float pointAZ) = GetHeightOnLine(height, tri.X1, tri.Y1, tri.Z1, tri.X2, tri.Y2, tri.Z2);
+            (float pointBX, float pointBZ) = GetHeightOnLine(height, tri.X1, tri.Y1, tri.Z1, tri.X3, tri.Y3, tri.Z3);
+            (float pointCX, float pointCZ) = GetHeightOnLine(height, tri.X2, tri.Y2, tri.Z2, tri.X3, tri.Y3, tri.Z3);
 
             List<(float x, float z)> points = new List<(float x, float z)>();
             if (!float.IsNaN(pointAX) && !float.IsNaN(pointAZ)) points.Add((pointAX, pointAZ));
@@ -350,188 +307,16 @@ namespace STROOP.Map
             return null;
         }
 
-        public static (float x1, float y1, float z1,
-            float x2, float y2, float z2,
-            TriangleClassification classification, bool xProjection, double pushAngle)? Get2DDataFromTri(TriangleDataModel tri)
+        private static (float x, float z) GetHeightOnLine(
+            float height, float x1, float y1, float z1, float x2, float y2, float z2)
         {
-            double uphillAngle = WatchVariableSpecialUtilities.GetTriangleUphillAngle(tri);
-            double pushAngle = MoreMath.ReverseAngle(uphillAngle);
-
-            if (Config.CurrentMapGraphics.MapViewPitchValue == 0 &&
-                (Config.CurrentMapGraphics.MapViewYawValue == 0 ||
-                Config.CurrentMapGraphics.MapViewYawValue == 32768))
-            {
-                (float pointAX, float pointAY) = GetZOnLine(Config.CurrentMapGraphics.MapViewCenterZValue, tri.X1, tri.Y1, tri.Z1, tri.X2, tri.Y2, tri.Z2);
-                (float pointBX, float pointBY) = GetZOnLine(Config.CurrentMapGraphics.MapViewCenterZValue, tri.X1, tri.Y1, tri.Z1, tri.X3, tri.Y3, tri.Z3);
-                (float pointCX, float pointCY) = GetZOnLine(Config.CurrentMapGraphics.MapViewCenterZValue, tri.X2, tri.Y2, tri.Z2, tri.X3, tri.Y3, tri.Z3);
-
-                List<(float x, float y)> points = new List<(float x, float y)>();
-                if (!float.IsNaN(pointAX) && !float.IsNaN(pointAY)) points.Add((pointAX, pointAY));
-                if (!float.IsNaN(pointBX) && !float.IsNaN(pointBY)) points.Add((pointBX, pointBY));
-                if (!float.IsNaN(pointCX) && !float.IsNaN(pointCY)) points.Add((pointCX, pointCY));
-
-                if (points.Count == 3)
-                {
-                    double distAB = MoreMath.GetDistanceBetween(pointAX, pointAY, pointBX, pointBY);
-                    double distAC = MoreMath.GetDistanceBetween(pointAX, pointAY, pointCX, pointCY);
-                    double distBC = MoreMath.GetDistanceBetween(pointBX, pointBY, pointCX, pointCY);
-                    if (distAB >= distAC && distAB >= distBC)
-                    {
-                        points.RemoveAt(2); // AB is biggest, so remove C
-                    }
-                    else if (distAC >= distBC)
-                    {
-                        points.RemoveAt(1); // AC is biggest, so remove B
-                    }
-                    else
-                    {
-                        points.RemoveAt(0); // BC is biggest, so remove A
-                    }
-                }
-
-                if (points.Count == 2)
-                {
-                    return (points[0].x, points[0].y, Config.CurrentMapGraphics.MapViewCenterZValue,
-                        points[1].x, points[1].y, Config.CurrentMapGraphics.MapViewCenterZValue,
-                        tri.Classification, tri.XProjection, pushAngle);
-                }
-
-                return null;
-            }
-            else if (Config.CurrentMapGraphics.MapViewPitchValue == 0 &&
-               (Config.CurrentMapGraphics.MapViewYawValue == 16384 ||
-               Config.CurrentMapGraphics.MapViewYawValue == 49152))
-            {
-                (float pointAY, float pointAZ) = GetXOnLine(Config.CurrentMapGraphics.MapViewCenterXValue, tri.X1, tri.Y1, tri.Z1, tri.X2, tri.Y2, tri.Z2);
-                (float pointBY, float pointBZ) = GetXOnLine(Config.CurrentMapGraphics.MapViewCenterXValue, tri.X1, tri.Y1, tri.Z1, tri.X3, tri.Y3, tri.Z3);
-                (float pointCY, float pointCZ) = GetXOnLine(Config.CurrentMapGraphics.MapViewCenterXValue, tri.X2, tri.Y2, tri.Z2, tri.X3, tri.Y3, tri.Z3);
-
-                List<(float y, float z)> points = new List<(float y, float z)>();
-                if (!float.IsNaN(pointAY) && !float.IsNaN(pointAZ)) points.Add((pointAY, pointAZ));
-                if (!float.IsNaN(pointBY) && !float.IsNaN(pointBZ)) points.Add((pointBY, pointBZ));
-                if (!float.IsNaN(pointCY) && !float.IsNaN(pointCZ)) points.Add((pointCY, pointCZ));
-
-                if (points.Count == 3)
-                {
-                    double distAB = MoreMath.GetDistanceBetween(pointAY, pointAZ, pointBY, pointBZ);
-                    double distAC = MoreMath.GetDistanceBetween(pointAY, pointAZ, pointCY, pointCZ);
-                    double distBC = MoreMath.GetDistanceBetween(pointBY, pointBZ, pointCY, pointCZ);
-                    if (distAB >= distAC && distAB >= distBC)
-                    {
-                        points.RemoveAt(2); // AB is biggest, so remove C
-                    }
-                    else if (distAC >= distBC)
-                    {
-                        points.RemoveAt(1); // AC is biggest, so remove B
-                    }
-                    else
-                    {
-                        points.RemoveAt(0); // BC is biggest, so remove A
-                    }
-                }
-
-                if (points.Count == 2)
-                {
-                    return (Config.CurrentMapGraphics.MapViewCenterXValue, points[0].y, points[0].z,
-                        Config.CurrentMapGraphics.MapViewCenterXValue, points[1].y, points[1].z,
-                        tri.Classification, tri.XProjection, pushAngle);
-                }
-
-                return null;
-            }
-            else
-            {
-                (float pointAX, float pointAY, float pointAZ) = GetOnLine(
-                    Config.CurrentMapGraphics.MapViewCenterXValue, Config.CurrentMapGraphics.MapViewCenterYValue,
-                    Config.CurrentMapGraphics.MapViewCenterZValue, Config.CurrentMapGraphics.MapViewYawValue, Config.CurrentMapGraphics.MapViewPitchValue,
-                    tri.X1, tri.Y1, tri.Z1, tri.X2, tri.Y2, tri.Z2);
-                (float pointBX, float pointBY, float pointBZ) = GetOnLine(
-                    Config.CurrentMapGraphics.MapViewCenterXValue, Config.CurrentMapGraphics.MapViewCenterYValue,
-                    Config.CurrentMapGraphics.MapViewCenterZValue, Config.CurrentMapGraphics.MapViewYawValue, Config.CurrentMapGraphics.MapViewPitchValue,
-                    tri.X1, tri.Y1, tri.Z1, tri.X3, tri.Y3, tri.Z3);
-                (float pointCX, float pointCY, float pointCZ) = GetOnLine(
-                    Config.CurrentMapGraphics.MapViewCenterXValue, Config.CurrentMapGraphics.MapViewCenterYValue,
-                    Config.CurrentMapGraphics.MapViewCenterZValue, Config.CurrentMapGraphics.MapViewYawValue, Config.CurrentMapGraphics.MapViewPitchValue,
-                    tri.X2, tri.Y2, tri.Z2, tri.X3, tri.Y3, tri.Z3);
-
-                List<(float x, float y, float z)> points = new List<(float x, float y, float z)>();
-                if (!float.IsNaN(pointAX) && !float.IsNaN(pointAY) && !float.IsNaN(pointAZ)) points.Add((pointAX, pointAY, pointAZ));
-                if (!float.IsNaN(pointBX) && !float.IsNaN(pointBY) && !float.IsNaN(pointBZ)) points.Add((pointBX, pointBY, pointBZ));
-                if (!float.IsNaN(pointCX) && !float.IsNaN(pointCY) && !float.IsNaN(pointCZ)) points.Add((pointCX, pointCY, pointCZ));
-
-                if (points.Count == 3)
-                {
-                    double distAB = MoreMath.GetDistanceBetween(pointAX, pointAY, pointAZ, pointBX, pointBY, pointBZ);
-                    double distAC = MoreMath.GetDistanceBetween(pointAX, pointAY, pointAZ, pointCX, pointCY, pointCZ);
-                    double distBC = MoreMath.GetDistanceBetween(pointBX, pointBY, pointBZ, pointCX, pointCY, pointCZ);
-                    if (distAB >= distAC && distAB >= distBC)
-                    {
-                        points.RemoveAt(2); // AB is biggest, so remove C
-                    }
-                    else if (distAC >= distBC)
-                    {
-                        points.RemoveAt(1); // AC is biggest, so remove B
-                    }
-                    else
-                    {
-                        points.RemoveAt(0); // BC is biggest, so remove A
-                    }
-                }
-
-                if (points.Count == 2)
-                {
-                    return (points[0].x, points[0].y, points[0].z,
-                        points[1].x, points[1].y, points[1].z,
-                        tri.Classification, tri.XProjection, pushAngle);
-                }
-
-                return null;
-            }
-        }
-
-        private static (float y, float z) GetXOnLine(
-            float x, float x1, float y1, float z1, float x2, float y2, float z2)
-        {
-            if (x1 == x2 || x < Math.Min(x1, x2) || x > Math.Max(x1, x2))
+            if (y1 == y2 || height < Math.Min(y1, y2) || height > Math.Max(y1, y2))
                 return (float.NaN, float.NaN);
 
-            float p = (x - x1) / (x2 - x1);
-            float py = y1 + p * (y2 - y1);
-            float pz = z1 + p * (z2 - z1);
-            return (py, pz);
-        }
-
-        private static (float x, float z) GetYOnLine(
-            float y, float x1, float y1, float z1, float x2, float y2, float z2)
-        {
-            if (y1 == y2 || y < Math.Min(y1, y2) || y > Math.Max(y1, y2))
-                return (float.NaN, float.NaN);
-
-            float p = (y - y1) / (y2 - y1);
+            float p = (height - y1) / (y2 - y1);
             float px = x1 + p * (x2 - x1);
             float pz = z1 + p * (z2 - z1);
             return (px, pz);
-        }
-
-        private static (float x, float y) GetZOnLine(
-            float z, float x1, float y1, float z1, float x2, float y2, float z2)
-        {
-            if (z1 == z2 || z < Math.Min(z1, z2) || z > Math.Max(z1, z2))
-                return (float.NaN, float.NaN);
-
-            float p = (z - z1) / (z2 - z1);
-            float px = x1 + p * (x2 - x1);
-            float py = y1 + p * (y2 - y1);
-            return (px, py);
-        }
-
-        private static (float x, float y, float z) GetOnLine(
-            float x, float y, float z, float yaw, float pitch, float x1, float y1, float z1, float x2, float y2, float z2)
-        {
-            (float x0, float y0, float z0, float t0) = ((float, float, float, float))
-                MoreMath.GetPlaneLineIntersection(x, y, z, yaw, pitch, x1, y1, z1, x2, y2, z2);
-            if (t0 < 0 || t0 > 1) return (float.NaN, float.NaN, float.NaN);
-            return (x0, y0, z0);
         }
 
         public static void MaybeChangeMapCameraMode()
@@ -544,7 +329,7 @@ namespace STROOP.Map
 
         public static int MaybeReverse(int value)
         {
-            return Config.MapGui.checkBoxMapOptionsReverseDragging.Checked ? -1 * value : value;
+            return StroopMainForm.instance.mapTab.checkBoxMapOptionsReverseDragging.Checked ? -1 * value : value;
         }
 
         public static void CreateTrackBarContextMenuStrip(TrackBar trackBar)
@@ -569,7 +354,16 @@ namespace STROOP.Map
 
         public static bool IsAbleToShowUnitPrecision()
         {
-            return Config.CurrentMapGraphics.MapViewScaleValue > SpecialConfig.MapUnitPrecisionThreshold;
+            int xMin = (int)Config.MapGraphics.MapViewXMin - 1;
+            int xMax = (int)Config.MapGraphics.MapViewXMax + 1;
+            int zMin = (int)Config.MapGraphics.MapViewZMin - 1;
+            int zMax = (int)Config.MapGraphics.MapViewZMax + 1;
+
+            int xDiff = xMax - xMin;
+            int zDiff = zMax - zMin;
+
+            return xDiff < StroopMainForm.instance.mapTab.glControlMap2D.Width &&
+                zDiff < StroopMainForm.instance.mapTab.glControlMap2D.Height;
         }
 
         public static List<(double x, double y, double z)> ParsePoints(string text, bool useTriplets)
@@ -601,20 +395,6 @@ namespace STROOP.Map
             }
 
             return points;
-        }
-
-        public static double GetSignedDistToCameraPlane(TriangleDataModel tri)
-        {
-            return MoreMath.Average(
-                MoreMath.GetPlaneDistanceToPointSigned(
-                    Config.CurrentMapGraphics.MapViewCenterXValue, Config.CurrentMapGraphics.MapViewCenterYValue, Config.CurrentMapGraphics.MapViewCenterZValue,
-                    Config.CurrentMapGraphics.MapViewYawValue, Config.CurrentMapGraphics.MapViewPitchValue, tri.X1, tri.Y1, tri.Z1),
-                MoreMath.GetPlaneDistanceToPointSigned(
-                    Config.CurrentMapGraphics.MapViewCenterXValue, Config.CurrentMapGraphics.MapViewCenterYValue, Config.CurrentMapGraphics.MapViewCenterZValue,
-                    Config.CurrentMapGraphics.MapViewYawValue, Config.CurrentMapGraphics.MapViewPitchValue, tri.X2, tri.Y2, tri.Z2),
-                MoreMath.GetPlaneDistanceToPointSigned(
-                    Config.CurrentMapGraphics.MapViewCenterXValue, Config.CurrentMapGraphics.MapViewCenterYValue, Config.CurrentMapGraphics.MapViewCenterZValue,
-                    Config.CurrentMapGraphics.MapViewYawValue, Config.CurrentMapGraphics.MapViewPitchValue, tri.X3, tri.Y3, tri.Z3));
         }
     }
 }
