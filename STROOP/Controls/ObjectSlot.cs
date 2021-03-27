@@ -361,7 +361,7 @@ namespace STROOP
                     _backColor = newColor.Lighten(0.7);
                     break;
             }
-            Image newImage = Config.ObjectAssociations.GetObjectImage(_behavior, !_isActive).Value;
+            Image newImage = Config.ObjectAssociations.GetObjectImage(_behavior, !_isActive)?.Value ?? Config.ObjectAssociations.DefaultImage.Value;
             if (_objectImage != newImage)
             {
                 lock (_gfxLock)

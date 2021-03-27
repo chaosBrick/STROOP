@@ -23,7 +23,6 @@ namespace STROOP.Structs
         HashSet<ObjectBehaviorAssociation> _objAssoc = new HashSet<ObjectBehaviorAssociation>();
         List<SpawnHack> _spawnHacks = new List<SpawnHack>();
 
-        Lazy<Image> _defaultImage;
         Lazy<Image> _transparentDefaultImage;
 
         public Lazy<Image>
@@ -84,7 +83,7 @@ namespace STROOP.Structs
         public List<SpawnHack> SpawnHacks => _spawnHacks;
         public ObjectAssociations()
         {
-            _transparentDefaultImage = new Lazy<Image>(() => _defaultImage.Value.GetOpaqueImage(0.5f));
+            _transparentDefaultImage = new Lazy<Image>(() => DefaultImage.Value.GetOpaqueImage(0.5f));
         }
 
         public bool AddAssociation(ObjectBehaviorAssociation objAsooc)
@@ -140,7 +139,7 @@ namespace STROOP.Structs
 
             var assoc = FindObjectAssociation(behaviorCriteria);
             if (assoc == null)
-                return transparent ? _transparentDefaultImage : _defaultImage;
+                return transparent ? _transparentDefaultImage : DefaultImage;
 
             return transparent ? assoc.TransparentImage : assoc.Image;
         }
@@ -164,7 +163,7 @@ namespace STROOP.Structs
 
             var assoc = FindObjectAssociation(behaviorCriteria);
             if (assoc == null)
-                return _defaultImage;
+                return DefaultImage;
 
             return assoc.MapImage;
         }
@@ -257,7 +256,7 @@ namespace STROOP.Structs
             }
 
             _transparentDefaultImage?.Dispose();
-            _defaultImage?.Dispose();
+            DefaultImage?.Dispose();
             foreach (var field in GetImageFields())
             {
                 Lazy<Image> lazyImage = (Lazy<Image>)field.GetValue(this);
