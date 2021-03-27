@@ -1,4 +1,4 @@
-﻿namespace STROOP.Tabs
+﻿namespace STROOP.Tabs.MapTab
 {
     partial class MapTab
     {
@@ -215,8 +215,8 @@
             // 
             // splitContainerMap
             // 
-            this.splitContainerMap.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.splitContainerMap.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.splitContainerMap.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.splitContainerMap.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;

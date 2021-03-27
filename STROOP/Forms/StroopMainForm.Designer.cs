@@ -122,7 +122,6 @@ namespace STROOP
             this.tabPageOptions = new System.Windows.Forms.TabPage();
             this.optionsTab = new STROOP.Tabs.OptionsTab();
             this.tabPageMap = new System.Windows.Forms.TabPage();
-            this.mapTab = new STROOP.Tabs.MapTab();
             this.tabPageTas = new System.Windows.Forms.TabPage();
             this.tasTab = new STROOP.Tabs.TasTab();
             this.tabPageCustom = new System.Windows.Forms.TabPage();
@@ -149,6 +148,7 @@ namespace STROOP
             this.tabPageObject = new System.Windows.Forms.TabPage();
             this.objectTab = new STROOP.Tabs.ObjectTab();
             this.tabControlMain = new STROOP.TabControlEx();
+            this.mapTab = new STROOP.Tabs.MapTab.MapTab();
             this.panelConnect.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
@@ -1156,16 +1156,6 @@ namespace STROOP
             this.tabPageMap.TabIndex = 35;
             this.tabPageMap.Text = "Map";
             // 
-            // mapTab
-            // 
-            this.mapTab.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.mapTab.Location = new System.Drawing.Point(0, 0);
-            this.mapTab.Name = "mapTab";
-            this.mapTab.Size = new System.Drawing.Size(0, 0);
-            this.mapTab.TabIndex = 0;
-            // 
             // tabPageTas
             // 
             this.tabPageTas.BackColor = System.Drawing.SystemColors.Control;
@@ -1472,6 +1462,16 @@ namespace STROOP
             this.tabControlMain.Size = new System.Drawing.Size(923, 489);
             this.tabControlMain.TabIndex = 3;
             // 
+            // mapTab
+            // 
+            this.mapTab.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.mapTab.Location = new System.Drawing.Point(0, 0);
+            this.mapTab.Name = "mapTab";
+            this.mapTab.Size = new System.Drawing.Size(915, 463);
+            this.mapTab.TabIndex = 0;
+            // 
             // StroopMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1623,7 +1623,6 @@ namespace STROOP
         private TabPage tabPageTas;
         internal Tabs.TasTab tasTab;
         private TabPage tabPageMap;
-        internal Tabs.MapTab mapTab;
         private TabPage tabPageOptions;
         internal Tabs.OptionsTab optionsTab;
         private TabPage tabPageMemory;
@@ -1672,6 +1671,7 @@ namespace STROOP
         internal Tabs.GhostTab.GhostTab ghostTab;
         private TabPage tabPageWater;
         private Tabs.WaterTab waterTab;
+        private Tabs.MapTab.MapTab mapTab;
     }
 }
 

@@ -9,7 +9,7 @@ using STROOP.Structs.Configurations;
 using STROOP.Map;
 using STROOP.Map.Map3D;
 
-namespace STROOP.Tabs
+namespace STROOP.Tabs.MapTab
 {
     public partial class MapTab : STROOPTab
     {

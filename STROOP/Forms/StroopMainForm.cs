@@ -22,7 +22,7 @@ namespace STROOP
     public partial class StroopMainForm : Form
     {
         public static StroopMainForm instance { get; private set; }
-
+        
         const string _version = "Refactor 0.1";
 
         ScriptParser _scriptParser;

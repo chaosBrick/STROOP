@@ -667,10 +667,10 @@
     <Compile Include="Tabs\MainSaveTab.Designer.cs">
       <DependentUpon>MainSaveTab.cs</DependentUpon>
     </Compile>
-    <Compile Include="Tabs\MapTab.cs">
+    <Compile Include="Tabs\MapTab\MapTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\MapTab.Designer.cs">
+    <Compile Include="Tabs\MapTab\MapTab.Designer.cs">
       <DependentUpon>MapTab.cs</DependentUpon>
     </Compile>
     <Compile Include="Tabs\MarioTab.cs">
@@ -1060,7 +1060,7 @@
     <EmbeddedResource Include="Tabs\MainSaveTab.resx">
       <DependentUpon>MainSaveTab.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\MapTab.resx">
+    <EmbeddedResource Include="Tabs\MapTab\MapTab.resx">
       <DependentUpon>MapTab.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Tabs\MarioTab.resx">
