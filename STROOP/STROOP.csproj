@@ -727,6 +727,12 @@
     <Compile Include="Tabs\PuTab.Designer.cs">
       <DependentUpon>PuTab.cs</DependentUpon>
     </Compile>
+    <Compile Include="Tabs\QuarterFramesTab.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Tabs\QuarterFramesTab.Designer.cs">
+      <DependentUpon>QuarterFramesTab.cs</DependentUpon>
+    </Compile>
     <Compile Include="Tabs\ScriptTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -786,6 +792,12 @@
     </Compile>
     <Compile Include="Tabs\WarpTab.Designer.cs">
       <DependentUpon>WarpTab.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tabs\WaterTab.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Tabs\WaterTab.Designer.cs">
+      <DependentUpon>WaterTab.cs</DependentUpon>
     </Compile>
     <Compile Include="Ttc\TtcPendulum2.cs" />
     <Compile Include="Ttc\TtcRng2.cs" />
@@ -1078,6 +1090,9 @@
     <EmbeddedResource Include="Tabs\PuTab.resx">
       <DependentUpon>PuTab.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Tabs\QuarterFramesTab.resx">
+      <DependentUpon>QuarterFramesTab.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Tabs\ScriptTab.resx">
       <DependentUpon>ScriptTab.cs</DependentUpon>
     </EmbeddedResource>
@@ -1107,6 +1122,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Tabs\WarpTab.resx">
       <DependentUpon>WarpTab.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tabs\WaterTab.resx">
+      <DependentUpon>WaterTab.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.manifest" />
     <None Include="Mappings\MappingJP.map">

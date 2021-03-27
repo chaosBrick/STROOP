@@ -358,14 +358,6 @@ namespace STROOP
                                 stroopTab.Size = page.Size;
                             stroopTab.UpdateOrInitialize(active);
                         }
-                        else if (active && pageControl is WatchVariableFlowLayoutPanel watchVariablePanel)
-                        {
-                            if (watchVariablePanel.Size != page.Size)
-                                watchVariablePanel.Size = page.Size;
-                            if (!watchVariablePanel.initialized)
-                                watchVariablePanel.DeferredInitialize();
-                            watchVariablePanel.UpdatePanel();
-                        }
                 }
 
                 WatchVariableLockManager.Update();
