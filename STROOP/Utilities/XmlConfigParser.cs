@@ -212,13 +212,6 @@ namespace STROOP.Utilities
             return objectData;
         }
 
-        struct SomeStructYo
-        {
-            public Color color;
-            public string imagePath, mapImagePath;
-        }
-
-
         class AssocConfig
         {
             public static string DefaultImagePath = "", EmptyImagePath = "", ImageDirectory = "", MapImageDirectory = "", OverlayImageDirectory = "";
@@ -244,13 +237,8 @@ namespace STROOP.Utilities
             Dictionary<string, string> assocConfigDictionary = new Dictionary<string, string>();
 
             string
-                marioImagePath = "", holpMapImagePath = "", homeMapImagePath = "", intendedNextPositionImagePath = "", hudImagePath = "", debugImagePath = "",
+                marioImagePath = "", hudImagePath = "", debugImagePath = "",
                 miscImagePath = "", cameraImagePath = "", marioMapImagePath = "", cameraMapImagePath = "",
-                blueMarioMapImagePath = "", greenMarioMapImagePath = "", orangeMarioMapImagePath = "", purpleMarioMapImagePath = "",
-                triangleFloorImagePath = "", triangleWallImagePath = "", triangleCeilingImagePath = "", triangleOtherImagePath = "", hitboxHackTrisImagePath = "",
-                cellGridlinesImagePath = "", currentCellImagePath = "", unitGridlinesImagePath = "", currentUnitImagePath = "",
-                nextPositionsImagePath = "", arrowImagePath = "", iwerlipsesImagePath = "", cylinderImagePath = "", sphereImagePath = "",
-                pathImagePath = "", customPointsImagePath = "", customGridlinesImagePath = "",
                 selectedOverlayImagePath = "", trackedAndShownOverlayImagePath = "", trackedNotShownOverlayImagePath = "",
                 stoodOnOverlayImagePath = "", riddenOverlayImagePath = "", heldOverlayImagePath = "", interactionOverlayImagePath = "",
                 usedOverlayImagePath = "", closestOverlayImagePath = "", cameraOverlayImagePath = "", cameraHackOverlayImagePath = "",

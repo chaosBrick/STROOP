@@ -18,7 +18,7 @@ namespace STROOP.Tabs.GhostTab
         {
             var target = WatchVariableSpecialUtilities.dictionary;
             Func<Func<GhostFrame, object>, Func<object>> displayGhostVarFloat =
-                selectMember => (() => selectMember(instance.lastValidPlaybackFrame));
+                selectMember => (() => selectMember(instance.currentGhostFrame));
 
             target.Add("GhostX", ((uint _) => displayGhostVarFloat(frame => frame.position.X)(), (object _, uint __) => false));
             target.Add("GhostY", ((uint _) => displayGhostVarFloat(frame => frame.position.Y)(), (object _, uint __) => false));
@@ -39,12 +39,17 @@ namespace STROOP.Tabs.GhostTab
         Ghost instantReplayOld;
         Ghost selectedGhost => listBoxGhosts.SelectedItem as Ghost;
         GhostFrame lastValidPlaybackFrame => selectedGhost?.lastValidPlaybackFrame ?? default(GhostFrame);
+        GhostFrame currentGhostFrame;
 
         RomHack hack;
+
+        public Vector3 GhostPosition { get; private set; }
+        public uint GhostAngle { get; private set; }
 
         public GhostTab()
         {
             InitializeComponent();
+            watchVariablePanelGhost.SetGroups(null, null);
             listBoxGhosts.KeyDown += listBoxGhosts_KeyDown;
 
             instance = this;
@@ -100,7 +105,6 @@ namespace STROOP.Tabs.GhostTab
                     case 0:
                         continue;
                     case 1:
-                        byte[] marioGfx = null;
                         currentTimer = BitConverter.ToInt32(theEntireRam, (int)(MiscConfig.GlobalTimerAddress & 0x00FFFFFF));
                         if (currentTimer == lastCurrentTimer)
                             goto boring;
@@ -184,7 +188,7 @@ namespace STROOP.Tabs.GhostTab
                     int i = (tm + globalTimer) & 0x7F;
                     GhostFrame newFrame = default(GhostFrame);
                     var index = globalTimer + tm - selectedGhost.playbackBaseFrame;
-                    if (index < 0 || selectedGhost.playbackFrames.TryGetValue((uint)index, out newFrame))
+                    if (index >= 0 && selectedGhost.playbackFrames.TryGetValue((uint)index, out newFrame))
                         selectedGhost.lastValidPlaybackFrame = newFrame;
 
                     Array.Copy(BitConverter.GetBytes(lastValidPlaybackFrame.position.X), 0, buffer, i * 0x20 + 0x00, 4);
@@ -196,6 +200,16 @@ namespace STROOP.Tabs.GhostTab
                     Array.Copy(BitConverter.GetBytes(lastValidPlaybackFrame.oRoll), 0, buffer, i * 0x20 + 0x18, 4);
                     Array.Copy(BitConverter.GetBytes(lastValidPlaybackFrame.animationFrame), 0, buffer, i * 0x20 + 0x1E, 2);
                 }
+
+                GhostFrame currentFrame;
+                var idx = globalTimer - selectedGhost.playbackBaseFrame;
+                if (idx >= 0 && selectedGhost.playbackFrames.TryGetValue((uint)idx, out currentFrame))
+                {
+                    this.currentGhostFrame = currentFrame;
+                    GhostPosition = currentFrame.position;
+                    GhostAngle = currentFrame.oYaw;
+                }
+
             }
             else
             {

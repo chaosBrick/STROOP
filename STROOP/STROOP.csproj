@@ -431,120 +431,121 @@
     <Compile Include="LoadingHandler.cs" />
     <Compile Include="Managers\IVariableAdder.cs" />
     <Compile Include="Managers\VariableAdder.cs" />
-    <Compile Include="Map\MapAllObjectCeilingObject.cs" />
-    <Compile Include="Map\MapAllObjectWallObject.cs" />
-    <Compile Include="Map\MapCustomPositionAngleArrowObject.cs" />
-    <Compile Include="Map\MapWatersObject.cs" />
-    <Compile Include="Map\MapCustomSpherePointsObject.cs" />
-    <Compile Include="Map\MapFacingDividerObject.cs" />
-    <Compile Include="Map\MapSwooperEffectiveTargetArrowObject.cs" />
-    <Compile Include="Map\MapSectorObject.cs" />
-    <Compile Include="Map\MapEffectiveHitboxCylinderObject.cs" />
-    <Compile Include="Map\MapEffectiveHurtboxCylinderObject.cs" />
-    <Compile Include="Map\MapAllObjectFloorObject.cs" />
-    <Compile Include="Map\MapAllObjectsWithNameObject.cs" />
-    <Compile Include="Map\MapPunchDetectorObject.cs" />
-    <Compile Include="Map\MapHurtboxCylinderObject.cs" />
-    <Compile Include="Map\MapMarioFloorArrowObject.cs" />
-    <Compile Include="Map\MapMarioTwirlArrowObject.cs" />
-    <Compile Include="Map\MapMarioSlidingArrowObject.cs" />
-    <Compile Include="Map\MapMarioIntendedArrowObject.cs" />
-    <Compile Include="Map\MapMarioMovingArrowObject.cs" />
-    <Compile Include="Map\MapObjectAngleToMarioArrowObject.cs" />
-    <Compile Include="Map\MapMarioFacingArrowObject.cs" />
-    <Compile Include="Map\MapObjectGraphicsArrowObject.cs" />
-    <Compile Include="Map\MapObjectMovingArrowObject.cs" />
-    <Compile Include="Map\MapObjectFacingArrowObject.cs" />
-    <Compile Include="Map\MapObjectCustomArrowObject.cs" />
-    <Compile Include="Map\MapHomeLineObject.cs" />
-    <Compile Include="Map\MapCeilingObject.cs" />
-    <Compile Include="Map\MapBackgroundObject.cs" />
-    <Compile Include="Map\MapAngleRangeObject.cs" />
-    <Compile Include="Map\MapMarioWallObject.cs" />
-    <Compile Include="Map\MapLineSegmentObject.cs" />
-    <Compile Include="Map\MapGhostObject.cs" />
-    <Compile Include="Map\MapPunchFloorObject.cs" />
-    <Compile Include="Map\MapCustomCylinderPointsObject.cs" />
-    <Compile Include="Map\MapCUpFloorObject.cs" />
-    <Compile Include="Map\MapPreviousPositionsObject.cs" />
-    <Compile Include="Map\MapArrowObject.cs" />
-    <Compile Include="Map\MapMapObject.cs" />
-    <Compile Include="Map\MapDrawType.cs" />
-    <Compile Include="Map\MapAggregatedPathObject.cs" />
-    <Compile Include="Map\MapPathObjectSegment.cs" />
-    <Compile Include="Map\MapCustomPositionAngleObject.cs" />
-    <Compile Include="Map\MapCompassObject.cs" />
-    <Compile Include="Map\MapSphereObject.cs" />
-    <Compile Include="Map\MapCylinderObject.cs" />
-    <Compile Include="Map\MapHitboxHackTriangleObject.cs" />
-    <Compile Include="Map\MapFloorObject.cs" />
-    <Compile Include="Map\MapTriangleObject.cs" />
-    <Compile Include="Map\MapIwerlipsesObject.cs" />
-    <Compile Include="Map\MapCustomGridlinesObject.cs" />
-    <Compile Include="Map\MapCustomBackgroundObject.cs" />
-    <Compile Include="Map\MapLevelCeilingObject.cs" />
-    <Compile Include="Map\MapLevelFloorObject.cs" />
-    <Compile Include="Map\MapLevelTriangleObjectI.cs" />
-    <Compile Include="Map\MapLevelWallObject.cs" />
-    <Compile Include="Map\MapCustomMapObject.cs" />
-    <Compile Include="Map\MapPathObject.cs" />
-    <Compile Include="Map\MapCustomCeilingObject.cs" />
-    <Compile Include="Map\MapCustomWallObject.cs" />
-    <Compile Include="Map\MapCustomUnitPointsObject.cs" />
-    <Compile Include="Map\MapMarioCeilingObject.cs" />
-    <Compile Include="Map\MapHitboxCylinderObject.cs" />
-    <Compile Include="Map\MapDrawDistanceSphereObject.cs" />
-    <Compile Include="Map\MapHomeObject.cs" />
-    <Compile Include="Map\MapCustomFloorObject.cs" />
-    <Compile Include="Map\MapObjectCeilingObject.cs" />
-    <Compile Include="Map\MapObjectWallObject.cs" />
-    <Compile Include="Map\MapObjectFloorObject.cs" />
-    <Compile Include="Map\MapNextPositionsObject.cs" />
-    <Compile Include="Map\MapPointObject.cs" />
-    <Compile Include="Map\MapPuGridlinesObject.cs" />
-    <Compile Include="Map\MapFloatGridlinesObject.cs" />
-    <Compile Include="Map\MapDrawingObject.cs" />
-    <Compile Include="Map\MapWallObject.cs" />
-    <Compile Include="Map\MapSelfObject.cs" />
-    <Compile Include="Map\MapTangibilitySphereObject.cs" />
-    <Compile Include="Map\MapCustomSphereObject.cs" />
-    <Compile Include="Map\MapCustomCylinderObject.cs" />
-    <Compile Include="Map\MapCurrentUnitObject.cs" />
-    <Compile Include="Map\MapGraphics.cs" />
-    <Compile Include="Map\MapLineObject.cs" />
-    <Compile Include="Map\MapCellGridlinesObject.cs" />
-    <Compile Include="Map\MapCurrentBackgroundObject.cs" />
-    <Compile Include="Map\MapCameraObject.cs" />
-    <Compile Include="Map\MapMarioFloorObject.cs" />
-    <Compile Include="Map\MapObjectObject.cs" />
-    <Compile Include="Map\MapCurrentCellObject.cs" />
-    <Compile Include="Map\MapCircleObject.cs" />
-    <Compile Include="Map\MapQuadObject.cs" />
-    <Compile Include="Map\MapUnitGridlinesObject.cs" />
-    <Compile Include="Map\MapUtilities.cs" />
-    <Compile Include="Map\MapHorizontalTriangleObject.cs" />
-    <Compile Include="Map\MapCurrentMapObject.cs" />
-    <Compile Include="Map\MapIconRectangleObject.cs" />
-    <Compile Include="Map\MapIconPointObject.cs" />
-    <Compile Include="Map\MapHolpObject.cs" />
-    <Compile Include="Map\MapMarioObject.cs" />
-    <Compile Include="Map\MapIconObject.cs" />
-    <Compile Include="Map\MapObject.cs" />
-    <Compile Include="Map\MapTracker.cs">
+    <Compile Include="Tabs\MapTab\GraphicsUtil.cs" />
+    <Compile Include="Tabs\MapTab\MapAllObjectCeilingObject.cs" />
+    <Compile Include="Tabs\MapTab\MapAllObjectWallObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCustomPositionAngleArrowObject.cs" />
+    <Compile Include="Tabs\MapTab\MapWatersObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCustomSpherePointsObject.cs" />
+    <Compile Include="Tabs\MapTab\MapFacingDividerObject.cs" />
+    <Compile Include="Tabs\MapTab\MapSwooperEffectiveTargetArrowObject.cs" />
+    <Compile Include="Tabs\MapTab\MapSectorObject.cs" />
+    <Compile Include="Tabs\MapTab\MapEffectiveHitboxCylinderObject.cs" />
+    <Compile Include="Tabs\MapTab\MapEffectiveHurtboxCylinderObject.cs" />
+    <Compile Include="Tabs\MapTab\MapAllObjectFloorObject.cs" />
+    <Compile Include="Tabs\MapTab\MapAllObjectsWithNameObject.cs" />
+    <Compile Include="Tabs\MapTab\MapPunchDetectorObject.cs" />
+    <Compile Include="Tabs\MapTab\MapHurtboxCylinderObject.cs" />
+    <Compile Include="Tabs\MapTab\MapMarioFloorArrowObject.cs" />
+    <Compile Include="Tabs\MapTab\MapMarioTwirlArrowObject.cs" />
+    <Compile Include="Tabs\MapTab\MapMarioSlidingArrowObject.cs" />
+    <Compile Include="Tabs\MapTab\MapMarioIntendedArrowObject.cs" />
+    <Compile Include="Tabs\MapTab\MapMarioMovingArrowObject.cs" />
+    <Compile Include="Tabs\MapTab\MapObjectAngleToMarioArrowObject.cs" />
+    <Compile Include="Tabs\MapTab\MapMarioFacingArrowObject.cs" />
+    <Compile Include="Tabs\MapTab\MapObjectGraphicsArrowObject.cs" />
+    <Compile Include="Tabs\MapTab\MapObjectMovingArrowObject.cs" />
+    <Compile Include="Tabs\MapTab\MapObjectFacingArrowObject.cs" />
+    <Compile Include="Tabs\MapTab\MapObjectCustomArrowObject.cs" />
+    <Compile Include="Tabs\MapTab\MapHomeLineObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCeilingObject.cs" />
+    <Compile Include="Tabs\MapTab\MapBackgroundObject.cs" />
+    <Compile Include="Tabs\MapTab\MapAngleRangeObject.cs" />
+    <Compile Include="Tabs\MapTab\MapMarioWallObject.cs" />
+    <Compile Include="Tabs\MapTab\MapLineSegmentObject.cs" />
+    <Compile Include="Tabs\MapTab\MapGhostObject.cs" />
+    <Compile Include="Tabs\MapTab\MapPunchFloorObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCustomCylinderPointsObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCUpFloorObject.cs" />
+    <Compile Include="Tabs\MapTab\MapPreviousPositionsObject.cs" />
+    <Compile Include="Tabs\MapTab\MapArrowObject.cs" />
+    <Compile Include="Tabs\MapTab\MapMapObject.cs" />
+    <Compile Include="Tabs\MapTab\MapDrawType.cs" />
+    <Compile Include="Tabs\MapTab\MapAggregatedPathObject.cs" />
+    <Compile Include="Tabs\MapTab\MapPathObjectSegment.cs" />
+    <Compile Include="Tabs\MapTab\MapCustomPositionAngleObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCompassObject.cs" />
+    <Compile Include="Tabs\MapTab\MapSphereObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCylinderObject.cs" />
+    <Compile Include="Tabs\MapTab\MapHitboxHackTriangleObject.cs" />
+    <Compile Include="Tabs\MapTab\MapFloorObject.cs" />
+    <Compile Include="Tabs\MapTab\MapTriangleObject.cs" />
+    <Compile Include="Tabs\MapTab\MapIwerlipsesObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCustomGridlinesObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCustomBackgroundObject.cs" />
+    <Compile Include="Tabs\MapTab\MapLevelCeilingObject.cs" />
+    <Compile Include="Tabs\MapTab\MapLevelFloorObject.cs" />
+    <Compile Include="Tabs\MapTab\MapLevelTriangleObjectI.cs" />
+    <Compile Include="Tabs\MapTab\MapLevelWallObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCustomMapObject.cs" />
+    <Compile Include="Tabs\MapTab\MapPathObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCustomCeilingObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCustomWallObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCustomUnitPointsObject.cs" />
+    <Compile Include="Tabs\MapTab\MapMarioCeilingObject.cs" />
+    <Compile Include="Tabs\MapTab\MapHitboxCylinderObject.cs" />
+    <Compile Include="Tabs\MapTab\MapDrawDistanceSphereObject.cs" />
+    <Compile Include="Tabs\MapTab\MapHomeObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCustomFloorObject.cs" />
+    <Compile Include="Tabs\MapTab\MapObjectCeilingObject.cs" />
+    <Compile Include="Tabs\MapTab\MapObjectWallObject.cs" />
+    <Compile Include="Tabs\MapTab\MapObjectFloorObject.cs" />
+    <Compile Include="Tabs\MapTab\MapNextPositionsObject.cs" />
+    <Compile Include="Tabs\MapTab\MapPointObject.cs" />
+    <Compile Include="Tabs\MapTab\MapPuGridlinesObject.cs" />
+    <Compile Include="Tabs\MapTab\MapFloatGridlinesObject.cs" />
+    <Compile Include="Tabs\MapTab\MapDrawingObject.cs" />
+    <Compile Include="Tabs\MapTab\MapWallObject.cs" />
+    <Compile Include="Tabs\MapTab\MapSelfObject.cs" />
+    <Compile Include="Tabs\MapTab\MapTangibilitySphereObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCustomSphereObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCustomCylinderObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCurrentUnitObject.cs" />
+    <Compile Include="Tabs\MapTab\MapGraphics.cs" />
+    <Compile Include="Tabs\MapTab\MapLineObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCellGridlinesObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCurrentBackgroundObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCameraObject.cs" />
+    <Compile Include="Tabs\MapTab\MapMarioFloorObject.cs" />
+    <Compile Include="Tabs\MapTab\MapObjectObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCurrentCellObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCircleObject.cs" />
+    <Compile Include="Tabs\MapTab\MapQuadObject.cs" />
+    <Compile Include="Tabs\MapTab\MapUnitGridlinesObject.cs" />
+    <Compile Include="Tabs\MapTab\MapUtilities.cs" />
+    <Compile Include="Tabs\MapTab\MapHorizontalTriangleObject.cs" />
+    <Compile Include="Tabs\MapTab\MapCurrentMapObject.cs" />
+    <Compile Include="Tabs\MapTab\MapIconRectangleObject.cs" />
+    <Compile Include="Tabs\MapTab\MapIconPointObject.cs" />
+    <Compile Include="Tabs\MapTab\MapHolpObject.cs" />
+    <Compile Include="Tabs\MapTab\MapMarioObject.cs" />
+    <Compile Include="Tabs\MapTab\MapIconObject.cs" />
+    <Compile Include="Tabs\MapTab\MapObject.cs" />
+    <Compile Include="Tabs\MapTab\MapTracker.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Map\MapTracker.Designer.cs">
+    <Compile Include="Tabs\MapTab\MapTracker.Designer.cs">
       <DependentUpon>MapTracker.cs</DependentUpon>
     </Compile>
-    <Compile Include="Map\MapTrackerFlowLayoutPanel.cs">
+    <Compile Include="Tabs\MapTab\MapTrackerFlowLayoutPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Map\MapSemaphore.cs" />
-    <Compile Include="Map\MapSemaphoreManager.cs" />
-    <Compile Include="Map\Map3D\Map3DCamera.cs" />
-    <Compile Include="Map\Map3D\Map3DGraphics.cs" />
-    <Compile Include="Map\Map3D\Map3DVertex.cs" />
-    <Compile Include="Map\MapObjectSettings.cs" />
+    <Compile Include="Tabs\MapTab\MapSemaphore.cs" />
+    <Compile Include="Tabs\MapTab\MapSemaphoreManager.cs" />
+    <Compile Include="Tabs\MapTab\Map3D\Map3DCamera.cs" />
+    <Compile Include="Tabs\MapTab\Map3D\Map3DGraphics.cs" />
+    <Compile Include="Tabs\MapTab\Map3D\Map3DVertex.cs" />
+    <Compile Include="Tabs\MapTab\MapObjectSettings.cs" />
     <Compile Include="Models\PanModel.cs" />
     <Compile Include="Script\ScriptEngine.cs" />
     <Compile Include="Script\TokenScript.cs" />
@@ -673,6 +674,13 @@
     <Compile Include="Tabs\MapTab\MapTab.Designer.cs">
       <DependentUpon>MapTab.cs</DependentUpon>
     </Compile>
+    <Compile Include="Tabs\MapTab\ObjectDescriptionAttribute.cs" />
+    <Compile Include="Tabs\MapTab\Renderers\CircleRenderer.cs" />
+    <Compile Include="Tabs\MapTab\Renderers\InstanceRenderer.cs" />
+    <Compile Include="Tabs\MapTab\Renderers\LineRenderer.cs" />
+    <Compile Include="Tabs\MapTab\Renderers\Renderer.cs" />
+    <Compile Include="Tabs\MapTab\Renderers\SpriteRenderer.cs" />
+    <Compile Include="Tabs\MapTab\Renderers\TriangleRenderer.cs" />
     <Compile Include="Tabs\MarioTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -908,6 +916,7 @@
     <Compile Include="Utilities\EasingUtilities.cs" />
     <Compile Include="Utilities\EnumUtilities.cs" />
     <Compile Include="Utilities\FlyingUtilities.cs" />
+    <Compile Include="Utilities\GeneralUtilities.cs" />
     <Compile Include="Utilities\InGameFunctionCall.cs" />
     <Compile Include="Utilities\MathOperationUtilities.cs" />
     <Compile Include="Calculators\WallDisplacementCalculator.cs" />
@@ -1334,7 +1343,7 @@
     <EmbeddedResource Include="Forms\VariableCreationForm.resx">
       <DependentUpon>VariableCreationForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Map\MapTracker.resx">
+    <EmbeddedResource Include="Tabs\MapTab\MapTracker.resx">
       <DependentUpon>MapTracker.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -1496,7 +1505,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Map\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>del "$(TargetDir)OpenTK.dll.config"

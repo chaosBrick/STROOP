@@ -366,7 +366,7 @@ namespace STROOP.Tabs
             }
         }
 
-        public void Update(bool updateView)
+        public override void Update(bool updateView)
         {
             if (!updateView) return;
 

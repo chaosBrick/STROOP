@@ -59,7 +59,6 @@ namespace STROOP.Utilities
             LastHome,
             GoombaProjection,
             KoopaTheQuick,
-            Ghost,
             Tri,
             ObjTri,
             Wall,
@@ -118,6 +117,8 @@ namespace STROOP.Utilities
                 posAngleType == PositionAngleTypeEnum.FirstHome ||
                 posAngleType == PositionAngleTypeEnum.LastHome;
         }
+
+        protected PositionAngle() { }
 
         private PositionAngle(
             PositionAngleTypeEnum posAngleType,
@@ -217,7 +218,6 @@ namespace STROOP.Utilities
         public static PositionAngle Holp = new PositionAngle(PositionAngleTypeEnum.Holp);
         public static PositionAngle Selected = new PositionAngle(PositionAngleTypeEnum.Selected);
         public static PositionAngle KoopaTheQuick = new PositionAngle(PositionAngleTypeEnum.KoopaTheQuick);
-        public static PositionAngle Ghost = new PositionAngle(PositionAngleTypeEnum.Ghost);
         public static PositionAngle Camera = new PositionAngle(PositionAngleTypeEnum.Camera);
         public static PositionAngle CameraFocus = new PositionAngle(PositionAngleTypeEnum.CameraFocus);
         public static PositionAngle CamHackCamera = new PositionAngle(PositionAngleTypeEnum.CamHackCamera);
@@ -375,10 +375,6 @@ namespace STROOP.Utilities
             else if (parts.Count == 1 && parts[0] == "koopathequick")
             {
                 return KoopaTheQuick;
-            }
-            else if (parts.Count == 1 && parts[0] == "ghost")
-            {
-                return Ghost;
             }
             else if (parts.Count == 3 && (parts[0] == "tri" || parts[0] == "triangle"))
             {
@@ -583,7 +579,7 @@ namespace STROOP.Utilities
 
 
 
-        public double X
+        public virtual double X
         {
             get
             {
@@ -619,12 +615,12 @@ namespace STROOP.Utilities
                     case PositionAngleTypeEnum.ObjScale:
                         return Config.Stream.GetSingle(Address.Value + ObjectConfig.ScaleWidthOffset);
                     case PositionAngleTypeEnum.Selected:
-                    {
-                        List<uint> objAddresses = Config.ObjectSlotsManager.SelectedSlotsAddresses;
-                        if (objAddresses.Count == 0) return Double.NaN;
-                        uint objAddress = objAddresses[0];
-                        return Config.Stream.GetSingle(objAddress + ObjectConfig.XOffset);
-                    }
+                        {
+                            List<uint> objAddresses = Config.ObjectSlotsManager.SelectedSlotsAddresses;
+                            if (objAddresses.Count == 0) return Double.NaN;
+                            uint objAddress = objAddresses[0];
+                            return Config.Stream.GetSingle(objAddress + ObjectConfig.XOffset);
+                        }
                     case PositionAngleTypeEnum.First:
                         return GetObjectValue(Text, true, CoordinateAngle.X);
                     case PositionAngleTypeEnum.Last:
@@ -637,8 +633,6 @@ namespace STROOP.Utilities
                         return GetGoombaProjection(Address.Value).x;
                     case PositionAngleTypeEnum.KoopaTheQuick:
                         return PlushUtilities.GetX();
-                    case PositionAngleTypeEnum.Ghost:
-                        return Config.Stream.GetSingle(GhostHackConfig.CurrentGhostStruct + GhostHackConfig.XOffset);
                     case PositionAngleTypeEnum.Tri:
                         return GetTriangleVertexComponent(Address.Value, Index.Value, Coordinate.X);
                     case PositionAngleTypeEnum.ObjTri:
@@ -687,7 +681,7 @@ namespace STROOP.Utilities
             }
         }
 
-        public double Y
+        public virtual double Y
         {
             get
             {
@@ -723,12 +717,12 @@ namespace STROOP.Utilities
                     case PositionAngleTypeEnum.ObjScale:
                         return Config.Stream.GetSingle(Address.Value + ObjectConfig.ScaleHeightOffset);
                     case PositionAngleTypeEnum.Selected:
-                    {
-                        List<uint> objAddresses = Config.ObjectSlotsManager.SelectedSlotsAddresses;
-                        if (objAddresses.Count == 0) return Double.NaN;
-                        uint objAddress = objAddresses[0];
-                        return Config.Stream.GetSingle(objAddress + ObjectConfig.YOffset);
-                    }
+                        {
+                            List<uint> objAddresses = Config.ObjectSlotsManager.SelectedSlotsAddresses;
+                            if (objAddresses.Count == 0) return Double.NaN;
+                            uint objAddress = objAddresses[0];
+                            return Config.Stream.GetSingle(objAddress + ObjectConfig.YOffset);
+                        }
                     case PositionAngleTypeEnum.First:
                         return GetObjectValue(Text, true, CoordinateAngle.Y);
                     case PositionAngleTypeEnum.Last:
@@ -741,8 +735,6 @@ namespace STROOP.Utilities
                         return Config.Stream.GetSingle(Address.Value + ObjectConfig.YOffset);
                     case PositionAngleTypeEnum.KoopaTheQuick:
                         return PlushUtilities.GetY();
-                    case PositionAngleTypeEnum.Ghost:
-                        return Config.Stream.GetSingle(GhostHackConfig.CurrentGhostStruct + GhostHackConfig.YOffset);
                     case PositionAngleTypeEnum.Tri:
                         return GetTriangleVertexComponent(Address.Value, Index.Value, Coordinate.Y);
                     case PositionAngleTypeEnum.ObjTri:
@@ -791,7 +783,7 @@ namespace STROOP.Utilities
             }
         }
 
-        public double Z
+        public virtual double Z
         {
             get
             {
@@ -827,12 +819,12 @@ namespace STROOP.Utilities
                     case PositionAngleTypeEnum.ObjScale:
                         return Config.Stream.GetSingle(Address.Value + ObjectConfig.ScaleDepthOffset);
                     case PositionAngleTypeEnum.Selected:
-                    {
-                        List<uint> objAddresses = Config.ObjectSlotsManager.SelectedSlotsAddresses;
-                        if (objAddresses.Count == 0) return Double.NaN;
-                        uint objAddress = objAddresses[0];
-                        return Config.Stream.GetSingle(objAddress + ObjectConfig.ZOffset);
-                    }
+                        {
+                            List<uint> objAddresses = Config.ObjectSlotsManager.SelectedSlotsAddresses;
+                            if (objAddresses.Count == 0) return Double.NaN;
+                            uint objAddress = objAddresses[0];
+                            return Config.Stream.GetSingle(objAddress + ObjectConfig.ZOffset);
+                        }
                     case PositionAngleTypeEnum.First:
                         return GetObjectValue(Text, true, CoordinateAngle.Z);
                     case PositionAngleTypeEnum.Last:
@@ -845,8 +837,6 @@ namespace STROOP.Utilities
                         return GetGoombaProjection(Address.Value).z;
                     case PositionAngleTypeEnum.KoopaTheQuick:
                         return PlushUtilities.GetZ();
-                    case PositionAngleTypeEnum.Ghost:
-                        return Config.Stream.GetSingle(GhostHackConfig.CurrentGhostStruct + GhostHackConfig.ZOffset);
                     case PositionAngleTypeEnum.Tri:
                         return GetTriangleVertexComponent(Address.Value, Index.Value, Coordinate.Z);
                     case PositionAngleTypeEnum.ObjTri:
@@ -895,7 +885,7 @@ namespace STROOP.Utilities
             }
         }
 
-        public double Angle
+        public virtual double Angle
         {
             get
             {
@@ -931,12 +921,12 @@ namespace STROOP.Utilities
                     case PositionAngleTypeEnum.ObjScale:
                         return Double.NaN;
                     case PositionAngleTypeEnum.Selected:
-                    {
-                        List<uint> objAddresses = Config.ObjectSlotsManager.SelectedSlotsAddresses;
-                        if (objAddresses.Count == 0) return Double.NaN;
-                        uint objAddress = objAddresses[0];
-                        return Config.Stream.GetUInt16(objAddress + ObjectConfig.YawFacingOffset);
-                    }
+                        {
+                            List<uint> objAddresses = Config.ObjectSlotsManager.SelectedSlotsAddresses;
+                            if (objAddresses.Count == 0) return Double.NaN;
+                            uint objAddress = objAddresses[0];
+                            return Config.Stream.GetUInt16(objAddress + ObjectConfig.YawFacingOffset);
+                        }
                     case PositionAngleTypeEnum.First:
                         return GetObjectValue(Text, true, CoordinateAngle.Angle);
                     case PositionAngleTypeEnum.Last:
@@ -949,8 +939,6 @@ namespace STROOP.Utilities
                         return MoreMath.NormalizeAngleUshort(Config.Stream.GetInt32(Address.Value + ObjectConfig.GoombaTargetAngleOffset));
                     case PositionAngleTypeEnum.KoopaTheQuick:
                         return PlushUtilities.GetAngle();
-                    case PositionAngleTypeEnum.Ghost:
-                        return Config.Stream.GetUInt16(GhostHackConfig.CurrentGhostStruct + GhostHackConfig.YawFacingOffset);
                     case PositionAngleTypeEnum.Tri:
                         return Double.NaN;
                     case PositionAngleTypeEnum.ObjTri:
@@ -1190,7 +1178,7 @@ namespace STROOP.Utilities
 
 
 
-        public bool SetX(double value)
+        public virtual bool SetX(double value)
         {
             if (ShouldHaveAddress(PosAngleType) && Address == 0) return false;
             switch (PosAngleType)
@@ -1228,12 +1216,12 @@ namespace STROOP.Utilities
                 case PositionAngleTypeEnum.ObjScale:
                     return Config.Stream.SetValue((float)value, Address.Value + ObjectConfig.ScaleWidthOffset);
                 case PositionAngleTypeEnum.Selected:
-                {
-                    List<uint> objAddresses = Config.ObjectSlotsManager.SelectedSlotsAddresses;
-                    if (objAddresses.Count == 0) return false;
-                    uint objAddress = objAddresses[0];
-                    return Config.Stream.SetValue((float)value, objAddress + ObjectConfig.XOffset);
-                }
+                    {
+                        List<uint> objAddresses = Config.ObjectSlotsManager.SelectedSlotsAddresses;
+                        if (objAddresses.Count == 0) return false;
+                        uint objAddress = objAddresses[0];
+                        return Config.Stream.SetValue((float)value, objAddress + ObjectConfig.XOffset);
+                    }
                 case PositionAngleTypeEnum.First:
                     return SetObjectValue(value, Text, true, CoordinateAngle.X);
                 case PositionAngleTypeEnum.Last:
@@ -1245,8 +1233,6 @@ namespace STROOP.Utilities
                 case PositionAngleTypeEnum.GoombaProjection:
                     return false;
                 case PositionAngleTypeEnum.KoopaTheQuick:
-                    return false;
-                case PositionAngleTypeEnum.Ghost:
                     return false;
                 case PositionAngleTypeEnum.Tri:
                     return SetTriangleVertexComponent((short)value, Address.Value, Index.Value, Coordinate.X);
@@ -1294,7 +1280,7 @@ namespace STROOP.Utilities
             }
         }
 
-        public bool SetY(double value)
+        public virtual bool SetY(double value)
         {
             if (ShouldHaveAddress(PosAngleType) && Address == 0) return false;
             switch (PosAngleType)
@@ -1332,12 +1318,12 @@ namespace STROOP.Utilities
                 case PositionAngleTypeEnum.ObjScale:
                     return Config.Stream.SetValue((float)value, Address.Value + ObjectConfig.ScaleHeightOffset);
                 case PositionAngleTypeEnum.Selected:
-                {
-                    List<uint> objAddresses = Config.ObjectSlotsManager.SelectedSlotsAddresses;
-                    if (objAddresses.Count == 0) return false;
-                    uint objAddress = objAddresses[0];
-                    return Config.Stream.SetValue((float)value, objAddress + ObjectConfig.YOffset);
-                }
+                    {
+                        List<uint> objAddresses = Config.ObjectSlotsManager.SelectedSlotsAddresses;
+                        if (objAddresses.Count == 0) return false;
+                        uint objAddress = objAddresses[0];
+                        return Config.Stream.SetValue((float)value, objAddress + ObjectConfig.YOffset);
+                    }
                 case PositionAngleTypeEnum.First:
                     return SetObjectValue(value, Text, true, CoordinateAngle.Y);
                 case PositionAngleTypeEnum.Last:
@@ -1349,8 +1335,6 @@ namespace STROOP.Utilities
                 case PositionAngleTypeEnum.GoombaProjection:
                     return false;
                 case PositionAngleTypeEnum.KoopaTheQuick:
-                    return false;
-                case PositionAngleTypeEnum.Ghost:
                     return false;
                 case PositionAngleTypeEnum.Tri:
                     return SetTriangleVertexComponent((short)value, Address.Value, Index.Value, Coordinate.Y);
@@ -1398,7 +1382,7 @@ namespace STROOP.Utilities
             }
         }
 
-        public bool SetZ(double value)
+        public virtual bool SetZ(double value)
         {
             if (ShouldHaveAddress(PosAngleType) && Address == 0) return false;
             switch (PosAngleType)
@@ -1436,12 +1420,12 @@ namespace STROOP.Utilities
                 case PositionAngleTypeEnum.ObjScale:
                     return Config.Stream.SetValue((float)value, Address.Value + ObjectConfig.ScaleDepthOffset);
                 case PositionAngleTypeEnum.Selected:
-                {
-                    List<uint> objAddresses = Config.ObjectSlotsManager.SelectedSlotsAddresses;
-                    if (objAddresses.Count == 0) return false;
-                    uint objAddress = objAddresses[0];
-                    return Config.Stream.SetValue((float)value, objAddress + ObjectConfig.ZOffset);
-                }
+                    {
+                        List<uint> objAddresses = Config.ObjectSlotsManager.SelectedSlotsAddresses;
+                        if (objAddresses.Count == 0) return false;
+                        uint objAddress = objAddresses[0];
+                        return Config.Stream.SetValue((float)value, objAddress + ObjectConfig.ZOffset);
+                    }
                 case PositionAngleTypeEnum.First:
                     return SetObjectValue(value, Text, true, CoordinateAngle.Z);
                 case PositionAngleTypeEnum.Last:
@@ -1453,8 +1437,6 @@ namespace STROOP.Utilities
                 case PositionAngleTypeEnum.GoombaProjection:
                     return false;
                 case PositionAngleTypeEnum.KoopaTheQuick:
-                    return false;
-                case PositionAngleTypeEnum.Ghost:
                     return false;
                 case PositionAngleTypeEnum.Tri:
                     return SetTriangleVertexComponent((short)value, Address.Value, Index.Value, Coordinate.Z);
@@ -1502,7 +1484,7 @@ namespace STROOP.Utilities
             }
         }
 
-        public bool SetAngle(double value)
+        public virtual bool SetAngle(double value)
         {
             if (ShouldHaveAddress(PosAngleType) && Address == 0) return false;
             ushort valueUShort = MoreMath.NormalizeAngleUshort(value);
@@ -1533,12 +1515,12 @@ namespace STROOP.Utilities
                     SpecialConfig.Map3DCameraYaw = (float)value;
                     return true;
                 case PositionAngleTypeEnum.Obj:
-                {
-                    bool success = true;
-                    success &= Config.Stream.SetValue(valueUShort, Address.Value + ObjectConfig.YawFacingOffset);
-                    success &= Config.Stream.SetValue(valueUShort, Address.Value + ObjectConfig.YawMovingOffset);
-                    return success;
-                }
+                    {
+                        bool success = true;
+                        success &= Config.Stream.SetValue(valueUShort, Address.Value + ObjectConfig.YawFacingOffset);
+                        success &= Config.Stream.SetValue(valueUShort, Address.Value + ObjectConfig.YawMovingOffset);
+                        return success;
+                    }
                 case PositionAngleTypeEnum.ObjHome:
                     return false;
                 case PositionAngleTypeEnum.ObjGfx:
@@ -1546,15 +1528,15 @@ namespace STROOP.Utilities
                 case PositionAngleTypeEnum.ObjScale:
                     return false;
                 case PositionAngleTypeEnum.Selected:
-                {
-                    List<uint> objAddresses = Config.ObjectSlotsManager.SelectedSlotsAddresses;
-                    if (objAddresses.Count == 0) return false;
-                    uint objAddress = objAddresses[0];
-                    bool success = true;
-                    success &= Config.Stream.SetValue(valueUShort, objAddress + ObjectConfig.YawFacingOffset);
-                    success &= Config.Stream.SetValue(valueUShort, objAddress + ObjectConfig.YawMovingOffset);
-                    return success;
-                }
+                    {
+                        List<uint> objAddresses = Config.ObjectSlotsManager.SelectedSlotsAddresses;
+                        if (objAddresses.Count == 0) return false;
+                        uint objAddress = objAddresses[0];
+                        bool success = true;
+                        success &= Config.Stream.SetValue(valueUShort, objAddress + ObjectConfig.YawFacingOffset);
+                        success &= Config.Stream.SetValue(valueUShort, objAddress + ObjectConfig.YawMovingOffset);
+                        return success;
+                    }
                 case PositionAngleTypeEnum.First:
                     return SetObjectValue(value, Text, true, CoordinateAngle.Angle);
                 case PositionAngleTypeEnum.Last:
@@ -1566,8 +1548,6 @@ namespace STROOP.Utilities
                 case PositionAngleTypeEnum.GoombaProjection:
                     return false;
                 case PositionAngleTypeEnum.KoopaTheQuick:
-                    return false;
-                case PositionAngleTypeEnum.Ghost:
                     return false;
                 case PositionAngleTypeEnum.Tri:
                     return false;
@@ -1973,7 +1953,7 @@ namespace STROOP.Utilities
             bool toggle = toggleNullable ?? GetToggle();
             if (!toggle)
             {
-                (double x, double z) = 
+                (double x, double z) =
                     MoreMath.RotatePointAboutPointToAngle(
                         p2.X, p2.Z, p1.X, p1.Z, angle);
                 return p2.SetValues(x: x, z: z);

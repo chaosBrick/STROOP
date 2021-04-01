@@ -150,6 +150,11 @@ namespace STROOP.Utilities
                 return true;
             }
 
+            public override int GetHashCode()
+            {
+                return base.GetHashCode();
+            }
+
             public override string ToString()
             {
                 String output = "";

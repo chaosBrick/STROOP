@@ -238,40 +238,42 @@ namespace STROOP.Structs.Configurations
         {
             get
             {
-                float relCenterX = CompassHorizontalMargin + CompassArrowHeight + CompassLineHeight + CompassLineWidth / 2;
-                switch (CompassPosition)
-                {
-                    case CompassPosition.TopLeft:
-                    case CompassPosition.BottomLeft:
-                        return relCenterX;
-                    case CompassPosition.TopRight:
-                    case CompassPosition.BottomRight:
-                        return StroopMainForm.instance.mapTab.glControlMap2D.Width - relCenterX;
-                    case CompassPosition.Center:
-                        return StroopMainForm.instance.mapTab.glControlMap2D.Width / 2;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                throw null;
+                //float relCenterX = CompassHorizontalMargin + CompassArrowHeight + CompassLineHeight + CompassLineWidth / 2;
+                //switch (CompassPosition)
+                //{
+                //    case CompassPosition.TopLeft:
+                //    case CompassPosition.BottomLeft:
+                //        return relCenterX;
+                //    case CompassPosition.TopRight:
+                //    case CompassPosition.BottomRight:
+                //        return glControl.Width - relCenterX;
+                //    case CompassPosition.Center:
+                //        return glControl.Width / 2;
+                //    default:
+                //        throw new ArgumentOutOfRangeException();
+                //}
             }
         }
         public static float CompassCenterZ
         {
             get
             {
-                float relCenterZ = CompassVerticalMargin + CompassArrowHeight + CompassLineHeight + CompassLineWidth / 2;
-                switch (CompassPosition)
-                {
-                    case CompassPosition.TopLeft:
-                    case CompassPosition.TopRight:
-                        return relCenterZ;
-                    case CompassPosition.BottomLeft:
-                    case CompassPosition.BottomRight:
-                        return StroopMainForm.instance.mapTab.glControlMap2D.Height - relCenterZ;
-                    case CompassPosition.Center:
-                        return StroopMainForm.instance.mapTab.glControlMap2D.Height / 2;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                throw null;
+                //float relCenterZ = CompassVer>ticalMargin + CompassArrowHeight + CompassLineHeight + CompassLineWidth / 2;
+                //switch (CompassPosition)
+                //{
+                //    case CompassPosition.TopLeft:
+                //    case CompassPosition.TopRight:
+                //        return relCenterZ;
+                //    case CompassPosition.BottomLeft:
+                //    case CompassPosition.BottomRight:
+                //        return glControl.Height - relCenterZ;
+                //    case CompassPosition.Center:
+                //        return glControl.Height / 2;
+                //    default:
+                //        throw new ArgumentOutOfRangeException();
+                //}
             }
         }
 

@@ -73,7 +73,7 @@ namespace STROOP.Tabs
             }
         }
 
-        public string Name
+        public string ObjectName
         {
             get
             {
@@ -86,7 +86,7 @@ namespace STROOP.Tabs
             }
         }
 
-        public Color BackColor
+        public Color ObjectBackColor
         {
             set
             {
@@ -478,9 +478,9 @@ namespace STROOP.Tabs
         {
             if (!_objects.Any())
             {
-                Name = "No Object Selected";
+                ObjectName = "No Object Selected";
                 Image = null;
-                BackColor = ObjectSlotsConfig.VacantSlotColor;
+                ObjectBackColor = ObjectSlotsConfig.VacantSlotColor;
                 Behavior = "";
                 SlotIndex = "";
                 SlotPos = "";
@@ -501,9 +501,9 @@ namespace STROOP.Tabs
                         .Lighten(0.8));
                     _lastGeneralizedBehavior = newBehavior;
                 }
-                Name = Config.ObjectAssociations.GetObjectName(newBehavior);
+                ObjectName = Config.ObjectAssociations.GetObjectName(newBehavior);
                 Image = Config.ObjectAssociations.GetObjectImage(newBehavior).Value;
-                BackColor = ObjectSlotsConfig.GetProcessingGroupColor(obj.CurrentProcessGroup);
+                ObjectBackColor = ObjectSlotsConfig.GetProcessingGroupColor(obj.CurrentProcessGroup);
                 int slotPos = obj.VacantSlotIndex ?? obj.ProcessIndex;
                 SlotIndex = (Config.ObjectSlotsManager.GetSlotIndexFromObj(obj)
                     + (SavedSettingsConfig.StartSlotIndexsFromOne ? 1 : 0))?.ToString() ?? "";
@@ -552,8 +552,8 @@ namespace STROOP.Tabs
                 }
 
                 Image = _multiImage;
-                Name = _objects.Count + " Objects Selected";
-                BackColor = ObjectSlotsConfig.GetProcessingGroupColor(processGroup);
+                ObjectName = _objects.Count + " Objects Selected";
+                ObjectBackColor = ObjectSlotsConfig.GetProcessingGroupColor(processGroup);
                 SlotIndex = "";
                 SlotPos = "";
                 labelObjAddValue.Text = "";

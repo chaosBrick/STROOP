@@ -1,24 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using STROOP.Structs;
-using STROOP.Extensions;
 using STROOP.Structs.Configurations;
-using STROOP.Managers;
 using STROOP.Models;
-using STROOP.Forms;
 using System.Diagnostics;
-using STROOP.Map;
 
 namespace STROOP.Utilities
 {
     public static class ButtonUtilities
     {
-        private enum Change { SET, ADD, MULTIPLY };
+        public enum Change { SET, ADD, MULTIPLY };
 
-        private static bool ChangeValues(List<PositionAngle> posAngles,
+        public static bool ChangeValues(List<PositionAngle> posAngles,
             float xValue, float yValue, float zValue, Change change, bool useRelative = false, bool handleScaling = true,
             (bool affectX, bool affectY, bool affectZ)? affects = null)
         {
@@ -1586,70 +1580,6 @@ namespace STROOP.Utilities
 
             if (!streamAlreadySuspended) Config.Stream.Resume();
             return success;
-        }
-
-        public static bool TranslateMapCameraPosition(float xOffset, float yOffset, float zOffset, bool useRelative)
-        {
-            MapUtilities.MaybeChangeMapCameraMode();
-            List<PositionAngle> posAngles = new List<PositionAngle> { PositionAngle.MapCamera };
-            return ChangeValues(posAngles, xOffset, yOffset, zOffset, Change.ADD, useRelative);
-        }
-
-        public static bool TranslateMapCameraSpherical(float radiusOffset, float thetaOffset, float phiOffset)
-        {
-            MapUtilities.MaybeChangeMapCameraMode();
-            HandleScaling(ref thetaOffset, ref phiOffset);
-
-            (double newX, double newY, double newZ) =
-                MoreMath.OffsetSphericallyAboutPivot(
-                    SpecialConfig.Map3DCameraX, SpecialConfig.Map3DCameraY, SpecialConfig.Map3DCameraZ,
-                    radiusOffset, thetaOffset, phiOffset,
-                    SpecialConfig.Map3DFocusX, SpecialConfig.Map3DFocusY, SpecialConfig.Map3DFocusZ);
-
-            SpecialConfig.Map3DCameraX = (float)newX;
-            SpecialConfig.Map3DCameraY = (float)newY;
-            SpecialConfig.Map3DCameraZ = (float)newZ;
-
-            return true;
-        }
-
-        public static bool TranslateMapFocusPosition(float xOffset, float yOffset, float zOffset, bool useRelative)
-        {
-            MapUtilities.MaybeChangeMapCameraMode();
-            List<PositionAngle> posAngles = new List<PositionAngle> { PositionAngle.MapFocus };
-            return ChangeValues(posAngles, xOffset, yOffset, zOffset, Change.ADD, useRelative);
-        }
-
-        public static bool TranslateMapFocusSpherical(float radiusOffset, float thetaOffset, float phiOffset)
-        {
-            MapUtilities.MaybeChangeMapCameraMode();
-            HandleScaling(ref thetaOffset, ref phiOffset);
-
-            if (SpecialConfig.Map3DMode == Map3DCameraMode.CameraPosAndAngle)
-            {
-                SpecialConfig.Map3DCameraYaw += thetaOffset;
-                SpecialConfig.Map3DCameraPitch += phiOffset;
-                return true;
-            }
-
-            (double newX, double newY, double newZ) =
-                MoreMath.OffsetSphericallyAboutPivot(
-                    SpecialConfig.Map3DFocusX, SpecialConfig.Map3DFocusY, SpecialConfig.Map3DFocusZ,
-                    radiusOffset, thetaOffset, phiOffset,
-                    SpecialConfig.Map3DCameraX, SpecialConfig.Map3DCameraY, SpecialConfig.Map3DCameraZ);
-
-            SpecialConfig.Map3DFocusX = (float)newX;
-            SpecialConfig.Map3DFocusY = (float)newY;
-            SpecialConfig.Map3DFocusZ = (float)newZ;
-
-            return true;
-        }
-
-        public static bool TranslateMapCameraFocus(float xOffset, float yOffset, float zOffset, bool useRelative)
-        {
-            MapUtilities.MaybeChangeMapCameraMode();
-            List<PositionAngle> posAngles = new List<PositionAngle> { PositionAngle.MapCamera, PositionAngle.MapFocus };
-            return ChangeValues(posAngles, xOffset, yOffset, zOffset, Change.ADD, useRelative);
         }
     }
 }

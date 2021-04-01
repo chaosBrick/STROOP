@@ -133,5 +133,8 @@ namespace STROOP.Utilities
         {
             return Color.FromArgb(alpha, color.R, color.G, color.B);
         }
+
+        public static OpenTK.Vector4 ColorToVec4(Color color, int alpha = -1) =>
+            new OpenTK.Vector4(color.R / 255f, color.G / 255f, color.B / 255f, (alpha == -1 ? color.A : alpha) / 255f);
     }
 }

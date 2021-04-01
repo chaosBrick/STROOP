@@ -1,14 +1,9 @@
 ﻿using STROOP.Forms;
 using STROOP.Managers;
-using STROOP.Map;
-using STROOP.Map.Map3D;
+ 
 using STROOP.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using static STROOP.Forms.VariablePopOutForm;
 
@@ -29,10 +24,6 @@ namespace STROOP.Structs.Configurations
         public static StroopMainForm StroopMainForm;
         public static TabControlEx TabControlMain;
         public static Label DebugText;
-
-        public static MapGraphics MapGraphics;
-        public static Map3DGraphics Map3DGraphics;
-        public static Map3DCamera Map3DCamera;
         
         public static ObjectSlotsManager ObjectSlotsManager;
         public static InjectionManager InjectionManager;

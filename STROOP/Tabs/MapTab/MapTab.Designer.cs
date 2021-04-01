@@ -184,12 +184,9 @@
             this.buttonMapCameraPositionXnZp = new System.Windows.Forms.Button();
             this.buttonMapCameraPositionXn = new System.Windows.Forms.Button();
             this.buttonMapCameraPositionXnZn = new System.Windows.Forms.Button();
-            this.flowLayoutPanelMapTrackers = new STROOP.Map.MapTrackerFlowLayoutPanel();
-            this.glControlMap3D = new OpenTK.GLControl();
-            this.glControlMap2D = new OpenTK.GLControl();
+            this.flowLayoutPanelMapTrackers = new STROOP.Tabs.MapTab.MapTrackerFlowLayoutPanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMap)).BeginInit();
             this.splitContainerMap.Panel1.SuspendLayout();
-            this.splitContainerMap.Panel2.SuspendLayout();
             this.splitContainerMap.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMapLeft)).BeginInit();
             this.splitContainerMapLeft.Panel1.SuspendLayout();
@@ -215,8 +212,8 @@
             // 
             // splitContainerMap
             // 
-            this.splitContainerMap.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.splitContainerMap.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.splitContainerMap.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.splitContainerMap.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
@@ -232,8 +229,6 @@
             // splitContainerMap.Panel2
             // 
             this.splitContainerMap.Panel2.BackColor = System.Drawing.Color.Black;
-            this.splitContainerMap.Panel2.Controls.Add(this.glControlMap3D);
-            this.splitContainerMap.Panel2.Controls.Add(this.glControlMap2D);
             this.splitContainerMap.Panel2MinSize = 0;
             this.splitContainerMap.Size = new System.Drawing.Size(915, 463);
             this.splitContainerMap.SplitterDistance = 357;
@@ -1124,7 +1119,7 @@
             this.tabPageMap3DVars.Margin = new System.Windows.Forms.Padding(0);
             this.tabPageMap3DVars.Name = "tabPageMap3DVars";
             this.tabPageMap3DVars.Padding = new System.Windows.Forms.Padding(2);
-            this.tabPageMap3DVars.Size = new System.Drawing.Size(347, 292);
+            this.tabPageMap3DVars.Size = new System.Drawing.Size(345, 292);
             this.tabPageMap3DVars.TabIndex = 4;
             this.tabPageMap3DVars.Text = "3D Vars";
             // 
@@ -1137,7 +1132,7 @@
             this.watchVariablePanelMap3DVars.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelMap3DVars.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelMap3DVars.Name = "watchVariablePanelMap3DVars";
-            this.watchVariablePanelMap3DVars.Size = new System.Drawing.Size(341, 286);
+            this.watchVariablePanelMap3DVars.Size = new System.Drawing.Size(339, 286);
             this.watchVariablePanelMap3DVars.TabIndex = 6;
             // 
             // tabPageMap3DControllers
@@ -1946,29 +1941,6 @@
             this.flowLayoutPanelMapTrackers.TabIndex = 0;
             this.flowLayoutPanelMapTrackers.WrapContents = false;
             // 
-            // glControlMap3D
-            // 
-            this.glControlMap3D.BackColor = System.Drawing.Color.Black;
-            this.glControlMap3D.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.glControlMap3D.Location = new System.Drawing.Point(0, 0);
-            this.glControlMap3D.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.glControlMap3D.Name = "glControlMap3D";
-            this.glControlMap3D.Size = new System.Drawing.Size(555, 461);
-            this.glControlMap3D.TabIndex = 1;
-            this.glControlMap3D.Visible = false;
-            this.glControlMap3D.VSync = false;
-            // 
-            // glControlMap2D
-            // 
-            this.glControlMap2D.BackColor = System.Drawing.Color.Black;
-            this.glControlMap2D.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.glControlMap2D.Location = new System.Drawing.Point(0, 0);
-            this.glControlMap2D.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.glControlMap2D.Name = "glControlMap2D";
-            this.glControlMap2D.Size = new System.Drawing.Size(555, 461);
-            this.glControlMap2D.TabIndex = 0;
-            this.glControlMap2D.VSync = false;
-            // 
             // MapTab
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1977,7 +1949,6 @@
             this.Name = "MapTab";
             this.Size = new System.Drawing.Size(915, 463);
             this.splitContainerMap.Panel1.ResumeLayout(false);
-            this.splitContainerMap.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMap)).EndInit();
             this.splitContainerMap.ResumeLayout(false);
             this.splitContainerMapLeft.Panel1.ResumeLayout(false);
@@ -2171,8 +2142,6 @@
         internal System.Windows.Forms.Button buttonMapCameraPositionXnZp;
         internal System.Windows.Forms.Button buttonMapCameraPositionXn;
         internal System.Windows.Forms.Button buttonMapCameraPositionXnZn;
-        internal Map.MapTrackerFlowLayoutPanel flowLayoutPanelMapTrackers;
-        internal OpenTK.GLControl glControlMap3D;
-        internal OpenTK.GLControl glControlMap2D;
+        internal Tabs.MapTab.MapTrackerFlowLayoutPanel flowLayoutPanelMapTrackers;
     }
 }

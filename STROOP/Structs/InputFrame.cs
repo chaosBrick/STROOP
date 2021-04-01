@@ -83,5 +83,9 @@ namespace STROOP.Structs
                 && IsButtonPressed_U2 == other.IsButtonPressed_U2
                 );
         }
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 }
