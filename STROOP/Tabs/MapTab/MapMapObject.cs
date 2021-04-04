@@ -32,12 +32,13 @@ namespace STROOP.Tabs.MapTab
             renderer.SetDrawCalls(graphics);
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
             {
-                var dim = GetDimensions().FirstOrDefault();
-                renderer.AddInstance(
-                    Matrix4.CreateScale(dim.size.Width, dim.size.Height, 1)
-                    * Matrix4.CreateTranslation(dim.loc.X, dim.loc.Y, 0),
-                    0
-                );
+                var dimooof = GetDimensions();
+                foreach (var dim in dimooof)
+                    renderer.AddInstance(
+                        Matrix4.CreateScale(dim.size.Width, dim.size.Height, 1)
+                        * Matrix4.CreateTranslation(dim.loc.X, dim.loc.Y, 0),
+                        0
+                    );
             });
         }
 
@@ -47,7 +48,7 @@ namespace STROOP.Tabs.MapTab
             float rectangleCenterX = rectangle.X + rectangle.Width / 2;
             float rectangleCenterZ = rectangle.Y + rectangle.Height / 2;
             List<(float x, float z)> rectangleCenters = graphics.MapViewEnablePuView ?
-                MapUtilities.GetPuCoordinates(rectangleCenterX, rectangleCenterZ) :
+                StroopMainForm.instance.mapTab.GetPuCoordinates(rectangleCenterX, rectangleCenterZ) :
                 new List<(float x, float z)>() { (rectangleCenterX, rectangleCenterZ) };
 
             List<(PointF loc, SizeF size)> dimensions = rectangleCenters.ConvertAll(

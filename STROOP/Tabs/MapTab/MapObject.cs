@@ -66,7 +66,7 @@ namespace STROOP.Tabs.MapTab
 
         public abstract void DrawOn2DControl(MapGraphics graphics);
 
-        public abstract void DrawOn3DControl(Map3DGraphics graphics3D);
+        public virtual void DrawOn3DControl(Map3DGraphics graphics3D) { }
 
         public virtual Matrix4 GetModelMatrix()
         {

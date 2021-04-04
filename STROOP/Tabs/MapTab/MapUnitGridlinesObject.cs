@@ -23,10 +23,10 @@ namespace STROOP.Tabs.MapTab
             OutlineColor = Color.Black;
         }
 
-        protected override List<(float x, float y, float z)> GetVertices()
+        protected override List<(float x, float y, float z)> GetVertices(MapGraphics graphics)
         {
             // failsafe to prevent filling the whole screen
-            if (!MapUtilities.IsAbleToShowUnitPrecision())
+            if (!graphics.hasUnitPrecision)
             {
                 return new List<(float x, float y, float z)>();
             }

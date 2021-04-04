@@ -17,7 +17,7 @@ namespace STROOP.Tabs.MapTab
     [ObjectDescription("Custom Map")]
     public class MapCustomMapObject : MapMapObject
     {
-        private object _mapLayoutChoice; 
+        private object _mapLayoutChoice;
 
         public MapCustomMapObject()
             : base()
@@ -27,7 +27,7 @@ namespace STROOP.Tabs.MapTab
 
         public override MapLayout GetMapLayout()
         {
-            return MapUtilities.GetMapLayout(_mapLayoutChoice);
+            return StroopMainForm.instance.mapTab.GetMapLayout(_mapLayoutChoice);
         }
 
         public override string GetName()

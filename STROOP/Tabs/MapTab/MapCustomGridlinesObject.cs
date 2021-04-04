@@ -23,7 +23,7 @@ namespace STROOP.Tabs.MapTab
             OutlineColor = Color.Black;
         }
 
-        protected override List<(float x, float y, float z)> GetVertices()
+        protected override List<(float x, float y, float z)> GetVertices(MapGraphics graphics)
         {
             float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
 
@@ -37,12 +37,10 @@ namespace STROOP.Tabs.MapTab
             double viewXMin = graphics.MapViewXMin;
             double viewXMax = graphics.MapViewXMax;
             double viewXDiff = viewXMax - viewXMin;
-            double viewXDiffPixels = viewXDiff * graphics.MapViewScaleValue;
 
             double viewZMin = graphics.MapViewZMin;
             double viewZMax = graphics.MapViewZMax;
             double viewZDiff = viewZMax - viewZMin;
-            double viewZDiffPixels = viewZDiff * graphics.MapViewScaleValue;
 
             int xMinMultiple = Math.Max((int)((viewXMin - gridlineMin) / increment) - 1, 0);
             int xMaxMultiple = Math.Min((int)((viewXMax - gridlineMin) / increment) + 1, (int)size);
@@ -51,10 +49,7 @@ namespace STROOP.Tabs.MapTab
             int zMinMultiple = Math.Max((int)((viewZMin - gridlineMin) / increment) - 1, 0);
             int zMaxMultiple = Math.Min((int)((viewZMax - gridlineMin) / increment) + 1, (int)size);
             int numZLines = zMaxMultiple - zMinMultiple + 1;
-
-            if (numXLines > viewXDiffPixels || numZLines > viewZDiffPixels)
-                return new List<(float x, float y, float z)>();
-            
+                        
             List<(float x, float y, float z)> vertices = new List<(float x, float y, float z)>();
             for (int multiple = xMinMultiple; multiple <= xMaxMultiple; multiple++)
             {

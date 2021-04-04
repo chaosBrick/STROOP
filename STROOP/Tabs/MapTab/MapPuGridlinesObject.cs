@@ -29,7 +29,7 @@ namespace STROOP.Tabs.MapTab
             _setting = PuGridlineSetting.SETTING1;
         }
 
-        protected override List<(float x, float y, float z)> GetVertices()
+        protected override List<(float x, float y, float z)> GetVertices(MapGraphics graphics)
         {
             switch (_setting)
             {

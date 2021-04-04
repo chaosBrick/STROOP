@@ -16,7 +16,7 @@ namespace STROOP.Tabs.MapTab
             OutlineColor = Color.Black;
         }
 
-        protected List<(float x, float y, float z)> GetVerticesTopDownView()
+        protected override List<(float x, float y, float z)> GetVertices(MapGraphics graphics)
         {
             float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
 
@@ -40,10 +40,5 @@ namespace STROOP.Tabs.MapTab
         }
 
         public override Lazy<Image> GetInternalImage() =>Config.ObjectAssociations.CellGridlinesImage;
-
-        protected override List<(float x, float y, float z)> GetVertices()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

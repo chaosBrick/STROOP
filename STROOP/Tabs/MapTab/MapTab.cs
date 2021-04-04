@@ -128,6 +128,39 @@ namespace STROOP.Tabs.MapTab
             InitializeSemaphores();
         }
 
+        public MapLayout GetMapLayout(object mapLayoutChoice = null) =>
+            (mapLayoutChoice ?? StroopMainForm.instance.mapTab.comboBoxMapOptionsLevel.SelectedItem) as MapLayout ?? Config.MapAssociations.GetBestMap();
+
+
+        public Lazy<Image> GetBackgroundImage(object backgroundChoice = null)
+        {
+            if ((backgroundChoice ?? comboBoxMapOptionsBackground.SelectedItem) is BackgroundImage result)
+                return result.Image;
+            return Config.MapAssociations.GetBestMap().BackgroundImage;
+        }
+
+        public List<(float x, float z)> GetPuCenters()
+        {
+            int xMin = ((((int)view.MapGraphics.MapViewXMin) / 65536) - 1) * 65536;
+            int xMax = ((((int)view.MapGraphics.MapViewXMax) / 65536) + 1) * 65536;
+            int zMin = ((((int)view.MapGraphics.MapViewZMin) / 65536) - 1) * 65536;
+            int zMax = ((((int)view.MapGraphics.MapViewZMax) / 65536) + 1) * 65536;
+            List<(float x, float z)> centers = new List<(float x, float z)>();
+            for (int x = xMin; x <= xMax; x += 65536)
+            {
+                for (int z = zMin; z <= zMax; z += 65536)
+                {
+                    centers.Add((x, z));
+                }
+            }
+            return centers;
+        }
+
+        public List<(float x, float z)> GetPuCoordinates(float relX, float relZ)
+        {
+            return GetPuCenters().ConvertAll(center => (center.x + relX, center.z + relZ));
+        }
+
         public void Load3D()
         {
             return;
@@ -140,7 +173,7 @@ namespace STROOP.Tabs.MapTab
         private void InitializeControls()
         {
             // FlowLayoutPanel
-            flowLayoutPanelMapTrackers.Initialize(new MapCurrentMapObject(), new MapCurrentBackgroundObject(), null); // new MapCurrentMapObject(), new MapCurrentBackgroundObject(), new MapHitboxHackTriangleObject());
+            flowLayoutPanelMapTrackers.Initialize(new MapCurrentMapObject(), new MapCurrentBackgroundObject()); 
 
             // ComboBox for Level
             List<MapLayout> mapLayouts = Config.MapAssociations.GetAllMaps();
@@ -323,17 +356,6 @@ namespace STROOP.Tabs.MapTab
                radioButtonMapControllersAngleCustom.Checked = true;
            });
 
-            // Additional Checkboxes
-            checkBoxMapOptionsEnable3D.Click += (sender, e) =>
-           {
-               // Make the toBeVisible one visible first in order to avoid flicker.
-               (GLControl toBeVisible, GLControl toBeInvisible) =
-               checkBoxMapOptionsEnable3D.Checked ?
-                  (glControlMap3D, glControlMap2D) :
-                  (glControlMap2D, glControlMap3D);
-               toBeVisible.Visible = true;
-               toBeInvisible.Visible = false;
-           };
             checkBoxMapOptionsEnablePuView.Click += (sender, e) =>
                view.MapGraphics.MapViewEnablePuView = checkBoxMapOptionsEnablePuView.Checked;
             checkBoxMapOptionsScaleIconSizes.Click += (sender, e) =>
@@ -352,93 +374,6 @@ namespace STROOP.Tabs.MapTab
             trackBarMapOptionsGlobalIconSize.AddManualChangeAction(() =>
                SetGlobalIconSize(trackBarMapOptionsGlobalIconSize.Value));
             MapUtilities.CreateTrackBarContextMenuStrip(trackBarMapOptionsGlobalIconSize);
-
-            // 3D Controllers
-            ControlUtilities.InitializeThreeDimensionController(
-                CoordinateSystem.Euler,
-                true,
-                 groupBoxMapCameraPosition,
-                 "MapCameraPosition",
-                (float hOffset, float vOffset, float nOffset, bool useRelative) =>
-                {
-                    view.TranslateMapCameraPosition(
-                        hOffset,
-                        nOffset,
-                        -1 * vOffset,
-                        useRelative);
-                });
-            ControlUtilities.InitializeThreeDimensionController(
-                CoordinateSystem.Spherical,
-                false,
-                 groupBoxMapCameraSpherical,
-                 "MapCameraSpherical",
-                (float hOffset, float vOffset, float nOffset, bool _) =>
-                {
-                    view.TranslateMapCameraSpherical(
-                        -1 * nOffset,
-                        hOffset,
-                        vOffset);
-                });
-
-            ControlUtilities.InitializeThreeDimensionController(
-                CoordinateSystem.Euler,
-                true,
-                 groupBoxMapFocusPosition,
-                 "MapFocusPosition",
-                (float hOffset, float vOffset, float nOffset, bool useRelative) =>
-                {
-                    view.TranslateMapFocusPosition(
-                        hOffset,
-                        nOffset,
-                        -1 * vOffset,
-                        useRelative);
-                });
-
-            ControlUtilities.InitializeThreeDimensionController(
-                CoordinateSystem.Spherical,
-                false,
-                 groupBoxMapFocusSpherical,
-                 "MapFocusSpherical",
-                (float hOffset, float vOffset, float nOffset, bool _) =>
-                {
-                    view.TranslateMapFocusSpherical(
-                        nOffset,
-                        hOffset,
-                        vOffset);
-                });
-
-            ControlUtilities.InitializeThreeDimensionController(
-                CoordinateSystem.Euler,
-                true,
-                 groupBoxMapCameraFocus,
-                 "MapCameraFocus",
-                (float hOffset, float vOffset, float nOffset, bool useRelative) =>
-                {
-                    view.TranslateMapCameraFocus(
-                        hOffset,
-                        nOffset,
-                        -1 * vOffset,
-                        useRelative);
-                });
-
-            // FOV
-            trackBarMapFov.ValueChanged += (sender, e) =>
-           {
-               MapUtilities.MaybeChangeMapCameraMode();
-               SpecialConfig.Map3DFOV = trackBarMapFov.Value;
-               textBoxMapFov.Text = trackBarMapFov.Value.ToString();
-           };
-
-            textBoxMapFov.AddEnterAction(() =>
-           {
-               float parsed = ParsingUtilities.ParseFloat(textBoxMapFov.Text);
-               if (parsed > 0 && parsed < 180)
-               {
-                   MapUtilities.MaybeChangeMapCameraMode();
-                   SpecialConfig.Map3DFOV = parsed;
-                   ControlUtilities.SetTrackBarValueCapped(trackBarMapFov, parsed);
-               }
-           });
         }
 
         private void ResetToInitialState()
@@ -518,7 +453,6 @@ namespace STROOP.Tabs.MapTab
         public override void Update(bool active)
         {
             if (!_isLoaded2D) return;
-            if (checkBoxMapOptionsEnable3D.Checked && !_isLoaded3D) return;
 
             flowLayoutPanelMapTrackers.UpdateControl();
 
@@ -528,19 +462,9 @@ namespace STROOP.Tabs.MapTab
             UpdateBasedOnObjectsSelectedOnMap();
             UpdateControlsBasedOnSemaphores();
             UpdateDataTab();
-            UpdateVarColors();
 
             if (!PauseMapUpdating)
-            {
-                if (checkBoxMapOptionsEnable3D.Checked)
-                {
-                    glControlMap3D.Invalidate();
-                }
-                else
-                {
-                    glControlMap2D.Invalidate();
-                }
-            }
+                glControlMap2D.Invalidate();
         }
 
         private void UpdateDataTab()
@@ -678,16 +602,5 @@ namespace STROOP.Tabs.MapTab
                 [Map3DCameraMode.FollowFocusRelativeAngle] = followFocusRelativeAngleColoredVars,
                 [Map3DCameraMode.FollowFocusAbsoluteAngle] = followFocusAbsoluteAngleColoredVars,
             };
-
-        private void UpdateVarColors()
-        {
-            List<string> coloredVarNames = coloredVarsMap[SpecialConfig.Map3DMode];
-            watchVariablePanelMap3DVars.ColorVarsUsingFunction(
-                control =>
-                    control.VarName == "Mode" ? ColorUtilities.GetColorFromString("Green") :
-                    coloredVarNames.Contains(control.VarName) ? ColorUtilities.GetColorFromString("Red") :
-                    speedVarNames.Contains(control.VarName) ? ColorUtilities.GetColorFromString("Grey") :
-                    SystemColors.Control);
-        }
     }
 }

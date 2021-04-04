@@ -66,7 +66,7 @@ namespace STROOP.Tabs.MapTab
 
             List<(float x, float y, float z)> vertices = GetDictionaryValues();
             List<(float x, float z)> veriticesForControl =
-                vertices.ConvertAll(vertex => MapUtilities.ConvertCoordsForControl(vertex.x, vertex.z));
+                vertices.ConvertAll(vertex => (vertex.x, vertex.z));
 
             for (int i = 0; i < veriticesForControl.Count - 1; i++)
             {
@@ -103,41 +103,24 @@ namespace STROOP.Tabs.MapTab
 
         public override void DrawOn2DControl(MapGraphics graphics)
         {
-            if (OutlineWidth == 0) return;
-
-            List<(float x, float y, float z)> vertices = GetDictionaryValues();
-            List<(float x, float z)> veriticesForControl =
-                vertices.ConvertAll(vertex => MapUtilities.ConvertCoordsForControl(vertex.x, vertex.z));
-
-            GL.BindTexture(TextureTarget.Texture2D, -1);
-            GL.MatrixMode(MatrixMode.Modelview);
-            GL.LoadIdentity();
-            GL.LineWidth(OutlineWidth);
-            for (int i = 0; i < veriticesForControl.Count - 1; i++)
+            graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
             {
-                Color color = OutlineColor;
-                if (_useBlending)
+
+                if (OutlineWidth == 0) return;
+
+                List<(float x, float y, float z)> vertices = GetDictionaryValues();
+                List<(float x, float z)> veriticesForControl = vertices.ConvertAll(vertex => (vertex.x, vertex.z));
+                Vector3 oldShitLol = default(Vector3);
+                int jkl = 0;
+                foreach (var vertex in vertices)
                 {
-                    int distFromEnd = veriticesForControl.Count - i - 2;
-                    if (distFromEnd < Size)
-                    {
-                        color = ColorUtilities.InterpolateColor(
-                            OutlineColor, Color, distFromEnd / (double)Size);
-                    }
-                    else
-                    {
-                        color = Color;
-                    }
+                    Vector4 color = ColorUtilities.ColorToVec4(_useBlending ? ColorUtilities.InterpolateColor(OutlineColor, Color, (double)jkl / vertices.Count) : Color, OpacityByte);
+                    if (jkl > 0)
+                        graphics.lineRenderer.Add(new Vector3(vertex.x, 0, vertex.z), oldShitLol, color, OutlineWidth);
+                    jkl++;
+                    oldShitLol = new Vector3(vertex.x, 0, vertex.z);
                 }
-                (float x1, float z1) = veriticesForControl[i];
-                (float x2, float z2) = veriticesForControl[i + 1];
-                GL.Color4(color.R, color.G, color.B, OpacityByte);
-                GL.Begin(PrimitiveType.Lines);
-                GL.Vertex2(x1, z1);
-                GL.Vertex2(x2, z2);
-                GL.End();
-            }
-            GL.Color4(1, 1, 1, 1.0f);
+            });
         }
 
         public override void DrawOn3DControl(Map3DGraphics graphics)

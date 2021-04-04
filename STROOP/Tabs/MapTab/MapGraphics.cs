@@ -32,6 +32,8 @@ namespace STROOP.Tabs.MapTab
         public Renderers.CircleRenderer circleRenderer;
         public Vector2 pixelsPerUnit { get; private set; }
 
+        public bool hasUnitPrecision { get; private set; }
+
         const int OBJECTS_TEXTURE_SIZE = 256;
         const int OBJECTS_TEXTURE_LAYERS = 256;
 
@@ -77,8 +79,8 @@ namespace STROOP.Tabs.MapTab
         public readonly GLControl glControl;
 
         public float MapViewRadius => (float)MoreMath.GetHypotenuse(glControl.Width / 2, glControl.Height / 2) / MapViewScaleValue;
-        public float MapViewXMin { get => MapViewCenterXValue - MapViewRadius; }
-        public float MapViewXMax { get => MapViewCenterXValue + MapViewRadius; }
+        public float MapViewXMin { get => MapViewCenterXValue - MapViewRadius * glControl.AspectRatio; }
+        public float MapViewXMax { get => MapViewCenterXValue + MapViewRadius * glControl.AspectRatio; }
         public float MapViewZMin { get => MapViewCenterZValue - MapViewRadius; }
         public float MapViewZMax { get => MapViewCenterZValue + MapViewRadius; }
 
@@ -196,6 +198,7 @@ namespace STROOP.Tabs.MapTab
                 * Matrix4.CreateRotationZ((float)(Math.PI + MoreMath.AngleUnitsToRadians(MapViewAngleValue)))
                 * Matrix4.CreateScale(scale / glControl.AspectRatio, -scale, 1);
             pixelsPerUnit = new Vector2(scale * glControl.Height, scale * glControl.Height) * 0.5f;
+            hasUnitPrecision = pixelsPerUnit.X >= 2 && pixelsPerUnit.Y >= 2;
         }
 
         private void UpdateScale()
@@ -215,7 +218,7 @@ namespace STROOP.Tabs.MapTab
                 case MapScale.CourseDefault:
                 case MapScale.MaxCourseSize:
                     RectangleF rectangle = MapViewScale == MapScale.CourseDefault ?
-                        MapUtilities.GetMapLayout().Coordinates : MAX_COURSE_SIZE;
+                        StroopMainForm.instance.mapTab.GetMapLayout().Coordinates : MAX_COURSE_SIZE;
                     List<(float, float)> coordinates = new List<(float, float)>()
                     {
                         (rectangle.Left, rectangle.Top),
@@ -267,7 +270,7 @@ namespace STROOP.Tabs.MapTab
             {
                 case MapCenter.BestFit:
                     RectangleF rectangle = MapViewScaleWasCourseDefault ?
-                        MapUtilities.GetMapLayout().Coordinates : MAX_COURSE_SIZE;
+                        StroopMainForm.instance.mapTab.GetMapLayout().Coordinates : MAX_COURSE_SIZE;
                     MapViewCenterXValue = rectangle.X + rectangle.Width / 2;
                     MapViewCenterZValue = rectangle.Y + rectangle.Height / 2;
                     break;

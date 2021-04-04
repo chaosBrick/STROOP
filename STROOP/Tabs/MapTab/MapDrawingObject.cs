@@ -4,6 +4,7 @@ using System.Drawing;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
 using System.Windows.Forms;
+using OpenTK;
 
 namespace STROOP.Tabs.MapTab
 {
@@ -28,7 +29,7 @@ namespace STROOP.Tabs.MapTab
             _mouseIsDown = false;
         }
 
-        protected override List<(float x, float y, float z)> GetVertices()
+        protected override List<(float x, float y, float z)> GetVertices(MapGraphics graphics)
         {
             return _vertices;
         }
@@ -68,8 +69,10 @@ namespace STROOP.Tabs.MapTab
 
         public override void NotifyMouseEvent(MouseEvent mouseEvent, bool isLeftButton, int mouseX, int mouseY)
         {
-            (float x, float z) inGameCoords = MapUtilities.ConvertCoordsForInGame(mouseX, mouseY);
-            (float x, float y, float z) currentVertex = (inGameCoords.x, 0, inGameCoords.z);
+            Vector3 coords = Vector3.TransformPosition(
+                new Vector3(2 * mouseX / graphics.glControl.Width - 1, 2 * mouseY / graphics.glControl.Height, 0),
+                Matrix4.Invert(graphics.ViewMatrix));
+            (float x, float y, float z) currentVertex = (coords.X, 0, coords.Z);
             switch (mouseEvent)
             {
                 case MouseEvent.MouseDown:

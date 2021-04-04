@@ -23,13 +23,11 @@ namespace STROOP.Tabs.MapTab
 
         private MapObject _mapObjMap;
         private MapObject _mapObjBackground;
-        private MapObject _mapObjHitboxHackTris;
 
-        public void Initialize(MapObject mapObjMap, MapObject mapObjBackground, MapObject mapObjHitboxHackTris)
+        public void Initialize(MapObject mapObjMap, MapObject mapObjBackground)
         {
             _mapObjMap = mapObjMap;
             _mapObjBackground = mapObjBackground;
-            _mapObjHitboxHackTris = mapObjHitboxHackTris;
         }
 
         public void MoveUpControl(MapTracker mapTracker, int numMoves)
@@ -68,7 +66,7 @@ namespace STROOP.Tabs.MapTab
                 Controls.Add(mapTracker);
             }
         }
-        
+
         public void ClearControls()
         {
             lock (_objectLock)
@@ -82,15 +80,8 @@ namespace STROOP.Tabs.MapTab
 
         public void UpdateControl()
         {
-            if (StroopMainForm.instance.mapTab.checkBoxMapOptionsEnable3D.Checked)
-            {            
-                _mapObjHitboxHackTris?.Update();
-            }
-            else
-            {
-                _mapObjMap?.Update();
-                _mapObjBackground?.Update();
-            }
+            _mapObjMap?.Update();
+            _mapObjBackground?.Update();
 
             lock (_objectLock)
             {
@@ -105,7 +96,7 @@ namespace STROOP.Tabs.MapTab
         {
             _mapObjBackground?.DrawOn2DControl(graphics);
             _mapObjMap?.DrawOn2DControl(graphics);
-            
+
             List<MapObject> listOrderOnTop = new List<MapObject>();
             List<MapObject> listOrderOnBottom = new List<MapObject>();
             List<MapObject> listOrderByY = new List<MapObject>();
@@ -184,10 +175,6 @@ namespace STROOP.Tabs.MapTab
 
             List<MapObject> listCombined = listOrderOnBottom.Concat(listOrderByY).Concat(listOrderOnTop).ToList();
             listCombined.Insert(0, _mapObjBackground);
-            if (!StroopMainForm.instance.mapTab.checkBoxMapOptionsDisable3DHitboxHackTris.Checked)
-            {
-                listCombined.Insert(0, _mapObjHitboxHackTris);
-            }
 
             List<MapObject> listDrawType = listCombined.FindAll(obj => obj.GetDrawType() == drawType);
             foreach (MapObject obj in listDrawType)

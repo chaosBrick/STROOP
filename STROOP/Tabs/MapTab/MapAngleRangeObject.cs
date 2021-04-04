@@ -35,7 +35,7 @@ namespace STROOP.Tabs.MapTab
             OutlineColor = Color.Black;
         }
 
-        protected override List<(float x, float y, float z)> GetVertices()
+        protected override List<(float x, float y, float z)> GetVertices(MapGraphics graphics)
         {
             List<(float x, float y, float z)> vertices = new List<(float x, float y, float z)>();
             int startingAngle = _useRelativeAngles ? MoreMath.NormalizeAngleTruncated(_posAngle.Angle) : 0;

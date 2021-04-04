@@ -27,131 +27,131 @@ namespace STROOP.Tabs.MapTab
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, 1, 1, 0, OpenTK.Graphics.OpenGL.PixelFormat.Luminance, PixelType.UnsignedByte, _whiteTexData);
         }
 
-        public static Vector3 GetPositionOnViewFromCoordinate(Vector3 pos)
-        {
-            throw null;
-            //Vector4 vec = Vector4.Transform(new Vector4(pos, 1), Config.Map3DCamera.Matrix);
-            //vec.X /= vec.W;
-            //vec.Y /= vec.W;
-            //vec.Z = 0;
-            //return vec.Xyz;
-        }
+        //public static Vector3 GetPositionOnViewFromCoordinate(Vector3 pos)
+        //{
+        //    throw null;
+        //    //Vector4 vec = Vector4.Transform(new Vector4(pos, 1), Config.Map3DCamera.Matrix);
+        //    //vec.X /= vec.W;
+        //    //vec.Y /= vec.W;
+        //    //vec.Z = 0;
+        //    //return vec.Xyz;
+        //}
 
-        /** Takes in in-game coordinates, outputs control coordinates. */
-        public static (float x, float z) ConvertCoordsForControl(float x, float z)
-        {
-            throw null;
-            //x = graphics.MapViewEnablePuView ? x : (float)PuUtilities.GetRelativeCoordinate(x);
-            //z = graphics.MapViewEnablePuView ? z : (float)PuUtilities.GetRelativeCoordinate(z);
-            //float xOffset = x - graphics.MapViewCenterXValue;
-            //float zOffset = z - graphics.MapViewCenterZValue;
-            //(float xOffsetRotated, float zOffsetRotated) =
-            //    ((float, float))MoreMath.RotatePointAboutPointAnAngularDistance(
-            //        xOffset,
-            //        zOffset,
-            //        0,
-            //        0,
-            //        -1 * graphics.MapViewAngleValue);
-            //float xOffsetPixels = xOffsetRotated * graphics.MapViewScaleValue;
-            //float zOffsetPixels = zOffsetRotated * graphics.MapViewScaleValue;
-            //float centerX = glControl.Width / 2 + xOffsetPixels;
-            //float centerZ = glControl.Height / 2 + zOffsetPixels;
-            //return (centerX, centerZ);
-        }
+        ///** Takes in in-game coordinates, outputs control coordinates. */
+        //public static (float x, float z) ConvertCoordsForControl(float x, float z)
+        //{
+        //    throw null;
+        //    //x = graphics.MapViewEnablePuView ? x : (float)PuUtilities.GetRelativeCoordinate(x);
+        //    //z = graphics.MapViewEnablePuView ? z : (float)PuUtilities.GetRelativeCoordinate(z);
+        //    //float xOffset = x - graphics.MapViewCenterXValue;
+        //    //float zOffset = z - graphics.MapViewCenterZValue;
+        //    //(float xOffsetRotated, float zOffsetRotated) =
+        //    //    ((float, float))MoreMath.RotatePointAboutPointAnAngularDistance(
+        //    //        xOffset,
+        //    //        zOffset,
+        //    //        0,
+        //    //        0,
+        //    //        -1 * graphics.MapViewAngleValue);
+        //    //float xOffsetPixels = xOffsetRotated * graphics.MapViewScaleValue;
+        //    //float zOffsetPixels = zOffsetRotated * graphics.MapViewScaleValue;
+        //    //float centerX = glControl.Width / 2 + xOffsetPixels;
+        //    //float centerZ = glControl.Height / 2 + zOffsetPixels;
+        //    //return (centerX, centerZ);
+        //}
 
-        /** Takes in control coordinates, outputs in-game coordinates. */
-        public static (float x, float z) ConvertCoordsForInGame(float x, float z)
-        {
-            throw null;
-            //float xOffset = x - glControl.Width / 2;
-            //float zOffset = z - glControl.Height / 2;
-            //float xOffsetScaled = xOffset / graphics.MapViewScaleValue;
-            //float zOffsetScaled = zOffset / graphics.MapViewScaleValue;
-            //(float xOffsetScaledRotated, float zOffsetScaledRotated) =
-            //    ((float, float))MoreMath.RotatePointAboutPointAnAngularDistance(
-            //        xOffsetScaled,
-            //        zOffsetScaled,
-            //        0,
-            //        0,
-            //        graphics.MapViewAngleValue);
-            //float centerX = xOffsetScaledRotated + graphics.MapViewCenterXValue;
-            //float centerZ = zOffsetScaledRotated + graphics.MapViewCenterZValue;
-            //return (centerX, centerZ);
-        }
+        ///** Takes in control coordinates, outputs in-game coordinates. */
+        //public static (float x, float z) ConvertCoordsForInGame(float x, float z)
+        //{
+        //    throw null;
+        //    //float xOffset = x - glControl.Width / 2;
+        //    //float zOffset = z - glControl.Height / 2;
+        //    //float xOffsetScaled = xOffset / graphics.MapViewScaleValue;
+        //    //float zOffsetScaled = zOffset / graphics.MapViewScaleValue;
+        //    //(float xOffsetScaledRotated, float zOffsetScaledRotated) =
+        //    //    ((float, float))MoreMath.RotatePointAboutPointAnAngularDistance(
+        //    //        xOffsetScaled,
+        //    //        zOffsetScaled,
+        //    //        0,
+        //    //        0,
+        //    //        graphics.MapViewAngleValue);
+        //    //float centerX = xOffsetScaledRotated + graphics.MapViewCenterXValue;
+        //    //float centerZ = zOffsetScaledRotated + graphics.MapViewCenterZValue;
+        //    //return (centerX, centerZ);
+        //}
 
-        /** Takes in in-game coordinates, outputs control coordinates. */
-        public static (float x, float y, float z) ConvertCoordsForControl(float x, float y, float z)
-        {
-            (float convertedX, float convertedZ) = ConvertCoordsForControl(x, z);
-            return (convertedX, y, convertedZ);
-        }
+        ///** Takes in in-game coordinates, outputs control coordinates. */
+        //public static (float x, float y, float z) ConvertCoordsForControl(float x, float y, float z)
+        //{
+        //    (float convertedX, float convertedZ) = ConvertCoordsForControl(x, z);
+        //    return (convertedX, y, convertedZ);
+        //}
 
-        /** Takes in in-game angle, outputs control angle. */
-        public static float ConvertAngleForControl(double angle)
-        {
-            throw null;
-            //angle += 32768 - graphics.MapViewAngleValue;
-            //if (double.IsNaN(angle)) angle = 0;
-            //return (float)MoreMath.AngleUnitsToDegrees(angle);
-        }
+        ///** Takes in in-game angle, outputs control angle. */
+        //public static float ConvertAngleForControl(double angle)
+        //{
+        //    throw null;
+        //    //angle += 32768 - graphics.MapViewAngleValue;
+        //    //if (double.IsNaN(angle)) angle = 0;
+        //    //return (float)MoreMath.AngleUnitsToDegrees(angle);
+        //}
 
-        public static SizeF ScaleImageSizeForControl(Size imageSize, float desiredRadius)
-        {
-            throw null;
-            //float desiredDiameter = desiredRadius * 2;
-            //if (graphics.MapViewScaleIconSizes) desiredDiameter *= graphics.MapViewScaleValue;
-            //float scale = Math.Max(imageSize.Height / desiredDiameter, imageSize.Width / desiredDiameter);
-            //return new SizeF(imageSize.Width / scale, imageSize.Height / scale);
-        }
+        //public static SizeF ScaleImageSizeForControl(Size imageSize, float desiredRadius)
+        //{
+        //    throw null;
+        //    //float desiredDiameter = desiredRadius * 2;
+        //    //if (graphics.MapViewScaleIconSizes) desiredDiameter *= graphics.MapViewScaleValue;
+        //    //float scale = Math.Max(imageSize.Height / desiredDiameter, imageSize.Width / desiredDiameter);
+        //    //return new SizeF(imageSize.Width / scale, imageSize.Height / scale);
+        //}
 
-        public static MapLayout GetMapLayout(object mapLayoutChoice = null)
-        {
-            mapLayoutChoice = mapLayoutChoice ?? StroopMainForm.instance.mapTab.comboBoxMapOptionsLevel.SelectedItem;
-            if (mapLayoutChoice is MapLayout mapLayout)
-            {
-                return mapLayout;
-            }
-            else
-            {
-                return Config.MapAssociations.GetBestMap();
-            }
-        }
+        //public static MapLayout GetMapLayout(object mapLayoutChoice = null)
+        //{
+        //    mapLayoutChoice = mapLayoutChoice ?? StroopMainForm.instance.mapTab.comboBoxMapOptionsLevel.SelectedItem;
+        //    if (mapLayoutChoice is MapLayout mapLayout)
+        //    {
+        //        return mapLayout;
+        //    }
+        //    else
+        //    {
+        //        return Config.MapAssociations.GetBestMap();
+        //    }
+        //}
 
-        public static Lazy<Image> GetBackgroundImage(object backgroundChoice = null)
-        {
-            backgroundChoice = backgroundChoice ?? StroopMainForm.instance.mapTab.comboBoxMapOptionsBackground.SelectedItem;
-            if (backgroundChoice is BackgroundImage background)
-            {
-                return background.Image;
-            }
-            else
-            {
-                return Config.MapAssociations.GetBestMap().BackgroundImage;
-            }
-        }
+        //public static Lazy<Image> GetBackgroundImage(object backgroundChoice = null)
+        //{
+        //    backgroundChoice = backgroundChoice ?? StroopMainForm.instance.mapTab.comboBoxMapOptionsBackground.SelectedItem;
+        //    if (backgroundChoice is BackgroundImage background)
+        //    {
+        //        return background.Image;
+        //    }
+        //    else
+        //    {
+        //        return Config.MapAssociations.GetBestMap().BackgroundImage;
+        //    }
+        //}
 
-        public static List<(float x, float z)> GetPuCenters()
-        {
-            throw null;
-            //int xMin = ((((int)graphics.MapViewXMin) / 65536) - 1) * 65536;
-            //int xMax = ((((int)graphics.MapViewXMax) / 65536) + 1) * 65536;
-            //int zMin = ((((int)graphics.MapViewZMin) / 65536) - 1) * 65536;
-            //int zMax = ((((int)graphics.MapViewZMax) / 65536) + 1) * 65536;
-            //List<(float x, float z)> centers = new List<(float x, float z)>();
-            //for (int x = xMin; x <= xMax; x += 65536)
-            //{
-            //    for (int z = zMin; z <= zMax; z += 65536)
-            //    {
-            //        centers.Add((x, z));
-            //    }
-            //}
-            //return centers;
-        }
+        //public static List<(float x, float z)> GetPuCenters()
+        //{
+        //    throw null;
+        //    //int xMin = ((((int)graphics.MapViewXMin) / 65536) - 1) * 65536;
+        //    //int xMax = ((((int)graphics.MapViewXMax) / 65536) + 1) * 65536;
+        //    //int zMin = ((((int)graphics.MapViewZMin) / 65536) - 1) * 65536;
+        //    //int zMax = ((((int)graphics.MapViewZMax) / 65536) + 1) * 65536;
+        //    //List<(float x, float z)> centers = new List<(float x, float z)>();
+        //    //for (int x = xMin; x <= xMax; x += 65536)
+        //    //{
+        //    //    for (int z = zMin; z <= zMax; z += 65536)
+        //    //    {
+        //    //        centers.Add((x, z));
+        //    //    }
+        //    //}
+        //    //return centers;
+        //}
 
-        public static List<(float x, float z)> GetPuCoordinates(float relX, float relZ)
-        {
-            return GetPuCenters().ConvertAll(center => (center.x + relX, center.z + relZ));
-        }
+        //public static List<(float x, float z)> GetPuCoordinates(float relX, float relZ)
+        //{
+        //    return GetPuCenters().ConvertAll(center => (center.x + relX, center.z + relZ));
+        //}
 
         public static int LoadTexture(Bitmap bmp)
         {
@@ -356,21 +356,6 @@ namespace STROOP.Tabs.MapTab
                 if (trackBar.Maximum == maxValue) item.Checked = true;
                 trackBar.ContextMenuStrip.Items.Add(item);
             }
-        }
-
-        public static bool IsAbleToShowUnitPrecision()
-        {
-            throw null;
-            //int xMin = (int)graphics.MapViewXMin - 1;
-            //int xMax = (int)graphics.MapViewXMax + 1;
-            //int zMin = (int)graphics.MapViewZMin - 1;
-            //int zMax = (int)graphics.MapViewZMax + 1;
-
-            //int xDiff = xMax - xMin;
-            //int zDiff = zMax - zMin;
-
-            //return xDiff < glControl.Width &&
-            //    zDiff < glControl.Height;
         }
 
         public static List<(double x, double y, double z)> ParsePoints(string text, bool useTriplets)

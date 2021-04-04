@@ -46,7 +46,7 @@ namespace STROOP.Tabs.MapTab
             return new MapLineSegmentObject(posAngle1, posAngle2);
         }
 
-        protected override List<(float x, float y, float z)> GetVertices()
+        protected override List<(float x, float y, float z)> GetVertices(MapGraphics graphics)
         {
             (double x1, double y1, double z1, double angle1) = _posAngle1.GetValues();
             (double x2, double y2, double z2, double angle2) = _posAngle2.GetValues();

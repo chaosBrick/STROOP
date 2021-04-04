@@ -34,48 +34,17 @@ namespace STROOP.Tabs.MapTab
 
         public override void DrawOn2DControl(MapGraphics graphics)
         {
-            List<(float centerX, float centerZ, float radius, float angle, float angleRadius)> dimenstionList = GetDimensions();
-
-            foreach ((float centerX, float centerZ, float radius, float angle, float angleRadius) in dimenstionList)
+            graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
             {
-                (float controlCenterX, float controlCenterZ) = MapUtilities.ConvertCoordsForControl(centerX, centerZ);
-                float controlRadius = radius * graphics.MapViewScaleValue;
-                List <(float pointX, float pointZ)> outerPoints = Enumerable.Range(0, NUM_POINTS_2D).ToList()
-                    .ConvertAll(index => (index - NUM_POINTS_2D / 2) / (float)(NUM_POINTS_2D / 2))
-                    .ConvertAll(proportion => angle + proportion * angleRadius)
-                    .ConvertAll(ang => ((float, float))MoreMath.AddVectorToPoint(controlRadius, ang, controlCenterX, controlCenterZ));
+                List<(float centerX, float centerZ, float radius, float angle, float angleRadius)> dimenstionList = GetDimensions();
+                foreach ((float centerX, float centerZ, float radius, float angle, float angleRadius) in dimenstionList)
+                    graphics.circleRenderer.AddInstance(
+                        Matrix4.CreateScale(radius) * Matrix4.CreateTranslation(centerX, 0, centerZ),
+                        OutlineWidth,
+                        ColorUtilities.ColorToVec4(Color, OpacityByte),
+                        ColorUtilities.ColorToVec4(OutlineColor));
 
-                GL.BindTexture(TextureTarget.Texture2D, -1);
-                GL.MatrixMode(MatrixMode.Modelview);
-                GL.LoadIdentity();
-
-                // Draw circle
-                GL.Color4(Color.R, Color.G, Color.B, OpacityByte);
-                GL.Begin(PrimitiveType.TriangleFan);
-                GL.Vertex2(controlCenterX, controlCenterZ);
-                foreach ((float x, float z) in outerPoints)
-                {
-                    GL.Vertex2(x, z);
-                }
-                GL.End();
-
-                // Draw outline
-                if (OutlineWidth != 0)
-                {
-                    GL.Color4(OutlineColor.R, OutlineColor.G, OutlineColor.B, (byte)255);
-                    GL.LineWidth(OutlineWidth);
-                    GL.Begin(PrimitiveType.LineLoop);
-                    GL.Vertex2(controlCenterX, controlCenterZ);
-                    foreach ((float x, float z) in outerPoints)
-                    {
-                        GL.Vertex2(x, z);
-                    }
-                    GL.Vertex2(controlCenterX, controlCenterZ);
-                    GL.End();
-                }
-            }
-
-            GL.Color4(1, 1, 1, 1.0f);
+            });
         }
 
         public override void DrawOn3DControl(Map3DGraphics graphics)
