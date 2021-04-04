@@ -202,7 +202,7 @@ namespace STROOP.Tabs.GhostTab
                 }
 
                 GhostFrame currentFrame;
-                var idx = globalTimer - selectedGhost.playbackBaseFrame;
+                var idx = (globalTimer - 1) - selectedGhost.playbackBaseFrame;
                 if (idx >= 0 && selectedGhost.playbackFrames.TryGetValue((uint)idx, out currentFrame))
                 {
                     this.currentGhostFrame = currentFrame;
