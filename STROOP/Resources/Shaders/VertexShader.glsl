@@ -1,8 +1,8 @@
 ﻿#version 110
 
-in vec3 position;
-in vec4 color;
-in vec2 texCoords;
+attribute vec3 position;
+attribute vec4 color;
+attribute vec2 texCoords;
 
 uniform mat4 view;
 

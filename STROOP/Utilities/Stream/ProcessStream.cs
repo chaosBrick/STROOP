@@ -323,7 +323,7 @@ namespace STROOP.Utilities
 
 
                     int alignedReadByteCount = (readBytes.Length / 4) * 4 + 8;
-                    if (alignedAddress + alignedReadByteCount> _ram.Length)
+                    if (alignedAddress + alignedReadByteCount > _ram.Length)
                         break;
                     swapBytes = new byte[alignedReadByteCount];
 
@@ -651,8 +651,9 @@ namespace STROOP.Utilities
                     else
                         Thread.Yield();
                 }
-                catch (Exception)
+                catch (Exception exception)
                 {
+                    MessageBox.Show($"An exception occured in {nameof(ProcessUpdate)}:\n{exception.ToString()}");
                     Debugger.Break();
                 }
             }

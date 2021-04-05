@@ -152,6 +152,8 @@ namespace STROOP.Tabs.MapTab
 
         private void OnPaint()
         {
+            if (Config.Stream == null)
+                return;
             Cursor cursor = StroopMainForm.instance.mapTab.NumDrawingsEnabled > 0 ? Cursors.Cross : Cursors.Hand;
             if (glControl.Cursor != cursor)
                 glControl.Cursor = cursor;
