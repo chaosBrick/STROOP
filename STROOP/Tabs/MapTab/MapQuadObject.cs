@@ -18,6 +18,25 @@ namespace STROOP.Tabs.MapTab
             //List<List<(float x, float z)>> quadListForControl =
             //    quadList.ConvertAll(quad => quad.ConvertAll(
             //        vertex => MapUtilities.ConvertCoordsForControl(vertex.x, vertex.z)));
+            graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
+            {
+
+                var color = Utilities.ColorUtilities.ColorToVec4(Color, OpacityByte);
+                var outlineColor = Utilities.ColorUtilities.ColorToVec4(OutlineColor);
+
+                foreach (var quad in GetQuadList())
+                {
+                    Matrix4 transform =
+                        Matrix4.CreateScale((quad.xMax - quad.xMin) * 0.5f, (quad.zMax - quad.zMin) * 0.5f, 0)
+                    * Matrix4.CreateTranslation((quad.xMin + quad.xMax) * 0.5f, (quad.zMin + quad.zMax) * 0.5f, 0);
+                    graphics.circleRenderer.AddInstance(
+                             transform,
+                             OutlineWidth,
+                             color,
+                             outlineColor,
+                             Renderers.CircleRenderer.Shapes.Quad);
+                }
+            });
 
             //GL.BindTexture(TextureTarget.Texture2D, -1);
             //GL.MatrixMode(MatrixMode.Modelview);
@@ -54,7 +73,7 @@ namespace STROOP.Tabs.MapTab
             //GL.Color4(1, 1, 1, 1.0f);
         }
 
-        protected abstract List<List<(float x, float y, float z)>> GetQuadList();
+        protected abstract List<(float xMin, float zMin, float xMax, float zMax)> GetQuadList();
 
         public override MapDrawType GetDrawType()
         {

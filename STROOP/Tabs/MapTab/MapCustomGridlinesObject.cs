@@ -12,7 +12,7 @@ using OpenTK;
 
 namespace STROOP.Tabs.MapTab
 {
-    [ObjectDescription("Custom Gridlines")]
+    [ObjectDescription("Custom Gridlines", "Grid")]
     public class MapCustomGridlinesObject : MapLineObject
     {
         public MapCustomGridlinesObject()

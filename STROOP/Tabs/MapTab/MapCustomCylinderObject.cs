@@ -1,15 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using OpenTK.Graphics.OpenGL;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
-using OpenTK;
-using System.Drawing.Imaging;
 using System.Windows.Forms;
 
 namespace STROOP.Tabs.MapTab
@@ -45,12 +39,7 @@ namespace STROOP.Tabs.MapTab
             return "Cylinder for " + _posAngle.GetMapName();
         }
 
-        public override PositionAngle GetPositionAngle()
-        {
-            return _posAngle;
-        }
-
-        public override ContextMenuStrip GetContextMenuStrip()
+        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {
@@ -62,7 +51,7 @@ namespace STROOP.Tabs.MapTab
                     if (!relativeMinY.HasValue) return;
                     MapObjectSettings settings = new MapObjectSettings(
                         customCylinderChangeRelativeMinY: true, customCylinderNewRelativeMinY: relativeMinY.Value);
-                    GetParentMapTracker().ApplySettings(settings);
+                    targetTracker.ApplySettings(settings);
                 };
 
                 ToolStripMenuItem itemSetRelativeMaxY = new ToolStripMenuItem("Set Relative Max Y...");
@@ -73,7 +62,7 @@ namespace STROOP.Tabs.MapTab
                     if (!relativeMaxY.HasValue) return;
                     MapObjectSettings settings = new MapObjectSettings(
                         customCylinderChangeRelativeMaxY: true, customCylinderNewRelativeMaxY: relativeMaxY.Value);
-                    GetParentMapTracker().ApplySettings(settings);
+                    targetTracker.ApplySettings(settings);
                 };
 
                 _contextMenuStrip = new ContextMenuStrip();

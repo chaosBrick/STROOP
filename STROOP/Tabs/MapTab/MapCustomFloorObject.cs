@@ -1,21 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using OpenTK.Graphics.OpenGL;
-using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
-using OpenTK;
-using System.Drawing.Imaging;
 using STROOP.Models;
 using System.Windows.Forms;
 
 namespace STROOP.Tabs.MapTab
 {
-    [ObjectDescription("Custom Floor Trianlges", nameof(Create))]
+    [ObjectDescription("Custom Floor Triangles", "Triangles", nameof(Create))]
     public class MapCustomFloorObject : MapFloorObject
     {
         private readonly List<uint> _triAddressList;
@@ -44,14 +37,14 @@ namespace STROOP.Tabs.MapTab
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.TriangleFloorImage;
 
-        public override ContextMenuStrip GetContextMenuStrip()
+        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {
                 _contextMenuStrip = new ContextMenuStrip();
                 GetFloorToolStripMenuItems().ForEach(item => _contextMenuStrip.Items.Add(item));
                 _contextMenuStrip.Items.Add(new ToolStripSeparator());
-                GetHorizontalTriangleToolStripMenuItems().ForEach(item => _contextMenuStrip.Items.Add(item));
+                GetHorizontalTriangleToolStripMenuItems(targetTracker).ForEach(item => _contextMenuStrip.Items.Add(item));
                 _contextMenuStrip.Items.Add(new ToolStripSeparator());
                 GetTriangleToolStripMenuItems().ForEach(item => _contextMenuStrip.Items.Add(item));
             }

@@ -234,7 +234,7 @@
 //            return bmp;
 //        }
 
-//        public override ContextMenuStrip GetContextMenuStrip()
+//        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
 //        {
 //            if (_contextMenuStrip == null)
 //            {

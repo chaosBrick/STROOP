@@ -35,12 +35,12 @@ namespace STROOP.Tabs.MapTab
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.TriangleWallImage;
 
-        public override ContextMenuStrip GetContextMenuStrip()
+        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {
                 _contextMenuStrip = new ContextMenuStrip();
-                GetWallToolStripMenuItems().ForEach(item => _contextMenuStrip.Items.Add(item));
+                GetWallToolStripMenuItems(targetTracker).ForEach(item => _contextMenuStrip.Items.Add(item));
                 _contextMenuStrip.Items.Add(new ToolStripSeparator());
                 GetTriangleToolStripMenuItems().ForEach(item => _contextMenuStrip.Items.Add(item));
             }

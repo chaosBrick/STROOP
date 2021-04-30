@@ -13,26 +13,36 @@ using STROOP.Models;
 
 namespace STROOP.Tabs.MapTab
 {
-    public class MapHomeObject : MapIconPointObject
+    public class MapIconPredicateObject : MapIconPointObject
     {
-        private readonly PositionAngle _posAngle;
+        public override void DrawOn2DControl(MapGraphics graphics)
+        {
+            graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
+            {
+                foreach (var a in positionAngleProvider())
+                    DrawIcon(graphics, (float)a.X, (float)a.Z, Rotates ? (float)a.Angle : 0x8000 - graphics.MapViewAngleValue, GetInternalImage().Value);
+            });
+        }
 
-        public MapHomeObject(uint objAddress)
+        public MapIconPredicateObject(PositionAngleProvider positionAngleProvider)
             : base()
         {
-            _posAngle = PositionAngle.ObjHome(objAddress);
+            this.positionAngleProvider = positionAngleProvider;
         }
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.HomeImage;
 
-        public override PositionAngle GetPositionAngle()
-        {
-            return _posAngle;
-        }
-
         public override string GetName()
         {
-            return _posAngle.GetMapName();
+            string firstString = null;
+            foreach (var _ in positionAngleProvider())
+            {
+                if (firstString == null)
+                    firstString = _.GetMapName();
+                else
+                    firstString = "Many";
+            }
+            return "Home of " + firstString;
         }
     }
 }

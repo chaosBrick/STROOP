@@ -45,7 +45,7 @@ namespace STROOP.Utilities
         public ProcessStream()
         {
             _ram = new byte[Config.RamSize];
-            _mainTask = Task.Run(() => ProcessUpdate());
+            //_mainTask = Task.Run(() => ProcessUpdate());
         }
 
         /// <summary>
@@ -53,7 +53,12 @@ namespace STROOP.Utilities
         /// </summary>
         public async Task WaitForDispose()
         {
-            await _mainTask;
+            //await _mainTask;
+        }
+
+        public void Run()
+        {
+            ProcessUpdate();
         }
 
         private void LogException(Exception e)
@@ -612,50 +617,51 @@ namespace STROOP.Utilities
 
             while (!disposedValue)
             {
-                try
+                System.Windows.Forms.Application.DoEvents();
+                //try
+                //{
+                int timeToWait;
+                lock (_mStreamProcess)
                 {
-                    int timeToWait;
-                    lock (_mStreamProcess)
+
+                    frameStopwatch.Restart();
+                    if ((!IsEnabled || !IsRunning) && !_lastUpdateBeforePausing)
+                        goto FrameLimitStreamUpdate;
+
+                    _lastUpdateBeforePausing = false;
+
+                    if (!RefreshRam())
+                        goto FrameLimitStreamUpdate;
+
+                    OnUpdate?.Invoke(this, new EventArgs());
+
+                    FrameLimitStreamUpdate:
+
+                    // Calculate delay to match correct FPS
+                    frameStopwatch.Stop();
+                    timeToWait = (int)RefreshRateConfig.RefreshRateInterval - (int)frameStopwatch.ElapsedMilliseconds;
+                    timeToWait = Math.Max(timeToWait, 0);
+
+                    // Calculate Fps
+                    if (_fpsTimes.Count() >= 10)
                     {
-
-                        frameStopwatch.Restart();
-                        if ((!IsEnabled || !IsRunning) && !_lastUpdateBeforePausing)
-                            goto FrameLimitStreamUpdate;
-
-                        _lastUpdateBeforePausing = false;
-
-                        if (!RefreshRam())
-                            goto FrameLimitStreamUpdate;
-
-                        OnUpdate?.Invoke(this, new EventArgs());
-
-                        FrameLimitStreamUpdate:
-
-                        // Calculate delay to match correct FPS
-                        frameStopwatch.Stop();
-                        timeToWait = (int)RefreshRateConfig.RefreshRateInterval - (int)frameStopwatch.ElapsedMilliseconds;
-                        timeToWait = Math.Max(timeToWait, 0);
-
-                        // Calculate Fps
-                        if (_fpsTimes.Count() >= 10)
-                        {
-                            double garbage;
-                            _fpsTimes.TryDequeue(out garbage);
-                        }
-                        _fpsTimes.Enqueue(frameStopwatch.ElapsedMilliseconds + timeToWait);
-                        FpsUpdated?.Invoke(this, new EventArgs());
+                        double garbage;
+                        _fpsTimes.TryDequeue(out garbage);
                     }
+                    _fpsTimes.Enqueue(frameStopwatch.ElapsedMilliseconds + timeToWait);
+                    FpsUpdated?.Invoke(this, new EventArgs());
+                }
 
-                    if (timeToWait > 0)
-                        Thread.Sleep(timeToWait);
-                    else
-                        Thread.Yield();
-                }
-                catch (Exception exception)
-                {
-                    MessageBox.Show($"An exception occured in {nameof(ProcessUpdate)}:\n{exception.ToString()}");
-                    Debugger.Break();
-                }
+                if (timeToWait > 0)
+                    Thread.Sleep(timeToWait);
+                else
+                    Thread.Yield();
+                //}
+                //catch (Exception exception)
+                //{
+                //    Debugger.Break();
+                //    MessageBox.Show($"An exception occured in {nameof(ProcessUpdate)}:\n{exception.ToString()}");
+                //}
             }
         }
 

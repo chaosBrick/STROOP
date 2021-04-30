@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using OpenTK.Graphics.OpenGL;
+using System.Collections.Generic;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
-using STROOP.Structs;
 using OpenTK;
+using System.Windows.Forms;
 
 namespace STROOP.Tabs.MapTab
 {
-    [ObjectDescription("Ghost")]
+    [ObjectDescription("Ghost", "Objects")]
     public class MapGhostObject : MapIconPointObject
     {
         class GhostPositionAngle : PositionAngle
@@ -34,12 +30,23 @@ namespace STROOP.Tabs.MapTab
         public MapGhostObject()
             : base()
         {
+            positionAngleProvider = () => new List<PositionAngle>(new[] { GhostPositionAngle.instance });
             InternalRotates = true;
         }
 
-        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.GreenMarioMapImage;
+        public override void InitSubTrackerContextMenuStrip(ContextMenuStrip targetStrip)
+        {
+            base.InitSubTrackerContextMenuStrip(targetStrip);
 
-        public override PositionAngle GetPositionAngle() => GhostPositionAngle.instance;
+            targetStrip.Items.AddHandlerToItem("Add Tracker for Ghost Graphics Angle",
+                 () => MapTracker.CreateTracker(new MapArrowObject(
+                     positionAngleProvider,
+                     _ => GhostPositionAngle.instance.Angle,
+                     MapArrowObject.ArrowSource.Constant(100),
+                     $"Ghost Graphics Angle")));
+        }
+
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.GreenMarioMapImage;
 
         public override string GetName()
         {

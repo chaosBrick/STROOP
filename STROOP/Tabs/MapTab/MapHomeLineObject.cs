@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using OpenTK.Graphics.OpenGL;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
-using STROOP.Structs;
-using OpenTK;
 
 namespace STROOP.Tabs.MapTab
 {
@@ -17,12 +11,13 @@ namespace STROOP.Tabs.MapTab
         private readonly PositionAngle _objPosAngle;
         private readonly PositionAngle _homePosAngle;
 
-        public MapHomeLineObject(uint objAddress)
+        string name;
+
+        public MapHomeLineObject(PositionAngleProvider positionAngleProvider, string name)
             : base()
         {
-            _objPosAngle = PositionAngle.Obj(objAddress);
-            _homePosAngle = PositionAngle.ObjHome(objAddress);
-
+            this.positionAngleProvider = positionAngleProvider;
+            this.name = name;
             OutlineWidth = 3;
             OutlineColor = Color.Black;
         }
@@ -30,21 +25,19 @@ namespace STROOP.Tabs.MapTab
         protected override List<(float x, float y, float z)> GetVertices(MapGraphics graphics)
         {
             List<(float x, float y, float z)> vertices = new List<(float x, float y, float z)>();
-            vertices.Add(((float)_homePosAngle.X, (float)_homePosAngle.Y, (float)_homePosAngle.Z));
-            vertices.Add(((float)_objPosAngle.X, (float)_objPosAngle.Y, (float)_objPosAngle.Z));
+            foreach (var posAngle in positionAngleProvider())
+            {
+                var address = posAngle.GetObjAddress();
+                var _objPosAngle = PositionAngle.Obj(address);
+                var _homePosAngle = PositionAngle.ObjHome(address);
+                vertices.Add(((float)_homePosAngle.X, (float)_homePosAngle.Y, (float)_homePosAngle.Z));
+                vertices.Add(((float)_objPosAngle.X, (float)_objPosAngle.Y, (float)_objPosAngle.Z));
+            }
             return vertices;
         }
 
-        public override string GetName()
-        {
-            return "Home Line";
-        }
+        public override string GetName() => $"Home Line for {name}";
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.ArrowImage;
-
-        public override PositionAngle GetPositionAngle()
-        {
-            return _objPosAngle;
-        }
     }
 }

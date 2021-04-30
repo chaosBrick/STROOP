@@ -55,10 +55,5 @@ namespace STROOP.Tabs.MapTab
                 rectangleCenter => (new PointF(rectangleCenter.x, rectangleCenter.z), new SizeF(rectangle.Width, rectangle.Height)));
             return dimensions;
         }
-
-        public override void DrawOn3DControl(Map3DGraphics graphics)
-        {
-            // do nothing
-        }
     }
 }

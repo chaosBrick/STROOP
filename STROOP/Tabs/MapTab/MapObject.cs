@@ -17,6 +17,11 @@ namespace STROOP.Tabs.MapTab
 
         public delegate IEnumerable<PositionAngle> PositionAngleProvider();
 
+        public static PositionAngleProvider NoPositionAngles = () => new PositionAngle[0];
+
+        public PositionAngleProvider positionAngleProvider { get; protected set; } = NoPositionAngles;
+
+
         public float Size = 25;
         public double Opacity = 1;
         public byte OpacityByte
@@ -41,22 +46,18 @@ namespace STROOP.Tabs.MapTab
             get => CustomRotates ?? InternalRotates;
         }
 
-        private BehaviorCriteria? _behaviorCriteriaToDisplay = null;
-
         public bool ShowTriUnits = false;
 
         protected ContextMenuStrip _contextMenuStrip = null;
 
-        public MapObject()
-        {
-        }
+        public MapObject() { }
 
         public void DrawIcon(MapGraphics graphics, float x, float z, float angle, Image image)
         {
             float desiredDiameter = Size * 2;
             if (!graphics.MapViewScaleIconSizes) desiredDiameter /= graphics.MapViewScaleValue;
             float scale = Math.Max(image.Height / desiredDiameter, image.Width / desiredDiameter);
-            float dsads = (float)MoreMath.AngleUnitsToRadians(Rotates ? angle : -graphics.MapViewAngleValue);
+            float dsads = (float)MoreMath.AngleUnitsToRadians(angle);
             Matrix4 transform =
                 Matrix4.CreateScale(image.Width / scale, image.Height / scale, 0)
                 * Matrix4.CreateRotationZ(-dsads)
@@ -93,58 +94,24 @@ namespace STROOP.Tabs.MapTab
 
         public virtual float GetY()
         {
-            PositionAngle posAngle = GetPositionAngle();
-            if (posAngle == null) return float.PositiveInfinity;
-            return (float)posAngle.Y;
+            if (positionAngleProvider == null)
+                return float.NegativeInfinity;
+            var maxY = float.NegativeInfinity;
+            foreach (var obj in positionAngleProvider())
+                if (obj.Y > maxY)
+                    maxY = (float)obj.Y;
+            return maxY;
         }
 
-        public void NotifyStoreBehaviorCritera()
-        {
-            ObjectDataModel obj = GetObject();
-            if (obj == null) return;
-            obj.Update();
-            _behaviorCriteriaToDisplay = obj.BehaviorCriteria;
-        }
-
-        public bool ShouldDisplay(MapTrackerVisibilityType visiblityType)
-        {
-            ObjectDataModel obj = GetObject();
-            if (obj == null) return true;
-            obj.Update();
-            switch (visiblityType)
-            {
-                case MapTrackerVisibilityType.VisibleAlways:
-                    return true;
-                case MapTrackerVisibilityType.VisibleWhenLoaded:
-                    return obj.IsActive;
-                case MapTrackerVisibilityType.VisibleWhenThisBhvrIsLoaded:
-                    return obj.IsActive && BehaviorCriteria.HasSameAssociation(obj.BehaviorCriteria, _behaviorCriteriaToDisplay);
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        public virtual PositionAngle GetPositionAngle()
-        {
-            return null;
-        }
+        public bool ShouldDisplay(MapTrackerVisibilityType visiblityType) => true;
         public virtual PositionAngleProvider GetPositionAngleProvider() => null;
-
-        public virtual ObjectDataModel GetObject()
-        {
-            PositionAngle posAngle = GetPositionAngle();
-            if (posAngle == null) return null;
-            if (!posAngle.IsObjectDependent()) return null;
-            uint objAddress = posAngle.GetObjectAddressIfObjectDependent().Value;
-            return new ObjectDataModel(objAddress, true);
-        }
 
         public override string ToString()
         {
             return GetName();
         }
 
-        public virtual ContextMenuStrip GetContextMenuStrip()
+        public virtual ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {
@@ -157,20 +124,13 @@ namespace STROOP.Tabs.MapTab
             return _contextMenuStrip;
         }
 
+        public virtual void InitSubTrackerContextMenuStrip(ContextMenuStrip targetStrip) { }
+
         public virtual void Update() { }
 
         public virtual bool ParticipatesInGlobalIconSize() => false;
 
         public virtual void ApplySettings(MapObjectSettings settings) { }
-
-        protected MapTracker GetParentMapTracker()
-        {
-            foreach (MapTracker mapTracker in StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.Controls)
-            {
-                if (mapTracker.ContainsMapObject(this)) return mapTracker;
-            }
-            return null;
-        }
 
         public virtual void NotifyMouseEvent(MouseEvent mouseEvent, bool isLeftButton, int mouseX, int mouseY) { }
 

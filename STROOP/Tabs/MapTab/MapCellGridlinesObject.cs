@@ -6,7 +6,7 @@ using STROOP.Structs;
 
 namespace STROOP.Tabs.MapTab
 {
-    [ObjectDescription("Cell Gridlines")]
+    [ObjectDescription("Cell Gridlines", "Grid")]
     public class MapCellGridlinesObject : MapLineObject
     {
         public MapCellGridlinesObject()

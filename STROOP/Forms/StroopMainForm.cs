@@ -22,8 +22,8 @@ namespace STROOP
     public partial class StroopMainForm : Form
     {
         public static StroopMainForm instance { get; private set; }
-        
-        const string _version = "Refactor 0.1";
+
+        const string _version = "Refactor 0.2";
 
         ScriptParser _scriptParser;
 
@@ -38,9 +38,7 @@ namespace STROOP
             instance = this;
             while (LoadingHandler.LoadingForm == null)
                 System.Threading.Thread.Sleep(10);
-            LoadConfig(LoadingHandler.LoadingForm);
-            InitializeComponent();
-            CreateManagers();
+            Initialize(LoadingHandler.LoadingForm);
         }
 
         private bool AttachToProcess(Process process)
@@ -78,7 +76,7 @@ namespace STROOP
             Config.TabControlMain.SelectedIndex = 0;
             InitializeTabRemoval();
             SavedSettingsConfig.InvokeInitiallySavedRemovedTabs();
-            
+
             labelVersionNumber.Text = _version;
 
             // Collect garbage, we are fully loaded now!
@@ -89,6 +87,14 @@ namespace STROOP
             buttonRefresh_Click(this, new EventArgs());
             panelConnect.Location = new Point();
             panelConnect.Size = this.Size;
+        }
+
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+            BringToFront();
+            Activate();
+            Config.Stream.Run();
         }
 
         private void InitializeTabRemoval()
@@ -261,57 +267,54 @@ namespace STROOP
             }));
         }
 
-        public void LoadConfig(MainLoadingForm loadingForm)
+        public void Initialize(MainLoadingForm loadingForm)
         {
-            int statusNum = 0;
-
             // Read configuration
-            loadingForm.UpdateStatus("Loading main configuration", statusNum++);
-            XmlConfigParser.OpenConfig(@"Config/Config.xml");
-            XmlConfigParser.OpenSavedSettings(@"Config/SavedSettings.xml");
-            loadingForm.UpdateStatus("Loading Miscellaneous Data", statusNum++);
-            loadingForm.UpdateStatus("Loading Object Data", statusNum++);
-            loadingForm.UpdateStatus("Loading Object Associations", statusNum++);
-            Config.ObjectAssociations = XmlConfigParser.OpenObjectAssoc(@"Config/ObjectAssociations.xml");
-            loadingForm.UpdateStatus("Loading Mario Data", statusNum++);
-            loadingForm.UpdateStatus("Loading Camera Data", statusNum++);
-            loadingForm.UpdateStatus("Loading Actions Data", statusNum++);
-            loadingForm.UpdateStatus("Loading Water Data", statusNum++);
-            loadingForm.UpdateStatus("Loading Input Data", statusNum++);
-            loadingForm.UpdateStatus("Loading Input Image Associations", statusNum++);
-            loadingForm.UpdateStatus("Loading File Data", statusNum++);
-            loadingForm.UpdateStatus("Loading File Image Associations", statusNum++);
-            XmlConfigParser.OpenFileImageAssoc(@"Config/FileImageAssociations.xml", Config.FileImageGui);
-            loadingForm.UpdateStatus("Loading Area Data", statusNum++);
-            loadingForm.UpdateStatus("Loading Quarter Frame Data", statusNum++);
-            loadingForm.UpdateStatus("Loading Camera Hack Data", statusNum++);
-            loadingForm.UpdateStatus("Loading Triangles Data", statusNum++);
-            loadingForm.UpdateStatus("Loading Debug Data", statusNum++);
-            loadingForm.UpdateStatus("Loading HUD Data", statusNum++);
-            loadingForm.UpdateStatus("Loading Map Associations", statusNum++);
-            Config.MapAssociations = XmlConfigParser.OpenMapAssoc(@"Config/MapAssociations.xml");
-            loadingForm.UpdateStatus("Loading Scripts", statusNum++);
-            _scriptParser = XmlConfigParser.OpenScripts(@"Config/Scripts.xml");
-            loadingForm.UpdateStatus("Loading Hacks", statusNum++);
-            loadingForm.UpdateStatus("Loading Mario Actions", statusNum++);
-
-            TableConfig.MarioActions = XmlConfigParser.OpenActionTable(@"Config/MarioActions.xml");
-            TableConfig.MarioAnimations = XmlConfigParser.OpenAnimationTable(@"Config/MarioAnimations.xml");
-            TableConfig.TriangleInfo = XmlConfigParser.OpenTriangleInfoTable(@"Config/TriangleInfo.xml");
-            TableConfig.PendulumSwings = XmlConfigParser.OpenPendulumSwingTable(@"Config/PendulumSwings.xml");
-            TableConfig.RacingPenguinWaypoints = XmlConfigParser.OpenWaypointTable(@"Config/RacingPenguinWaypoints.xml");
-            TableConfig.KoopaTheQuick1Waypoints = XmlConfigParser.OpenWaypointTable(@"Config/KoopaTheQuick1Waypoints.xml");
-            TableConfig.KoopaTheQuick2Waypoints = XmlConfigParser.OpenWaypointTable(@"Config/KoopaTheQuick2Waypoints.xml");
-            TableConfig.TtmBowlingBallPoints = XmlConfigParser.OpenPointTable(@"Config/TtmBowlingBallPoints.xml");
-            TableConfig.Missions = XmlConfigParser.OpenMissionTable(@"Config/Missions.xml");
-            TableConfig.CourseData = XmlConfigParser.OpenCourseDataTable(@"Config/CourseData.xml");
-            TableConfig.FlyGuyData = new FlyGuyDataTable();
-            TableConfig.WdwRotatingPlatformTable = new ObjectAngleTable(1120);
-            TableConfig.ElevatorAxleTable = new ObjectAngleTable(400);
-
-            loadingForm.UpdateStatus("Creating Managers", statusNum++);
-
-            loadingForm.UpdateStatus("Finishing", statusNum);
+            loadingForm.RunLoadingTasks(
+                ("Loading main configuration",
+                () =>
+                {
+                    XmlConfigParser.OpenConfig(@"Config/Config.xml");
+                    XmlConfigParser.OpenSavedSettings(@"Config/SavedSettings.xml");
+                }
+            ),
+                ("Loading Object Associations",
+                () => Config.ObjectAssociations = XmlConfigParser.OpenObjectAssoc(@"Config/ObjectAssociations.xml")
+            ),
+                ("Loading File Image Associations",
+                () => XmlConfigParser.OpenFileImageAssoc(@"Config/FileImageAssociations.xml", Config.FileImageGui)
+            ),
+                ("Loading Map Associations",
+                () => Config.MapAssociations = XmlConfigParser.OpenMapAssoc(@"Config/MapAssociations.xml")
+            ),
+                ("Loading Scripts",
+                () =>
+            _scriptParser = XmlConfigParser.OpenScripts(@"Config/Scripts.xml")
+            ),
+                ("Opening Tables",
+                () =>
+                {
+                    TableConfig.MarioActions = XmlConfigParser.OpenActionTable(@"Config/MarioActions.xml");
+                    TableConfig.MarioAnimations = XmlConfigParser.OpenAnimationTable(@"Config/MarioAnimations.xml");
+                    TableConfig.TriangleInfo = XmlConfigParser.OpenTriangleInfoTable(@"Config/TriangleInfo.xml");
+                    TableConfig.PendulumSwings = XmlConfigParser.OpenPendulumSwingTable(@"Config/PendulumSwings.xml");
+                    TableConfig.RacingPenguinWaypoints = XmlConfigParser.OpenWaypointTable(@"Config/RacingPenguinWaypoints.xml");
+                    TableConfig.KoopaTheQuick1Waypoints = XmlConfigParser.OpenWaypointTable(@"Config/KoopaTheQuick1Waypoints.xml");
+                    TableConfig.KoopaTheQuick2Waypoints = XmlConfigParser.OpenWaypointTable(@"Config/KoopaTheQuick2Waypoints.xml");
+                    TableConfig.TtmBowlingBallPoints = XmlConfigParser.OpenPointTable(@"Config/TtmBowlingBallPoints.xml");
+                    TableConfig.Missions = XmlConfigParser.OpenMissionTable(@"Config/Missions.xml");
+                    TableConfig.CourseData = XmlConfigParser.OpenCourseDataTable(@"Config/CourseData.xml");
+                    TableConfig.FlyGuyData = new FlyGuyDataTable();
+                    TableConfig.WdwRotatingPlatformTable = new ObjectAngleTable(1120);
+                    TableConfig.ElevatorAxleTable = new ObjectAngleTable(400);
+                }
+            ),
+                ("Initialize Main Form",
+                InitializeComponent
+            ),
+                ("Creating Managers",
+                CreateManagers
+            ));
         }
 
         private List<Process> GetAvailableProcesses()
@@ -340,29 +343,26 @@ namespace STROOP
 
         private void OnUpdate(object sender, EventArgs e)
         {
-            this.TryInvoke(new Action(() =>
+            UpdateComboBoxes();
+            DataModels.Update();
+            FormManager.Update();
+            Config.ObjectSlotsManager.Update();
+            Config.InjectionManager.Update();
+
+            foreach (TabPage page in tabControlMain.TabPages)
             {
-                UpdateComboBoxes();
-                DataModels.Update();
-                FormManager.Update();
-                Config.ObjectSlotsManager.Update();
-                Config.InjectionManager.Update();
+                bool active = tabControlMain.SelectedTab == page;
+                foreach (var pageControl in page.Controls)
+                    if (pageControl is Tabs.STROOPTab stroopTab)
+                    {
+                        if (stroopTab.Size != page.Size)
+                            stroopTab.Size = page.Size;
+                        stroopTab.UpdateOrInitialize(active);
+                    }
+            }
 
-                foreach (TabPage page in tabControlMain.TabPages)
-                {
-                    bool active = tabControlMain.SelectedTab == page;
-                    foreach (var pageControl in page.Controls)
-                        if (pageControl is Tabs.STROOPTab stroopTab)
-                        {
-                            if (stroopTab.Size != page.Size)
-                                stroopTab.Size = page.Size;
-                            stroopTab.UpdateOrInitialize(active);
-                        }
-                }
-
-                WatchVariableLockManager.Update();
-                TriangleDataModel.ClearCache();
-            }));
+            WatchVariableLockManager.Update();
+            TriangleDataModel.ClearCache();
         }
 
         private void UpdateComboBoxes()

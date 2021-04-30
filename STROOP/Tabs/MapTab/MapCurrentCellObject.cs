@@ -6,7 +6,7 @@ using STROOP.Structs;
 
 namespace STROOP.Tabs.MapTab
 {
-    [ObjectDescription("Current Cell")]
+    [ObjectDescription("Current Cell", "Current")]
     public class MapCurrentCellObject : MapQuadObject
     {
         public MapCurrentCellObject()
@@ -16,23 +16,15 @@ namespace STROOP.Tabs.MapTab
             Color = Color.Yellow;
         }
 
-        protected override List<List<(float x, float y, float z)>> GetQuadList()
+
+        protected override List<(float xMin, float zMin, float xMax, float zMax)> GetQuadList()
         {
-            float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
             (int cellX, int cellZ) = WatchVariableSpecialUtilities.GetMarioCell();
             int xMin = (cellX - 8) * 1024;
             int xMax = xMin + 1024;
             int zMin = (cellZ - 8) * 1024;
             int zMax = zMin + 1024;
-            List<(float x, float y, float z)> quad =
-                new List<(float x, float y, float z)>()
-                {
-                    (xMin, marioY, zMin),
-                    (xMin, marioY, zMax),
-                    (xMax, marioY, zMax),
-                    (xMax, marioY, zMin),
-                };
-            return new List<List<(float x, float y, float z)>>() { quad };
+            return new List<(float, float, float, float)>(new[] { ((float)xMin, (float)xMax, (float)zMin, (float)zMax) });
         }
 
         public override string GetName()

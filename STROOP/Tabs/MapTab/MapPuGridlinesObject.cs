@@ -1,20 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using OpenTK.Graphics.OpenGL;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
-using OpenTK;
-using System.Drawing.Imaging;
 using System.Windows.Forms;
 
 namespace STROOP.Tabs.MapTab
 {
-    [ObjectDescription("PU Gridlines")]
+    [ObjectDescription("PU Gridlines", "Grid")]
     public class MapPuGridlinesObject : MapLineObject
     {
         private enum PuGridlineSetting { SETTING1, SETTING2, SETTING3 };
@@ -123,7 +117,7 @@ namespace STROOP.Tabs.MapTab
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.UnitGridlinesImage;
 
-        public override ContextMenuStrip GetContextMenuStrip()
+        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {

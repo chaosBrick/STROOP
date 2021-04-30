@@ -15,6 +15,7 @@ namespace STROOP.Tabs.MapTab
 {
     public enum MapDrawType
     {
+        None,
         Perspective,
         Overlay,
         Background,

@@ -14,7 +14,7 @@ using STROOP.Forms;
 
 namespace STROOP.Tabs.MapTab
 {
-    [ObjectDescription("Custom Background")]
+    [ObjectDescription("Custom Background", "Misc")]
     public class MapCustomBackgroundObject : MapBackgroundObject
     {
         private object _backgroundChoice;
@@ -32,7 +32,7 @@ namespace STROOP.Tabs.MapTab
             return "Custom Background";
         }
 
-        public override ContextMenuStrip GetContextMenuStrip()
+        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {

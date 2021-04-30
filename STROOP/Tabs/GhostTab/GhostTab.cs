@@ -49,7 +49,6 @@ namespace STROOP.Tabs.GhostTab
         public GhostTab()
         {
             InitializeComponent();
-            watchVariablePanelGhost.SetGroups(null, null);
             listBoxGhosts.KeyDown += listBoxGhosts_KeyDown;
 
             instance = this;
@@ -275,6 +274,11 @@ namespace STROOP.Tabs.GhostTab
 
         private void buttonRecordGhost_Click(object sender, EventArgs e)
         {
+            if (!hack.Enabled)
+            {
+                MessageBox.Show("Ghost hack must be enabled to record a ghost from within STROOP.");
+                return;
+            }
             if (recordingGhost)
             {
                 ((Button)sender).Text = "Record Ghost";
@@ -309,6 +313,45 @@ namespace STROOP.Tabs.GhostTab
                 {
                     rd.Close();
                 }
+            }
+        }
+
+        private void buttonWatchGhostFile_Click(object sender, EventArgs e)
+        {
+            var dlg = new OpenFileDialog();
+            dlg.Filter = "ghost files (*.ghost)|*.ghost";
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                DateTime oldFileChangedDate = DateTime.Now;
+                string file = dlg.FileName;
+                int i = 0;
+                FileSystemWatcher watcher = new FileSystemWatcher(Path.GetDirectoryName(dlg.FileName));
+                var ghostName = Path.GetFileNameWithoutExtension(dlg.FileName);
+                watcher.NotifyFilter = NotifyFilters.LastWrite;
+                watcher.EnableRaisingEvents = true;
+                watcher.Changed += (a, aa) =>
+                {
+                    if (aa.FullPath == file)
+                    {
+                        var newFileChangedDate = File.GetLastWriteTime(file);
+                        if (newFileChangedDate - oldFileChangedDate > new TimeSpan(0, 0, 1))
+                        {
+                            BinaryReader rd = null;
+                            try
+                            {
+                                rd = new BinaryReader(new FileStream(file, FileMode.Open));
+                                var newGhost = Ghost.FromFile(rd);
+                                groupBoxGhosts.Invoke((Action)(() => AddGhost($"{ghostName} {i++}", newGhost)));
+                                oldFileChangedDate = newFileChangedDate;
+                            }
+                            catch { }
+                            finally
+                            {
+                                rd?.Close();
+                            }
+                        }
+                    }
+                };
             }
         }
 
@@ -401,6 +444,20 @@ namespace STROOP.Tabs.GhostTab
                 }
                 i++;
             }
+        }
+
+        private void buttonTutorial_Click(object sender, EventArgs e)
+        {
+            STROOP.Forms.InfoForm frm = new Forms.InfoForm();
+            frm.SetText("Watch Ghost File Tutorial",
+                        "How watching ghost files works",
+@"Create a file called tmp.ghost next to recordghost.lua.
+(If the file already exists, you don't need to do anything).
+Click the 'Watch Ghost File' button and choose that same file.
+Start an instance of recordghost.lua - Every time you hit 'Start',
+a new ghost will start recording. Once you hit 'Stop', the ghost will be 
+saved to tmp.ghost and automatically added to the list of ghosts.");
+            frm.ShowDialog();
         }
     }
 }

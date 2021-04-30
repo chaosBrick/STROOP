@@ -16,7 +16,7 @@ using STROOP.Forms;
 
 namespace STROOP.Tabs.MapTab
 {
-    [ObjectDescription("All Object Ceiling Trianlges")]
+    [ObjectDescription("All Object Ceiling Triangles", "Triangles")]
     public class MapAllObjectCeilingObject : MapCeilingObject
     {
         private readonly List<TriangleDataModel> _tris;
@@ -35,7 +35,7 @@ namespace STROOP.Tabs.MapTab
             return _tris;
         }
 
-        public override ContextMenuStrip GetContextMenuStrip()
+        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {
@@ -50,7 +50,7 @@ namespace STROOP.Tabs.MapTab
                 _contextMenuStrip = new ContextMenuStrip();
                 _contextMenuStrip.Items.Add(itemAutoUpdate);
                 _contextMenuStrip.Items.Add(new ToolStripSeparator());
-                GetHorizontalTriangleToolStripMenuItems().ForEach(item => _contextMenuStrip.Items.Add(item));
+                GetHorizontalTriangleToolStripMenuItems(targetTracker).ForEach(item => _contextMenuStrip.Items.Add(item));
                 _contextMenuStrip.Items.Add(new ToolStripSeparator());
                 GetTriangleToolStripMenuItems().ForEach(item => _contextMenuStrip.Items.Add(item));
             }

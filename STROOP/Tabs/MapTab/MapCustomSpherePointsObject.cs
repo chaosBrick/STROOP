@@ -1,20 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using OpenTK.Graphics.OpenGL;
-using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
-using OpenTK;
-using System.Drawing.Imaging;
-using System.Windows.Forms;
 
 namespace STROOP.Tabs.MapTab
 {
-    [ObjectDescription("Custom Sphere Points", nameof(Create))]
+    [ObjectDescription("Custom Sphere Points", "Custom", nameof(Create))]
     public class MapCustomSpherePointsObject : MapSphereObject
     {
         private readonly List<(float x, float y, float z)> _points;

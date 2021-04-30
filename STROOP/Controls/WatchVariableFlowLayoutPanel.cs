@@ -57,12 +57,15 @@ namespace STROOP.Controls
             ContextMenuStrip.Opening += (sender, e) => UnselectAllVariables();
         }
 
+        bool hasGroups = false;
+
         public void SetGroups(
             List<VariableGroup> allVariableGroupsNullable,
             List<VariableGroup> visibleVariableGroupsNullable)
         {
             if (Program.IsVisualStudioHostProcess()) return;
 
+            hasGroups = true;
             DeferActionToUpdate(nameof(SetGroups), () =>
             {
                 _allGroups = allVariableGroupsNullable != null ? new List<VariableGroup>(allVariableGroupsNullable) : new List<VariableGroup>();
@@ -85,7 +88,6 @@ namespace STROOP.Controls
                 return;
             DeferActionToUpdate(nameof(Initialize), () =>
             {
-
                 _selectionToolStripItems =
                     WatchVariableSelectionUtilities.CreateSelectionToolStripItems(
                         () => new List<WatchVariableControl>(_selectedWatchVarControls), this);
@@ -103,6 +105,8 @@ namespace STROOP.Controls
                 _allGroups.AddRange(new List<VariableGroup>(new[] { VariableGroup.Custom }));
                 _initialVisibleGroups.AddRange(new List<VariableGroup>(new[] { VariableGroup.Custom }));
                 _visibleGroups.AddRange(new List<VariableGroup>(new[] { VariableGroup.Custom }));
+                if (!hasGroups)
+                    UpdateControlsBasedOnFilters();
             });
         }
 

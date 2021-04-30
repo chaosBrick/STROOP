@@ -1,64 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using OpenTK.Graphics.OpenGL;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
-using OpenTK;
-using System.Drawing.Imaging;
 
 namespace STROOP.Tabs.MapTab
 {
-    [ObjectDescription("Current Unit")]
-    public class MapCurrentUnitObject : MapQuadObject
+    [ObjectDescription("Current Unit", "Current")]
+    public class MapCurrentUnitsObject : MapQuadObject
     {
-        private readonly PositionAngle _posAngle;
+        string name;
 
-        public MapCurrentUnitObject() : this(PositionAngle.Mario) { }
-        public MapCurrentUnitObject(PositionAngle posAngle)
+        public MapCurrentUnitsObject() : this(() => new List<PositionAngle>(new[] { PositionAngle.Mario }), "Mario") { }
+        public MapCurrentUnitsObject(PositionAngleProvider positionAngleProvider, string name)
             : base()
         {
-            _posAngle = posAngle;
+            this.positionAngleProvider = positionAngleProvider;
 
             Opacity = 0.5;
             Color = Color.Purple;
         }
 
-        protected override List<List<(float x, float y, float z)>> GetQuadList()
+        protected override List<(float xMin, float zMin, float xMax, float zMax)> GetQuadList()
         {
-            float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
-            float posAngleX = (float)_posAngle.X;
-            float posAngleZ = (float)_posAngle.Z;
-            int xMin = (short)posAngleX;
-            int xMax = xMin + (posAngleX >= 0 ? 1 : -1);
-            int zMin = (short)posAngleZ;
-            int zMax = zMin + (posAngleZ >= 0 ? 1 : -1);
+            List<(float, float, float, float)> quads = new List<(float, float, float, float)>();
 
-            List<(float x, float y, float z)> quad =
-                new List<(float x, float y, float z)>()
-                {
-                    (xMin, marioY, zMin),
-                    (xMin, marioY, zMax),
-                    (xMax, marioY, zMax),
-                    (xMax, marioY, zMin),
-                };
-            return new List<List<(float x, float y, float z)>>() { quad };
+            foreach (var obj in positionAngleProvider())
+            {
+                var posAngleX = obj.X;
+                var posAngleZ = obj.Z;
+                int xMin = (short)posAngleX;
+                int xMax = xMin + (posAngleX >= 0 ? 1 : -1);
+                int zMin = (short)posAngleZ;
+                int zMax = zMin + (posAngleZ >= 0 ? 1 : -1);
+                quads.Add(((float)xMin, (float)xMax, (float)zMin, (float)zMax));
+            }
+            return quads;
         }
 
-        public override string GetName()
-        {
-            return "Current Unit for " + _posAngle.GetMapName();
-        }
+        public override string GetName() => $"Current Unit for {name}";
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.CurrentUnitImage;
-
-        public override PositionAngle GetPositionAngle()
-        {
-            return _posAngle;
-        }
     }
 }

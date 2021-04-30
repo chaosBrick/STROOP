@@ -30,9 +30,11 @@
         {
             this.components = new System.ComponentModel.Container();
             this.groupBoxGhosts = new System.Windows.Forms.GroupBox();
+            this.buttonTutorial = new System.Windows.Forms.Button();
             this.buttonDiscardOld = new System.Windows.Forms.CheckBox();
             this.buttonInstantReplayMode = new System.Windows.Forms.CheckBox();
             this.listBoxGhosts = new System.Windows.Forms.ListBox();
+            this.buttonWatchGhostFile = new System.Windows.Forms.Button();
             this.buttonRecordGhost = new System.Windows.Forms.Button();
             this.buttonLoadGhost = new System.Windows.Forms.Button();
             this.groupBoxGhostInfo = new System.Windows.Forms.GroupBox();
@@ -62,9 +64,11 @@
             this.groupBoxGhosts.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBoxGhosts.Controls.Add(this.buttonTutorial);
             this.groupBoxGhosts.Controls.Add(this.buttonDiscardOld);
             this.groupBoxGhosts.Controls.Add(this.buttonInstantReplayMode);
             this.groupBoxGhosts.Controls.Add(this.listBoxGhosts);
+            this.groupBoxGhosts.Controls.Add(this.buttonWatchGhostFile);
             this.groupBoxGhosts.Controls.Add(this.buttonRecordGhost);
             this.groupBoxGhosts.Controls.Add(this.buttonLoadGhost);
             this.groupBoxGhosts.Controls.Add(this.groupBoxGhostInfo);
@@ -76,12 +80,23 @@
             this.groupBoxGhosts.TabStop = false;
             this.groupBoxGhosts.Text = "Ghosts";
             // 
+            // buttonTutorial
+            // 
+            this.buttonTutorial.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonTutorial.Location = new System.Drawing.Point(365, 41);
+            this.buttonTutorial.Name = "buttonTutorial";
+            this.buttonTutorial.Size = new System.Drawing.Size(60, 23);
+            this.buttonTutorial.TabIndex = 7;
+            this.buttonTutorial.Text = "Tutorial";
+            this.buttonTutorial.UseVisualStyleBackColor = true;
+            this.buttonTutorial.Click += new System.EventHandler(this.buttonTutorial_Click);
+            // 
             // buttonDiscardOld
             // 
             this.buttonDiscardOld.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonDiscardOld.Appearance = System.Windows.Forms.Appearance.Button;
             this.buttonDiscardOld.AutoSize = true;
-            this.buttonDiscardOld.Location = new System.Drawing.Point(365, 160);
+            this.buttonDiscardOld.Location = new System.Drawing.Point(365, 239);
             this.buttonDiscardOld.Name = "buttonDiscardOld";
             this.buttonDiscardOld.Size = new System.Drawing.Size(72, 23);
             this.buttonDiscardOld.TabIndex = 6;
@@ -93,7 +108,7 @@
             this.buttonInstantReplayMode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonInstantReplayMode.Appearance = System.Windows.Forms.Appearance.Button;
             this.buttonInstantReplayMode.AutoSize = true;
-            this.buttonInstantReplayMode.Location = new System.Drawing.Point(365, 131);
+            this.buttonInstantReplayMode.Location = new System.Drawing.Point(365, 210);
             this.buttonInstantReplayMode.Name = "buttonInstantReplayMode";
             this.buttonInstantReplayMode.Size = new System.Drawing.Size(115, 23);
             this.buttonInstantReplayMode.TabIndex = 6;
@@ -113,10 +128,21 @@
             this.listBoxGhosts.TabIndex = 5;
             this.listBoxGhosts.SelectedIndexChanged += new System.EventHandler(this.listBoxGhosts_SelectedIndexChanged);
             // 
+            // buttonWatchGhostFile
+            // 
+            this.buttonWatchGhostFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonWatchGhostFile.Location = new System.Drawing.Point(365, 12);
+            this.buttonWatchGhostFile.Name = "buttonWatchGhostFile";
+            this.buttonWatchGhostFile.Size = new System.Drawing.Size(143, 23);
+            this.buttonWatchGhostFile.TabIndex = 0;
+            this.buttonWatchGhostFile.Text = "Watch Ghost File";
+            this.buttonWatchGhostFile.UseVisualStyleBackColor = true;
+            this.buttonWatchGhostFile.Click += new System.EventHandler(this.buttonWatchGhostFile_Click);
+            // 
             // buttonRecordGhost
             // 
             this.buttonRecordGhost.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonRecordGhost.Location = new System.Drawing.Point(365, 19);
+            this.buttonRecordGhost.Location = new System.Drawing.Point(365, 82);
             this.buttonRecordGhost.Name = "buttonRecordGhost";
             this.buttonRecordGhost.Size = new System.Drawing.Size(143, 23);
             this.buttonRecordGhost.TabIndex = 0;
@@ -127,7 +153,7 @@
             // buttonLoadGhost
             // 
             this.buttonLoadGhost.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonLoadGhost.Location = new System.Drawing.Point(365, 48);
+            this.buttonLoadGhost.Location = new System.Drawing.Point(365, 111);
             this.buttonLoadGhost.Name = "buttonLoadGhost";
             this.buttonLoadGhost.Size = new System.Drawing.Size(143, 23);
             this.buttonLoadGhost.TabIndex = 0;
@@ -242,7 +268,7 @@
             // buttonSaveGhost
             // 
             this.buttonSaveGhost.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonSaveGhost.Location = new System.Drawing.Point(365, 77);
+            this.buttonSaveGhost.Location = new System.Drawing.Point(365, 140);
             this.buttonSaveGhost.Name = "buttonSaveGhost";
             this.buttonSaveGhost.Size = new System.Drawing.Size(143, 23);
             this.buttonSaveGhost.TabIndex = 0;
@@ -345,5 +371,7 @@
         private System.Windows.Forms.TextBox textBoxGhostName;
         public System.Windows.Forms.Label labelName;
         private Controls.WatchVariableFlowLayoutPanel watchVariablePanelGhost;
+        private System.Windows.Forms.Button buttonWatchGhostFile;
+        private System.Windows.Forms.Button buttonTutorial;
     }
 }

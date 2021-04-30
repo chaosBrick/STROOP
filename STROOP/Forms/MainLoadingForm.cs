@@ -17,10 +17,9 @@ namespace STROOP.Forms
         int _maxStatus;
         Point lastclickedpoint;
 
-        public MainLoadingForm(int maxStatus)
+        public MainLoadingForm()
         {
             InitializeComponent();
-            _maxStatus = maxStatus;
             textBoxLoadingHelpfulHint.Text = HelpfulHintUtilities.GetRandomHelpfulHint();
             ControlUtilities.AddContextMenuStripFunctions(
                 textBoxLoadingHelpfulHint,
@@ -34,19 +33,21 @@ namespace STROOP.Forms
             CenterToScreen();
         }
 
-        public void UpdateStatus(string status, int number)
+        public void RunLoadingTasks(params (string name, Action task)[] tasks)
         {
-            this.Invoke(new Action(() =>
+            _maxStatus = tasks.Length;
+            for (int i = 0; i < tasks.Length; i++)
             {
-                progressBarLoading.Value = number;
-                if (number == _maxStatus)
+                var taskNumber = i;
+                tasks[i].task();
+                Invoke(new Action(() =>
                 {
-                    labelLoadingStatus.Text = status;
-                    return;
-                }
-
-                labelLoadingStatus.Text = String.Format(status + " [{0} / {1}]", number + 1, _maxStatus);
-            }));
+                    progressBarLoading.Maximum = _maxStatus;
+                    progressBarLoading.Value = taskNumber;
+                    labelLoadingStatus.Text = $"{tasks[taskNumber].name}[{taskNumber} / {_maxStatus}]";
+                }));
+            }
+            Invoke(new Action(() => labelLoadingStatus.Text = "Finishing"));
         }
 
         private void MainLoadingForm_MouseDown(object sender, MouseEventArgs e)
@@ -61,7 +62,7 @@ namespace STROOP.Forms
             {
                 this.Left += e.X - lastclickedpoint.X;
                 this.Top += e.Y - lastclickedpoint.Y;
-            }   
+            }
         }
 
         private void progressBarLoading_MouseDown(object sender, MouseEventArgs e)

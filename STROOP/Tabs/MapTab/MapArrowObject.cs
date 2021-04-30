@@ -1,28 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using OpenTK.Graphics.OpenGL;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
-using OpenTK;
 using System.Windows.Forms;
 
 namespace STROOP.Tabs.MapTab
 {
-    public abstract class MapArrowObject : MapLineObject
+    public class MapArrowObject : MapLineObject
     {
+        public delegate double GetYaw(PositionAngle obj);
+        public delegate double GetRecommendedSize(PositionAngle obj);
+
+        public GetYaw getYaw;
+        public GetRecommendedSize getRecommendedSize;
+
         private bool _useRecommendedArrowLength;
         private float _arrowHeadSideLength;
 
         private ToolStripMenuItem _itemUseSpeedForArrowLength;
 
-        public MapArrowObject()
+        string name;
+
+        public MapArrowObject(PositionAngleProvider positionAngleProvider, GetYaw getYaw, GetRecommendedSize getRecommendedSize, string name)
             : base()
         {
+            this.positionAngleProvider = positionAngleProvider;
+            this.getYaw = getYaw;
+            this.getRecommendedSize = getRecommendedSize;
+            this.name = name;
             _useRecommendedArrowLength = false;
             _arrowHeadSideLength = 100;
 
@@ -33,41 +40,37 @@ namespace STROOP.Tabs.MapTab
 
         protected override List<(float x, float y, float z)> GetVertices(MapGraphics graphics)
         {
-            PositionAngle posAngle = GetPositionAngle();
-            float x = (float)posAngle.X;
-            float y = (float)posAngle.Y;
-            float z = (float)posAngle.Z;
-            float yaw = (float)GetYaw();
-            float size = _useRecommendedArrowLength ? (float)GetRecommendedSize() : Size;
-            (float arrowHeadX, float arrowHeadZ) =
-                ((float, float))MoreMath.AddVectorToPoint(size, yaw, x, z);
-
-            (float pointSide1X, float pointSide1Z) =
-                ((float, float))MoreMath.AddVectorToPoint(_arrowHeadSideLength, yaw + 32768 + 8192, arrowHeadX, arrowHeadZ);
-            (float pointSide2X, float pointSide2Z) =
-                ((float, float))MoreMath.AddVectorToPoint(_arrowHeadSideLength, yaw + 32768 - 8192, arrowHeadX, arrowHeadZ);
-
             List<(float x, float y, float z)> vertices = new List<(float x, float y, float z)>();
+            foreach (var posAngle in positionAngleProvider())
+            {
+                float x = (float)posAngle.X;
+                float y = (float)posAngle.Y;
+                float z = (float)posAngle.Z;
+                float yaw = (float)getYaw(posAngle);
+                float size = _useRecommendedArrowLength ? (float)getRecommendedSize(posAngle) : Size;
+                (float arrowHeadX, float arrowHeadZ) =
+                    ((float, float))MoreMath.AddVectorToPoint(size, yaw, x, z);
 
-            vertices.Add((x, y, z));
-            vertices.Add((arrowHeadX, y, arrowHeadZ));
+                (float pointSide1X, float pointSide1Z) =
+                    ((float, float))MoreMath.AddVectorToPoint(_arrowHeadSideLength, yaw + 32768 + 8192, arrowHeadX, arrowHeadZ);
+                (float pointSide2X, float pointSide2Z) =
+                    ((float, float))MoreMath.AddVectorToPoint(_arrowHeadSideLength, yaw + 32768 - 8192, arrowHeadX, arrowHeadZ);
 
-            vertices.Add((arrowHeadX, y, arrowHeadZ));
-            vertices.Add((pointSide1X, y, pointSide1Z));
+                vertices.Add((x, y, z));
+                vertices.Add((arrowHeadX, y, arrowHeadZ));
 
-            vertices.Add((arrowHeadX, y, arrowHeadZ));
-            vertices.Add((pointSide2X, y, pointSide2Z));
+                vertices.Add((arrowHeadX, y, arrowHeadZ));
+                vertices.Add((pointSide1X, y, pointSide1Z));
 
+                vertices.Add((arrowHeadX, y, arrowHeadZ));
+                vertices.Add((pointSide2X, y, pointSide2Z));
+            }
             return vertices;
         }
 
-        protected abstract double GetYaw();
-
-        protected abstract double GetRecommendedSize();
-
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.ArrowImage;
 
-        public override ContextMenuStrip GetContextMenuStrip()
+        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {
@@ -77,7 +80,7 @@ namespace STROOP.Tabs.MapTab
                     MapObjectSettings settings = new MapObjectSettings(
                         arrowChangeUseRecommendedLength: true,
                         arrowNewUseRecommendedLength: !_useRecommendedArrowLength);
-                    GetParentMapTracker().ApplySettings(settings);
+                    targetTracker.ApplySettings(settings);
                 };
                 _itemUseSpeedForArrowLength.Checked = _useRecommendedArrowLength;
 
@@ -89,7 +92,7 @@ namespace STROOP.Tabs.MapTab
                     if (!arrowHeadSideLength.HasValue) return;
                     MapObjectSettings settings = new MapObjectSettings(
                         arrowChangeHeadSideLength: true, arrowNewHeadSideLength: arrowHeadSideLength.Value);
-                    GetParentMapTracker().ApplySettings(settings);
+                    targetTracker.ApplySettings(settings);
                 };
 
                 _contextMenuStrip = new ContextMenuStrip();
@@ -114,6 +117,33 @@ namespace STROOP.Tabs.MapTab
             {
                 _arrowHeadSideLength = settings.ArrowNewHeadSideLength;
             }
+        }
+
+        public override string GetName() => name;
+
+        public class ArrowSource
+        {
+            public static GetYaw ObjectFacingYaw = posAngle => Config.Stream.GetUInt16(posAngle.GetObjAddress() + ObjectConfig.YawFacingOffset);
+            public static GetYaw ObjectGraphicsYaw = posAngle => Config.Stream.GetUInt16(posAngle.GetObjAddress() + ObjectConfig.GraphicsYawOffset);
+            public static GetYaw ObjectMovingYaw = posAngle => Config.Stream.GetUInt16(posAngle.GetObjAddress() + ObjectConfig.YawMovingOffset);
+            public static GetYaw ObjectAngleToMario = posAngle => Config.Stream.GetUInt16(posAngle.GetObjAddress() + ObjectConfig.AngleToMarioOffset);
+
+            public static GetYaw MarioFacingYaw = posAngle => Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
+            public static GetYaw MarioIndendedYaw = posAngle => Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.IntendedYawOffset);
+            public static GetYaw MarioMovingYaw = posAngle => Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.MovingYawOffset);
+            public static GetYaw MarioSlidingYaw = posAngle => WatchVariableSpecialUtilities.GetMarioSlidingAngle();
+            public static GetYaw MarioTwirlingYaw = posAngle => Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.TwirlYawOffset);
+
+
+            public static GetRecommendedSize ObjectHSpeed = posAngle => Config.Stream.GetSingle(posAngle.GetObjAddress() + ObjectConfig.HSpeedOffset);
+            public static GetRecommendedSize ObjectDistanceToMario = posAngle => Config.Stream.GetSingle(posAngle.GetObjAddress() + ObjectConfig.DistanceToMarioOffset);
+
+
+            public static GetRecommendedSize MarioHSpeed = posAngle => Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.HSpeedOffset);
+            public static GetRecommendedSize MarioSlidingSpeed = posAngle => WatchVariableSpecialUtilities.GetMarioSlidingSpeed();
+
+
+            public static GetRecommendedSize Constant(double length) => _ => length;
         }
     }
 }

@@ -6,7 +6,7 @@ using STROOP.Structs;
 
 namespace STROOP.Tabs.MapTab
 {
-    [ObjectDescription("Waters")]
+    [ObjectDescription("Waters", "Misc")]
     public class MapWatersObject : MapQuadObject
     {
         public MapWatersObject()
@@ -16,19 +16,12 @@ namespace STROOP.Tabs.MapTab
             Color = Color.Purple;
         }
 
-        protected override List<List<(float x, float y, float z)>> GetQuadList()
+        protected override List<(float xMin, float zMin, float xMax, float zMax)> GetQuadList()
         {
             List<(int y, int xMin, int xMax, int zMin, int zMax)> waters = WaterUtilities.GetWaterLevels();
-            List<List<(float x, float y, float z)>> quads = new List<List<(float x, float y, float z)>>();
+            List<(float, float, float, float)> quads = new List<(float, float, float, float)>();
             foreach (var water in waters)
-            {
-                List<(float x, float y, float z)> quad = new List<(float x, float y, float z)>();
-                quad.Add((water.xMin, water.y, water.zMin));
-                quad.Add((water.xMin, water.y, water.zMax));
-                quad.Add((water.xMax, water.y, water.zMax));
-                quad.Add((water.xMax, water.y, water.zMin));
-                quads.Add(quad);
-            }
+                quads.Add((water.xMin, water.xMax, water.zMin, water.zMax));
             return quads;
         }
 

@@ -87,6 +87,17 @@ namespace STROOP.Utilities
             return viCount;
         }
 
+
+        public static bool WriteVICount(int newVICount)
+        {
+            if (!IsUsingMupen())
+                return false;
+            byte[] buffer = new byte[4];
+            Config.Stream.SetValue(newVICount, (uint)VICountAddress, true);
+            int viCount = BitConverter.ToInt32(buffer, 0);
+            return true;
+        }
+
         public static int GetLagCount()
         {
             return GetVICount() - 2 * GetFrameCount();

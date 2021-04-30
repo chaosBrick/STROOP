@@ -6,7 +6,7 @@ using STROOP.Structs.Configurations;
 
 namespace STROOP.Tabs.MapTab
 {
-    [ObjectDescription("Punch Detector")]
+    [ObjectDescription("Punch Detector", "Misc")]
     public class MapPunchDetectorObject : MapCylinderObject
     {
         public MapPunchDetectorObject()

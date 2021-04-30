@@ -8,7 +8,7 @@ using OpenTK;
 
 namespace STROOP.Tabs.MapTab
 {
-    [ObjectDescription("Drawing")]
+    [ObjectDescription("Drawing", "Custom")]
     public class MapDrawingObject : MapLineObject
     {
         private readonly List<(float x, float y, float z)> _vertices;
@@ -41,7 +41,7 @@ namespace STROOP.Tabs.MapTab
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.PathImage;
 
-        public override ContextMenuStrip GetContextMenuStrip()
+        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {

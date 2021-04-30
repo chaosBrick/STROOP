@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using OpenTK.Graphics.OpenGL;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
-using OpenTK;
 using System.Windows.Forms;
 
 namespace STROOP.Tabs.MapTab
 {
-    [ObjectDescription("Line Segment", nameof(Create))]
+    [ObjectDescription("Line Segment", "Misc", nameof(Create))]
     public class MapLineSegmentObject : MapLineObject
     {
         private PositionAngle _posAngle1;
@@ -60,7 +55,7 @@ namespace STROOP.Tabs.MapTab
             return vertices;
         }
 
-        public override ContextMenuStrip GetContextMenuStrip()
+        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {

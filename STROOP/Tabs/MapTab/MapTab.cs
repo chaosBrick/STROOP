@@ -173,7 +173,7 @@ namespace STROOP.Tabs.MapTab
         private void InitializeControls()
         {
             // FlowLayoutPanel
-            flowLayoutPanelMapTrackers.Initialize(new MapCurrentMapObject(), new MapCurrentBackgroundObject()); 
+            flowLayoutPanelMapTrackers.Initialize(new MapCurrentMapObject(), new MapCurrentBackgroundObject());
 
             // ComboBox for Level
             List<MapLayout> mapLayouts = Config.MapAssociations.GetAllMaps();
@@ -189,11 +189,11 @@ namespace STROOP.Tabs.MapTab
 
             // Buttons on Options
 
-            List<ToolStripMenuItem> adders = new List<ToolStripMenuItem>();
+            Dictionary<string, List<ToolStripMenuItem>> adders = new Dictionary<string, List<ToolStripMenuItem>>();
             foreach (var type in GeneralUtilities.EnumerateTypes(_ => _.IsSubclassOf(typeof(MapObject))))
             {
-                var attr = type.GetCustomAttribute<ObjectDescriptionAttribute>();
-                if (attr != null)
+                var attrArray = type.GetCustomAttributes<ObjectDescriptionAttribute>();
+                foreach (var attr in attrArray)
                 {
                     var capturedType = type;
                     var toolStripItem = new ToolStripMenuItem($"Add Tracker for {attr.DisplayName}");
@@ -213,28 +213,26 @@ namespace STROOP.Tabs.MapTab
                             if (obj != null)
                                 flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(obj));
                         };
-                    adders.Add(toolStripItem);
+                    List<ToolStripMenuItem> categoryList;
+                    if (!adders.TryGetValue(attr.Category, out categoryList))
+                        adders[attr.Category] = categoryList = new List<ToolStripMenuItem>();
+                    categoryList.Add(toolStripItem);
                 }
             }
-            adders.Sort((a, b) => a.Text.CompareTo(b.Text));
-
-            ToolStripMenuItem itemAllObjects = new ToolStripMenuItem("Add Tracker for All Objects");
-            itemAllObjects.Click += (sender, e) =>
-            {
-                TrackMultipleObjects(ObjectUtilities.GetAllObjectAddresses());
-            };
-
-            ToolStripMenuItem itemMarkedObjects = new ToolStripMenuItem("Add Tracker for Marked Objects");
-            itemMarkedObjects.Click += (sender, e) =>
-            {
-                TrackMultipleObjects(Config.ObjectSlotsManager.MarkedSlotsAddresses);
-            };
-            adders.Add(itemMarkedObjects);
 
             buttonMapOptionsAddNewTracker.ContextMenuStrip = new ContextMenuStrip();
-            adders.Add(itemAllObjects);
-            foreach (var adder in adders)
-                buttonMapOptionsAddNewTracker.ContextMenuStrip.Items.Add(adder);
+
+            foreach (var schnotzel in adders)
+            {
+                var lolz = new ToolStripMenuItem(schnotzel.Key);
+                schnotzel.Value.Sort((a, b) => a.Text.CompareTo(b.Text));
+                foreach (var knonw in schnotzel.Value)
+                    lolz.DropDownItems.Add(knonw);
+                buttonMapOptionsAddNewTracker.ContextMenuStrip.Items.Add(lolz);
+            }
+
+            //foreach (var adder in adders)
+            //    buttonMapOptionsAddNewTracker.ContextMenuStrip.Items.Add(adder);
 
             buttonMapOptionsAddNewTracker.Click += (sender, e) =>
                 buttonMapOptionsAddNewTracker.ContextMenuStrip.Show(Cursor.Position);
@@ -402,9 +400,8 @@ namespace STROOP.Tabs.MapTab
             _checkBoxMarioAction = InitializeCheckboxSemaphore(checkBoxMapOptionsTrackMario, MapSemaphoreManager.Mario, () => new MapMarioObject(), true);
             InitializeCheckboxSemaphore(checkBoxMapOptionsTrackHolp, MapSemaphoreManager.Holp, () => new MapHolpObject(), false);
             InitializeCheckboxSemaphore(checkBoxMapOptionsTrackCamera, MapSemaphoreManager.Camera, () => new MapCameraObject(), false);
-            InitializeCheckboxSemaphore(checkBoxMapOptionsTrackGhost, MapSemaphoreManager.Ghost, () => new MapGhostObject(), false);
-            InitializeCheckboxSemaphore(checkBoxMapOptionsTrackSelf, MapSemaphoreManager.Self, () => new MapSelfObject(), false);
-            InitializeCheckboxSemaphore(checkBoxMapOptionsTrackPoint, MapSemaphoreManager.Point, () => new MapPointObject(), false);
+            //InitializeCheckboxSemaphore(checkBoxMapOptionsTrackGhost, MapSemaphoreManager.Ghost, () => new MapGhostObject(), false);
+            //InitializeCheckboxSemaphore(checkBoxMapOptionsTrackSelf, MapSemaphoreManager.Self, () => new MapSelfObject(), false);
             InitializeCheckboxSemaphore(checkBoxMapOptionsTrackFloorTri, MapSemaphoreManager.FloorTri, () => new MapMarioFloorObject(), false);
             InitializeCheckboxSemaphore(checkBoxMapOptionsTrackWallTri, MapSemaphoreManager.WallTri, () => new MapMarioWallObject(), false);
             InitializeCheckboxSemaphore(checkBoxMapOptionsTrackCeilingTri, MapSemaphoreManager.CeilingTri, () => new MapMarioCeilingObject(), false);
@@ -416,9 +413,7 @@ namespace STROOP.Tabs.MapTab
         {
             Action<bool> addTrackerAction = (bool withSemaphore) =>
             {
-                MapTracker tracker = new MapTracker(
-                    new List<MapObject>() { mapObjFunc() },
-                    withSemaphore ? new List<MapSemaphore>() { semaphore } : new List<MapSemaphore>());
+                MapTracker tracker = new MapTracker(mapObjFunc(), withSemaphore ? new List<MapSemaphore>() { semaphore } : new List<MapSemaphore>());
                 flowLayoutPanelMapTrackers.AddNewControl(tracker);
             };
             Action clickAction = () =>
@@ -524,8 +519,7 @@ namespace STROOP.Tabs.MapTab
                 MapObject mapObj = new MapObjectObject(address);
                 MapSemaphore semaphore = MapSemaphoreManager.Objects[index];
                 semaphore.IsUsed = true;
-                MapTracker tracker = new MapTracker(
-                    new List<MapObject>() { mapObj }, new List<MapSemaphore>() { semaphore });
+                MapTracker tracker = new MapTracker(mapObj, new List<MapSemaphore>() { semaphore });
                 flowLayoutPanelMapTrackers.AddNewControl(tracker);
             }
         }
@@ -537,8 +531,6 @@ namespace STROOP.Tabs.MapTab
             checkBoxMapOptionsTrackHolp.Checked = MapSemaphoreManager.Holp.IsUsed;
             checkBoxMapOptionsTrackCamera.Checked = MapSemaphoreManager.Camera.IsUsed;
             checkBoxMapOptionsTrackGhost.Checked = MapSemaphoreManager.Ghost.IsUsed;
-            checkBoxMapOptionsTrackSelf.Checked = MapSemaphoreManager.Self.IsUsed;
-            checkBoxMapOptionsTrackPoint.Checked = MapSemaphoreManager.Point.IsUsed;
             checkBoxMapOptionsTrackFloorTri.Checked = MapSemaphoreManager.FloorTri.IsUsed;
             checkBoxMapOptionsTrackWallTri.Checked = MapSemaphoreManager.WallTri.IsUsed;
             checkBoxMapOptionsTrackCeilingTri.Checked = MapSemaphoreManager.CeilingTri.IsUsed;
@@ -552,24 +544,6 @@ namespace STROOP.Tabs.MapTab
                 .FindAll(index => !MapSemaphoreManager.Objects[index].IsUsed)
                 .ConvertAll(index => ObjectUtilities.GetObjectAddress(index))
                 .ForEach(address => Config.ObjectSlotsManager.SelectedOnMapSlotsAddresses.Remove(address));
-        }
-
-        private void TrackMultipleObjects(List<uint> addresses)
-        {
-            if (addresses.Count == 0) return;
-            List<MapObject> mapObjs = addresses
-                .ConvertAll(address => new MapObjectObject(address) as MapObject);
-            List<int> indexes = addresses
-                .ConvertAll(address => ObjectUtilities.GetObjectIndex(address))
-                .FindAll(index => index.HasValue)
-                .ConvertAll(index => index.Value);
-            List<MapSemaphore> semaphores = indexes
-                .ConvertAll(index => MapSemaphoreManager.Objects[index]);
-            semaphores.ForEach(semaphore => semaphore.IsUsed = true);
-            Config.ObjectSlotsManager.SelectedOnMapSlotsAddresses.AddRange(addresses);
-            _currentObjIndexes.AddRange(indexes);
-            MapTracker tracker = new MapTracker(mapObjs, semaphores);
-            flowLayoutPanelMapTrackers.AddNewControl(tracker);
         }
 
         private static readonly List<string> speedVarNames = new List<string>()

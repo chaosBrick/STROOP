@@ -1,47 +1,58 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using OpenTK.Graphics.OpenGL;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
 using OpenTK;
-using System.Windows.Forms;
 using STROOP.Models;
+using System.Windows.Forms;
 
 namespace STROOP.Tabs.MapTab
 {
-    [ObjectDescription("Objects with Name", nameof(Create))]
-    public class MapAllObjectsWithNameObject : MapIconObject
+    [ObjectDescription("Objects with Name", "Objects", nameof(CreateByName))]
+    [ObjectDescription("All Objects", "Objects", nameof(CreateAllObjects))]
+    public class MapMultipleObjects : MapObject
     {
         private readonly string _objName;
         private readonly Lazy<Image> _objImage;
         private readonly Lazy<Image> _objMapImage;
+        Func<ObjectDataModel, bool> predicate;
 
-        public MapAllObjectsWithNameObject(ObjectBehaviorAssociation assoc)
-            : base()
+        private MapMultipleObjects(string name, Lazy<Image> image, Lazy<Image> mapImage) : base()
         {
-            _objName = assoc.Name;
-            _objImage = assoc.Image;
-            _objMapImage = assoc.MapImage;
-            InternalRotates = assoc.RotatesOnMap;
+            _objName = name;
+            _objImage = image;
+            _objMapImage = mapImage;
+            positionAngleProvider = () => Config.ObjectSlotsManager.GetLoadedObjectsWithPredicate(predicate).ConvertAll(_ => PositionAngle.Obj(_.Address)).ToArray();
         }
 
-        public static MapAllObjectsWithNameObject Create()
+        public static MapMultipleObjects CreateByName()
         {
             string objName = DialogUtilities.GetStringFromDialog(labelText: "Enter the name of the object.");
             if (objName == null) return null;
             ObjectBehaviorAssociation assoc = Config.ObjectAssociations.GetObjectAssociation(objName);
             if (assoc == null) return null;
-            return new MapAllObjectsWithNameObject(assoc);
+            var objByName = new MapMultipleObjects("All " + assoc.Name, assoc.Image, assoc.MapImage);
+            objByName.predicate = _ => _.BehaviorAssociation.Name == objName;
+            return objByName;
         }
 
-        public override PositionAngleProvider GetPositionAngleProvider()
+        public static MapMultipleObjects CreateAllObjects()
         {
-            return () => Config.ObjectSlotsManager.GetLoadedObjectsWithName(_objName).ConvertAll(obj => PositionAngle.Obj(obj.Address));
+            var objByName = new MapMultipleObjects("All Objects", Config.ObjectAssociations.DefaultImage, Config.ObjectAssociations.DefaultImage);
+            objByName.predicate = _ => true;
+            return objByName;
+        }
+
+        public override void InitSubTrackerContextMenuStrip(ContextMenuStrip targetStrip)
+        {
+            base.InitSubTrackerContextMenuStrip(targetStrip);
+            MapObjectObject.AddObjectSubTrackers(
+                _objName,
+                targetStrip,
+                () => Config.ObjectSlotsManager.GetLoadedObjectsWithPredicate(predicate).ConvertAll(obj => PositionAngle.Obj(obj.Address))
+                );
         }
 
         public override Lazy<Image> GetInternalImage()
@@ -51,52 +62,30 @@ namespace STROOP.Tabs.MapTab
                 _objMapImage;
         }
 
-        public override string GetName()
-        {
-            return "All " + _objName;
-        }
+        public override string GetName() => _objName;
 
         public override void DrawOn2DControl(MapGraphics graphics)
         {
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
             {
-                List<(float x, float y, float z, float angle, Image tex)> data = GetData();
+                List<(float x, float y, float z, float angle, Lazy<Image> tex)> data = GetData();
                 data.Reverse();
                 foreach (var dataPoint in data)
                 {
-                    (float x, float y, float z, float angle, Image tex) = dataPoint;
-                    DrawIcon(graphics, x, z, angle, tex);
+                    (float x, float y, float z, float angle, Lazy<Image> tex) = dataPoint;
+                    DrawIcon(graphics, x, z, angle, tex.Value);
                 }
             });
         }
 
-        private Map3DVertex[] GetVertices()
+        public virtual List<(float x, float y, float z, float angle, Lazy<Image> tex)> GetData()
         {
-            return new Map3DVertex[]
-            {
-                new Map3DVertex(new Vector3(-1, -1, 0), Color4, new Vector2(0, 1)),
-                new Map3DVertex(new Vector3(1, -1, 0), Color4, new Vector2(1, 1)),
-                new Map3DVertex(new Vector3(-1, 1, 0), Color4, new Vector2(0, 0)),
-                new Map3DVertex(new Vector3(1, 1, 0), Color4, new Vector2(1, 0)),
-                new Map3DVertex(new Vector3(-1, 1, 0), Color4,  new Vector2(0, 0)),
-                new Map3DVertex(new Vector3(1, -1, 0), Color4, new Vector2(1, 1)),
-            };
+            List<ObjectDataModel> objs = Config.ObjectSlotsManager.GetLoadedObjectsWithPredicate(predicate);
+            return objs.ConvertAll(obj => (obj.X, obj.Y, obj.Z, (float)obj.FacingYaw, Config.ObjectAssociations.GetObjectMapImage(obj.BehaviorCriteria)));
         }
 
-        public List<(float x, float y, float z, float angle, Image tex)> GetData()
-        {
-            List<ObjectDataModel> objs = Config.ObjectSlotsManager.GetLoadedObjectsWithName(_objName);
-            return objs.ConvertAll(obj => (obj.X, obj.Y, obj.Z, (float)obj.FacingYaw, Image));
-        }
+        public override bool ParticipatesInGlobalIconSize() => true;
 
-        public override bool ParticipatesInGlobalIconSize()
-        {
-            return true;
-        }
-
-        public override MapDrawType GetDrawType()
-        {
-            return MapDrawType.Overlay;
-        }
+        public override MapDrawType GetDrawType() => MapDrawType.Overlay;
     }
 }

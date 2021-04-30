@@ -14,32 +14,33 @@
   <CloningUpdatesHolpType>true</CloningUpdatesHolpType>
   <UseInGameTrigForAngleLogic>false</UseInGameTrigForAngleLogic>
   <UseExtendedLevelBoundaries>false</UseExtendedLevelBoundaries>
-  <UseExpandedRamSize>false</UseExpandedRamSize>
+  <UseExpandedRamSize>true</UseExpandedRamSize>
   <TabOrder>
     <Tab>Object</Tab>
     <Tab>Mario</Tab>
     <Tab>HUD</Tab>
-    <Tab>Camera</Tab>
+    <Tab>Map</Tab>
+    <Tab>Ghost</Tab>
     <Tab>Triangles</Tab>
-    <Tab>File</Tab>
-    <Tab>M64</Tab>
-    <Tab>Actions</Tab>
-    <Tab>Input</Tab>
     <Tab>Water</Tab>
+    <Tab>File</Tab>
+    <Tab>Camera</Tab>
+    <Tab>Hacks</Tab>
+    <Tab>M64</Tab>
+    <Tab>Input</Tab>
     <Tab>Misc</Tab>
     <Tab>Custom</Tab>
     <Tab>TAS</Tab>
-    <Tab>Map</Tab>
-    <Tab>Memory</Tab>
-    <Tab>Options</Tab>
   </TabOrder>
   <RemovedTabs>
+    <Tab>Options</Tab>
+    <Tab>Memory</Tab>
+    <Tab>Actions</Tab>
     <Tab>PU</Tab>
     <Tab>Area</Tab>
     <Tab>Model</Tab>
     <Tab>Gfx</Tab>
     <Tab>Debug</Tab>
-    <Tab>Hacks</Tab>
     <Tab>Cam Hack</Tab>
     <Tab>Q Frames</Tab>
     <Tab>Var Hack</Tab>

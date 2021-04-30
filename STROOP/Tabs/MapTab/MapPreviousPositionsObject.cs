@@ -14,7 +14,7 @@ using System.Windows.Forms;
 
 namespace STROOP.Tabs.MapTab
 {
-    [ObjectDescription("Previous Positions")]
+    [ObjectDescription("Previous Positions", "Movement")]
     public class MapPreviousPositionsObject : MapObject
     {
         private DateTime _showEachPointStartTime = DateTime.MinValue;
@@ -211,7 +211,7 @@ namespace STROOP.Tabs.MapTab
             return MapDrawType.Overlay;
         }
 
-        public override ContextMenuStrip GetContextMenuStrip()
+        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {

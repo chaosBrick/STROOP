@@ -57,8 +57,9 @@ namespace STROOP.Tabs.MapTab.Renderers
                 GL.BindTexture(TextureTarget.Texture2DArray, texture);
                 GL.Uniform1(uniform_sampler, (int)0);
                 GL.Disable(EnableCap.CullFace);
+                GL.Disable(EnableCap.DepthTest);
 
-                GL.DrawArraysInstanced(PrimitiveType.TriangleFan, 0, 4, instances.Count);
+                GL.DrawArraysInstanced(PrimitiveType.TriangleStrip, 0, 4, instances.Count);
                 GL.BindVertexArray(0);
             });
         }

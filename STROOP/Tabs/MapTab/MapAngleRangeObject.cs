@@ -1,31 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using OpenTK.Graphics.OpenGL;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
-using OpenTK;
 using System.Windows.Forms;
 
 namespace STROOP.Tabs.MapTab
 {
     public class MapAngleRangeObject : MapLineObject
     {
-        private readonly PositionAngle _posAngle;
-
         private bool _useRelativeAngles;
         private int _angleDiff;
+        string name;
 
         private ToolStripMenuItem _itemUseRelativeAngles;
 
-        public MapAngleRangeObject(PositionAngle posAngle)
-            : base()
+        public MapAngleRangeObject(PositionAngleProvider positionAngleProvider, string name)
         {
-            _posAngle = posAngle;
+            this.positionAngleProvider = positionAngleProvider;
+            this.name = name;
 
             _useRelativeAngles = false;
             _angleDiff = 16;
@@ -38,30 +32,25 @@ namespace STROOP.Tabs.MapTab
         protected override List<(float x, float y, float z)> GetVertices(MapGraphics graphics)
         {
             List<(float x, float y, float z)> vertices = new List<(float x, float y, float z)>();
-            int startingAngle = _useRelativeAngles ? MoreMath.NormalizeAngleTruncated(_posAngle.Angle) : 0;
-            for (int angle = startingAngle; angle < startingAngle + 65536; angle += _angleDiff)
+            foreach (var _posAngle in positionAngleProvider())
             {
-                (double x1, double y1, double z1, double a) = _posAngle.GetValues();
-                (double x2, double z2) = MoreMath.AddVectorToPoint(Size, angle, x1, z1);
-                vertices.Add(((float)x1, (float)y1, (float)z1));
-                vertices.Add(((float)x2, (float)y1, (float)z2));
+                int startingAngle = _useRelativeAngles ? MoreMath.NormalizeAngleTruncated(_posAngle.Angle) : 0;
+                for (int angle = startingAngle; angle < startingAngle + 65536; angle += _angleDiff)
+                {
+                    (double x1, double y1, double z1, double a) = _posAngle.GetValues();
+                    (double x2, double z2) = MoreMath.AddVectorToPoint(Size, angle, x1, z1);
+                    vertices.Add(((float)x1, (float)y1, (float)z1));
+                    vertices.Add(((float)x2, (float)y1, (float)z2));
+                }
             }
             return vertices;
         }
 
-        public override PositionAngle GetPositionAngle()
-        {
-            return _posAngle;
-        }
-
-        public override string GetName()
-        {
-            return "Angle Range";
-        }
+        public override string GetName() =>$"Angle Range for {name}";
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.CustomGridlinesImage;
 
-        public override ContextMenuStrip GetContextMenuStrip()
+        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {
@@ -71,7 +60,7 @@ namespace STROOP.Tabs.MapTab
                     MapObjectSettings settings = new MapObjectSettings(
                         angleRangeChangeUseRelativeAngles: true,
                         angleRangeNewUseRelativeAngles: !_useRelativeAngles);
-                    GetParentMapTracker().ApplySettings(settings);
+                    targetTracker.ApplySettings(settings);
                 };
 
                 ToolStripMenuItem itemSetAngleDiff = new ToolStripMenuItem("Set Angle Diff");
@@ -82,7 +71,7 @@ namespace STROOP.Tabs.MapTab
                     if (!angleDiff.HasValue || angleDiff.Value <= 0) return;
                     MapObjectSettings settings = new MapObjectSettings(
                         angleRangeChangeAngleDiff: true, angleRangeNewAngleDiff: angleDiff.Value);
-                    GetParentMapTracker().ApplySettings(settings);
+                    targetTracker.ApplySettings(settings);
                 };
 
                 _contextMenuStrip = new ContextMenuStrip();

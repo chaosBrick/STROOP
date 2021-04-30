@@ -12,13 +12,9 @@ using System.Windows.Forms;
 
 namespace STROOP.Tabs.MapTab
 {
-    [ObjectDescription("Next Positions")]
+    [ObjectDescription("Next Positions", "Movement")]
     public class MapNextPositionsObject : MapIconObject
     {
-        private int _redMarioTex = -1;
-        private int _blueMarioTex = -1;
-        private int _orangeMarioTex = -1;
-
         private bool _useColoredMarios = true;
         private bool _showQuarterSteps = true;
         private double _numFrames = 4;
@@ -45,7 +41,7 @@ namespace STROOP.Tabs.MapTab
         {
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
             {
-                List<(float x, float y, float z, float angle, int tex)> data = GetData();
+                List<(float x, float y, float z, float angle, Lazy<Image> tex)> data = GetData();
                 data.Reverse();
                 foreach (var dataPoint in data)
                     DrawIcon(graphics, dataPoint.x, dataPoint.z, dataPoint.angle, GetInternalImage().Value);
@@ -65,7 +61,7 @@ namespace STROOP.Tabs.MapTab
             };
         }
 
-        public List<(float x, float y, float z, float angle, int tex)> GetData()
+        public List<(float x, float y, float z, float angle, Lazy<Image> tex)> GetData()
         {
             float marioX = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.XOffset);
             float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
@@ -89,41 +85,22 @@ namespace STROOP.Tabs.MapTab
                 .ConvertAll(frameStep => ((float x, float z))MoreMath.AddVectorToPoint(
                     frameStep * effectiveSpeed, marioAngle, marioX, marioZ));
 
-            int fullStepTex = _useColoredMarios ? _blueMarioTex : _redMarioTex;
-            int quarterStepTex = _useColoredMarios ? _orangeMarioTex : _redMarioTex;
-            List<(float x, float y, float z, float angle, int tex)> data =
-                new List<(float x, float y, float z, float angle, int tex)>();
+            var fullStepTex = _useColoredMarios ? Config.ObjectAssociations.BlueMarioMapImage : Config.ObjectAssociations.MarioMapImage;
+            var quarterStepTex = _useColoredMarios ? Config.ObjectAssociations.OrangeMarioMapImage : Config.ObjectAssociations.MarioMapImage;
+            List<(float x, float y, float z, float angle, Lazy<Image> tex)> data =
+                new List<(float x, float y, float z, float angle, Lazy<Image> tex)>();
             for (int i = 0; i < points2D.Count; i++)
             {
                 bool isFullStep = i % 4 == 3;
                 if (!isFullStep && !_showQuarterSteps) continue;
                 (float x, float z) = points2D[i];
-                int tex = isFullStep ? fullStepTex : quarterStepTex;
+                var tex = isFullStep ? fullStepTex : quarterStepTex;
                 data.Add((x, marioY, z, marioAngle, tex));
             }
             return data;
         }
-
-        public override void Update()
-        {
-            if (_redMarioTex == -1)
-            {
-                _redMarioTex = MapUtilities.LoadTexture(
-                    Config.ObjectAssociations.MarioMapImage.Value as Bitmap);
-            }
-            if (_blueMarioTex == -1)
-            {
-                _blueMarioTex = MapUtilities.LoadTexture(
-                    Config.ObjectAssociations.BlueMarioMapImage.Value as Bitmap);
-            }
-            if (_orangeMarioTex == -1)
-            {
-                _orangeMarioTex = MapUtilities.LoadTexture(
-                    Config.ObjectAssociations.OrangeMarioMapImage.Value as Bitmap);
-            }
-        }
-
-        public override ContextMenuStrip GetContextMenuStrip()
+        
+        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {

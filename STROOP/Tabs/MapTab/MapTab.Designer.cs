@@ -45,9 +45,7 @@
             this.checkBoxMapOptionsReverseDragging = new System.Windows.Forms.CheckBox();
             this.checkBoxMapOptionsEnablePuView = new System.Windows.Forms.CheckBox();
             this.checkBoxMapOptionsTrackUnitGridlines = new System.Windows.Forms.CheckBox();
-            this.checkBoxMapOptionsTrackPoint = new System.Windows.Forms.CheckBox();
             this.checkBoxMapOptionsTrackGhost = new System.Windows.Forms.CheckBox();
-            this.checkBoxMapOptionsTrackSelf = new System.Windows.Forms.CheckBox();
             this.checkBoxMapOptionsTrackCeilingTri = new System.Windows.Forms.CheckBox();
             this.checkBoxMapOptionsTrackWallTri = new System.Windows.Forms.CheckBox();
             this.checkBoxMapOptionsTrackFloorTri = new System.Windows.Forms.CheckBox();
@@ -170,7 +168,7 @@
             this.splitContainerMapLeft.Panel2.Controls.Add(this.flowLayoutPanelMapTrackers);
             this.splitContainerMapLeft.Panel2MinSize = 0;
             this.splitContainerMapLeft.Size = new System.Drawing.Size(357, 463);
-            this.splitContainerMapLeft.SplitterDistance = 320;
+            this.splitContainerMapLeft.SplitterDistance = 225;
             this.splitContainerMapLeft.SplitterWidth = 1;
             this.splitContainerMapLeft.TabIndex = 41;
             // 
@@ -184,7 +182,7 @@
             this.tabControlMap.Margin = new System.Windows.Forms.Padding(0);
             this.tabControlMap.Name = "tabControlMap";
             this.tabControlMap.SelectedIndex = 0;
-            this.tabControlMap.Size = new System.Drawing.Size(355, 318);
+            this.tabControlMap.Size = new System.Drawing.Size(355, 223);
             this.tabControlMap.TabIndex = 39;
             // 
             // tabPageMapOptions
@@ -204,9 +202,7 @@
             this.tabPageMapOptions.Controls.Add(this.checkBoxMapOptionsReverseDragging);
             this.tabPageMapOptions.Controls.Add(this.checkBoxMapOptionsEnablePuView);
             this.tabPageMapOptions.Controls.Add(this.checkBoxMapOptionsTrackUnitGridlines);
-            this.tabPageMapOptions.Controls.Add(this.checkBoxMapOptionsTrackPoint);
             this.tabPageMapOptions.Controls.Add(this.checkBoxMapOptionsTrackGhost);
-            this.tabPageMapOptions.Controls.Add(this.checkBoxMapOptionsTrackSelf);
             this.tabPageMapOptions.Controls.Add(this.checkBoxMapOptionsTrackCeilingTri);
             this.tabPageMapOptions.Controls.Add(this.checkBoxMapOptionsTrackWallTri);
             this.tabPageMapOptions.Controls.Add(this.checkBoxMapOptionsTrackFloorTri);
@@ -217,31 +213,31 @@
             this.tabPageMapOptions.Location = new System.Drawing.Point(4, 22);
             this.tabPageMapOptions.Margin = new System.Windows.Forms.Padding(0);
             this.tabPageMapOptions.Name = "tabPageMapOptions";
-            this.tabPageMapOptions.Size = new System.Drawing.Size(347, 292);
+            this.tabPageMapOptions.Size = new System.Drawing.Size(347, 197);
             this.tabPageMapOptions.TabIndex = 3;
             this.tabPageMapOptions.Text = "Options";
             // 
             // comboBoxMapOptionsBackground
             // 
             this.comboBoxMapOptionsBackground.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxMapOptionsBackground.Location = new System.Drawing.Point(87, 265);
+            this.comboBoxMapOptionsBackground.Location = new System.Drawing.Point(69, 171);
             this.comboBoxMapOptionsBackground.Margin = new System.Windows.Forms.Padding(2);
             this.comboBoxMapOptionsBackground.Name = "comboBoxMapOptionsBackground";
-            this.comboBoxMapOptionsBackground.Size = new System.Drawing.Size(236, 21);
+            this.comboBoxMapOptionsBackground.Size = new System.Drawing.Size(183, 21);
             this.comboBoxMapOptionsBackground.TabIndex = 13;
             // 
             // comboBoxMapOptionsLevel
             // 
             this.comboBoxMapOptionsLevel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxMapOptionsLevel.Location = new System.Drawing.Point(87, 240);
+            this.comboBoxMapOptionsLevel.Location = new System.Drawing.Point(69, 146);
             this.comboBoxMapOptionsLevel.Margin = new System.Windows.Forms.Padding(2);
             this.comboBoxMapOptionsLevel.Name = "comboBoxMapOptionsLevel";
-            this.comboBoxMapOptionsLevel.Size = new System.Drawing.Size(236, 21);
+            this.comboBoxMapOptionsLevel.Size = new System.Drawing.Size(183, 21);
             this.comboBoxMapOptionsLevel.TabIndex = 13;
             // 
             // textBoxMapOptionsGlobalIconSize
             // 
-            this.textBoxMapOptionsGlobalIconSize.Location = new System.Drawing.Point(228, 173);
+            this.textBoxMapOptionsGlobalIconSize.Location = new System.Drawing.Point(272, 136);
             this.textBoxMapOptionsGlobalIconSize.Name = "textBoxMapOptionsGlobalIconSize";
             this.textBoxMapOptionsGlobalIconSize.Size = new System.Drawing.Size(65, 20);
             this.textBoxMapOptionsGlobalIconSize.TabIndex = 43;
@@ -251,7 +247,7 @@
             // labelMapOptionsGlobalIconSize
             // 
             this.labelMapOptionsGlobalIconSize.AutoSize = true;
-            this.labelMapOptionsGlobalIconSize.Location = new System.Drawing.Point(143, 176);
+            this.labelMapOptionsGlobalIconSize.Location = new System.Drawing.Point(129, 124);
             this.labelMapOptionsGlobalIconSize.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.labelMapOptionsGlobalIconSize.Name = "labelMapOptionsGlobalIconSize";
             this.labelMapOptionsGlobalIconSize.Size = new System.Drawing.Size(87, 13);
@@ -261,7 +257,7 @@
             // labelMapOptionsBackground
             // 
             this.labelMapOptionsBackground.AutoSize = true;
-            this.labelMapOptionsBackground.Location = new System.Drawing.Point(13, 268);
+            this.labelMapOptionsBackground.Location = new System.Drawing.Point(3, 174);
             this.labelMapOptionsBackground.Name = "labelMapOptionsBackground";
             this.labelMapOptionsBackground.Size = new System.Drawing.Size(68, 13);
             this.labelMapOptionsBackground.TabIndex = 12;
@@ -270,7 +266,7 @@
             // labelMapOptionsLevel
             // 
             this.labelMapOptionsLevel.AutoSize = true;
-            this.labelMapOptionsLevel.Location = new System.Drawing.Point(50, 243);
+            this.labelMapOptionsLevel.Location = new System.Drawing.Point(39, 149);
             this.labelMapOptionsLevel.Name = "labelMapOptionsLevel";
             this.labelMapOptionsLevel.Size = new System.Drawing.Size(31, 13);
             this.labelMapOptionsLevel.TabIndex = 12;
@@ -278,7 +274,7 @@
             // 
             // buttonMapOptionsClearAllTrackers
             // 
-            this.buttonMapOptionsClearAllTrackers.Location = new System.Drawing.Point(148, 38);
+            this.buttonMapOptionsClearAllTrackers.Location = new System.Drawing.Point(177, 35);
             this.buttonMapOptionsClearAllTrackers.Margin = new System.Windows.Forms.Padding(0);
             this.buttonMapOptionsClearAllTrackers.Name = "buttonMapOptionsClearAllTrackers";
             this.buttonMapOptionsClearAllTrackers.Size = new System.Drawing.Size(135, 25);
@@ -288,7 +284,7 @@
             // 
             // buttonMapOptionsAddNewTracker
             // 
-            this.buttonMapOptionsAddNewTracker.Location = new System.Drawing.Point(148, 10);
+            this.buttonMapOptionsAddNewTracker.Location = new System.Drawing.Point(177, 7);
             this.buttonMapOptionsAddNewTracker.Margin = new System.Windows.Forms.Padding(0);
             this.buttonMapOptionsAddNewTracker.Name = "buttonMapOptionsAddNewTracker";
             this.buttonMapOptionsAddNewTracker.Size = new System.Drawing.Size(135, 25);
@@ -299,7 +295,7 @@
             // checkBoxMapOptionsScaleIconSizes
             // 
             this.checkBoxMapOptionsScaleIconSizes.AutoSize = true;
-            this.checkBoxMapOptionsScaleIconSizes.Location = new System.Drawing.Point(148, 151);
+            this.checkBoxMapOptionsScaleIconSizes.Location = new System.Drawing.Point(177, 99);
             this.checkBoxMapOptionsScaleIconSizes.Name = "checkBoxMapOptionsScaleIconSizes";
             this.checkBoxMapOptionsScaleIconSizes.Size = new System.Drawing.Size(105, 17);
             this.checkBoxMapOptionsScaleIconSizes.TabIndex = 19;
@@ -309,7 +305,7 @@
             // checkBoxMapOptionsReverseDragging
             // 
             this.checkBoxMapOptionsReverseDragging.AutoSize = true;
-            this.checkBoxMapOptionsReverseDragging.Location = new System.Drawing.Point(148, 133);
+            this.checkBoxMapOptionsReverseDragging.Location = new System.Drawing.Point(177, 81);
             this.checkBoxMapOptionsReverseDragging.Name = "checkBoxMapOptionsReverseDragging";
             this.checkBoxMapOptionsReverseDragging.Size = new System.Drawing.Size(112, 17);
             this.checkBoxMapOptionsReverseDragging.TabIndex = 19;
@@ -319,7 +315,7 @@
             // checkBoxMapOptionsEnablePuView
             // 
             this.checkBoxMapOptionsEnablePuView.AutoSize = true;
-            this.checkBoxMapOptionsEnablePuView.Location = new System.Drawing.Point(148, 115);
+            this.checkBoxMapOptionsEnablePuView.Location = new System.Drawing.Point(177, 63);
             this.checkBoxMapOptionsEnablePuView.Name = "checkBoxMapOptionsEnablePuView";
             this.checkBoxMapOptionsEnablePuView.Size = new System.Drawing.Size(103, 17);
             this.checkBoxMapOptionsEnablePuView.TabIndex = 19;
@@ -329,47 +325,27 @@
             // checkBoxMapOptionsTrackUnitGridlines
             // 
             this.checkBoxMapOptionsTrackUnitGridlines.AutoSize = true;
-            this.checkBoxMapOptionsTrackUnitGridlines.Location = new System.Drawing.Point(14, 169);
+            this.checkBoxMapOptionsTrackUnitGridlines.Location = new System.Drawing.Point(14, 126);
             this.checkBoxMapOptionsTrackUnitGridlines.Name = "checkBoxMapOptionsTrackUnitGridlines";
             this.checkBoxMapOptionsTrackUnitGridlines.Size = new System.Drawing.Size(119, 17);
             this.checkBoxMapOptionsTrackUnitGridlines.TabIndex = 19;
             this.checkBoxMapOptionsTrackUnitGridlines.Text = "Track Unit Gridlines";
             this.checkBoxMapOptionsTrackUnitGridlines.UseVisualStyleBackColor = true;
             // 
-            // checkBoxMapOptionsTrackPoint
-            // 
-            this.checkBoxMapOptionsTrackPoint.AutoSize = true;
-            this.checkBoxMapOptionsTrackPoint.Location = new System.Drawing.Point(14, 97);
-            this.checkBoxMapOptionsTrackPoint.Name = "checkBoxMapOptionsTrackPoint";
-            this.checkBoxMapOptionsTrackPoint.Size = new System.Drawing.Size(81, 17);
-            this.checkBoxMapOptionsTrackPoint.TabIndex = 19;
-            this.checkBoxMapOptionsTrackPoint.Text = "Track Point";
-            this.checkBoxMapOptionsTrackPoint.UseVisualStyleBackColor = true;
-            // 
             // checkBoxMapOptionsTrackGhost
             // 
             this.checkBoxMapOptionsTrackGhost.AutoSize = true;
-            this.checkBoxMapOptionsTrackGhost.Location = new System.Drawing.Point(14, 61);
+            this.checkBoxMapOptionsTrackGhost.Location = new System.Drawing.Point(14, 41);
             this.checkBoxMapOptionsTrackGhost.Name = "checkBoxMapOptionsTrackGhost";
             this.checkBoxMapOptionsTrackGhost.Size = new System.Drawing.Size(85, 17);
             this.checkBoxMapOptionsTrackGhost.TabIndex = 19;
             this.checkBoxMapOptionsTrackGhost.Text = "Track Ghost";
             this.checkBoxMapOptionsTrackGhost.UseVisualStyleBackColor = true;
             // 
-            // checkBoxMapOptionsTrackSelf
-            // 
-            this.checkBoxMapOptionsTrackSelf.AutoSize = true;
-            this.checkBoxMapOptionsTrackSelf.Location = new System.Drawing.Point(14, 79);
-            this.checkBoxMapOptionsTrackSelf.Name = "checkBoxMapOptionsTrackSelf";
-            this.checkBoxMapOptionsTrackSelf.Size = new System.Drawing.Size(75, 17);
-            this.checkBoxMapOptionsTrackSelf.TabIndex = 19;
-            this.checkBoxMapOptionsTrackSelf.Text = "Track Self";
-            this.checkBoxMapOptionsTrackSelf.UseVisualStyleBackColor = true;
-            // 
             // checkBoxMapOptionsTrackCeilingTri
             // 
             this.checkBoxMapOptionsTrackCeilingTri.AutoSize = true;
-            this.checkBoxMapOptionsTrackCeilingTri.Location = new System.Drawing.Point(14, 151);
+            this.checkBoxMapOptionsTrackCeilingTri.Location = new System.Drawing.Point(14, 109);
             this.checkBoxMapOptionsTrackCeilingTri.Name = "checkBoxMapOptionsTrackCeilingTri";
             this.checkBoxMapOptionsTrackCeilingTri.Size = new System.Drawing.Size(103, 17);
             this.checkBoxMapOptionsTrackCeilingTri.TabIndex = 19;
@@ -379,7 +355,7 @@
             // checkBoxMapOptionsTrackWallTri
             // 
             this.checkBoxMapOptionsTrackWallTri.AutoSize = true;
-            this.checkBoxMapOptionsTrackWallTri.Location = new System.Drawing.Point(14, 133);
+            this.checkBoxMapOptionsTrackWallTri.Location = new System.Drawing.Point(14, 92);
             this.checkBoxMapOptionsTrackWallTri.Name = "checkBoxMapOptionsTrackWallTri";
             this.checkBoxMapOptionsTrackWallTri.Size = new System.Drawing.Size(93, 17);
             this.checkBoxMapOptionsTrackWallTri.TabIndex = 19;
@@ -389,7 +365,7 @@
             // checkBoxMapOptionsTrackFloorTri
             // 
             this.checkBoxMapOptionsTrackFloorTri.AutoSize = true;
-            this.checkBoxMapOptionsTrackFloorTri.Location = new System.Drawing.Point(14, 115);
+            this.checkBoxMapOptionsTrackFloorTri.Location = new System.Drawing.Point(14, 75);
             this.checkBoxMapOptionsTrackFloorTri.Name = "checkBoxMapOptionsTrackFloorTri";
             this.checkBoxMapOptionsTrackFloorTri.Size = new System.Drawing.Size(95, 17);
             this.checkBoxMapOptionsTrackFloorTri.TabIndex = 19;
@@ -399,7 +375,7 @@
             // checkBoxMapOptionsTrackCamera
             // 
             this.checkBoxMapOptionsTrackCamera.AutoSize = true;
-            this.checkBoxMapOptionsTrackCamera.Location = new System.Drawing.Point(14, 43);
+            this.checkBoxMapOptionsTrackCamera.Location = new System.Drawing.Point(14, 58);
             this.checkBoxMapOptionsTrackCamera.Name = "checkBoxMapOptionsTrackCamera";
             this.checkBoxMapOptionsTrackCamera.Size = new System.Drawing.Size(93, 17);
             this.checkBoxMapOptionsTrackCamera.TabIndex = 19;
@@ -409,7 +385,7 @@
             // checkBoxMapOptionsTrackHolp
             // 
             this.checkBoxMapOptionsTrackHolp.AutoSize = true;
-            this.checkBoxMapOptionsTrackHolp.Location = new System.Drawing.Point(14, 25);
+            this.checkBoxMapOptionsTrackHolp.Location = new System.Drawing.Point(14, 24);
             this.checkBoxMapOptionsTrackHolp.Name = "checkBoxMapOptionsTrackHolp";
             this.checkBoxMapOptionsTrackHolp.Size = new System.Drawing.Size(86, 17);
             this.checkBoxMapOptionsTrackHolp.TabIndex = 19;
@@ -428,7 +404,7 @@
             // 
             // trackBarMapOptionsGlobalIconSize
             // 
-            this.trackBarMapOptionsGlobalIconSize.Location = new System.Drawing.Point(174, 197);
+            this.trackBarMapOptionsGlobalIconSize.Location = new System.Drawing.Point(218, 114);
             this.trackBarMapOptionsGlobalIconSize.Margin = new System.Windows.Forms.Padding(0);
             this.trackBarMapOptionsGlobalIconSize.Maximum = 100;
             this.trackBarMapOptionsGlobalIconSize.Name = "trackBarMapOptionsGlobalIconSize";
@@ -448,7 +424,7 @@
             this.tabPageMapControllers.Location = new System.Drawing.Point(4, 22);
             this.tabPageMapControllers.Margin = new System.Windows.Forms.Padding(0);
             this.tabPageMapControllers.Name = "tabPageMapControllers";
-            this.tabPageMapControllers.Size = new System.Drawing.Size(347, 292);
+            this.tabPageMapControllers.Size = new System.Drawing.Size(347, 222);
             this.tabPageMapControllers.TabIndex = 1;
             this.tabPageMapControllers.Text = "Controllers";
             // 
@@ -905,7 +881,7 @@
             this.tabPageMapData.Location = new System.Drawing.Point(4, 22);
             this.tabPageMapData.Margin = new System.Windows.Forms.Padding(0);
             this.tabPageMapData.Name = "tabPageMapData";
-            this.tabPageMapData.Size = new System.Drawing.Size(347, 292);
+            this.tabPageMapData.Size = new System.Drawing.Size(347, 222);
             this.tabPageMapData.TabIndex = 2;
             this.tabPageMapData.Text = "Data";
             // 
@@ -1009,7 +985,7 @@
             this.flowLayoutPanelMapTrackers.Location = new System.Drawing.Point(0, 0);
             this.flowLayoutPanelMapTrackers.Margin = new System.Windows.Forms.Padding(0);
             this.flowLayoutPanelMapTrackers.Name = "flowLayoutPanelMapTrackers";
-            this.flowLayoutPanelMapTrackers.Size = new System.Drawing.Size(355, 140);
+            this.flowLayoutPanelMapTrackers.Size = new System.Drawing.Size(355, 235);
             this.flowLayoutPanelMapTrackers.TabIndex = 0;
             this.flowLayoutPanelMapTrackers.WrapContents = false;
             // 
@@ -1062,9 +1038,7 @@
         internal System.Windows.Forms.CheckBox checkBoxMapOptionsReverseDragging;
         internal System.Windows.Forms.CheckBox checkBoxMapOptionsEnablePuView;
         internal System.Windows.Forms.CheckBox checkBoxMapOptionsTrackUnitGridlines;
-        internal System.Windows.Forms.CheckBox checkBoxMapOptionsTrackPoint;
         internal System.Windows.Forms.CheckBox checkBoxMapOptionsTrackGhost;
-        internal System.Windows.Forms.CheckBox checkBoxMapOptionsTrackSelf;
         internal System.Windows.Forms.CheckBox checkBoxMapOptionsTrackCeilingTri;
         internal System.Windows.Forms.CheckBox checkBoxMapOptionsTrackWallTri;
         internal System.Windows.Forms.CheckBox checkBoxMapOptionsTrackFloorTri;

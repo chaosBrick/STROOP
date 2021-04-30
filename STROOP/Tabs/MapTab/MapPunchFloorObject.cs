@@ -6,7 +6,7 @@ using STROOP.Structs.Configurations;
 
 namespace STROOP.Tabs.MapTab
 {
-    [ObjectDescription("Punch Floor Triangles")]
+    [ObjectDescription("Punch Floor Triangles", "Triangles")]
     public class MapPunchFloorObject : MapCustomFloorObject
     {
         private static List<uint> GetPunchTriangleList()

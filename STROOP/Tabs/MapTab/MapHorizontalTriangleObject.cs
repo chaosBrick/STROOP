@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using OpenTK.Graphics.OpenGL;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
 using OpenTK;
-using System.Drawing.Imaging;
 
 using System.Windows.Forms;
-using STROOP.Models;
 
 namespace STROOP.Tabs.MapTab
 {
@@ -47,7 +42,7 @@ namespace STROOP.Tabs.MapTab
             });
         }
         
-        protected List<ToolStripMenuItem> GetHorizontalTriangleToolStripMenuItems()
+        protected List<ToolStripMenuItem> GetHorizontalTriangleToolStripMenuItems(MapTracker targetTracker)
         {
             ToolStripMenuItem itemSetMinHeight = new ToolStripMenuItem("Set Min Height");
             itemSetMinHeight.Click += (sender, e) =>
@@ -60,7 +55,7 @@ namespace STROOP.Tabs.MapTab
                 if (!minHeightNullable.HasValue) return;
                 MapObjectSettings settings = new MapObjectSettings(
                     triangleChangeMinHeight: true, triangleNewMinHeight: minHeightNullable.Value);
-                GetParentMapTracker().ApplySettings(settings);
+                targetTracker.ApplySettings(settings);
             };
 
             ToolStripMenuItem itemClearMinHeight = new ToolStripMenuItem("Clear Min Height");
@@ -68,7 +63,7 @@ namespace STROOP.Tabs.MapTab
             {
                 MapObjectSettings settings = new MapObjectSettings(
                     triangleChangeMinHeight: true, triangleNewMinHeight: null);
-                GetParentMapTracker().ApplySettings(settings);
+                targetTracker.ApplySettings(settings);
             };
 
             ToolStripMenuItem itemSetMaxHeight = new ToolStripMenuItem("Set Max Height");
@@ -82,7 +77,7 @@ namespace STROOP.Tabs.MapTab
                 if (!maxHeightNullable.HasValue) return;
                 MapObjectSettings settings = new MapObjectSettings(
                     triangleChangeMaxHeight: true, triangleNewMaxHeight: maxHeightNullable.Value);
-                GetParentMapTracker().ApplySettings(settings);
+                targetTracker.ApplySettings(settings);
             };
 
             ToolStripMenuItem itemClearMaxHeight = new ToolStripMenuItem("Clear Max Height");
@@ -90,7 +85,7 @@ namespace STROOP.Tabs.MapTab
             {
                 MapObjectSettings settings = new MapObjectSettings(
                     triangleChangeMaxHeight: true, triangleNewMaxHeight: null);
-                GetParentMapTracker().ApplySettings(settings);
+                targetTracker.ApplySettings(settings);
             };
 
             return new List<ToolStripMenuItem>()

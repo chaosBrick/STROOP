@@ -233,7 +233,7 @@ namespace STROOP.Tabs.MapTab
             }
         }
 
-        public override ContextMenuStrip GetContextMenuStrip()
+        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {
@@ -241,7 +241,7 @@ namespace STROOP.Tabs.MapTab
                 itemResetPath.Click += (sender, e) =>
                 {
                     MapObjectSettings settings = new MapObjectSettings(pathDoReset: true);
-                    GetParentMapTracker().ApplySettings(settings);
+                    targetTracker.ApplySettings(settings);
                 };
 
                 _itemResetPathOnLevelChange = new ToolStripMenuItem("Reset Path on Level Change");
@@ -250,7 +250,7 @@ namespace STROOP.Tabs.MapTab
                     MapObjectSettings settings = new MapObjectSettings(
                         pathChangeResetPathOnLevelChange: true,
                         pathNewResetPathOnLevelChange: !_resetPathOnLevelChange);
-                    GetParentMapTracker().ApplySettings(settings);
+                    targetTracker.ApplySettings(settings);
                 };
                 _itemResetPathOnLevelChange.Checked = _resetPathOnLevelChange;
 
@@ -260,7 +260,7 @@ namespace STROOP.Tabs.MapTab
                     MapObjectSettings settings = new MapObjectSettings(
                         pathChangeUseBlending: true,
                         pathNewUseBlending: !_useBlending);
-                    GetParentMapTracker().ApplySettings(settings);
+                    targetTracker.ApplySettings(settings);
                 };
                 _itemUseBlending.Checked = _useBlending;
 
@@ -270,7 +270,7 @@ namespace STROOP.Tabs.MapTab
                     MapObjectSettings settings = new MapObjectSettings(
                         pathChangePaused: true,
                         pathNewPaused: !_isPaused);
-                    GetParentMapTracker().ApplySettings(settings);
+                    targetTracker.ApplySettings(settings);
                 };
                 _itemPause.Checked = _isPaused;
 
@@ -282,7 +282,7 @@ namespace STROOP.Tabs.MapTab
                     if (!moduloNullable.HasValue || moduloNullable.Value <= 0) return;
                     MapObjectSettings settings = new MapObjectSettings(
                         pathChangeModulo: true, pathNewModulo: moduloNullable.Value);
-                    GetParentMapTracker().ApplySettings(settings);
+                    targetTracker.ApplySettings(settings);
                 };
 
                 _contextMenuStrip = new ContextMenuStrip();
@@ -329,21 +329,10 @@ namespace STROOP.Tabs.MapTab
             }
         }
 
-        public override string GetName()
-        {
-            return "Path for " + _posAngle.GetMapName();
-        }
+        public override string GetName() => "Path for " + _posAngle.GetMapName();
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.PathImage;
 
-        public override MapDrawType GetDrawType()
-        {
-            return MapDrawType.Perspective;
-        }
-
-        public override PositionAngle GetPositionAngle()
-        {
-            return _posAngle;
-        }
+        public override MapDrawType GetDrawType() => MapDrawType.Perspective;
     }
 }

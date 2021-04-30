@@ -17,19 +17,11 @@ namespace STROOP.Tabs.MapTab
         public MapCameraObject()
             : base()
         {
+            positionAngleProvider = () => new[] { PositionAngle.Camera };
             InternalRotates = true;
         }
 
-        public override Lazy<Image> GetInternalImage() =>Config.ObjectAssociations.CameraMapImage;
-
-        public override PositionAngle GetPositionAngle()
-        {
-            return PositionAngle.Camera;
-        }
-
-        public override string GetName()
-        {
-            return "Camera";
-        }
+        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.CameraMapImage;
+        public override string GetName() => "Camera";
     }
 }

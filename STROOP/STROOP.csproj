@@ -285,12 +285,6 @@
     <Compile Include="Forms\ActionForm.Designer.cs">
       <DependentUpon>ActionForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\LoadingForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\LoadingForm.Designer.cs">
-      <DependentUpon>LoadingForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\VariableTripletControllerForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -433,6 +427,7 @@
     <Compile Include="Managers\VariableAdder.cs" />
     <Compile Include="Tabs\MapTab\GraphicsUtil.cs" />
     <Compile Include="Tabs\MapTab\MapAllObjectCeilingObject.cs" />
+    <Compile Include="Tabs\MapTab\MapAllObjectFloorObject.cs" />
     <Compile Include="Tabs\MapTab\MapAllObjectWallObject.cs" />
     <Compile Include="Tabs\MapTab\MapCustomPositionAngleArrowObject.cs" />
     <Compile Include="Tabs\MapTab\MapWatersObject.cs" />
@@ -440,22 +435,9 @@
     <Compile Include="Tabs\MapTab\MapFacingDividerObject.cs" />
     <Compile Include="Tabs\MapTab\MapSwooperEffectiveTargetArrowObject.cs" />
     <Compile Include="Tabs\MapTab\MapSectorObject.cs" />
-    <Compile Include="Tabs\MapTab\MapEffectiveHitboxCylinderObject.cs" />
-    <Compile Include="Tabs\MapTab\MapEffectiveHurtboxCylinderObject.cs" />
-    <Compile Include="Tabs\MapTab\MapAllObjectFloorObject.cs" />
     <Compile Include="Tabs\MapTab\MapAllObjectsWithNameObject.cs" />
     <Compile Include="Tabs\MapTab\MapPunchDetectorObject.cs" />
-    <Compile Include="Tabs\MapTab\MapHurtboxCylinderObject.cs" />
     <Compile Include="Tabs\MapTab\MapMarioFloorArrowObject.cs" />
-    <Compile Include="Tabs\MapTab\MapMarioTwirlArrowObject.cs" />
-    <Compile Include="Tabs\MapTab\MapMarioSlidingArrowObject.cs" />
-    <Compile Include="Tabs\MapTab\MapMarioIntendedArrowObject.cs" />
-    <Compile Include="Tabs\MapTab\MapMarioMovingArrowObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjectAngleToMarioArrowObject.cs" />
-    <Compile Include="Tabs\MapTab\MapMarioFacingArrowObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjectGraphicsArrowObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjectMovingArrowObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjectFacingArrowObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjectCustomArrowObject.cs" />
     <Compile Include="Tabs\MapTab\MapHomeLineObject.cs" />
     <Compile Include="Tabs\MapTab\MapCeilingObject.cs" />
@@ -477,7 +459,6 @@
     <Compile Include="Tabs\MapTab\MapCompassObject.cs" />
     <Compile Include="Tabs\MapTab\MapSphereObject.cs" />
     <Compile Include="Tabs\MapTab\MapCylinderObject.cs" />
-    <Compile Include="Tabs\MapTab\MapHitboxHackTriangleObject.cs" />
     <Compile Include="Tabs\MapTab\MapFloorObject.cs" />
     <Compile Include="Tabs\MapTab\MapTriangleObject.cs" />
     <Compile Include="Tabs\MapTab\MapIwerlipsesObject.cs" />
@@ -493,8 +474,7 @@
     <Compile Include="Tabs\MapTab\MapCustomWallObject.cs" />
     <Compile Include="Tabs\MapTab\MapCustomUnitPointsObject.cs" />
     <Compile Include="Tabs\MapTab\MapMarioCeilingObject.cs" />
-    <Compile Include="Tabs\MapTab\MapHitboxCylinderObject.cs" />
-    <Compile Include="Tabs\MapTab\MapDrawDistanceSphereObject.cs" />
+    <Compile Include="Tabs\MapTab\MapObjectCylinderObject.cs" />
     <Compile Include="Tabs\MapTab\MapHomeObject.cs" />
     <Compile Include="Tabs\MapTab\MapCustomFloorObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjectCeilingObject.cs" />
@@ -507,8 +487,7 @@
     <Compile Include="Tabs\MapTab\MapDrawingObject.cs" />
     <Compile Include="Tabs\MapTab\MapWallObject.cs" />
     <Compile Include="Tabs\MapTab\MapSelfObject.cs" />
-    <Compile Include="Tabs\MapTab\MapTangibilitySphereObject.cs" />
-    <Compile Include="Tabs\MapTab\MapCustomSphereObject.cs" />
+    <Compile Include="Tabs\MapTab\MapObjectSphereObject.cs" />
     <Compile Include="Tabs\MapTab\MapCustomCylinderObject.cs" />
     <Compile Include="Tabs\MapTab\MapCurrentUnitObject.cs" />
     <Compile Include="Tabs\MapTab\MapGraphics.cs" />
@@ -916,6 +895,7 @@
     <Compile Include="Utilities\EasingUtilities.cs" />
     <Compile Include="Utilities\EnumUtilities.cs" />
     <Compile Include="Utilities\FlyingUtilities.cs" />
+    <Compile Include="Utilities\FormsUtilities.cs" />
     <Compile Include="Utilities\GeneralUtilities.cs" />
     <Compile Include="Utilities\InGameFunctionCall.cs" />
     <Compile Include="Utilities\MathOperationUtilities.cs" />
@@ -1192,10 +1172,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ActionForm.resx">
       <DependentUpon>ActionForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\LoadingForm.resx">
-      <DependentUpon>LoadingForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\VariableTripletControllerForm.resx">
       <DependentUpon>VariableTripletControllerForm.cs</DependentUpon>

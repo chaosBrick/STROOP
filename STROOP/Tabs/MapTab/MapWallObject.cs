@@ -93,14 +93,14 @@ namespace STROOP.Tabs.MapTab
             });
         }
 
-        protected List<ToolStripMenuItem> GetWallToolStripMenuItems()
+        protected List<ToolStripMenuItem> GetWallToolStripMenuItems(MapTracker targetTracker)
         {
             _itemShowArrows = new ToolStripMenuItem("Show Arrows");
             _itemShowArrows.Click += (sender, e) =>
             {
                 MapObjectSettings settings = new MapObjectSettings(
                     wallChangeShowArrows: true, wallNewShowArrows: !_showArrows);
-                GetParentMapTracker().ApplySettings(settings);
+                targetTracker.ApplySettings(settings);
             };
 
             ToolStripMenuItem itemSetRelativeHeight = new ToolStripMenuItem("Set Relative Height");
@@ -111,7 +111,7 @@ namespace STROOP.Tabs.MapTab
                 if (!relativeHeightNullable.HasValue) return;
                 MapObjectSettings settings = new MapObjectSettings(
                     wallChangeRelativeHeight: true, wallNewRelativeHeight: relativeHeightNullable.Value);
-                GetParentMapTracker().ApplySettings(settings);
+                targetTracker.ApplySettings(settings);
             };
 
             ToolStripMenuItem itemClearRelativeHeight = new ToolStripMenuItem("Clear Relative Height");
@@ -119,7 +119,7 @@ namespace STROOP.Tabs.MapTab
             {
                 MapObjectSettings settings = new MapObjectSettings(
                     wallChangeRelativeHeight: true, wallNewRelativeHeight: null);
-                GetParentMapTracker().ApplySettings(settings);
+                targetTracker.ApplySettings(settings);
             };
 
             ToolStripMenuItem itemSetAbsoluteHeight = new ToolStripMenuItem("Set Absolute Height");
@@ -133,7 +133,7 @@ namespace STROOP.Tabs.MapTab
                 if (!absoluteHeightNullable.HasValue) return;
                 MapObjectSettings settings = new MapObjectSettings(
                     wallChangeAbsoluteHeight: true, wallNewAbsoluteHeight: absoluteHeightNullable.Value);
-                GetParentMapTracker().ApplySettings(settings);
+                targetTracker.ApplySettings(settings);
             };
 
             ToolStripMenuItem itemClearAbsoluteHeight = new ToolStripMenuItem("Clear Absolute Height");
@@ -141,7 +141,7 @@ namespace STROOP.Tabs.MapTab
             {
                 MapObjectSettings settings = new MapObjectSettings(
                     wallChangeAbsoluteHeight: true, wallNewAbsoluteHeight: null);
-                GetParentMapTracker().ApplySettings(settings);
+                targetTracker.ApplySettings(settings);
             };
 
             return new List<ToolStripMenuItem>()

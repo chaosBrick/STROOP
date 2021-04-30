@@ -11,7 +11,7 @@ namespace STROOP.Tabs.GhostTab
         public GhostFrame lastValidPlaybackFrame;
         public uint originalPlaybackBaseFrame { get; private set; }
         public uint maxFrame { get; private set; }
-        public uint numFrames => (maxFrame - originalPlaybackBaseFrame) + 1;
+        public uint numFrames => maxFrame + 1;
         public string name, fileName = "-";
         public Ghost() { }
         public Ghost(uint playbackBaseFrame, Dictionary<uint, GhostFrame> playbackFrames)

@@ -46,7 +46,7 @@ namespace STROOP.Tabs.MapTab
             var imageData = GraphicsUtil.GetPixelData(image, OBJECTS_TEXTURE_SIZE, OBJECTS_TEXTURE_SIZE);
             var result = objectLayer++;
             GL.BindTexture(TextureTarget.Texture2DArray, objectRenderer.texture);
-            GL.TexSubImage3D(TextureTarget.Texture2DArray, 0, 0, 0, result, OBJECTS_TEXTURE_SIZE, OBJECTS_TEXTURE_SIZE, 1, OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, imageData);
+            GL.TexSubImage3D(TextureTarget.Texture2DArray, 0, 0, 0, result, OBJECTS_TEXTURE_SIZE, OBJECTS_TEXTURE_SIZE, 1, PixelFormat.Rgba, PixelType.UnsignedByte, imageData);
             GL.BindTexture(TextureTarget.Texture2DArray, 0);
             needsRecreateObjectMipmaps = true;
             knownIcons[image] = result;

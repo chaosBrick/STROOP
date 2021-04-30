@@ -10,6 +10,13 @@ namespace STROOP.Tabs.MapTab.Renderers
             public Matrix4 transform;
             public Vector4 color;
             public Vector4 outlineColor;
+            public float shape;
+        }
+
+        public enum Shapes
+        {
+            Circle = 0,
+            Quad = 1
         }
 
         public CircleRenderer(int numExpectedInstances = 512)
@@ -27,16 +34,19 @@ namespace STROOP.Tabs.MapTab.Renderers
                 GL.VertexAttribDivisor(i, 1);
                 GL.VertexAttribPointer(i, 4, VertexAttribPointerType.Float, false, instanceSize, sizeof(float) * i * 4);
             }
+            GL.EnableVertexAttribArray(6);
+            GL.VertexAttribDivisor(6, 1);
+            GL.VertexAttribPointer(6, 1, VertexAttribPointerType.Float, false, instanceSize, sizeof(float) * 6 * 4);
             GL.BindVertexArray(0);
         }
-
-        public void AddInstance(Matrix4 transform, float outlineWidth, Vector4 color, Vector4 outlineColor)
+        public void AddInstance(Matrix4 transform, float outlineWidth, Vector4 color, Vector4 outlineColor, Shapes shape = Shapes.Circle)
         {
             instances.Add(new InstanceData
             {
                 transform = transform,
                 color = color,
-                outlineColor = new Vector4(outlineColor.X, outlineColor.Y, outlineColor.Z, outlineWidth)
+                outlineColor = new Vector4(outlineColor.X, outlineColor.Y, outlineColor.Z, outlineWidth),
+                shape = (float)(int)shape
             });
         }
 
@@ -50,8 +60,9 @@ namespace STROOP.Tabs.MapTab.Renderers
 
                BeginDraw(graphics);
                GL.Disable(EnableCap.CullFace);
+               GL.Disable(EnableCap.DepthTest);
 
-               GL.DrawArraysInstanced(PrimitiveType.TriangleFan, 0, 4, instances.Count);
+               GL.DrawArraysInstanced(PrimitiveType.TriangleStrip, 0, 4, instances.Count);
                GL.BindVertexArray(0);
            });
         }
