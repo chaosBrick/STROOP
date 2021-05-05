@@ -44,7 +44,7 @@ namespace STROOP.Forms
                 {
                     progressBarLoading.Maximum = _maxStatus;
                     progressBarLoading.Value = taskNumber;
-                    labelLoadingStatus.Text = $"{tasks[taskNumber].name}[{taskNumber} / {_maxStatus}]";
+                    labelLoadingStatus.Text = $"{tasks[taskNumber].name} [{(taskNumber + 1)} / {_maxStatus}]";
                 }));
             }
             Invoke(new Action(() => labelLoadingStatus.Text = "Finishing"));

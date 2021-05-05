@@ -271,7 +271,7 @@ namespace STROOP
         {
             // Read configuration
             loadingForm.RunLoadingTasks(
-                ("Loading main configuration",
+                ("Loading Main Configuration",
                 () =>
                 {
                     XmlConfigParser.OpenConfig(@"Config/Config.xml");

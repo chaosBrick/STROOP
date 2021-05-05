@@ -210,7 +210,7 @@ namespace STROOP
             // 
             this.labelVersionNumber.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.labelVersionNumber.AutoSize = true;
-            this.labelVersionNumber.Location = new System.Drawing.Point(894, 15);
+            this.labelVersionNumber.Location = new System.Drawing.Point(868, 15);
             this.labelVersionNumber.Name = "labelVersionNumber";
             this.labelVersionNumber.Size = new System.Drawing.Size(41, 13);
             this.labelVersionNumber.TabIndex = 5;
@@ -330,7 +330,7 @@ namespace STROOP
             // 
             this.comboBoxRomVersion.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.comboBoxRomVersion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxRomVersion.Location = new System.Drawing.Point(557, 11);
+            this.comboBoxRomVersion.Location = new System.Drawing.Point(531, 11);
             this.comboBoxRomVersion.Margin = new System.Windows.Forms.Padding(2);
             this.comboBoxRomVersion.Name = "comboBoxRomVersion";
             this.comboBoxRomVersion.Size = new System.Drawing.Size(79, 21);
@@ -340,7 +340,7 @@ namespace STROOP
             // 
             this.comboBoxReadWriteMode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.comboBoxReadWriteMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxReadWriteMode.Location = new System.Drawing.Point(640, 11);
+            this.comboBoxReadWriteMode.Location = new System.Drawing.Point(614, 11);
             this.comboBoxReadWriteMode.Margin = new System.Windows.Forms.Padding(2);
             this.comboBoxReadWriteMode.Name = "comboBoxReadWriteMode";
             this.comboBoxReadWriteMode.Size = new System.Drawing.Size(75, 21);
@@ -717,7 +717,7 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Right)));
             this.mapTab.Location = new System.Drawing.Point(0, 0);
             this.mapTab.Name = "mapTab";
-            this.mapTab.Size = new System.Drawing.Size(921, 460);
+            this.mapTab.Size = new System.Drawing.Size(0, 0);
             this.mapTab.TabIndex = 0;
             // 
             // tabPageOptions
@@ -921,7 +921,7 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Right)));
             this.quarterFramesTab.Location = new System.Drawing.Point(0, 0);
             this.quarterFramesTab.Name = "quarterFramesTab";
-            this.quarterFramesTab.Size = new System.Drawing.Size(192, 74);
+            this.quarterFramesTab.Size = new System.Drawing.Size(0, 0);
             this.quarterFramesTab.TabIndex = 0;
             // 
             // tabPageVarHack
@@ -1192,9 +1192,10 @@ namespace STROOP
             this.ghostTab.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.ghostTab.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ghostTab.Location = new System.Drawing.Point(0, 0);
             this.ghostTab.Name = "ghostTab";
-            this.ghostTab.Size = new System.Drawing.Size(915, 463);
+            this.ghostTab.Size = new System.Drawing.Size(0, 0);
             this.ghostTab.TabIndex = 0;
             // 
             // tabPageWater
@@ -1214,7 +1215,7 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Right)));
             this.waterTab.Location = new System.Drawing.Point(0, 0);
             this.waterTab.Name = "waterTab";
-            this.waterTab.Size = new System.Drawing.Size(192, 74);
+            this.waterTab.Size = new System.Drawing.Size(0, 0);
             this.waterTab.TabIndex = 0;
             // 
             // groupBoxObjects
@@ -1350,7 +1351,7 @@ namespace STROOP
             this.pictureBoxCog.BackgroundImage = global::STROOP.Properties.Resources.cog;
             this.pictureBoxCog.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.pictureBoxCog.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.pictureBoxCog.Location = new System.Drawing.Point(868, 11);
+            this.pictureBoxCog.Location = new System.Drawing.Point(842, 11);
             this.pictureBoxCog.Name = "pictureBoxCog";
             this.pictureBoxCog.Size = new System.Drawing.Size(20, 20);
             this.pictureBoxCog.TabIndex = 23;
@@ -1361,7 +1362,7 @@ namespace STROOP
             this.buttonShowTopPane.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonShowTopPane.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buttonShowTopPane.BackgroundImage")));
             this.buttonShowTopPane.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.buttonShowTopPane.Location = new System.Drawing.Point(844, 11);
+            this.buttonShowTopPane.Location = new System.Drawing.Point(818, 11);
             this.buttonShowTopPane.Margin = new System.Windows.Forms.Padding(2);
             this.buttonShowTopPane.Name = "buttonShowTopPane";
             this.buttonShowTopPane.Size = new System.Drawing.Size(21, 21);
@@ -1374,7 +1375,7 @@ namespace STROOP
             this.buttonShowTopBottomPane.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonShowTopBottomPane.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buttonShowTopBottomPane.BackgroundImage")));
             this.buttonShowTopBottomPane.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.buttonShowTopBottomPane.Location = new System.Drawing.Point(819, 11);
+            this.buttonShowTopBottomPane.Location = new System.Drawing.Point(793, 11);
             this.buttonShowTopBottomPane.Margin = new System.Windows.Forms.Padding(2);
             this.buttonShowTopBottomPane.Name = "buttonShowTopBottomPane";
             this.buttonShowTopBottomPane.Size = new System.Drawing.Size(21, 21);
@@ -1387,7 +1388,7 @@ namespace STROOP
             this.buttonShowBottomPane.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonShowBottomPane.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buttonShowBottomPane.BackgroundImage")));
             this.buttonShowBottomPane.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.buttonShowBottomPane.Location = new System.Drawing.Point(794, 11);
+            this.buttonShowBottomPane.Location = new System.Drawing.Point(768, 11);
             this.buttonShowBottomPane.Margin = new System.Windows.Forms.Padding(2);
             this.buttonShowBottomPane.Name = "buttonShowBottomPane";
             this.buttonShowBottomPane.Size = new System.Drawing.Size(21, 21);
@@ -1400,7 +1401,7 @@ namespace STROOP
             this.buttonShowRightPane.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonShowRightPane.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buttonShowRightPane.BackgroundImage")));
             this.buttonShowRightPane.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.buttonShowRightPane.Location = new System.Drawing.Point(769, 11);
+            this.buttonShowRightPane.Location = new System.Drawing.Point(743, 11);
             this.buttonShowRightPane.Margin = new System.Windows.Forms.Padding(2);
             this.buttonShowRightPane.Name = "buttonShowRightPane";
             this.buttonShowRightPane.Size = new System.Drawing.Size(21, 21);
@@ -1413,7 +1414,7 @@ namespace STROOP
             this.buttonShowLeftRightPane.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonShowLeftRightPane.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buttonShowLeftRightPane.BackgroundImage")));
             this.buttonShowLeftRightPane.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.buttonShowLeftRightPane.Location = new System.Drawing.Point(744, 11);
+            this.buttonShowLeftRightPane.Location = new System.Drawing.Point(718, 11);
             this.buttonShowLeftRightPane.Margin = new System.Windows.Forms.Padding(2);
             this.buttonShowLeftRightPane.Name = "buttonShowLeftRightPane";
             this.buttonShowLeftRightPane.Size = new System.Drawing.Size(21, 21);
@@ -1426,7 +1427,7 @@ namespace STROOP
             this.buttonTabAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonTabAdd.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buttonTabAdd.BackgroundImage")));
             this.buttonTabAdd.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.buttonTabAdd.Location = new System.Drawing.Point(532, 11);
+            this.buttonTabAdd.Location = new System.Drawing.Point(506, 11);
             this.buttonTabAdd.Margin = new System.Windows.Forms.Padding(2);
             this.buttonTabAdd.Name = "buttonTabAdd";
             this.buttonTabAdd.Size = new System.Drawing.Size(21, 21);
@@ -1439,7 +1440,7 @@ namespace STROOP
             this.buttonMoveTabLeft.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonMoveTabLeft.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buttonMoveTabLeft.BackgroundImage")));
             this.buttonMoveTabLeft.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.buttonMoveTabLeft.Location = new System.Drawing.Point(482, 11);
+            this.buttonMoveTabLeft.Location = new System.Drawing.Point(456, 11);
             this.buttonMoveTabLeft.Margin = new System.Windows.Forms.Padding(2);
             this.buttonMoveTabLeft.Name = "buttonMoveTabLeft";
             this.buttonMoveTabLeft.Size = new System.Drawing.Size(21, 21);
@@ -1452,7 +1453,7 @@ namespace STROOP
             this.buttonMoveTabRight.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonMoveTabRight.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buttonMoveTabRight.BackgroundImage")));
             this.buttonMoveTabRight.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.buttonMoveTabRight.Location = new System.Drawing.Point(507, 11);
+            this.buttonMoveTabRight.Location = new System.Drawing.Point(481, 11);
             this.buttonMoveTabRight.Margin = new System.Windows.Forms.Padding(2);
             this.buttonMoveTabRight.Name = "buttonMoveTabRight";
             this.buttonMoveTabRight.Size = new System.Drawing.Size(21, 21);
@@ -1465,7 +1466,7 @@ namespace STROOP
             this.buttonShowLeftPane.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonShowLeftPane.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buttonShowLeftPane.BackgroundImage")));
             this.buttonShowLeftPane.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.buttonShowLeftPane.Location = new System.Drawing.Point(719, 11);
+            this.buttonShowLeftPane.Location = new System.Drawing.Point(693, 11);
             this.buttonShowLeftPane.Margin = new System.Windows.Forms.Padding(2);
             this.buttonShowLeftPane.Name = "buttonShowLeftPane";
             this.buttonShowLeftPane.Size = new System.Drawing.Size(21, 21);
