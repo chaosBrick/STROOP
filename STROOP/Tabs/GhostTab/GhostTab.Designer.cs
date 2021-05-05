@@ -352,7 +352,6 @@
             this.Controls.Add(this.groupBoxGhosts);
             this.Controls.Add(this.groupGhostHack);
             this.Name = "GhostTab";
-            this.Size = new System.Drawing.Size(915, 463);
             this.groupBoxGhosts.ResumeLayout(false);
             this.groupBoxGhosts.PerformLayout();
             this.groupBoxGhostInfo.ResumeLayout(false);

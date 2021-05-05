@@ -245,8 +245,11 @@ namespace STROOP.Tabs.GhostTab
                     Array.Copy(BitConverter.GetBytes((ushort)0), 0, buffer, i * 0x20 + 0x1E, 2);
                 }
             }
-            Config.Stream.WriteRam(buffer, bufferBaseAddress, EndiannessType.Little);
-            lastGlobalTimer = globalTimer;
+            if (hack.Enabled)
+            {
+                Config.Stream.WriteRam(buffer, bufferBaseAddress, EndiannessType.Little);
+                lastGlobalTimer = globalTimer;
+            }
         }
 
         void StartRecording()

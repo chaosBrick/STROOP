@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<VarData>
+	<Data type="uint" offsetUS="0x8032D5D4" offsetJP="0x8032C694" offsetSH="0x8030CD04" offsetEU="0x802F9784" base="Relative">Global Timer</Data>
+	<Data base="None" specialType="GhostX">Ghost X</Data>
+	<Data base="None" specialType="GhostY">Ghost Y</Data>
+	<Data base="None" specialType="GhostZ">Ghost Z</Data>
+	<Data base="None" specialType="GhostYaw">Ghost Yaw</Data>
+	<Data base="None" specialType="GhostPitch">Ghost Pitch</Data>
+	<Data base="None" specialType="GhostRoll">Ghost Roll</Data>
+</VarData>

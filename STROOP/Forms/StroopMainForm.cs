@@ -23,7 +23,7 @@ namespace STROOP
     {
         public static StroopMainForm instance { get; private set; }
 
-        const string _version = "Refactor 0.2";
+        const string _version = "Refactor 0.3";
 
         ScriptParser _scriptParser;
 
