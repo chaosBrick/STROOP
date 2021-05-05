@@ -156,16 +156,20 @@ namespace STROOP.Tabs.MapTab
 
         protected delegate ObjectDataModel[] ObjectProvider();
         private readonly ObjectProvider objectProvider;
-        private readonly PositionAngle _posAngle;
+
+        MapObjectObject()
+        {
+            positionAngleProvider = () => objectProvider().ConvertAndRemoveNull(_ => PositionAngle.Obj(_.Address));
+        }
 
         public MapObjectObject(uint objAddress)
-            : base()
+            : this()
         {
             objectProvider = () => new[] { new ObjectDataModel(objAddress) };
         }
 
         protected MapObjectObject(ObjectProvider objectProvider)
-            : base()
+            : this()
         {
             this.objectProvider = objectProvider;
         }
@@ -192,7 +196,16 @@ namespace STROOP.Tabs.MapTab
             return result ?? Config.ObjectAssociations.EmptyImage;
         }
 
-        public override string GetName() => "_OBJECT_"; // _posAngle.GetMapName();
+        public override string GetName()
+        {
+            string name = null;
+            foreach (var posAngle in positionAngleProvider())
+                if (name == null)
+                    name = posAngle.GetMapName();
+                else if (name != posAngle.GetMapName())
+                    name = "Multiple Objects";
+            return name ?? "<null>";
+        }
 
         public override void Update()
         {
