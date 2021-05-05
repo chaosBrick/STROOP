@@ -53,10 +53,12 @@
             this.buttonDisableGhostHack = new System.Windows.Forms.Button();
             this.buttonEnableGhostHack = new System.Windows.Forms.Button();
             this.watchVariablePanelGhost = new STROOP.Controls.WatchVariableFlowLayoutPanel();
+            this.groupBoxVariables = new System.Windows.Forms.GroupBox();
             this.groupBoxGhosts.SuspendLayout();
             this.groupBoxGhostInfo.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownStartOfPlayback)).BeginInit();
             this.groupGhostHack.SuspendLayout();
+            this.groupBoxVariables.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBoxGhosts
@@ -64,6 +66,7 @@
             this.groupBoxGhosts.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBoxGhosts.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.groupBoxGhosts.Controls.Add(this.buttonTutorial);
             this.groupBoxGhosts.Controls.Add(this.buttonDiscardOld);
             this.groupBoxGhosts.Controls.Add(this.buttonInstantReplayMode);
@@ -124,7 +127,7 @@
             this.listBoxGhosts.FormattingEnabled = true;
             this.listBoxGhosts.Location = new System.Drawing.Point(9, 12);
             this.listBoxGhosts.Name = "listBoxGhosts";
-            this.listBoxGhosts.Size = new System.Drawing.Size(350, 277);
+            this.listBoxGhosts.Size = new System.Drawing.Size(350, 264);
             this.listBoxGhosts.TabIndex = 5;
             this.listBoxGhosts.SelectedIndexChanged += new System.EventHandler(this.listBoxGhosts_SelectedIndexChanged);
             // 
@@ -319,19 +322,33 @@
             // 
             // watchVariablePanelGhost
             // 
-            this.watchVariablePanelGhost.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.watchVariablePanelGhost.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.watchVariablePanelGhost.DataPath = "Config/GhostData.xml";
-            this.watchVariablePanelGhost.Location = new System.Drawing.Point(691, 3);
+            this.watchVariablePanelGhost.Location = new System.Drawing.Point(6, 19);
             this.watchVariablePanelGhost.Name = "watchVariablePanelGhost";
-            this.watchVariablePanelGhost.Size = new System.Drawing.Size(221, 457);
+            this.watchVariablePanelGhost.Size = new System.Drawing.Size(209, 432);
             this.watchVariablePanelGhost.TabIndex = 4;
+            // 
+            // groupBoxVariables
+            // 
+            this.groupBoxVariables.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBoxVariables.Controls.Add(this.watchVariablePanelGhost);
+            this.groupBoxVariables.Location = new System.Drawing.Point(691, 3);
+            this.groupBoxVariables.Name = "groupBoxVariables";
+            this.groupBoxVariables.Size = new System.Drawing.Size(221, 457);
+            this.groupBoxVariables.TabIndex = 5;
+            this.groupBoxVariables.TabStop = false;
+            this.groupBoxVariables.Text = "Variables";
             // 
             // GhostTab
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.watchVariablePanelGhost);
+            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.Controls.Add(this.groupBoxVariables);
             this.Controls.Add(this.groupBoxGhosts);
             this.Controls.Add(this.groupGhostHack);
             this.Name = "GhostTab";
@@ -343,6 +360,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownStartOfPlayback)).EndInit();
             this.groupGhostHack.ResumeLayout(false);
             this.groupGhostHack.PerformLayout();
+            this.groupBoxVariables.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -373,5 +391,6 @@
         private Controls.WatchVariableFlowLayoutPanel watchVariablePanelGhost;
         private System.Windows.Forms.Button buttonWatchGhostFile;
         private System.Windows.Forms.Button buttonTutorial;
+        private System.Windows.Forms.GroupBox groupBoxVariables;
     }
 }

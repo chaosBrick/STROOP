@@ -1,18 +1,30 @@
 ﻿using System;
 using STROOP.Controls;
 using System.Windows.Forms;
-using System.Collections.Generic;
+using System.Drawing;
 
 namespace STROOP.Tabs
 {
     public partial class STROOPTab : UserControl
     {
         public TabPage Tab => Parent as TabPage;
+        static readonly Size InitSize = new Size(915, 463);
 
         bool initialized = false;
+        public override Size MinimumSize
+        {
+            get => initialized ? base.MinimumSize : InitSize;
+            set => base.MinimumSize = initialized ? value : InitSize;
+        }
+        public override Size MaximumSize
+        {
+            get => initialized ? base.MinimumSize : InitSize;
+            set => base.MinimumSize = initialized ? value : InitSize;
+        }
 
         public STROOPTab()
         {
+            Size = InitSize;
             InitializeComponent();
         }
 
