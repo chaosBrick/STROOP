@@ -60,7 +60,7 @@ namespace STROOP.Structs
             CustomPointsImage,
             CustomGridlinesImage;
 
-        public Color 
+        public Color
             MarioColor,
             HudColor,
             DebugColor,
@@ -243,7 +243,7 @@ namespace STROOP.Structs
             {
                 foreach (var img in _cachedBufferedObjectImages)
                 {
-                    img.Value.Dispose();
+                    img.Value?.Dispose();
                 }
             }
 
@@ -258,11 +258,7 @@ namespace STROOP.Structs
             _transparentDefaultImage?.Dispose();
             DefaultImage?.Dispose();
             foreach (var field in GetImageFields())
-            {
-                Lazy<Image> lazyImage = (Lazy<Image>)field.GetValue(this);
-                if (lazyImage != null && lazyImage.IsValueCreated)
-                    lazyImage.Value?.Dispose();
-            }
+                ((Lazy<Image>)field.GetValue(this)).Dispose();
         }
     }
 }

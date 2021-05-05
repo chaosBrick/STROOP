@@ -18,6 +18,15 @@ namespace STROOP.Utilities
                 image.Value?.Dispose();
         }
 
+        public static readonly Lazy<Image> NullImage = new Lazy<Image>(() => null);
+
+        public static Lazy<Image> FromPathOrNull(string path)
+        {
+            if (!System.IO.File.Exists(path))
+                return NullImage;
+            return new Lazy<Image>(() => Image.FromFile(path));
+        }
+
         public static Image CreateMultiImage(List<Image> images, int width, int height)
         {
             Image multiBitmap = new Bitmap(width, height);

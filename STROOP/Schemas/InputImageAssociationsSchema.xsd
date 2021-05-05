@@ -19,184 +19,20 @@
         <xs:element name="InputImages">
           <xs:complexType>
             <xs:all>
-              <xs:element name="ButtonA">
-                <xs:complexType>
-                  <xs:all>
-                    <xs:element name="InputImage" minOccurs="0" maxOccurs="1">
-                      <xs:complexType>
-                        <xs:attribute name="path" use="required" type="xs:string"/>
-                      </xs:complexType>
-                    </xs:element>
-                  </xs:all>
-                </xs:complexType>
-              </xs:element>
-              <xs:element name="ButtonB">
-                <xs:complexType>
-                  <xs:all>
-                    <xs:element name="InputImage" minOccurs="0" maxOccurs="1">
-                      <xs:complexType>
-                        <xs:attribute name="path" use="required" type="xs:string"/>
-                      </xs:complexType>
-                    </xs:element>
-                  </xs:all>
-                </xs:complexType>
-              </xs:element>
-              <xs:element name="ButtonZ">
-                <xs:complexType>
-                  <xs:all>
-                    <xs:element name="InputImage" minOccurs="0" maxOccurs="1">
-                      <xs:complexType>
-                        <xs:attribute name="path" use="required" type="xs:string"/>
-                      </xs:complexType>
-                    </xs:element>
-                  </xs:all>
-                </xs:complexType>
-              </xs:element>
-              <xs:element name="ButtonStart">
-                <xs:complexType>
-                  <xs:all>
-                    <xs:element name="InputImage" minOccurs="0" maxOccurs="1">
-                      <xs:complexType>
-                        <xs:attribute name="path" use="required" type="xs:string"/>
-                      </xs:complexType>
-                    </xs:element>
-                  </xs:all>
-                </xs:complexType>
-              </xs:element>
-
-              <xs:element name="ButtonR">
-                <xs:complexType>
-                  <xs:all>
-                    <xs:element name="InputImage" minOccurs="0" maxOccurs="1">
-                      <xs:complexType>
-                        <xs:attribute name="path" use="required" type="xs:string"/>
-                      </xs:complexType>
-                    </xs:element>
-                  </xs:all>
-                </xs:complexType>
-              </xs:element>
-              <xs:element name="ButtonL">
-                <xs:complexType>
-                  <xs:all>
-                    <xs:element name="OverlayImage" minOccurs="0" maxOccurs="1">
-                      <xs:complexType>
-                        <xs:attribute name="path" use="required" type="xs:string"/>
-                      </xs:complexType>
-                    </xs:element>
-                  </xs:all>
-                </xs:complexType>
-              </xs:element>
-
-              <xs:element name="ButtonCUp">
-                <xs:complexType>
-                  <xs:all>
-                    <xs:element name="InputImage" minOccurs="0" maxOccurs="1">
-                      <xs:complexType>
-                        <xs:attribute name="path" use="required" type="xs:string"/>
-                      </xs:complexType>
-                    </xs:element>
-                  </xs:all>
-                </xs:complexType>
-              </xs:element>
-              <xs:element name="ButtonCDown">
-                <xs:complexType>
-                  <xs:all>
-                    <xs:element name="InputImage" minOccurs="0" maxOccurs="1">
-                      <xs:complexType>
-                        <xs:attribute name="path" use="required" type="xs:string"/>
-                      </xs:complexType>
-                    </xs:element>
-                  </xs:all>
-                </xs:complexType>
-              </xs:element>
-              <xs:element name="ButtonCLeft">
-                <xs:complexType>
-                  <xs:all>
-                    <xs:element name="InputImage" minOccurs="0" maxOccurs="1">
-                      <xs:complexType>
-                        <xs:attribute name="path" use="required" type="xs:string"/>
-                      </xs:complexType>
-                    </xs:element>
-                  </xs:all>
-                </xs:complexType>
-              </xs:element>
-              <xs:element name="ButtonCRight">
-                <xs:complexType>
-                  <xs:all>
-                    <xs:element name="InputImage" minOccurs="0" maxOccurs="1">
-                      <xs:complexType>
-                        <xs:attribute name="path" use="required" type="xs:string"/>
-                      </xs:complexType>
-                    </xs:element>
-                  </xs:all>
-                </xs:complexType>
-              </xs:element>
-
-              <xs:element name="ButtonDUp">
-                <xs:complexType>
-                  <xs:all>
-                    <xs:element name="InputImage" minOccurs="0" maxOccurs="1">
-                      <xs:complexType>
-                        <xs:attribute name="path" use="required" type="xs:string"/>
-                      </xs:complexType>
-                    </xs:element>
-                  </xs:all>
-                </xs:complexType>
-              </xs:element>
-              <xs:element name="ButtonDDown">
-                <xs:complexType>
-                  <xs:all>
-                    <xs:element name="InputImage" minOccurs="0" maxOccurs="1">
-                      <xs:complexType>
-                        <xs:attribute name="path" use="required" type="xs:string"/>
-                      </xs:complexType>
-                    </xs:element>
-                  </xs:all>
-                </xs:complexType>
-              </xs:element>
-              <xs:element name="ButtonDLeft">
-                <xs:complexType>
-                  <xs:all>
-                    <xs:element name="InputImage" minOccurs="0" maxOccurs="1">
-                      <xs:complexType>
-                        <xs:attribute name="path" use="required" type="xs:string"/>
-                      </xs:complexType>
-                    </xs:element>
-                  </xs:all>
-                </xs:complexType>
-              </xs:element>
-              <xs:element name="ButtonDRight">
-                <xs:complexType>
-                  <xs:all>
-                    <xs:element name="InputImage" minOccurs="0" maxOccurs="1">
-                      <xs:complexType>
-                        <xs:attribute name="path" use="required" type="xs:string"/>
-                      </xs:complexType>
-                    </xs:element>
-                  </xs:all>
-                </xs:complexType>
-              </xs:element>
-
+			  <xs:element name="Button">
+			    <xs:complexType>
+				  <xs:attribute name="name" use="required" type="xs:string"/>
+				  <xs:attribute name="path" use="required" type="xs:string"/>
+				</xs:complexType>
+			  </xs:element>
               <xs:element name="ControlStick">
                 <xs:complexType>
-                  <xs:all>
-                    <xs:element name="InputImage" minOccurs="0" maxOccurs="1">
-                      <xs:complexType>
-                        <xs:attribute name="path" use="required" type="xs:string"/>
-                      </xs:complexType>
-                    </xs:element>
-                  </xs:all>
+				  <xs:attribute name="path" use="required" type="xs:string"/>
                 </xs:complexType>
               </xs:element>
               <xs:element name="InputBase">
                 <xs:complexType>
-                  <xs:all>
-                    <xs:element name="InputImage" minOccurs="0" maxOccurs="1">
-                      <xs:complexType>
-                        <xs:attribute name="path" use="required" type="xs:string"/>
-                      </xs:complexType>
-                    </xs:element>
-                  </xs:all>
+				  <xs:attribute name="path" use="required" type="xs:string"/>
                 </xs:complexType>
               </xs:element>
             </xs:all>

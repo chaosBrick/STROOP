@@ -29,6 +29,8 @@ namespace STROOP.Structs
             MapImage = new Lazy<Image>(() =>
             {
                 var path = Path.Combine(Config.MapAssociations.MapImageFolderPath, ImagePath);
+                if (!File.Exists(path))
+                    return Config.MapAssociations.DefaultMap.MapImage.Value;
                 using (Bitmap preLoad = Bitmap.FromFile(path) as Bitmap)
                 {
                     int maxSize = 1080;

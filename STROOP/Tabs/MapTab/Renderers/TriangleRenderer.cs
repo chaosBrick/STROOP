@@ -108,7 +108,6 @@ namespace STROOP.Tabs.MapTab.Renderers
             IntPtr ptr = dataPtr;
             foreach (var instance in triangles)
             {
-                //TODO: if triangle shows unit squares, inflate
                 for (int i = 0; i < 3; i++)
                 {
                     Marshal.StructureToPtr(new TriangleVertex

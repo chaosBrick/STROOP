@@ -1,56 +1,24 @@
-﻿using STROOP.Controls;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+using STROOP.Structs.Configurations;
+using STROOP.Utilities;
 
 namespace STROOP.Structs
 {
     public class InputImageGui
     {
         public InputDisplayTypeEnum InputDisplayType;
-        public Image ButtonAImage;
-        public Image ButtonBImage;
-        public Image ButtonZImage;
-        public Image ButtonStartImage;
-        public Image ButtonRImage;
-        public Image ButtonLImage;
-        public Image ButtonCUpImage;
-        public Image ButtonCDownImage;
-        public Image ButtonCLeftImage;
-        public Image ButtonCRightImage;
-        public Image ButtonDUpImage;
-        public Image ButtonDDownImage;
-        public Image ButtonDLeftImage;
-        public Image ButtonDRightImage;
-        public Image ButtonU1Image;
-        public Image ButtonU2Image;
-        public Image ControlStickImage;
-        public Image ControllerImage;
+        public Dictionary<InputConfig.ButtonMask, Lazy<Image>> ButtonImages = new Dictionary<InputConfig.ButtonMask, Lazy<Image>>();
+        public Lazy<Image> ControlStickImage, ControllerImage;
 
         ~InputImageGui()
         {
-            ButtonAImage?.Dispose();
-            ButtonBImage?.Dispose();
-            ButtonZImage?.Dispose();
-            ButtonStartImage?.Dispose();
-            ButtonRImage?.Dispose();
-            ButtonLImage?.Dispose();
-            ButtonCUpImage?.Dispose();
-            ButtonCDownImage?.Dispose();
-            ButtonCLeftImage?.Dispose();
-            ButtonCRightImage?.Dispose();
-            ButtonDUpImage?.Dispose();
-            ButtonDDownImage?.Dispose();
-            ButtonDLeftImage?.Dispose();
-            ButtonDRightImage?.Dispose();
-            ButtonU1Image?.Dispose();
-            ButtonU2Image?.Dispose();
-            ControlStickImage?.Dispose();
-            ControllerImage?.Dispose();
+            foreach (var img in ButtonImages)
+                if (img.Value.IsValueCreated)
+                    img.Value.Dispose();
+            ControlStickImage.Dispose();
+            ControllerImage.Dispose();
         }
     }
 }

@@ -12,7 +12,6 @@ using STROOP.Controls;
 using STROOP.Extensions;
 using System.Drawing.Drawing2D;
 using STROOP.Structs.Configurations;
-using Accord.Video.FFMPEG;
 using STROOP.Models;
 
 namespace STROOP

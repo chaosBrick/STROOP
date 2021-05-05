@@ -709,26 +709,7 @@ namespace STROOP.Utilities
             var doc = XDocument.Load(path);
             doc.Validate(schemaSet, Validation);
 
-            // Create path list
-            string buttonAPath = "",
-                   buttonBPath = "",
-                   buttonZPath = "",
-                   buttonStartPath = "",
-                   buttonRPath = "",
-                   buttonLPath = "",
-                   buttonCUpPath = "",
-                   buttonCDownPath = "",
-                   buttonCLeftPath = "",
-                   buttonCRightPath = "",
-                   buttonDUpPath = "",
-                   buttonDDownPath = "",
-                   buttonDLeftPath = "",
-                   buttonDRightPath = "",
-                   buttonU1Path = "",
-                   buttonU2Path = "",
-                   controlStickPath = "",
-                   controllerPath = "";
-
+            InputImageGui result = new InputImageGui() { InputDisplayType = inputDisplayType };
             foreach (XElement element in doc.Root.Elements())
             {
                 switch (element.Name.ToString())
@@ -738,113 +719,28 @@ namespace STROOP.Utilities
                         {
                             switch (subElement.Name.ToString())
                             {
-                                case "ButtonA":
-                                    buttonAPath = subElement.Element(XName.Get("InputImage")).Attribute(XName.Get("path")).Value;
-                                    break;
-
-                                case "ButtonB":
-                                    buttonBPath = subElement.Element(XName.Get("InputImage")).Attribute(XName.Get("path")).Value;
-                                    break;
-
-                                case "ButtonZ":
-                                    buttonZPath = subElement.Element(XName.Get("InputImage")).Attribute(XName.Get("path")).Value;
-                                    break;
-
-                                case "ButtonStart":
-                                    buttonStartPath = subElement.Element(XName.Get("InputImage")).Attribute(XName.Get("path")).Value;
-                                    break;
-
-                                case "ButtonR":
-                                    buttonRPath = subElement.Element(XName.Get("InputImage")).Attribute(XName.Get("path")).Value;
-                                    break;
-
-                                case "ButtonL":
-                                    buttonLPath = subElement.Element(XName.Get("InputImage")).Attribute(XName.Get("path")).Value;
-                                    break;
-
-                                case "ButtonCUp":
-                                    buttonCUpPath = subElement.Element(XName.Get("InputImage")).Attribute(XName.Get("path")).Value;
-                                    break;
-
-                                case "ButtonCDown":
-                                    buttonCDownPath = subElement.Element(XName.Get("InputImage")).Attribute(XName.Get("path")).Value;
-                                    break;
-
-                                case "ButtonCLeft":
-                                    buttonCLeftPath = subElement.Element(XName.Get("InputImage")).Attribute(XName.Get("path")).Value;
-                                    break;
-
-                                case "ButtonCRight":
-                                    buttonCRightPath = subElement.Element(XName.Get("InputImage")).Attribute(XName.Get("path")).Value;
-                                    break;
-
-                                case "ButtonDUp":
-                                    buttonDUpPath = subElement.Element(XName.Get("InputImage")).Attribute(XName.Get("path")).Value;
-                                    break;
-
-                                case "ButtonDDown":
-                                    buttonDDownPath = subElement.Element(XName.Get("InputImage")).Attribute(XName.Get("path")).Value;
-                                    break;
-
-                                case "ButtonDLeft":
-                                    buttonDLeftPath = subElement.Element(XName.Get("InputImage")).Attribute(XName.Get("path")).Value;
-                                    break;
-
-                                case "ButtonDRight":
-                                    buttonDRightPath = subElement.Element(XName.Get("InputImage")).Attribute(XName.Get("path")).Value;
-                                    break;
-
-                                case "ButtonU1":
-                                    buttonU1Path = subElement.Element(XName.Get("InputImage")).Attribute(XName.Get("path")).Value;
-                                    break;
-
-                                case "ButtonU2":
-                                    buttonU2Path = subElement.Element(XName.Get("InputImage")).Attribute(XName.Get("path")).Value;
+                                case "Button":
+                                    string buttonName = subElement.Attribute(XName.Get("name")).Value;
+                                    string buttonPath = subElement.Attribute(XName.Get("path")).Value;
+                                    if (Enum.TryParse<InputConfig.ButtonMask>(buttonName, out var mask))
+                                        result.ButtonImages[mask] = ImageUtilities.FromPathOrNull(inputImageDir + buttonPath);
                                     break;
 
                                 case "ControlStick":
-                                    controlStickPath = subElement.Element(XName.Get("InputImage")).Attribute(XName.Get("path")).Value;
+                                    result.ControlStickImage = ImageUtilities.FromPathOrNull(
+                                        inputImageDir + subElement.Attribute(XName.Get("path")).Value);
                                     break;
 
                                 case "Controller":
-                                    controllerPath = subElement.Element(XName.Get("InputImage")).Attribute(XName.Get("path")).Value;
+                                    result.ControllerImage = ImageUtilities.FromPathOrNull(
+                                        inputImageDir + subElement.Attribute(XName.Get("path")).Value);
                                     break;
                             }
                         }
                         break;
                 }
             }
-
-            // Load Images
-            // TODO: Exceptions
-            return new InputImageGui()
-            {
-                InputDisplayType = inputDisplayType,
-
-                ButtonAImage = Image.FromFile(inputImageDir + buttonAPath),
-                ButtonBImage = Image.FromFile(inputImageDir + buttonBPath),
-                ButtonZImage = Image.FromFile(inputImageDir + buttonZPath),
-                ButtonStartImage = Image.FromFile(inputImageDir + buttonStartPath),
-
-                ButtonRImage = Image.FromFile(inputImageDir + buttonRPath),
-                ButtonLImage = Image.FromFile(inputImageDir + buttonLPath),
-
-                ButtonCUpImage = Image.FromFile(inputImageDir + buttonCUpPath),
-                ButtonCDownImage = Image.FromFile(inputImageDir + buttonCDownPath),
-                ButtonCLeftImage = Image.FromFile(inputImageDir + buttonCLeftPath),
-                ButtonCRightImage = Image.FromFile(inputImageDir + buttonCRightPath),
-
-                ButtonDUpImage = Image.FromFile(inputImageDir + buttonDUpPath),
-                ButtonDDownImage = Image.FromFile(inputImageDir + buttonDDownPath),
-                ButtonDLeftImage = Image.FromFile(inputImageDir + buttonDLeftPath),
-                ButtonDRightImage = Image.FromFile(inputImageDir + buttonDRightPath),
-
-                ButtonU1Image = Image.FromFile(inputImageDir + buttonU1Path),
-                ButtonU2Image = Image.FromFile(inputImageDir + buttonU2Path),
-
-                ControlStickImage = Image.FromFile(inputImageDir + controlStickPath),
-                ControllerImage = Image.FromFile(inputImageDir + controllerPath)
-            };
+            return result;
         }
 
         public static void OpenFileImageAssoc(string path, FileImageGui fileImageGui)
