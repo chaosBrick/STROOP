@@ -105,6 +105,16 @@ namespace STROOP.Tabs.MapTab
 
         public Matrix4 ViewMatrix { get; private set; } = Matrix4.Identity;
 
+        Control previouslyActiveControl;
+        Control GetActiveLeafControl(ContainerControl root)
+        {
+            while (root.ActiveControl is ContainerControl ctrl && ctrl.ActiveControl != null)
+                root = ctrl;
+            return root.ActiveControl;
+        }
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        static extern int SetForegroundWindow(int hwnd);
+
         public void Load()
         {
             glControl.MakeCurrent();
@@ -117,6 +127,18 @@ namespace STROOP.Tabs.MapTab
             glControl.MouseMove += OnMouseMove;
             glControl.MouseWheel += OnScroll;
             glControl.DoubleClick += OnDoubleClick;
+            glControl.MouseEnter += (_, __) =>
+            {
+                var form = glControl.FindForm();
+                previouslyActiveControl = GetActiveLeafControl(form);
+            };
+            glControl.MouseLeave += (_, __) =>
+            {
+                var form = glControl.FindForm();
+                var activeControl = GetActiveLeafControl(form);
+                if (activeControl == glControl)
+                    form.ActiveControl = previouslyActiveControl;
+            };
 
             GL.ClearColor(Color.FromKnownColor(KnownColor.Control));
             GL.Enable(EnableCap.Texture2D);
@@ -535,7 +557,7 @@ namespace STROOP.Tabs.MapTab
             }
         }
 
-        private void OnScroll(object sender, System.Windows.Forms.MouseEventArgs e)
+        private void OnScroll(object sender, MouseEventArgs e)
         {
             ChangeScale2(e.Delta > 0 ? 1 : -1, SpecialConfig.Map2DScrollSpeed);
         }

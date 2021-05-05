@@ -656,7 +656,7 @@ namespace STROOP.Tabs.MapTab
             {
                 StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.RemoveControl(this);
             }
-            pictureBoxPicture.Image = mapObject.GetImage().Value;
+            pictureBoxPicture.Image = mapObject.GetImage()?.Value;
             textBoxName.SubmitTextLoosely(_customName ?? string.Join(", ", mapObject.GetName()));
         }
 

@@ -400,8 +400,7 @@ namespace STROOP.Tabs.MapTab
             _checkBoxMarioAction = InitializeCheckboxSemaphore(checkBoxMapOptionsTrackMario, MapSemaphoreManager.Mario, () => new MapMarioObject(), true);
             InitializeCheckboxSemaphore(checkBoxMapOptionsTrackHolp, MapSemaphoreManager.Holp, () => new MapHolpObject(), false);
             InitializeCheckboxSemaphore(checkBoxMapOptionsTrackCamera, MapSemaphoreManager.Camera, () => new MapCameraObject(), false);
-            //InitializeCheckboxSemaphore(checkBoxMapOptionsTrackGhost, MapSemaphoreManager.Ghost, () => new MapGhostObject(), false);
-            //InitializeCheckboxSemaphore(checkBoxMapOptionsTrackSelf, MapSemaphoreManager.Self, () => new MapSelfObject(), false);
+            InitializeCheckboxSemaphore(checkBoxMapOptionsTrackGhost, MapSemaphoreManager.Ghost, () => new MapGhostObject(), false);
             InitializeCheckboxSemaphore(checkBoxMapOptionsTrackFloorTri, MapSemaphoreManager.FloorTri, () => new MapMarioFloorObject(), false);
             InitializeCheckboxSemaphore(checkBoxMapOptionsTrackWallTri, MapSemaphoreManager.WallTri, () => new MapMarioWallObject(), false);
             InitializeCheckboxSemaphore(checkBoxMapOptionsTrackCeilingTri, MapSemaphoreManager.CeilingTri, () => new MapMarioCeilingObject(), false);

@@ -23,7 +23,10 @@ namespace STROOP.Utilities
         public static Lazy<Image> FromPathOrNull(string path)
         {
             if (!System.IO.File.Exists(path))
+            {
+                System.Diagnostics.Debugger.Break();
                 return NullImage;
+            }
             return new Lazy<Image>(() => Image.FromFile(path));
         }
 

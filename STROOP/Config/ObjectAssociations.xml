@@ -45,6 +45,7 @@
   <MapImage name="Debug" path = "DEBUG.png"/>
   <MapImage name="Misc" path = "MISC.png"/>
   <MapImage name="Camera" path = "Camera.png"/>
+  <MapImage name="CameraMap" path = "Camera.png"/>
 
   <Hud>
     <Image path="HUD.png"/>

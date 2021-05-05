@@ -54,6 +54,8 @@ namespace STROOP.Tabs.MapTab
 
         public void DrawIcon(MapGraphics graphics, float x, float z, float angle, Image image)
         {
+            if (image == null)
+                return;
             float desiredDiameter = Size * 2;
             if (!graphics.MapViewScaleIconSizes) desiredDiameter /= graphics.MapViewScaleValue;
             float scale = Math.Max(image.Height / desiredDiameter, image.Width / desiredDiameter);

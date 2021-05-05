@@ -532,48 +532,7 @@ namespace STROOP.Utilities
 
             foreach (var field in ObjectAssociations.GetImageFields())
                 if (assocDictionary.TryGetValue(field.Name, out string imagePath))
-                {
-                    Lazy<Image> lazyImage = new Lazy<Image>(() => Image.FromFile(AssocConfig.ImageDirectory + imagePath));
-                    field.SetValue(assoc, lazyImage);
-                }
-
-            //assoc.DefaultImage = Image.FromFile(AssocConfig.ImageDirectory + AssocConfig.DefaultImagePath);
-            //assoc.EmptyImage = Image.FromFile(imageDir + emptyImagePath);
-            //assoc.MarioImage = Image.FromFile(imageDir + marioImagePath);
-            //assoc.CameraImage = Image.FromFile(imageDir + cameraImagePath);
-            //assoc.MarioMapImage = marioMapImagePath == "" ? assoc.MarioImage : Image.FromFile(mapImageDir + marioMapImagePath);
-            //assoc.HudImage = Image.FromFile(imageDir + hudImagePath);
-            //assoc.DebugImage = Image.FromFile(imageDir + debugImagePath);
-            //assoc.MiscImage = Image.FromFile(imageDir + miscImagePath);
-            //assoc.HolpImage = Image.FromFile(mapImageDir + holpMapImagePath);
-            //assoc.HomeImage = Image.FromFile(mapImageDir + homeMapImagePath);
-            //assoc.IntendedNextPositionImage = Image.FromFile(mapImageDir + intendedNextPositionImagePath);
-            //assoc.CameraMapImage = Image.FromFile(mapImageDir + cameraMapImagePath);
-            //assoc.BlueMarioMapImage = Image.FromFile(mapImageDir + blueMarioMapImagePath);
-            //assoc.GreenMarioMapImage = Image.FromFile(mapImageDir + greenMarioMapImagePath);
-            //assoc.OrangeMarioMapImage = Image.FromFile(mapImageDir + orangeMarioMapImagePath);
-            //assoc.PurpleMarioMapImage = Image.FromFile(mapImageDir + purpleMarioMapImagePath);
-
-            //assoc.AddEmptyAssociation(); // Need to do this after Empty Image is set
-
-            //assoc.TriangleFloorImage = Image.FromFile(mapImageDir + triangleFloorImagePath);
-            //assoc.TriangleWallImage = Image.FromFile(mapImageDir + triangleWallImagePath);
-            //assoc.TriangleCeilingImage = Image.FromFile(mapImageDir + triangleCeilingImagePath);
-            //assoc.TriangleOtherImage = Image.FromFile(mapImageDir + triangleOtherImagePath);
-            //assoc.HitboxHackTrisImage = Image.FromFile(mapImageDir + hitboxHackTrisImagePath);
-
-            //assoc.CellGridlinesImage = Image.FromFile(mapImageDir + cellGridlinesImagePath);
-            //assoc.CurrentCellImage = Image.FromFile(mapImageDir + currentCellImagePath);
-            //assoc.UnitGridlinesImage = Image.FromFile(mapImageDir + unitGridlinesImagePath);
-            //assoc.CurrentUnitImage = Image.FromFile(mapImageDir + currentUnitImagePath);
-            //assoc.NextPositionsImage = Image.FromFile(mapImageDir + nextPositionsImagePath);
-            //assoc.ArrowImage = Image.FromFile(mapImageDir + arrowImagePath);
-            //assoc.IwerlipsesImage = Image.FromFile(mapImageDir + iwerlipsesImagePath);
-            //assoc.CylinderImage = Image.FromFile(mapImageDir + cylinderImagePath);
-            //assoc.SphereImage = Image.FromFile(mapImageDir + sphereImagePath);
-            //assoc.PathImage = Image.FromFile(mapImageDir + pathImagePath);
-            //assoc.CustomPointsImage = Image.FromFile(mapImageDir + customPointsImagePath);
-            //assoc.CustomGridlinesImage = Image.FromFile(mapImageDir + customGridlinesImagePath);
+                    field.SetValue(assoc, ImageUtilities.FromPathOrNull(AssocConfig.ImageDirectory + imagePath));
 
             assoc.MarioBehavior = marioBehavior;
 
