@@ -81,7 +81,7 @@ namespace STROOP.Tabs.MapTab
             this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
             this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 68F));
             this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 106F));
-            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 34F));
+            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 36F));
             this.tableLayoutPanel.Controls.Add(this.checkBoxShowTriUnits, 0, 5);
             this.tableLayoutPanel.Controls.Add(this.trackBarOutlineWidth, 0, 5);
             this.tableLayoutPanel.Controls.Add(this.colorSelectorOutline, 3, 3);
@@ -166,7 +166,7 @@ namespace STROOP.Tabs.MapTab
             this.pictureBoxDownArrow.Location = new System.Drawing.Point(292, 65);
             this.pictureBoxDownArrow.Margin = new System.Windows.Forms.Padding(1);
             this.pictureBoxDownArrow.Name = "pictureBoxDownArrow";
-            this.pictureBoxDownArrow.Size = new System.Drawing.Size(32, 18);
+            this.pictureBoxDownArrow.Size = new System.Drawing.Size(34, 18);
             this.pictureBoxDownArrow.TabIndex = 12;
             this.pictureBoxDownArrow.TabStop = false;
             this.pictureBoxDownArrow.Click += new System.EventHandler(this.pictureBoxDownArrow_Click);
@@ -180,7 +180,7 @@ namespace STROOP.Tabs.MapTab
             this.pictureBoxUpArrow.Location = new System.Drawing.Point(292, 44);
             this.pictureBoxUpArrow.Margin = new System.Windows.Forms.Padding(1);
             this.pictureBoxUpArrow.Name = "pictureBoxUpArrow";
-            this.pictureBoxUpArrow.Size = new System.Drawing.Size(32, 18);
+            this.pictureBoxUpArrow.Size = new System.Drawing.Size(34, 18);
             this.pictureBoxUpArrow.TabIndex = 12;
             this.pictureBoxUpArrow.TabStop = false;
             this.pictureBoxUpArrow.Click += new System.EventHandler(this.pictureBoxUpArrow_Click);
@@ -194,7 +194,7 @@ namespace STROOP.Tabs.MapTab
             this.pictureBoxRedX.Location = new System.Drawing.Point(292, 2);
             this.pictureBoxRedX.Margin = new System.Windows.Forms.Padding(1);
             this.pictureBoxRedX.Name = "pictureBoxRedX";
-            this.pictureBoxRedX.Size = new System.Drawing.Size(32, 18);
+            this.pictureBoxRedX.Size = new System.Drawing.Size(34, 18);
             this.pictureBoxRedX.TabIndex = 12;
             this.pictureBoxRedX.TabStop = false;
             this.pictureBoxRedX.Click += new System.EventHandler(this.pictureBoxRedX_Click);
@@ -208,7 +208,7 @@ namespace STROOP.Tabs.MapTab
             this.pictureBoxEye.Location = new System.Drawing.Point(292, 23);
             this.pictureBoxEye.Margin = new System.Windows.Forms.Padding(1);
             this.pictureBoxEye.Name = "pictureBoxEye";
-            this.pictureBoxEye.Size = new System.Drawing.Size(32, 18);
+            this.pictureBoxEye.Size = new System.Drawing.Size(34, 18);
             this.pictureBoxEye.TabIndex = 12;
             this.pictureBoxEye.TabStop = false;
             this.pictureBoxEye.Click += new System.EventHandler(this.pictureBoxEye_Click);
@@ -380,7 +380,7 @@ namespace STROOP.Tabs.MapTab
             this.pictureBoxPlus.Location = new System.Drawing.Point(292, 107);
             this.pictureBoxPlus.Margin = new System.Windows.Forms.Padding(1);
             this.pictureBoxPlus.Name = "pictureBoxPlus";
-            this.pictureBoxPlus.Size = new System.Drawing.Size(32, 19);
+            this.pictureBoxPlus.Size = new System.Drawing.Size(34, 19);
             this.pictureBoxPlus.TabIndex = 17;
             this.pictureBoxPlus.TabStop = false;
             // 
@@ -415,7 +415,7 @@ namespace STROOP.Tabs.MapTab
             this.pictureBoxCog.Location = new System.Drawing.Point(292, 86);
             this.pictureBoxCog.Margin = new System.Windows.Forms.Padding(1);
             this.pictureBoxCog.Name = "pictureBoxCog";
-            this.pictureBoxCog.Size = new System.Drawing.Size(32, 18);
+            this.pictureBoxCog.Size = new System.Drawing.Size(34, 18);
             this.pictureBoxCog.TabIndex = 43;
             this.pictureBoxCog.TabStop = false;
             // 
@@ -461,7 +461,6 @@ namespace STROOP.Tabs.MapTab
         private IntPictureBox pictureBoxPicture;
         private TrackBarEx trackBarOpacity;
         private TrackBarEx trackBarSize;
-        private BetterTextbox textBoxSize;
         private BetterTextbox textBoxOpacity;
         private System.Windows.Forms.Label labelSize;
         private System.Windows.Forms.Label labelOpacity;
@@ -472,5 +471,6 @@ namespace STROOP.Tabs.MapTab
         private BetterTextbox textBoxOutlineWidth;
         private System.Windows.Forms.PictureBox pictureBoxCog;
         private System.Windows.Forms.CheckBox checkBoxShowTriUnits;
+        public BetterTextbox textBoxSize;
     }
 }

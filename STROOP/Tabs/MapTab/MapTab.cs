@@ -95,12 +95,18 @@ namespace STROOP.Tabs.MapTab
 
         public bool PauseMapUpdating = false;
         private bool _isLoaded2D = false;
-        private bool _isLoaded3D = false;
-        public int NumDrawingsEnabled = 0;
 
-        public void NotifyDrawingEnabledChange(bool enabled)
+        public bool HasMouseListeners => mouseEventListeners.Count > 0;
+        HashSet<MapObject> mouseEventListeners = new HashSet<MapObject>();
+
+        public void RegisterMouseEventListener(MapObject tracker)
         {
-            NumDrawingsEnabled += enabled ? +1 : -1;
+            mouseEventListeners.Add(tracker);
+        }
+
+        public void UnregisterMouseEventListener(MapObject tracker)
+        {
+            mouseEventListeners.Remove(tracker);
         }
 
         public MapTab()
@@ -159,15 +165,6 @@ namespace STROOP.Tabs.MapTab
         public List<(float x, float z)> GetPuCoordinates(float relX, float relZ)
         {
             return GetPuCenters().ConvertAll(center => (center.x + relX, center.z + relZ));
-        }
-
-        public void Load3D()
-        {
-            return;
-            // Create new graphics control
-            view.Map3DGraphics = new Map3DGraphics(view);
-            view.Map3DGraphics.Load();
-            _isLoaded3D = true;
         }
 
         private void InitializeControls()
@@ -441,7 +438,6 @@ namespace STROOP.Tabs.MapTab
         {
             base.InitializeTab();
             Load2D();
-            Load3D();
         }
 
         public override void Update(bool active)

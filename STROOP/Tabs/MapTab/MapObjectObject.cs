@@ -141,8 +141,8 @@ namespace STROOP.Tabs.MapTab
             anglesItem.DropDownItems.AddHandlerToItem("Add Tracker for Home Line",
                 () => MapTracker.CreateTracker(new MapHomeLineObject(positionAngleProvider, name)));
 
-            //anglesItem.DropDownItems.AddHandlerToItem("Add Tracker for Sector",
-            //    () => MapTracker.CreateTracker(new MapSectorObject(positionAngleProvider, name)));
+            anglesItem.DropDownItems.AddHandlerToItem("Add Tracker for Sector",
+                () => MapTracker.CreateTracker(new MapSectorObject(positionAngleProvider, name)));
 
             targetStrip.Items.Add(anglesItem);
 

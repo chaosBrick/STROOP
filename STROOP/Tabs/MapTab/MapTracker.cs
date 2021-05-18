@@ -652,6 +652,7 @@ namespace STROOP.Tabs.MapTab
 
         public void UpdateControl()
         {
+            mapObject.Update();
             if (System.Linq.Enumerable.Any(_semaphoreList, semaphore => !semaphore.IsUsed))
             {
                 StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.RemoveControl(this);

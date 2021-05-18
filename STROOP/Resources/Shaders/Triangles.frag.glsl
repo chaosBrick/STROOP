@@ -11,6 +11,7 @@ in vec2 fs_coord2;
 layout(location=0) out vec4 color;
 
 uniform vec2 pixelsPerUnit;
+uniform float unitDivisor;
 
 uniform sampler2DArray sampler;
 
@@ -43,17 +44,18 @@ void main()
 		f = edgeFactor();
 	else 
 	{
-		ivec2 unit = ivec2(fs_worldPosition_showunits.xy);
-		ivec2 p1 = ivec2(fs_coord01.xy);
-		ivec2 p2 = ivec2(fs_coord01.zw);
-		ivec2 p3 = ivec2(fs_coord2.xy);
+		vec2 dasDaHalt = fs_worldPosition_showunits.xy / unitDivisor;
+		ivec2 unit = ivec2(dasDaHalt);
+		ivec2 p1 = ivec2(fs_coord01.xy / unitDivisor);
+		ivec2 p2 = ivec2(fs_coord01.zw / unitDivisor);
+		ivec2 p3 = ivec2(fs_coord2.xy / unitDivisor);
 		
 		if (!PointInTriangle(unit.x, unit.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y))
 			discard;
 		
-		vec2 frac = fract(fs_worldPosition_showunits.xy);
+		vec2 frac = fract(dasDaHalt);
 		frac = 1 - max(frac, vec2(1) - frac);
-		f = clamp(pixelsPerUnit.x * min(frac.x, frac.y), 0, 1);
+		f = clamp(pixelsPerUnit.x * min(frac.x, frac.y) * unitDivisor, 0, 1);
 		f *= clamp(pixelsPerUnit.x, 0, 1);
 	}
 	gl_FragColor = mix(fs_outline_color, fs_color, f);

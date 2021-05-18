@@ -176,7 +176,7 @@ namespace STROOP.Tabs.MapTab
         {
             if (Config.Stream == null)
                 return;
-            Cursor cursor = StroopMainForm.instance.mapTab.NumDrawingsEnabled > 0 ? Cursors.Cross : Cursors.Hand;
+            Cursor cursor = StroopMainForm.instance.mapTab.HasMouseListeners ? Cursors.Cross : Cursors.Hand;
             if (glControl.Cursor != cursor)
                 glControl.Cursor = cursor;
 
@@ -478,7 +478,7 @@ namespace STROOP.Tabs.MapTab
 
         private void OnMouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            if (StroopMainForm.instance.mapTab.NumDrawingsEnabled > 0)
+            if (StroopMainForm.instance.mapTab.HasMouseListeners)
             {
                 StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.NotifyMouseEvent(
                     MouseEvent.MouseDown, e.Button == MouseButtons.Left, e.X, e.Y);
@@ -505,7 +505,7 @@ namespace STROOP.Tabs.MapTab
 
         private void OnMouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            if (StroopMainForm.instance.mapTab.NumDrawingsEnabled > 0)
+            if (StroopMainForm.instance.mapTab.HasMouseListeners)
             {
                 StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.NotifyMouseEvent(
                     MouseEvent.MouseUp, e.Button == MouseButtons.Left, e.X, e.Y);
@@ -525,7 +525,7 @@ namespace STROOP.Tabs.MapTab
 
         private void OnMouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            if (StroopMainForm.instance.mapTab.NumDrawingsEnabled > 0)
+            if (StroopMainForm.instance.mapTab.HasMouseListeners)
             {
                 StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.NotifyMouseEvent(
                     MouseEvent.MouseMove, e.Button == MouseButtons.Left, e.X, e.Y);
@@ -564,10 +564,8 @@ namespace STROOP.Tabs.MapTab
 
         private void OnDoubleClick(object sender, EventArgs e)
         {
-            if (StroopMainForm.instance.mapTab.NumDrawingsEnabled > 0)
-            {
+            if (StroopMainForm.instance.mapTab.HasMouseListeners)
                 return;
-            }
 
             StroopMainForm.instance.mapTab.radioButtonMapControllersScaleCourseDefault.Checked = true;
             StroopMainForm.instance.mapTab.radioButtonMapControllersCenterBestFit.Checked = true;

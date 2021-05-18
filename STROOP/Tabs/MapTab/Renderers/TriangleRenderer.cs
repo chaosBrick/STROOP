@@ -35,7 +35,7 @@ namespace STROOP.Tabs.MapTab.Renderers
 
         List<Triangle> triangles = new List<Triangle>();
 
-        int uniform_viewProjection, uniform_pixelsPerUnit;
+        int uniform_viewProjection, uniform_pixelsPerUnit, uniform_unitDivisor;
         public TriangleRenderer(int maxExpectedTriangles)
         {
             int expectedSize = maxExpectedTriangles * TriangleVertex.Size * 3;
@@ -62,6 +62,7 @@ namespace STROOP.Tabs.MapTab.Renderers
                 "Resources/Shaders/Triangles.geom.glsl");
             uniform_viewProjection = GL.GetUniformLocation(shader, "viewProjection");
             uniform_pixelsPerUnit = GL.GetUniformLocation(shader, "pixelsPerUnit");
+            uniform_unitDivisor = GL.GetUniformLocation(shader, "unitDivisor");
 
             dataPtr = Marshal.AllocHGlobal(expectedSize);
         }
@@ -83,6 +84,8 @@ namespace STROOP.Tabs.MapTab.Renderers
                 var mat = graphics.ViewMatrix;
                 GL.UniformMatrix4(uniform_viewProjection, false, ref mat);
                 GL.Uniform2(uniform_pixelsPerUnit, ref pixelsPerUnit);
+                float unitDivisor = Structs.Configurations.SavedSettingsConfig.UseExtendedLevelBoundaries ? 4 : 1;
+                GL.Uniform1(uniform_unitDivisor, unitDivisor);
                 GL.DrawArrays(PrimitiveType.Triangles, 0, triangles.Count * 3);
                 error = GL.GetError();
                 GL.BindVertexArray(0);

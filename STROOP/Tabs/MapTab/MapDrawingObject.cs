@@ -50,7 +50,10 @@ namespace STROOP.Tabs.MapTab
                 {
                     _drawingEnabled = !_drawingEnabled;
                     itemEnableDrawing.Checked = _drawingEnabled;
-                    StroopMainForm.instance.mapTab.NotifyDrawingEnabledChange(_drawingEnabled);
+                    if (_drawingEnabled)
+                        StroopMainForm.instance.mapTab.RegisterMouseEventListener(this);
+                    else
+                        StroopMainForm.instance.mapTab.UnregisterMouseEventListener(this);
                 };
 
                 ToolStripMenuItem itemClearDrawing = new ToolStripMenuItem("Clear Drawing");
@@ -96,11 +99,8 @@ namespace STROOP.Tabs.MapTab
 
         public override void CleanUp()
         {
-            if (_drawingEnabled)
-            {
-                _drawingEnabled = false;
-                StroopMainForm.instance.mapTab.NotifyDrawingEnabledChange(_drawingEnabled);
-            }
+            _drawingEnabled = false;
+            StroopMainForm.instance.mapTab.UnregisterMouseEventListener(this);
         }
     }
 }
