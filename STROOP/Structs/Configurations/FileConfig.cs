@@ -8,7 +8,7 @@ namespace STROOP.Structs.Configurations
 {
     public static class FileConfig
     {
-        public static uint CurrentFileAddress => StroopMainForm.instance.fileTab.getFileAddress();
+        public static uint CurrentFileAddress => AccessScope<StroopMainForm>.content.fileTab.getFileAddress();
 
         public static uint FileStructAddress { get => RomVersionConfig.SwitchMap(FileStructAddressUS, FileStructAddressJP, FileStructAddressSH, FileStructAddressEU); }
         public static readonly uint FileStructAddressUS = 0x80207700;

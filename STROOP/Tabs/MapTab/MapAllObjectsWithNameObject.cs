@@ -45,10 +45,10 @@ namespace STROOP.Tabs.MapTab
             return objByName;
         }
 
-        public override void InitSubTrackerContextMenuStrip(ContextMenuStrip targetStrip)
+        public override void InitSubTrackerContextMenuStrip(MapTab mapTab, ContextMenuStrip targetStrip)
         {
-            base.InitSubTrackerContextMenuStrip(targetStrip);
-            MapObjectObject.AddObjectSubTrackers(
+            base.InitSubTrackerContextMenuStrip(mapTab, targetStrip);
+            MapObjectObject.AddObjectSubTrackers(mapTab,
                 _objName,
                 targetStrip,
                 () => Config.ObjectSlotsManager.GetLoadedObjectsWithPredicate(predicate).ConvertAll(obj => PositionAngle.Obj(obj.Address))

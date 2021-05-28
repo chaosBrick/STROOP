@@ -129,7 +129,7 @@ namespace STROOP.Forms
                     short? triangleType = TableConfig.TriangleInfo.GetType(triangleTypeDescription);
                     if (triangleType.HasValue)
                     {
-                        foreach (uint triangleAddress in StroopMainForm.instance.trianglesTab.TriangleAddresses)
+                        foreach (uint triangleAddress in AccessScope<StroopMainForm>.content.trianglesTab.TriangleAddresses)
                         {
                             Config.Stream.SetValue(
                                 triangleType.Value,

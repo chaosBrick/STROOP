@@ -141,48 +141,6 @@ namespace STROOP.Tabs.MapTab
             }
         }
 
-        public void DrawOn3DControl(Map3DGraphics graphics, MapDrawType drawType)
-        {
-            List<MapObject> listOrderOnTop = new List<MapObject>();
-            List<MapObject> listOrderOnBottom = new List<MapObject>();
-            List<MapObject> listOrderByY = new List<MapObject>();
-
-            lock (_objectLock)
-            {
-                foreach (MapTracker mapTracker in Controls)
-                {
-                    switch (mapTracker.GetOrderType())
-                    {
-                        case MapTrackerOrderType.OrderOnTop:
-                            listOrderOnTop.AddRange(mapTracker.GetMapObjectsToDisplay());
-                            break;
-                        case MapTrackerOrderType.OrderOnBottom:
-                            listOrderOnBottom.AddRange(mapTracker.GetMapObjectsToDisplay());
-                            break;
-                        case MapTrackerOrderType.OrderByY:
-                            listOrderByY.AddRange(mapTracker.GetMapObjectsToDisplay());
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-                }
-            }
-
-            listOrderOnTop.Reverse();
-            listOrderOnBottom.Reverse();
-            listOrderByY.Reverse();
-            listOrderByY = listOrderByY.OrderBy(obj => obj.GetY()).ToList();
-
-            List<MapObject> listCombined = listOrderOnBottom.Concat(listOrderByY).Concat(listOrderOnTop).ToList();
-            listCombined.Insert(0, _mapObjBackground);
-
-            List<MapObject> listDrawType = listCombined.FindAll(obj => obj.GetDrawType() == drawType);
-            foreach (MapObject obj in listDrawType)
-            {
-                obj?.DrawOn3DControl(graphics);
-            }
-        }
-
         public void SetGlobalIconSize(float size)
         {
             lock (_objectLock)

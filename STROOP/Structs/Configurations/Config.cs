@@ -21,11 +21,11 @@ namespace STROOP.Structs.Configurations
         public static FileImageGui FileImageGui = new FileImageGui();
         public static ObjectAssociations ObjectAssociations;
         public static MapAssociations MapAssociations;
-        public static StroopMainForm StroopMainForm;
+        public static StroopMainForm StroopMainForm => AccessScope<StroopMainForm>.content;
         public static TabControlEx TabControlMain;
         public static Label DebugText;
         
-        public static ObjectSlotsManager ObjectSlotsManager;
+        public static ObjectSlotsManager ObjectSlotsManager => StroopMainForm.ObjectSlotsManager;
         public static InjectionManager InjectionManager;
 
         public static List<Controls.WatchVariableFlowLayoutPanel> GetVariableAdders()

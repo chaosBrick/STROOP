@@ -162,11 +162,6 @@ namespace STROOP.Tabs.MapTab
             }
         }
 
-        public static int MaybeReverse(int value)
-        {
-            return StroopMainForm.instance.mapTab.checkBoxMapOptionsReverseDragging.Checked ? -1 * value : value;
-        }
-
         public static void CreateTrackBarContextMenuStrip(TrackBar trackBar)
         {
             List<int> maxValues = Enumerable.Range(1, 9).ToList().ConvertAll(p => (int)Math.Pow(10, p));

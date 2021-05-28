@@ -21,24 +21,22 @@ namespace STROOP
 {
     public partial class StroopMainForm : Form
     {
-        public static StroopMainForm instance { get; private set; }
-
         const string _version = "Refactor 0.3.1";
-
-        ScriptParser _scriptParser;
 
         DataTable _tableOtherData = new DataTable();
         Dictionary<int, DataRow> _otherDataRowAssoc = new Dictionary<int, DataRow>();
+        public ObjectSlotsManager ObjectSlotsManager;
 
         bool _objSlotResizing = false;
         int _resizeObjSlotTime = 0;
+        readonly bool isMainForm;
 
-        public StroopMainForm()
+        public StroopMainForm(bool isMainForm)
         {
-            instance = this;
-            while (LoadingHandler.LoadingForm == null)
-                System.Threading.Thread.Sleep(10);
-            Initialize(LoadingHandler.LoadingForm);
+            this.isMainForm = isMainForm;
+            InitializeComponent();
+            ObjectSlotsManager = new ObjectSlotsManager(this, tabControlMain);
+            optionsTab.AddCogContextMenu(pictureBoxCog);
         }
 
         private bool AttachToProcess(Process process)
@@ -56,9 +54,7 @@ namespace STROOP
 
         private void StroopMainForm_Load(object sender, EventArgs e)
         {
-            Config.Stream = new ProcessStream();
             Config.Stream.OnUpdate += OnUpdate;
-            Config.Stream.FpsUpdated += _sm64Stream_FpsUpdated;
             Config.Stream.OnDisconnect += _sm64Stream_OnDisconnect;
             Config.Stream.WarnReadonlyOff += _sm64Stream_WarnReadonlyOff;
 
@@ -67,7 +63,6 @@ namespace STROOP
 
             SetUpContextMenuStrips();
 
-            Config.StroopMainForm = this;
             Config.TabControlMain = tabControlMain;
             Config.DebugText = labelDebugText;
 
@@ -224,16 +219,6 @@ namespace STROOP
                 });
         }
 
-        private void CreateManagers()
-        {
-            // Create managers
-            Config.InjectionManager = new InjectionManager(_scriptParser, optionsTab.checkBoxUseRomHack);
-
-            // Create Object Slots
-            Config.ObjectSlotsManager = new ObjectSlotsManager(tabControlMain);
-            optionsTab.AddCogContextMenu(pictureBoxCog);
-        }
-
         private void _sm64Stream_WarnReadonlyOff(object sender, EventArgs e)
         {
             this.TryInvoke(new Action(() =>
@@ -267,56 +252,6 @@ namespace STROOP
             }));
         }
 
-        public void Initialize(MainLoadingForm loadingForm)
-        {
-            // Read configuration
-            loadingForm.RunLoadingTasks(
-                ("Loading Main Configuration",
-                () =>
-                {
-                    XmlConfigParser.OpenConfig(@"Config/Config.xml");
-                    XmlConfigParser.OpenSavedSettings(@"Config/SavedSettings.xml");
-                }
-            ),
-                ("Loading Object Associations",
-                () => Config.ObjectAssociations = XmlConfigParser.OpenObjectAssoc(@"Config/ObjectAssociations.xml")
-            ),
-                ("Loading File Image Associations",
-                () => XmlConfigParser.OpenFileImageAssoc(@"Config/FileImageAssociations.xml", Config.FileImageGui)
-            ),
-                ("Loading Map Associations",
-                () => Config.MapAssociations = XmlConfigParser.OpenMapAssoc(@"Config/MapAssociations.xml")
-            ),
-                ("Loading Scripts",
-                () =>
-            _scriptParser = XmlConfigParser.OpenScripts(@"Config/Scripts.xml")
-            ),
-                ("Opening Tables",
-                () =>
-                {
-                    TableConfig.MarioActions = XmlConfigParser.OpenActionTable(@"Config/MarioActions.xml");
-                    TableConfig.MarioAnimations = XmlConfigParser.OpenAnimationTable(@"Config/MarioAnimations.xml");
-                    TableConfig.TriangleInfo = XmlConfigParser.OpenTriangleInfoTable(@"Config/TriangleInfo.xml");
-                    TableConfig.PendulumSwings = XmlConfigParser.OpenPendulumSwingTable(@"Config/PendulumSwings.xml");
-                    TableConfig.RacingPenguinWaypoints = XmlConfigParser.OpenWaypointTable(@"Config/RacingPenguinWaypoints.xml");
-                    TableConfig.KoopaTheQuick1Waypoints = XmlConfigParser.OpenWaypointTable(@"Config/KoopaTheQuick1Waypoints.xml");
-                    TableConfig.KoopaTheQuick2Waypoints = XmlConfigParser.OpenWaypointTable(@"Config/KoopaTheQuick2Waypoints.xml");
-                    TableConfig.TtmBowlingBallPoints = XmlConfigParser.OpenPointTable(@"Config/TtmBowlingBallPoints.xml");
-                    TableConfig.Missions = XmlConfigParser.OpenMissionTable(@"Config/Missions.xml");
-                    TableConfig.CourseData = XmlConfigParser.OpenCourseDataTable(@"Config/CourseData.xml");
-                    TableConfig.FlyGuyData = new FlyGuyDataTable();
-                    TableConfig.WdwRotatingPlatformTable = new ObjectAngleTable(1120);
-                    TableConfig.ElevatorAxleTable = new ObjectAngleTable(400);
-                }
-            ),
-                ("Initialize Main Form",
-                InitializeComponent
-            ),
-                ("Creating Managers",
-                CreateManagers
-            ));
-        }
-
         private List<Process> GetAvailableProcesses()
         {
             var AvailableProcesses = Process.GetProcesses();
@@ -343,26 +278,21 @@ namespace STROOP
 
         private void OnUpdate(object sender, EventArgs e)
         {
-            UpdateComboBoxes();
-            DataModels.Update();
-            FormManager.Update();
-            Config.ObjectSlotsManager.Update();
-            Config.InjectionManager.Update();
-
-            foreach (TabPage page in tabControlMain.TabPages)
+            using (new AccessScope<StroopMainForm>(this))
             {
-                bool active = tabControlMain.SelectedTab == page;
-                foreach (var pageControl in page.Controls)
-                    if (pageControl is Tabs.STROOPTab stroopTab)
-                    {
-                        if (stroopTab.Size != page.Size)
-                            stroopTab.Size = page.Size;
-                        stroopTab.UpdateOrInitialize(active);
-                    }
-            }
+                labelFpsCounter.Text = "FPS: " + (int)Config.Stream?.FpsInPractice ?? "<none>";
+                UpdateComboBoxes();
+                DataModels.Update();
+                FormManager.Update();
+                Config.ObjectSlotsManager.Update();
+                //Config.InjectionManager.Update();
 
-            WatchVariableLockManager.Update();
-            TriangleDataModel.ClearCache();
+                foreach (TabPage page in tabControlMain.TabPages)
+                    Tabs.STROOPTab.UpdateTab(page, tabControlMain.SelectedTab == page);
+
+                WatchVariableLockManager.Update();
+                TriangleDataModel.ClearCache();
+            }
         }
 
         private void UpdateComboBoxes()
@@ -372,14 +302,6 @@ namespace STROOP
 
             // Readonly / Read+Write
             Config.Stream.Readonly = (ReadWriteMode)comboBoxReadWriteMode.SelectedItem == ReadWriteMode.ReadOnly;
-        }
-
-        private void _sm64Stream_FpsUpdated(object sender, EventArgs e)
-        {
-            BeginInvoke(new Action(() =>
-            {
-                labelFpsCounter.Text = "FPS: " + (int)Config.Stream.FpsInPractice;
-            }));
         }
 
         private void buttonShowTopPanel_Click(object sender, EventArgs e)
@@ -466,6 +388,18 @@ namespace STROOP
             }
         }
 
+        private void buttonCreateWindow_Click(object sender, EventArgs e)
+        {
+            var newForm = new StroopMainForm(false);
+            FormClosedEventHandler vfa = (_, __) => newForm.Close(); ;
+            FormClosed += vfa;
+            newForm.Controls.Remove(newForm.buttonDisconnect);
+            newForm.panelConnect.Visible = false;
+            FormClosing += (_, __) => newForm.Close();
+            newForm.Show();
+            newForm.FormClosed += (_, __) => FormClosed -= vfa;
+        }
+
         private void MoveTab(bool rightwards)
         {
             TabPage currentTab = tabControlMain.SelectedTab;
@@ -541,7 +475,7 @@ namespace STROOP
             buttonConnect_Click(sender, e);
         }
 
-        private async void trackBarObjSlotSize_ValueChanged(object sender, EventArgs e)
+        private void trackBarObjSlotSize_ValueChanged(object sender, EventArgs e)
         {
             ChangeObjectSlotSize(trackBarObjSlotSize.Value);
         }
@@ -615,24 +549,18 @@ namespace STROOP
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            if (Config.Stream != null)
-            {
-                Config.Stream.OnUpdate -= OnUpdate;
-                Config.Stream.FpsUpdated -= _sm64Stream_FpsUpdated;
-                Config.Stream.OnDisconnect -= _sm64Stream_OnDisconnect;
-                Config.Stream.WarnReadonlyOff -= _sm64Stream_WarnReadonlyOff;
-                Config.Stream.Dispose();
-                Task.Run(async () =>
-                {
-                    await Config.Stream.WaitForDispose();
-                    Config.Stream = null;
-                    Invoke(new Action(() => Close()));
-                });
-                e.Cancel = true;
-                return;
-            }
-
             base.OnFormClosing(e);
+            Config.Stream.OnUpdate -= OnUpdate;
+            Config.Stream.OnDisconnect -= _sm64Stream_OnDisconnect;
+            Config.Stream.WarnReadonlyOff -= _sm64Stream_WarnReadonlyOff;
+            if (isMainForm)
+            {
+                if (Config.Stream != null)
+                {
+                    Config.Stream.Dispose();
+                    Config.Stream = null;
+                }
+            }
         }
     }
 }

@@ -25,7 +25,7 @@ namespace STROOP.Tabs.MapTab
             _backgroundChoice = "Recommended";
         }
 
-        public override Lazy<Image> GetInternalImage()=>StroopMainForm.instance.mapTab.GetBackgroundImage(_backgroundChoice);
+        public override Lazy<Image> GetInternalImage()=>currentMapTab.GetBackgroundImage(_backgroundChoice);
 
         public override string GetName()
         {

@@ -35,11 +35,11 @@ namespace STROOP.Controls
                 if (uintValue == 0) return;
                 if (ObjectUtilities.IsObjectAddress(uintValue))
                 {
-                    StroopMainForm.instance.memoryTab.SetObjectAddress(uintValue);
+                    AccessScope<StroopMainForm>.content.memoryTab.SetObjectAddress(uintValue);
                 }
                 else
                 {
-                    StroopMainForm.instance.memoryTab.SetCustomAddress(uintValue);
+                    AccessScope<StroopMainForm>.content.memoryTab.SetCustomAddress(uintValue);
                 }
                 Config.TabControlMain.SelectedTab = Config.TabControlMain.TabPages["tabPageMemory"];
             };

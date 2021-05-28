@@ -47,10 +47,8 @@ namespace STROOP.Controls
 
             panelColorSelector.Click += (sender, e) =>
             {
-                StroopMainForm.instance.mapTab.PauseMapUpdating = true;
                 Color? newColor = ColorUtilities.GetColorFromDialog(SelectedColor);
                 if (newColor.HasValue) SelectedColor = newColor.Value;
-                StroopMainForm.instance.mapTab.PauseMapUpdating = false;
             };
         }
 

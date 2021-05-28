@@ -84,7 +84,7 @@ namespace STROOP.Controls
         public void Initialize(string varFilePath = null)
         {
             _varFilePath = varFilePath;
-            if (!System.IO.File.Exists(varFilePath))
+            if (varFilePath != null && !System.IO.File.Exists(varFilePath))
                 return;
             DeferActionToUpdate(nameof(Initialize), () =>
             {
@@ -418,7 +418,7 @@ namespace STROOP.Controls
         private void AddAllVariablesToCustomTab()
         {
             GetCurrentVariableControls().ForEach(varControl =>
-                varControl.AddToTab(StroopMainForm.instance.customTab.watchVariablePanelCustom));
+                varControl.AddToTab(AccessScope<StroopMainForm>.content.customTab.watchVariablePanelCustom));
         }
 
         private List<XElement> GetCurrentVarXmlElements(bool useCurrentState = true)

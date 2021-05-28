@@ -62,19 +62,6 @@ namespace STROOP.Tabs.MapTab
             });
         }
 
-        private Map3DVertex[] GetVertices()
-        {
-            return new Map3DVertex[]
-            {
-                new Map3DVertex(new Vector3(-1, -1, 0), Color4, new Vector2(0, 1)),
-                new Map3DVertex(new Vector3(1, -1, 0), Color4, new Vector2(1, 1)),
-                new Map3DVertex(new Vector3(-1, 1, 0), Color4, new Vector2(0, 0)),
-                new Map3DVertex(new Vector3(1, 1, 0), Color4, new Vector2(1, 0)),
-                new Map3DVertex(new Vector3(-1, 1, 0), Color4,  new Vector2(0, 0)),
-                new Map3DVertex(new Vector3(1, -1, 0), Color4, new Vector2(1, 1)),
-            };
-        }
-
         public List<(float x, float y, float z, float angle, Lazy<Image> image, bool show)> GetData()
         {
             float pos01X = Config.Stream.GetSingle(0x80372F00);

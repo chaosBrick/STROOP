@@ -7,6 +7,17 @@ namespace STROOP.Tabs
 {
     public partial class STROOPTab : UserControl
     {
+        public static void UpdateTab(TabPage page, bool active)
+        {
+            foreach (var pageControl in page.Controls)
+                if (pageControl is STROOPTab stroopTab)
+                {
+                    if (stroopTab.Size != page.Size)
+                        stroopTab.Size = page.Size;
+                    stroopTab.UpdateOrInitialize(active);
+                }
+        }
+
         public TabPage Tab => Parent as TabPage;
         static readonly Size InitSize = new Size(915, 463);
 

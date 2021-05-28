@@ -40,22 +40,12 @@ namespace STROOP.Utilities
         public string ProcessName => _io?.Name ?? "(No Emulator)";
         public bool IsSuspended => _io?.IsSuspended ?? false;
         public double FpsInPractice => _fpsTimes.Count == 0 ? 0 : 1000 / _fpsTimes.Average();
-        Task _mainTask;
 
         public ProcessStream()
         {
             _ram = new byte[Config.RamSize];
-            //_mainTask = Task.Run(() => ProcessUpdate());
         }
-
-        /// <summary>
-        /// Workaround for WinForms Threading
-        /// </summary>
-        public async Task WaitForDispose()
-        {
-            //await _mainTask;
-        }
-
+        
         public void Run()
         {
             ProcessUpdate();
@@ -617,7 +607,7 @@ namespace STROOP.Utilities
 
             while (!disposedValue)
             {
-                System.Windows.Forms.Application.DoEvents();
+                Application.DoEvents();
                 //try
                 //{
                 int timeToWait;

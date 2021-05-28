@@ -33,9 +33,9 @@ namespace STROOP.Tabs.MapTab
                 {
                     itemFreeze.Checked = !itemFreeze.Checked;
                     if (itemFreeze.Checked)
-                        StroopMainForm.instance.mapTab.RegisterMouseEventListener(this);
+                        currentMapTab.RegisterMouseEventListener(this);
                     else
-                        StroopMainForm.instance.mapTab.UnregisterMouseEventListener(this);
+                        currentMapTab.UnregisterMouseEventListener(this);
                 };
 
                 _contextMenuStrip = new ContextMenuStrip();
@@ -73,7 +73,7 @@ namespace STROOP.Tabs.MapTab
         public override void CleanUp()
         {
             base.CleanUp();
-            StroopMainForm.instance.mapTab.UnregisterMouseEventListener(this);
+            currentMapTab.UnregisterMouseEventListener(this);
         }
     }
 }

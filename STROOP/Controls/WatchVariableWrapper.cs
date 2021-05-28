@@ -150,7 +150,7 @@ namespace STROOP.Controls
 
             ToolStripMenuItem itemAddToCustomTab = new ToolStripMenuItem("Add to Custom Tab");
             itemAddToCustomTab.Click += (sender, e) =>
-                _watchVarControl.AddToTab(StroopMainForm.instance.customTab.watchVariablePanelCustom);
+                _watchVarControl.AddToTab(AccessScope<StroopMainForm>.content.customTab.watchVariablePanelCustom);
 
             _contextMenuStrip.AddToEndingList(new ToolStripSeparator());
             _contextMenuStrip.AddToEndingList(itemOpenController);
@@ -259,8 +259,8 @@ namespace STROOP.Controls
             if (addressList.Count == 0) return;
             uint address = addressList[0];
             Config.TabControlMain.SelectedTab = Config.TabControlMain.TabPages["tabPageMemory"];
-            StroopMainForm.instance.memoryTab.SetCustomAddress(address);
-            StroopMainForm.instance.memoryTab.UpdateHexDisplay();
+            AccessScope<StroopMainForm>.content.memoryTab.SetCustomAddress(address);
+            AccessScope<StroopMainForm>.content.memoryTab.UpdateHexDisplay();
         }
 
         public CheckState GetLockedCheckState(List<uint> addresses = null)

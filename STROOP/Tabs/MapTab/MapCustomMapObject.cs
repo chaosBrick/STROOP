@@ -21,7 +21,7 @@ namespace STROOP.Tabs.MapTab
 
         public override MapLayout GetMapLayout()
         {
-            return StroopMainForm.instance.mapTab.GetMapLayout(_mapLayoutChoice);
+            return currentMapTab.GetMapLayout(_mapLayoutChoice);
         }
 
         public override string GetName()

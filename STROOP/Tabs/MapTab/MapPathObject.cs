@@ -123,54 +123,6 @@ namespace STROOP.Tabs.MapTab
             });
         }
 
-        public override void DrawOn3DControl(Map3DGraphics graphics)
-        {
-            if (OutlineWidth == 0) return;
-
-            List<(float x, float y, float z)> vertices = GetDictionaryValues();
-            List<Map3DVertex[]> vertexArrayList = new List<Map3DVertex[]>();
-            for (int i = 0; i < vertices.Count - 1; i++)
-            {
-                Color color = OutlineColor;
-                if (_useBlending)
-                {
-                    int distFromEnd = vertices.Count - i - 2;
-                    if (distFromEnd < Size)
-                    {
-                        color = ColorUtilities.InterpolateColor(
-                            OutlineColor, Color, distFromEnd / (double)Size);
-                    }
-                    else
-                    {
-                        color = Color;
-                    }
-                }
-                (float x1, float y1, float z1) = vertices[i];
-                (float x2, float y2, float z2) = vertices[i + 1];
-
-                vertexArrayList.Add(new Map3DVertex[]
-                {
-                    new Map3DVertex(new Vector3(x1, y1, z1), color),
-                    new Map3DVertex(new Vector3(x2, y2, z2), color),
-                });
-            }
-
-            Matrix4 viewMatrix = GetModelMatrix() * graphics3D.Map3DCamera.Matrix;
-            GL.UniformMatrix4(graphics3D.GLUniformView, false, ref viewMatrix);
-
-            vertexArrayList.ForEach(vertexes =>
-            {
-                int buffer = GL.GenBuffer();
-                GL.BindTexture(TextureTarget.Texture2D, MapUtilities.WhiteTexture);
-                GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexes.Length * Map3DVertex.Size), vertexes, BufferUsageHint.DynamicDraw);
-                GL.LineWidth(OutlineWidth);
-                graphics3D.BindVertices();
-                GL.DrawArrays(PrimitiveType.Lines, 0, vertexes.Length);
-                GL.DeleteBuffer(buffer);
-            });
-        }
-
         public override void Update()
         {
             (byte level, byte area, ushort loadingPoint, ushort missionLayout) currentLocationStats =

@@ -15,7 +15,7 @@ namespace STROOP.Tabs.MapTab
         public override void DrawOn2DControl(MapGraphics graphics)
         {
             List<MapPathObject> paths = new List<MapPathObject>();
-            //foreach (MapTracker mapTracker in StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.Controls)
+            //foreach (MapTracker mapTracker in currentMapTab.flowLayoutPanelMapTrackers.Controls)
             //{
             //    paths.AddRange(mapTracker.GetMapPathObjects());
             //}

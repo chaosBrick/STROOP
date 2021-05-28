@@ -77,6 +77,7 @@ namespace STROOP.Tabs.MapTab
         public bool MapViewCenterChangeByPixels = true;
 
         public readonly GLControl glControl;
+        public readonly MapTab mapTab;
 
         public float MapViewRadius => (float)MoreMath.GetHypotenuse(glControl.Width / 2, glControl.Height / 2) / MapViewScaleValue;
         public float MapViewXMin { get => MapViewCenterXValue - MapViewRadius * glControl.AspectRatio; }
@@ -95,8 +96,9 @@ namespace STROOP.Tabs.MapTab
                 MAX_COURSE_SIZE_X_MAX - MAX_COURSE_SIZE_X_MIN,
                 MAX_COURSE_SIZE_Z_MAX - MAX_COURSE_SIZE_Z_MIN);
 
-        public MapGraphics(GLControl glControl)
+        public MapGraphics(MapTab mapTab, GLControl glControl)
         {
+            this.mapTab = mapTab;
             this.glControl = glControl;
             drawLayers = new List<Action>[Enum.GetNames(typeof(DrawLayers)).Length];
             for (int i = 0; i < drawLayers.Length; i++)
@@ -176,38 +178,41 @@ namespace STROOP.Tabs.MapTab
         {
             if (Config.Stream == null)
                 return;
-            Cursor cursor = StroopMainForm.instance.mapTab.HasMouseListeners ? Cursors.Cross : Cursors.Hand;
-            if (glControl.Cursor != cursor)
-                glControl.Cursor = cursor;
-
-            glControl.MakeCurrent();
-            UpdateMapView();
-
-            // Set default background color (clear drawing area)
-            GL.ClearColor(0, 0, 0.5f, 1.0f);
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-            for (int i = 0; i < drawLayers.Length; i++)
-                drawLayers[i].Clear();
-
-            StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.DrawOn2DControl(this);
-            foreach (var renderer in renderers)
-                renderer.SetDrawCalls(this);
-            drawLayers[(int)DrawLayers.Objects].Insert(0, () =>
+            using (new AccessScope<MapTab>(mapTab))
             {
-                if (needsRecreateObjectMipmaps)
+                Cursor cursor = mapTab.HasMouseListeners ? Cursors.Cross : Cursors.Hand;
+                if (glControl.Cursor != cursor)
+                    glControl.Cursor = cursor;
+
+                glControl.MakeCurrent();
+                UpdateMapView();
+
+                // Set default background color (clear drawing area)
+                GL.ClearColor(0, 0, 0.5f, 1.0f);
+                GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+                for (int i = 0; i < drawLayers.Length; i++)
+                    drawLayers[i].Clear();
+
+                mapTab.flowLayoutPanelMapTrackers.DrawOn2DControl(this);
+                foreach (var renderer in renderers)
+                    renderer.SetDrawCalls(this);
+                drawLayers[(int)DrawLayers.Objects].Insert(0, () =>
                 {
-                    GL.BindTexture(TextureTarget.Texture2DArray, objectRenderer.texture);
-                    GL.GenerateMipmap(GenerateMipmapTarget.Texture2DArray);
-                    needsRecreateObjectMipmaps = false;
-                }
-            });
+                    if (needsRecreateObjectMipmaps)
+                    {
+                        GL.BindTexture(TextureTarget.Texture2DArray, objectRenderer.texture);
+                        GL.GenerateMipmap(GenerateMipmapTarget.Texture2DArray);
+                        needsRecreateObjectMipmaps = false;
+                    }
+                });
 
-            foreach (var layer in drawLayers)
-                foreach (var action in layer)
-                    action.Invoke();
+                foreach (var layer in drawLayers)
+                    foreach (var action in layer)
+                        action.Invoke();
 
-            glControl.SwapBuffers();
+                glControl.SwapBuffers();
+            }
         }
 
         private void UpdateMapView()
@@ -227,9 +232,9 @@ namespace STROOP.Tabs.MapTab
 
         private void UpdateScale()
         {
-            if (StroopMainForm.instance.mapTab.radioButtonMapControllersScaleCourseDefault.Checked)
+            if (mapTab.radioButtonMapControllersScaleCourseDefault.Checked)
                 MapViewScale = MapScale.CourseDefault;
-            else if (StroopMainForm.instance.mapTab.radioButtonMapControllersScaleMaxCourseSize.Checked)
+            else if (mapTab.radioButtonMapControllersScaleMaxCourseSize.Checked)
                 MapViewScale = MapScale.MaxCourseSize;
             else
                 MapViewScale = MapScale.Custom;
@@ -242,7 +247,7 @@ namespace STROOP.Tabs.MapTab
                 case MapScale.CourseDefault:
                 case MapScale.MaxCourseSize:
                     RectangleF rectangle = MapViewScale == MapScale.CourseDefault ?
-                        StroopMainForm.instance.mapTab.GetMapLayout().Coordinates : MAX_COURSE_SIZE;
+                        mapTab.GetMapLayout().Coordinates : MAX_COURSE_SIZE;
                     List<(float, float)> coordinates = new List<(float, float)>()
                     {
                         (rectangle.Left, rectangle.Top),
@@ -268,24 +273,24 @@ namespace STROOP.Tabs.MapTab
                     break;
                 case MapScale.Custom:
                     MapViewScaleValue = ParsingUtilities.ParseFloatNullable(
-                        StroopMainForm.instance.mapTab.textBoxMapControllersScaleCustom.LastSubmittedText)
+                        mapTab.textBoxMapControllersScaleCustom.LastSubmittedText)
                         ?? DEFAULT_MAP_VIEW_SCALE_VALUE;
                     break;
             }
 
             if (MapViewScale != MapScale.Custom)
             {
-                StroopMainForm.instance.mapTab.textBoxMapControllersScaleCustom.SubmitTextLoosely(MapViewScaleValue.ToString());
+                mapTab.textBoxMapControllersScaleCustom.SubmitTextLoosely(MapViewScaleValue.ToString());
             }
         }
 
         private void UpdateCenter()
         {
-            if (StroopMainForm.instance.mapTab.radioButtonMapControllersCenterBestFit.Checked)
+            if (mapTab.radioButtonMapControllersCenterBestFit.Checked)
                 MapViewCenter = MapCenter.BestFit;
-            else if (StroopMainForm.instance.mapTab.radioButtonMapControllersCenterOrigin.Checked)
+            else if (mapTab.radioButtonMapControllersCenterOrigin.Checked)
                 MapViewCenter = MapCenter.Origin;
-            else if (StroopMainForm.instance.mapTab.radioButtonMapControllersCenterMario.Checked)
+            else if (mapTab.radioButtonMapControllersCenterMario.Checked)
                 MapViewCenter = MapCenter.Mario;
             else
                 MapViewCenter = MapCenter.Custom;
@@ -294,7 +299,7 @@ namespace STROOP.Tabs.MapTab
             {
                 case MapCenter.BestFit:
                     RectangleF rectangle = MapViewScaleWasCourseDefault ?
-                        StroopMainForm.instance.mapTab.GetMapLayout().Coordinates : MAX_COURSE_SIZE;
+                        mapTab.GetMapLayout().Coordinates : MAX_COURSE_SIZE;
                     MapViewCenterXValue = rectangle.X + rectangle.Width / 2;
                     MapViewCenterZValue = rectangle.Y + rectangle.Height / 2;
                     break;
@@ -308,7 +313,7 @@ namespace STROOP.Tabs.MapTab
                     break;
                 case MapCenter.Custom:
                     PositionAngle posAngle = PositionAngle.FromString(
-                        StroopMainForm.instance.mapTab.textBoxMapControllersCenterCustom.LastSubmittedText);
+                        mapTab.textBoxMapControllersCenterCustom.LastSubmittedText);
                     if (posAngle != null)
                     {
                         MapViewCenterXValue = (float)posAngle.X;
@@ -316,7 +321,7 @@ namespace STROOP.Tabs.MapTab
                         break;
                     }
                     List<string> stringValues = ParsingUtilities.ParseStringList(
-                        StroopMainForm.instance.mapTab.textBoxMapControllersCenterCustom.LastSubmittedText, replaceComma: false);
+                        mapTab.textBoxMapControllersCenterCustom.LastSubmittedText, replaceComma: false);
                     if (stringValues.Count >= 2)
                     {
                         MapViewCenterXValue = ParsingUtilities.ParseFloatNullable(stringValues[0]) ?? DEFAULT_MAP_VIEW_CENTER_X_VALUE;
@@ -337,25 +342,25 @@ namespace STROOP.Tabs.MapTab
 
             if (MapViewCenter != MapCenter.Custom)
             {
-                StroopMainForm.instance.mapTab.textBoxMapControllersCenterCustom.SubmitTextLoosely(MapViewCenterXValue + ";" + MapViewCenterZValue);
+                mapTab.textBoxMapControllersCenterCustom.SubmitTextLoosely(MapViewCenterXValue + ";" + MapViewCenterZValue);
             }
         }
 
         private void UpdateAngle()
         {
-            if (StroopMainForm.instance.mapTab.radioButtonMapControllersAngle0.Checked)
+            if (mapTab.radioButtonMapControllersAngle0.Checked)
                 MapViewAngle = MapAngle.Angle0;
-            else if (StroopMainForm.instance.mapTab.radioButtonMapControllersAngle16384.Checked)
+            else if (mapTab.radioButtonMapControllersAngle16384.Checked)
                 MapViewAngle = MapAngle.Angle16384;
-            else if (StroopMainForm.instance.mapTab.radioButtonMapControllersAngle32768.Checked)
+            else if (mapTab.radioButtonMapControllersAngle32768.Checked)
                 MapViewAngle = MapAngle.Angle32768;
-            else if (StroopMainForm.instance.mapTab.radioButtonMapControllersAngle49152.Checked)
+            else if (mapTab.radioButtonMapControllersAngle49152.Checked)
                 MapViewAngle = MapAngle.Angle49152;
-            else if (StroopMainForm.instance.mapTab.radioButtonMapControllersAngleMario.Checked)
+            else if (mapTab.radioButtonMapControllersAngleMario.Checked)
                 MapViewAngle = MapAngle.Mario;
-            else if (StroopMainForm.instance.mapTab.radioButtonMapControllersAngleCamera.Checked)
+            else if (mapTab.radioButtonMapControllersAngleCamera.Checked)
                 MapViewAngle = MapAngle.Camera;
-            else if (StroopMainForm.instance.mapTab.radioButtonMapControllersAngleCentripetal.Checked)
+            else if (mapTab.radioButtonMapControllersAngleCentripetal.Checked)
                 MapViewAngle = MapAngle.Centripetal;
             else
                 MapViewAngle = MapAngle.Custom;
@@ -386,21 +391,21 @@ namespace STROOP.Tabs.MapTab
                     break;
                 case MapAngle.Custom:
                     PositionAngle posAngle = PositionAngle.FromString(
-                        StroopMainForm.instance.mapTab.textBoxMapControllersAngleCustom.LastSubmittedText);
+                        mapTab.textBoxMapControllersAngleCustom.LastSubmittedText);
                     if (posAngle != null)
                     {
                         MapViewAngleValue = (float)posAngle.Angle;
                         break;
                     }
                     MapViewAngleValue = ParsingUtilities.ParseFloatNullable(
-                        StroopMainForm.instance.mapTab.textBoxMapControllersAngleCustom.LastSubmittedText)
+                        mapTab.textBoxMapControllersAngleCustom.LastSubmittedText)
                         ?? DEFAULT_MAP_VIEW_ANGLE_VALUE;
                     break;
             }
 
             if (MapViewAngle != MapAngle.Custom)
             {
-                StroopMainForm.instance.mapTab.textBoxMapControllersAngleCustom.SubmitTextLoosely(MapViewAngleValue.ToString());
+                mapTab.textBoxMapControllersAngleCustom.SubmitTextLoosely(MapViewAngleValue.ToString());
             }
         }
 
@@ -408,25 +413,25 @@ namespace STROOP.Tabs.MapTab
         {
             float? parsed = ParsingUtilities.ParseFloatNullable(value);
             if (!parsed.HasValue) return;
-            StroopMainForm.instance.mapTab.radioButtonMapControllersScaleCustom.Checked = true;
+            mapTab.radioButtonMapControllersScaleCustom.Checked = true;
             float newScaleValue = MapViewScaleValue + sign * parsed.Value;
-            StroopMainForm.instance.mapTab.textBoxMapControllersScaleCustom.SubmitText(newScaleValue.ToString());
+            mapTab.textBoxMapControllersScaleCustom.SubmitText(newScaleValue.ToString());
         }
 
         public void ChangeScale2(int power, object value)
         {
             float? parsed = ParsingUtilities.ParseFloatNullable(value);
             if (!parsed.HasValue) return;
-            StroopMainForm.instance.mapTab.radioButtonMapControllersScaleCustom.Checked = true;
+            mapTab.radioButtonMapControllersScaleCustom.Checked = true;
             float newScaleValue = MapViewScaleValue * (float)Math.Pow(parsed.Value, power);
-            StroopMainForm.instance.mapTab.textBoxMapControllersScaleCustom.SubmitText(newScaleValue.ToString());
+            mapTab.textBoxMapControllersScaleCustom.SubmitText(newScaleValue.ToString());
         }
 
         public void ChangeCenter(int xSign, int zSign, object value)
         {
             float? parsed = ParsingUtilities.ParseFloatNullable(value);
             if (!parsed.HasValue) return;
-            StroopMainForm.instance.mapTab.radioButtonMapControllersCenterCustom.Checked = true;
+            mapTab.radioButtonMapControllersCenterCustom.Checked = true;
             float xOffset = xSign * parsed.Value;
             float zOffset = zSign * parsed.Value;
             (float xOffsetRotated, float zOffsetRotated) = ((float, float))MoreMath.RotatePointAboutPointAnAngularDistance(
@@ -434,35 +439,35 @@ namespace STROOP.Tabs.MapTab
             float multiplier = MapViewCenterChangeByPixels ? 1 / MapViewScaleValue : 1;
             float newCenterXValue = MapViewCenterXValue + xOffsetRotated * multiplier;
             float newCenterZValue = MapViewCenterZValue + zOffsetRotated * multiplier;
-            StroopMainForm.instance.mapTab.textBoxMapControllersCenterCustom.SubmitText(newCenterXValue + ";" + newCenterZValue);
+            mapTab.textBoxMapControllersCenterCustom.SubmitText(newCenterXValue + ";" + newCenterZValue);
         }
 
         public void ChangeAngle(int sign, object value)
         {
             float? parsed = ParsingUtilities.ParseFloatNullable(value);
             if (!parsed.HasValue) return;
-            StroopMainForm.instance.mapTab.radioButtonMapControllersAngleCustom.Checked = true;
+            mapTab.radioButtonMapControllersAngleCustom.Checked = true;
             float newAngleValue = MapViewAngleValue + sign * parsed.Value;
             newAngleValue = (float)MoreMath.NormalizeAngleDouble(newAngleValue);
-            StroopMainForm.instance.mapTab.textBoxMapControllersAngleCustom.SubmitText(newAngleValue.ToString());
+            mapTab.textBoxMapControllersAngleCustom.SubmitText(newAngleValue.ToString());
         }
 
         public void SetCustomScale(object value)
         {
-            StroopMainForm.instance.mapTab.radioButtonMapControllersScaleCustom.Checked = true;
-            StroopMainForm.instance.mapTab.textBoxMapControllersScaleCustom.SubmitText(value.ToString());
+            mapTab.radioButtonMapControllersScaleCustom.Checked = true;
+            mapTab.textBoxMapControllersScaleCustom.SubmitText(value.ToString());
         }
 
         public void SetCustomCenter(object value)
         {
-            StroopMainForm.instance.mapTab.radioButtonMapControllersCenterCustom.Checked = true;
-            StroopMainForm.instance.mapTab.textBoxMapControllersCenterCustom.SubmitText(value.ToString());
+            mapTab.radioButtonMapControllersCenterCustom.Checked = true;
+            mapTab.textBoxMapControllersCenterCustom.SubmitText(value.ToString());
         }
 
         public void SetCustomAngle(object value)
         {
-            StroopMainForm.instance.mapTab.radioButtonMapControllersAngleCustom.Checked = true;
-            StroopMainForm.instance.mapTab.textBoxMapControllersAngleCustom.SubmitText(value.ToString());
+            mapTab.radioButtonMapControllersAngleCustom.Checked = true;
+            mapTab.textBoxMapControllersAngleCustom.SubmitText(value.ToString());
         }
 
         private bool _isTranslating = false;
@@ -478,9 +483,9 @@ namespace STROOP.Tabs.MapTab
 
         private void OnMouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            if (StroopMainForm.instance.mapTab.HasMouseListeners)
+            if (mapTab.HasMouseListeners)
             {
-                StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.NotifyMouseEvent(
+                mapTab.flowLayoutPanelMapTrackers.NotifyMouseEvent(
                     MouseEvent.MouseDown, e.Button == MouseButtons.Left, e.X, e.Y);
                 return;
             }
@@ -505,9 +510,9 @@ namespace STROOP.Tabs.MapTab
 
         private void OnMouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            if (StroopMainForm.instance.mapTab.HasMouseListeners)
+            if (mapTab.HasMouseListeners)
             {
-                StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.NotifyMouseEvent(
+                mapTab.flowLayoutPanelMapTrackers.NotifyMouseEvent(
                     MouseEvent.MouseUp, e.Button == MouseButtons.Left, e.X, e.Y);
                 return;
             }
@@ -525,9 +530,9 @@ namespace STROOP.Tabs.MapTab
 
         private void OnMouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            if (StroopMainForm.instance.mapTab.HasMouseListeners)
+            if (mapTab.HasMouseListeners)
             {
-                StroopMainForm.instance.mapTab.flowLayoutPanelMapTrackers.NotifyMouseEvent(
+                mapTab.flowLayoutPanelMapTrackers.NotifyMouseEvent(
                     MouseEvent.MouseMove, e.Button == MouseButtons.Left, e.X, e.Y);
                 return;
             }
@@ -536,8 +541,8 @@ namespace STROOP.Tabs.MapTab
             {
                 int pixelDiffX = e.X - _translateStartMouseX;
                 int pixelDiffY = e.Y - _translateStartMouseY;
-                pixelDiffX = MapUtilities.MaybeReverse(pixelDiffX);
-                pixelDiffY = MapUtilities.MaybeReverse(pixelDiffY);
+                pixelDiffX = mapTab.MaybeReverse(pixelDiffX);
+                pixelDiffY = mapTab.MaybeReverse(pixelDiffY);
                 float unitDiffX = pixelDiffX / MapViewScaleValue;
                 float unitDiffY = pixelDiffY / MapViewScaleValue;
                 (float rotatedX, float rotatedY) = ((float, float))
@@ -551,7 +556,7 @@ namespace STROOP.Tabs.MapTab
             if (_isRotating)
             {
                 float angleToMouse = (float)MoreMath.AngleTo_AngleUnits(
-                    _rotateStartMouseX, _rotateStartMouseY, e.X, e.Y) * MapUtilities.MaybeReverse(-1) + 32768;
+                    _rotateStartMouseX, _rotateStartMouseY, e.X, e.Y) * mapTab.MaybeReverse(-1) + 32768;
                 float newAngle = _rotateStartAngle + angleToMouse;
                 SetCustomAngle(newAngle);
             }
@@ -564,12 +569,12 @@ namespace STROOP.Tabs.MapTab
 
         private void OnDoubleClick(object sender, EventArgs e)
         {
-            if (StroopMainForm.instance.mapTab.HasMouseListeners)
+            if (mapTab.HasMouseListeners)
                 return;
 
-            StroopMainForm.instance.mapTab.radioButtonMapControllersScaleCourseDefault.Checked = true;
-            StroopMainForm.instance.mapTab.radioButtonMapControllersCenterBestFit.Checked = true;
-            StroopMainForm.instance.mapTab.radioButtonMapControllersAngle32768.Checked = true;
+            mapTab.radioButtonMapControllersScaleCourseDefault.Checked = true;
+            mapTab.radioButtonMapControllersCenterBestFit.Checked = true;
+            mapTab.radioButtonMapControllersAngle32768.Checked = true;
         }
     }
 }

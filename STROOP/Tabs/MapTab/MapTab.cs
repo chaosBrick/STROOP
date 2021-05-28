@@ -12,12 +12,11 @@ using System.Reflection;
 
 namespace STROOP.Tabs.MapTab
 {
-    public partial class MapTab : STROOPTab
+    public partial class MapTab : STROOPTab, IDisposable
     {
         public class View
         {
             public MapGraphics MapGraphics;
-            public Map3DGraphics Map3DGraphics;
 
             public bool TranslateMapCameraPosition(float xOffset, float yOffset, float zOffset, bool useRelative)
             {
@@ -85,12 +84,9 @@ namespace STROOP.Tabs.MapTab
         }
 
         public GLControl glControlMap2D { get; private set; }
-        public GLControl glControlMap3D { get; private set; }
 
-        public static MapTab instance;
         public View view = new View();
 
-        private Action _checkBoxMarioAction;
         private List<int> _currentObjIndexes = new List<int>();
 
         public bool PauseMapUpdating = false;
@@ -98,6 +94,8 @@ namespace STROOP.Tabs.MapTab
 
         public bool HasMouseListeners => mouseEventListeners.Count > 0;
         HashSet<MapObject> mouseEventListeners = new HashSet<MapObject>();
+        Dictionary<object, MapTracker> semaphoreTrackers = new Dictionary<object, MapTracker>();
+        List<(CheckBox checkBox, MapTracker tracker)> quickSemaphores = new List<(CheckBox checkBox, MapTracker tracker)>();
 
         public void RegisterMouseEventListener(MapObject tracker)
         {
@@ -111,9 +109,7 @@ namespace STROOP.Tabs.MapTab
 
         public MapTab()
         {
-            instance = this;
             InitializeComponent();
-
             if (Program.IsVisualStudioHostProcess()) return;
         }
 
@@ -126,16 +122,15 @@ namespace STROOP.Tabs.MapTab
             glControlMap2D.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
             glControlMap2D.Location = new Point(0, 0);
             parentControl.Controls.Add(glControlMap2D);
-            view.MapGraphics = new MapGraphics(glControlMap2D);
+            view.MapGraphics = new MapGraphics(this, glControlMap2D);
             view.MapGraphics.Load();
             _isLoaded2D = true;
 
             InitializeControls();
-            InitializeSemaphores();
         }
 
         public MapLayout GetMapLayout(object mapLayoutChoice = null) =>
-            (mapLayoutChoice ?? StroopMainForm.instance.mapTab.comboBoxMapOptionsLevel.SelectedItem) as MapLayout ?? Config.MapAssociations.GetBestMap();
+            (mapLayoutChoice ?? comboBoxMapOptionsLevel.SelectedItem) as MapLayout ?? Config.MapAssociations.GetBestMap();
 
 
         public Lazy<Image> GetBackgroundImage(object backgroundChoice = null)
@@ -167,8 +162,23 @@ namespace STROOP.Tabs.MapTab
             return GetPuCenters().ConvertAll(center => (center.x + relX, center.z + relZ));
         }
 
+        public int MaybeReverse(int value) => checkBoxMapOptionsReverseDragging.Checked ? -1 * value : value;
+
         private void InitializeControls()
         {
+            quickSemaphores = new List<(CheckBox checkBox, MapTracker tracker)>(new[]
+            {
+                (checkBoxMapOptionsTrackMario, new MapTracker(this, new MapMarioObject())),
+                (checkBoxMapOptionsTrackHolp, new MapTracker(this, new MapHolpObject())),
+                (checkBoxMapOptionsTrackGhost, new MapTracker(this, new MapGhostObject())),
+                (checkBoxMapOptionsTrackCamera, new MapTracker(this, new MapCameraObject())),
+                (checkBoxMapOptionsTrackFloorTri, new MapTracker(this, new MapMarioFloorObject())),
+                (checkBoxMapOptionsTrackWallTri, new MapTracker(this, new MapMarioWallObject())),
+                (checkBoxMapOptionsTrackCeilingTri, new MapTracker(this, new MapMarioCeilingObject())),
+                (checkBoxMapOptionsTrackUnitGridlines, new MapTracker(this, new MapUnitGridlinesObject())),
+            });
+            checkBoxMapOptionsTrackMario.Checked = true;
+
             // FlowLayoutPanel
             flowLayoutPanelMapTrackers.Initialize(new MapCurrentMapObject(), new MapCurrentBackgroundObject());
 
@@ -198,7 +208,7 @@ namespace STROOP.Tabs.MapTab
                         toolStripItem.Click += (sender, e) =>
                         {
                             MapObject obj = (MapObject)Activator.CreateInstance(capturedType);
-                            flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(obj));
+                            flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(this, obj));
                         };
                     else
                         toolStripItem.Click += (sender, e) =>
@@ -208,7 +218,7 @@ namespace STROOP.Tabs.MapTab
                                         ?.Invoke(null, new object[0])
                                         ?? null);
                             if (obj != null)
-                                flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(obj));
+                                flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(this, obj));
                         };
                     List<ToolStripMenuItem> categoryList;
                     if (!adders.TryGetValue(attr.Category, out categoryList))
@@ -374,7 +384,6 @@ namespace STROOP.Tabs.MapTab
         private void ResetToInitialState()
         {
             flowLayoutPanelMapTrackers.ClearControls();
-            _checkBoxMarioAction();
             comboBoxMapOptionsLevel.SelectedItem = "Recommended";
             comboBoxMapOptionsBackground.SelectedItem = "Recommended";
             radioButtonMapControllersScaleCourseDefault.Checked = true;
@@ -392,48 +401,6 @@ namespace STROOP.Tabs.MapTab
             trackBarMapOptionsGlobalIconSize.StopChangingByCode();
         }
 
-        private void InitializeSemaphores()
-        {
-            _checkBoxMarioAction = InitializeCheckboxSemaphore(checkBoxMapOptionsTrackMario, MapSemaphoreManager.Mario, () => new MapMarioObject(), true);
-            InitializeCheckboxSemaphore(checkBoxMapOptionsTrackHolp, MapSemaphoreManager.Holp, () => new MapHolpObject(), false);
-            InitializeCheckboxSemaphore(checkBoxMapOptionsTrackCamera, MapSemaphoreManager.Camera, () => new MapCameraObject(), false);
-            InitializeCheckboxSemaphore(checkBoxMapOptionsTrackGhost, MapSemaphoreManager.Ghost, () => new MapGhostObject(), false);
-            InitializeCheckboxSemaphore(checkBoxMapOptionsTrackFloorTri, MapSemaphoreManager.FloorTri, () => new MapMarioFloorObject(), false);
-            InitializeCheckboxSemaphore(checkBoxMapOptionsTrackWallTri, MapSemaphoreManager.WallTri, () => new MapMarioWallObject(), false);
-            InitializeCheckboxSemaphore(checkBoxMapOptionsTrackCeilingTri, MapSemaphoreManager.CeilingTri, () => new MapMarioCeilingObject(), false);
-            InitializeCheckboxSemaphore(checkBoxMapOptionsTrackUnitGridlines, MapSemaphoreManager.UnitGridlines, () => new MapUnitGridlinesObject(), false);
-        }
-
-        private Action InitializeCheckboxSemaphore(
-            CheckBox checkBox, MapSemaphore semaphore, Func<MapObject> mapObjFunc, bool startAsOn)
-        {
-            Action<bool> addTrackerAction = (bool withSemaphore) =>
-            {
-                MapTracker tracker = new MapTracker(mapObjFunc(), withSemaphore ? new List<MapSemaphore>() { semaphore } : new List<MapSemaphore>());
-                flowLayoutPanelMapTrackers.AddNewControl(tracker);
-            };
-            Action clickAction = () =>
-            {
-                semaphore.Toggle();
-                if (semaphore.IsUsed)
-                {
-                    addTrackerAction(true);
-                }
-            };
-            checkBox.Click += (sender, e) => clickAction();
-            if (startAsOn)
-            {
-                checkBox.Checked = true;
-                clickAction();
-            }
-
-            checkBox.ContextMenuStrip = new ContextMenuStrip();
-            ToolStripMenuItem item = new ToolStripMenuItem("Add Additional Tracker");
-            item.Click += (sender, e) => addTrackerAction(false);
-            checkBox.ContextMenuStrip.Items.Add(item);
-            return clickAction;
-        }
-
         public override void InitializeTab()
         {
             base.InitializeTab();
@@ -444,17 +411,19 @@ namespace STROOP.Tabs.MapTab
         {
             if (!_isLoaded2D) return;
 
-            flowLayoutPanelMapTrackers.UpdateControl();
+            using (new AccessScope<MapTab>(this))
+            {
+                flowLayoutPanelMapTrackers.UpdateControl();
 
-            if (!active) return;
+                if (!active) return;
 
-            base.Update(active);
-            UpdateBasedOnObjectsSelectedOnMap();
-            UpdateControlsBasedOnSemaphores();
-            UpdateDataTab();
+                base.Update(active);
+                UpdateBasedOnObjectsSelectedOnMap();
+                UpdateDataTab();
 
-            if (!PauseMapUpdating)
-                glControlMap2D.Invalidate();
+                if (!PauseMapUpdating)
+                    glControlMap2D.Invalidate();
+            }
         }
 
         private void UpdateDataTab()
@@ -496,49 +465,46 @@ namespace STROOP.Tabs.MapTab
                 .ConvertAll(address => ObjectUtilities.GetObjectIndex(address))
                 .FindAll(address => address.HasValue)
                 .ConvertAll(address => address.Value);
-            List<int> toBeRemovedIndexes = _currentObjIndexes.FindAll(i => !currentObjIndexes.Contains(i));
-            List<int> toBeAddedIndexes = currentObjIndexes.FindAll(i => !_currentObjIndexes.Contains(i));
+
+            foreach (var lastChecked in _currentObjIndexes)
+            {
+                if (!currentObjIndexes.Contains(lastChecked))
+                    if (semaphoreTrackers.TryGetValue(lastChecked, out var mapTracker))
+                    {
+                        flowLayoutPanelMapTrackers.RemoveControl(mapTracker);
+                        semaphoreTrackers.Remove(lastChecked);
+                    }
+            }
             _currentObjIndexes = currentObjIndexes;
-
-            // Newly unchecked slots have their semaphore turned off
-            foreach (int index in toBeRemovedIndexes)
+            foreach (var index in _currentObjIndexes)
             {
-                MapSemaphore semaphore = MapSemaphoreManager.Objects[index];
-                semaphore.IsUsed = false;
+                if (!semaphoreTrackers.ContainsKey(index))
+                {
+                    uint address = ObjectUtilities.GetObjectAddress(index);
+                    MapObject mapObj = new MapObjectObject(address);
+                    MapTracker tracker = new MapTracker(this, mapObj);
+                    flowLayoutPanelMapTrackers.AddNewControl(tracker);
+                    semaphoreTrackers[index] = tracker;
+                }
             }
 
-            // Newly checked slots have their semaphore turned on and a tracker is created
-            foreach (int index in toBeAddedIndexes)
+            foreach (var lolz in quickSemaphores)
             {
-                uint address = ObjectUtilities.GetObjectAddress(index);
-                MapObject mapObj = new MapObjectObject(address);
-                MapSemaphore semaphore = MapSemaphoreManager.Objects[index];
-                semaphore.IsUsed = true;
-                MapTracker tracker = new MapTracker(mapObj, new List<MapSemaphore>() { semaphore });
-                flowLayoutPanelMapTrackers.AddNewControl(tracker);
+                bool hasTracker = semaphoreTrackers.TryGetValue(lolz.checkBox, out var tracker);
+                if (tracker != null && !flowLayoutPanelMapTrackers.Controls.Contains(tracker))
+                    hasTracker = false;
+
+                if (!hasTracker && lolz.checkBox.Checked)
+                {
+                    semaphoreTrackers[lolz.checkBox] = lolz.tracker;
+                    flowLayoutPanelMapTrackers.AddNewControl(lolz.tracker);
+                }
+                else if (hasTracker && !lolz.checkBox.Checked)
+                {
+                    semaphoreTrackers.Remove(lolz.checkBox);
+                    flowLayoutPanelMapTrackers.RemoveControl(lolz.tracker);
+                }
             }
-        }
-
-        private void UpdateControlsBasedOnSemaphores()
-        {
-            // Update checkboxes when tracker is deleted
-            checkBoxMapOptionsTrackMario.Checked = MapSemaphoreManager.Mario.IsUsed;
-            checkBoxMapOptionsTrackHolp.Checked = MapSemaphoreManager.Holp.IsUsed;
-            checkBoxMapOptionsTrackCamera.Checked = MapSemaphoreManager.Camera.IsUsed;
-            checkBoxMapOptionsTrackGhost.Checked = MapSemaphoreManager.Ghost.IsUsed;
-            checkBoxMapOptionsTrackFloorTri.Checked = MapSemaphoreManager.FloorTri.IsUsed;
-            checkBoxMapOptionsTrackWallTri.Checked = MapSemaphoreManager.WallTri.IsUsed;
-            checkBoxMapOptionsTrackCeilingTri.Checked = MapSemaphoreManager.CeilingTri.IsUsed;
-            checkBoxMapOptionsTrackUnitGridlines.Checked = MapSemaphoreManager.UnitGridlines.IsUsed;
-
-            // Update object slots when tracker is deleted
-            Config.ObjectSlotsManager.SelectedOnMapSlotsAddresses
-                .ConvertAll(address => ObjectUtilities.GetObjectIndex(address))
-                .FindAll(index => index.HasValue)
-                .ConvertAll(index => index.Value)
-                .FindAll(index => !MapSemaphoreManager.Objects[index].IsUsed)
-                .ConvertAll(index => ObjectUtilities.GetObjectAddress(index))
-                .ForEach(address => Config.ObjectSlotsManager.SelectedOnMapSlotsAddresses.Remove(address));
         }
 
         private static readonly List<string> speedVarNames = new List<string>()

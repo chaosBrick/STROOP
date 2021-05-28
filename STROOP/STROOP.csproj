@@ -240,6 +240,12 @@
     <Compile Include="Forms\ImageForm.Designer.cs">
       <DependentUpon>ImageForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\TabPopoutForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\TabPopoutForm.Designer.cs">
+      <DependentUpon>TabPopoutForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\TriangleListForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -513,11 +519,6 @@
     <Compile Include="Tabs\MapTab\MapTrackerFlowLayoutPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Tabs\MapTab\MapSemaphore.cs" />
-    <Compile Include="Tabs\MapTab\MapSemaphoreManager.cs" />
-    <Compile Include="Tabs\MapTab\Map3D\Map3DCamera.cs" />
-    <Compile Include="Tabs\MapTab\Map3D\Map3DGraphics.cs" />
-    <Compile Include="Tabs\MapTab\Map3D\Map3DVertex.cs" />
     <Compile Include="Tabs\MapTab\MapObjectSettings.cs" />
     <Compile Include="Models\PanModel.cs" />
     <Compile Include="Script\ScriptEngine.cs" />
@@ -882,6 +883,7 @@
     <Compile Include="Structs\RomHack.cs" />
     <Compile Include="Structs\SpawnHack.cs" />
     <Compile Include="Enums\AngleUnitType.cs" />
+    <Compile Include="Utilities\AccessScope.cs" />
     <Compile Include="Utilities\AnimationUtilities.cs" />
     <Compile Include="Utilities\CellUtilities.cs" />
     <Compile Include="Structs\ObjectAngleTable.cs" />

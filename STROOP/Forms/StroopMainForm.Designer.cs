@@ -148,6 +148,7 @@ namespace STROOP
             this.buttonMoveTabLeft = new System.Windows.Forms.Button();
             this.buttonMoveTabRight = new System.Windows.Forms.Button();
             this.buttonShowLeftPane = new System.Windows.Forms.Button();
+            this.buttonCreateWindow = new System.Windows.Forms.Button();
             this.panelConnect.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
@@ -330,7 +331,7 @@ namespace STROOP
             // 
             this.comboBoxRomVersion.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.comboBoxRomVersion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxRomVersion.Location = new System.Drawing.Point(531, 11);
+            this.comboBoxRomVersion.Location = new System.Drawing.Point(479, 11);
             this.comboBoxRomVersion.Margin = new System.Windows.Forms.Padding(2);
             this.comboBoxRomVersion.Name = "comboBoxRomVersion";
             this.comboBoxRomVersion.Size = new System.Drawing.Size(79, 21);
@@ -340,7 +341,7 @@ namespace STROOP
             // 
             this.comboBoxReadWriteMode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.comboBoxReadWriteMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxReadWriteMode.Location = new System.Drawing.Point(614, 11);
+            this.comboBoxReadWriteMode.Location = new System.Drawing.Point(562, 11);
             this.comboBoxReadWriteMode.Margin = new System.Windows.Forms.Padding(2);
             this.comboBoxReadWriteMode.Name = "comboBoxReadWriteMode";
             this.comboBoxReadWriteMode.Size = new System.Drawing.Size(75, 21);
@@ -350,7 +351,7 @@ namespace STROOP
             // 
             this.labelDebugText.AutoSize = true;
             this.labelDebugText.BackColor = System.Drawing.Color.White;
-            this.labelDebugText.Location = new System.Drawing.Point(325, 15);
+            this.labelDebugText.Location = new System.Drawing.Point(271, 15);
             this.labelDebugText.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.labelDebugText.Name = "labelDebugText";
             this.labelDebugText.Size = new System.Drawing.Size(63, 13);
@@ -462,6 +463,8 @@ namespace STROOP
             this.objectTab.Behavior = null;
             this.objectTab.Image = null;
             this.objectTab.Location = new System.Drawing.Point(0, 0);
+            this.objectTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.objectTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.objectTab.Name = "objectTab";
             this.objectTab.ObjectBackColor = System.Drawing.Color.Transparent;
             this.objectTab.ObjectName = "objectTab";
@@ -487,8 +490,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.marioTab.Location = new System.Drawing.Point(0, 0);
+            this.marioTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.marioTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.marioTab.Name = "marioTab";
-            this.marioTab.Size = new System.Drawing.Size(0, 0);
+            this.marioTab.Size = new System.Drawing.Size(915, 463);
             this.marioTab.TabIndex = 0;
             // 
             // tabPageHud
@@ -507,8 +512,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.hudTab.Location = new System.Drawing.Point(0, 0);
+            this.hudTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.hudTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.hudTab.Name = "hudTab";
-            this.hudTab.Size = new System.Drawing.Size(0, 0);
+            this.hudTab.Size = new System.Drawing.Size(915, 463);
             this.hudTab.TabIndex = 0;
             // 
             // tabPageCamera
@@ -527,8 +534,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cameraTab.Location = new System.Drawing.Point(0, 0);
+            this.cameraTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.cameraTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.cameraTab.Name = "cameraTab";
-            this.cameraTab.Size = new System.Drawing.Size(0, 0);
+            this.cameraTab.Size = new System.Drawing.Size(915, 463);
             this.cameraTab.TabIndex = 0;
             // 
             // tabPageTriangles
@@ -547,8 +556,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.trianglesTab.Location = new System.Drawing.Point(0, 0);
+            this.trianglesTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.trianglesTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.trianglesTab.Name = "trianglesTab";
-            this.trianglesTab.Size = new System.Drawing.Size(0, 0);
+            this.trianglesTab.Size = new System.Drawing.Size(915, 463);
             this.trianglesTab.TabIndex = 0;
             // 
             // tabPageActions
@@ -565,6 +576,8 @@ namespace STROOP
             // actionsTab1
             // 
             this.actionsTab1.Location = new System.Drawing.Point(0, 0);
+            this.actionsTab1.MaximumSize = new System.Drawing.Size(915, 463);
+            this.actionsTab1.MinimumSize = new System.Drawing.Size(915, 463);
             this.actionsTab1.Name = "actionsTab1";
             this.actionsTab1.Size = new System.Drawing.Size(915, 463);
             this.actionsTab1.TabIndex = 1;
@@ -599,8 +612,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.fileTab.Location = new System.Drawing.Point(0, 0);
+            this.fileTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.fileTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.fileTab.Name = "fileTab";
-            this.fileTab.Size = new System.Drawing.Size(0, 0);
+            this.fileTab.Size = new System.Drawing.Size(915, 463);
             this.fileTab.TabIndex = 0;
             // 
             // tabPageInput
@@ -616,6 +631,8 @@ namespace STROOP
             // inputTab
             // 
             this.inputTab.Location = new System.Drawing.Point(0, 0);
+            this.inputTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.inputTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.inputTab.Name = "inputTab";
             this.inputTab.Size = new System.Drawing.Size(915, 463);
             this.inputTab.TabIndex = 0;
@@ -633,6 +650,8 @@ namespace STROOP
             // miscTab
             // 
             this.miscTab.Location = new System.Drawing.Point(0, 0);
+            this.miscTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.miscTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.miscTab.Name = "miscTab";
             this.miscTab.Size = new System.Drawing.Size(915, 463);
             this.miscTab.TabIndex = 0;
@@ -653,8 +672,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.m64Tab.Location = new System.Drawing.Point(0, 0);
+            this.m64Tab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.m64Tab.MinimumSize = new System.Drawing.Size(915, 463);
             this.m64Tab.Name = "m64Tab";
-            this.m64Tab.Size = new System.Drawing.Size(0, 0);
+            this.m64Tab.Size = new System.Drawing.Size(915, 463);
             this.m64Tab.TabIndex = 0;
             // 
             // tabPageCustom
@@ -674,8 +695,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.customTab.Location = new System.Drawing.Point(0, 0);
+            this.customTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.customTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.customTab.Name = "customTab";
-            this.customTab.Size = new System.Drawing.Size(0, 0);
+            this.customTab.Size = new System.Drawing.Size(915, 463);
             this.customTab.TabIndex = 0;
             // 
             // tabPageTas
@@ -695,8 +718,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tasTab.Location = new System.Drawing.Point(0, 0);
+            this.tasTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.tasTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.tasTab.Name = "tasTab";
-            this.tasTab.Size = new System.Drawing.Size(0, 0);
+            this.tasTab.Size = new System.Drawing.Size(915, 463);
             this.tasTab.TabIndex = 0;
             // 
             // tabPageMap
@@ -716,8 +741,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.mapTab.Location = new System.Drawing.Point(0, 0);
+            this.mapTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.mapTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.mapTab.Name = "mapTab";
-            this.mapTab.Size = new System.Drawing.Size(0, 0);
+            this.mapTab.Size = new System.Drawing.Size(915, 463);
             this.mapTab.TabIndex = 0;
             // 
             // tabPageOptions
@@ -737,8 +764,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.optionsTab.Location = new System.Drawing.Point(0, 0);
+            this.optionsTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.optionsTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.optionsTab.Name = "optionsTab";
-            this.optionsTab.Size = new System.Drawing.Size(0, 0);
+            this.optionsTab.Size = new System.Drawing.Size(915, 463);
             this.optionsTab.TabIndex = 0;
             // 
             // tabPageMemory
@@ -759,8 +788,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.memoryTab.Location = new System.Drawing.Point(0, 0);
+            this.memoryTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.memoryTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.memoryTab.Name = "memoryTab";
-            this.memoryTab.Size = new System.Drawing.Size(0, 0);
+            this.memoryTab.Size = new System.Drawing.Size(915, 463);
             this.memoryTab.TabIndex = 0;
             // 
             // tabPagePu
@@ -779,8 +810,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.puTab.Location = new System.Drawing.Point(0, 0);
+            this.puTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.puTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.puTab.Name = "puTab";
-            this.puTab.Size = new System.Drawing.Size(0, 0);
+            this.puTab.Size = new System.Drawing.Size(915, 463);
             this.puTab.TabIndex = 0;
             // 
             // tabPageArea
@@ -800,8 +833,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.areaTab.Location = new System.Drawing.Point(0, 0);
+            this.areaTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.areaTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.areaTab.Name = "areaTab";
-            this.areaTab.Size = new System.Drawing.Size(0, 0);
+            this.areaTab.Size = new System.Drawing.Size(915, 463);
             this.areaTab.TabIndex = 0;
             // 
             // tabPageModel
@@ -821,8 +856,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Right)));
             this.modelTab.Location = new System.Drawing.Point(0, 0);
             this.modelTab.ManualMode = false;
+            this.modelTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.modelTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.modelTab.Name = "modelTab";
-            this.modelTab.Size = new System.Drawing.Size(0, 0);
+            this.modelTab.Size = new System.Drawing.Size(915, 463);
             this.modelTab.TabIndex = 0;
             // 
             // tabPageGfx
@@ -862,8 +899,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.debugTab.Location = new System.Drawing.Point(0, 0);
+            this.debugTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.debugTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.debugTab.Name = "debugTab";
-            this.debugTab.Size = new System.Drawing.Size(0, 0);
+            this.debugTab.Size = new System.Drawing.Size(915, 463);
             this.debugTab.TabIndex = 0;
             // 
             // tabPageHacks
@@ -882,8 +921,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.hackTab.Location = new System.Drawing.Point(0, 0);
+            this.hackTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.hackTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.hackTab.Name = "hackTab";
-            this.hackTab.Size = new System.Drawing.Size(0, 0);
+            this.hackTab.Size = new System.Drawing.Size(915, 463);
             this.hackTab.TabIndex = 0;
             // 
             // tabPageCamHack
@@ -899,6 +940,8 @@ namespace STROOP
             // camHackTab
             // 
             this.camHackTab.Location = new System.Drawing.Point(0, 0);
+            this.camHackTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.camHackTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.camHackTab.Name = "camHackTab";
             this.camHackTab.Size = new System.Drawing.Size(915, 463);
             this.camHackTab.TabIndex = 0;
@@ -920,8 +963,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.quarterFramesTab.Location = new System.Drawing.Point(0, 0);
+            this.quarterFramesTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.quarterFramesTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.quarterFramesTab.Name = "quarterFramesTab";
-            this.quarterFramesTab.Size = new System.Drawing.Size(0, 0);
+            this.quarterFramesTab.Size = new System.Drawing.Size(915, 463);
             this.quarterFramesTab.TabIndex = 0;
             // 
             // tabPageVarHack
@@ -941,8 +986,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.varHackTab.Location = new System.Drawing.Point(0, 0);
+            this.varHackTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.varHackTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.varHackTab.Name = "varHackTab";
-            this.varHackTab.Size = new System.Drawing.Size(0, 0);
+            this.varHackTab.Size = new System.Drawing.Size(915, 463);
             this.varHackTab.TabIndex = 0;
             // 
             // tabPageCoin
@@ -962,8 +1009,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.coinTab.Location = new System.Drawing.Point(0, 0);
+            this.coinTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.coinTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.coinTab.Name = "coinTab";
-            this.coinTab.Size = new System.Drawing.Size(0, 0);
+            this.coinTab.Size = new System.Drawing.Size(915, 463);
             this.coinTab.TabIndex = 0;
             // 
             // tabPageDisassembly
@@ -983,8 +1032,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.disassemblyTab.Location = new System.Drawing.Point(0, 0);
+            this.disassemblyTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.disassemblyTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.disassemblyTab.Name = "disassemblyTab";
-            this.disassemblyTab.Size = new System.Drawing.Size(0, 0);
+            this.disassemblyTab.Size = new System.Drawing.Size(915, 463);
             this.disassemblyTab.TabIndex = 0;
             // 
             // tabPageSnow
@@ -1004,8 +1055,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.snowTab.Location = new System.Drawing.Point(0, 0);
+            this.snowTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.snowTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.snowTab.Name = "snowTab";
-            this.snowTab.Size = new System.Drawing.Size(0, 0);
+            this.snowTab.Size = new System.Drawing.Size(915, 463);
             this.snowTab.TabIndex = 0;
             // 
             // tabPageMainSave
@@ -1025,8 +1078,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.mainSaveTab.Location = new System.Drawing.Point(0, 0);
+            this.mainSaveTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.mainSaveTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.mainSaveTab.Name = "mainSaveTab";
-            this.mainSaveTab.Size = new System.Drawing.Size(0, 0);
+            this.mainSaveTab.Size = new System.Drawing.Size(915, 463);
             this.mainSaveTab.TabIndex = 0;
             // 
             // tabPagePainting
@@ -1046,8 +1101,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.paintingTab.Location = new System.Drawing.Point(0, 0);
+            this.paintingTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.paintingTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.paintingTab.Name = "paintingTab";
-            this.paintingTab.Size = new System.Drawing.Size(0, 0);
+            this.paintingTab.Size = new System.Drawing.Size(915, 463);
             this.paintingTab.TabIndex = 0;
             // 
             // tabPageSound
@@ -1067,8 +1124,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.soundTab.Location = new System.Drawing.Point(0, 0);
+            this.soundTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.soundTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.soundTab.Name = "soundTab";
-            this.soundTab.Size = new System.Drawing.Size(0, 0);
+            this.soundTab.Size = new System.Drawing.Size(915, 463);
             this.soundTab.TabIndex = 0;
             // 
             // tabPageSearch
@@ -1088,8 +1147,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.searchTab.Location = new System.Drawing.Point(0, 0);
+            this.searchTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.searchTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.searchTab.Name = "searchTab";
-            this.searchTab.Size = new System.Drawing.Size(0, 0);
+            this.searchTab.Size = new System.Drawing.Size(915, 463);
             this.searchTab.TabIndex = 0;
             // 
             // tabPageCells
@@ -1109,8 +1170,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cellsTab.Location = new System.Drawing.Point(0, 0);
+            this.cellsTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.cellsTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.cellsTab.Name = "cellsTab";
-            this.cellsTab.Size = new System.Drawing.Size(0, 0);
+            this.cellsTab.Size = new System.Drawing.Size(915, 463);
             this.cellsTab.TabIndex = 0;
             // 
             // tabPageMusic
@@ -1130,8 +1193,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.musicTab.Location = new System.Drawing.Point(0, 0);
+            this.musicTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.musicTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.musicTab.Name = "musicTab";
-            this.musicTab.Size = new System.Drawing.Size(0, 0);
+            this.musicTab.Size = new System.Drawing.Size(915, 463);
             this.musicTab.TabIndex = 0;
             // 
             // tabPageScript
@@ -1151,8 +1216,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.scriptTab.Location = new System.Drawing.Point(0, 0);
+            this.scriptTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.scriptTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.scriptTab.Name = "scriptTab";
-            this.scriptTab.Size = new System.Drawing.Size(0, 0);
+            this.scriptTab.Size = new System.Drawing.Size(915, 463);
             this.scriptTab.TabIndex = 0;
             // 
             // tabPageWarp
@@ -1172,8 +1239,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.warpTab.Location = new System.Drawing.Point(0, 0);
+            this.warpTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.warpTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.warpTab.Name = "warpTab";
-            this.warpTab.Size = new System.Drawing.Size(0, 0);
+            this.warpTab.Size = new System.Drawing.Size(915, 463);
             this.warpTab.TabIndex = 0;
             // 
             // tabPageGhost
@@ -1194,8 +1263,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ghostTab.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ghostTab.Location = new System.Drawing.Point(0, 0);
+            this.ghostTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.ghostTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.ghostTab.Name = "ghostTab";
-            this.ghostTab.Size = new System.Drawing.Size(0, 0);
+            this.ghostTab.Size = new System.Drawing.Size(915, 463);
             this.ghostTab.TabIndex = 0;
             // 
             // tabPageWater
@@ -1214,8 +1285,10 @@ namespace STROOP
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.waterTab.Location = new System.Drawing.Point(0, 0);
+            this.waterTab.MaximumSize = new System.Drawing.Size(915, 463);
+            this.waterTab.MinimumSize = new System.Drawing.Size(915, 463);
             this.waterTab.Name = "waterTab";
-            this.waterTab.Size = new System.Drawing.Size(0, 0);
+            this.waterTab.Size = new System.Drawing.Size(915, 463);
             this.waterTab.TabIndex = 0;
             // 
             // groupBoxObjects
@@ -1427,7 +1500,7 @@ namespace STROOP
             this.buttonTabAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonTabAdd.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buttonTabAdd.BackgroundImage")));
             this.buttonTabAdd.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.buttonTabAdd.Location = new System.Drawing.Point(506, 11);
+            this.buttonTabAdd.Location = new System.Drawing.Point(454, 11);
             this.buttonTabAdd.Margin = new System.Windows.Forms.Padding(2);
             this.buttonTabAdd.Name = "buttonTabAdd";
             this.buttonTabAdd.Size = new System.Drawing.Size(21, 21);
@@ -1440,7 +1513,7 @@ namespace STROOP
             this.buttonMoveTabLeft.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonMoveTabLeft.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buttonMoveTabLeft.BackgroundImage")));
             this.buttonMoveTabLeft.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.buttonMoveTabLeft.Location = new System.Drawing.Point(456, 11);
+            this.buttonMoveTabLeft.Location = new System.Drawing.Point(404, 11);
             this.buttonMoveTabLeft.Margin = new System.Windows.Forms.Padding(2);
             this.buttonMoveTabLeft.Name = "buttonMoveTabLeft";
             this.buttonMoveTabLeft.Size = new System.Drawing.Size(21, 21);
@@ -1453,7 +1526,7 @@ namespace STROOP
             this.buttonMoveTabRight.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonMoveTabRight.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buttonMoveTabRight.BackgroundImage")));
             this.buttonMoveTabRight.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.buttonMoveTabRight.Location = new System.Drawing.Point(481, 11);
+            this.buttonMoveTabRight.Location = new System.Drawing.Point(429, 11);
             this.buttonMoveTabRight.Margin = new System.Windows.Forms.Padding(2);
             this.buttonMoveTabRight.Name = "buttonMoveTabRight";
             this.buttonMoveTabRight.Size = new System.Drawing.Size(21, 21);
@@ -1474,6 +1547,20 @@ namespace STROOP
             this.buttonShowLeftPane.UseVisualStyleBackColor = true;
             this.buttonShowLeftPane.Click += new System.EventHandler(this.buttonShowLeftPanel_Click);
             // 
+            // buttonCreateWindow
+            // 
+            this.buttonCreateWindow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonCreateWindow.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buttonCreateWindow.BackgroundImage")));
+            this.buttonCreateWindow.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.buttonCreateWindow.Location = new System.Drawing.Point(641, 11);
+            this.buttonCreateWindow.Margin = new System.Windows.Forms.Padding(2);
+            this.buttonCreateWindow.Name = "buttonCreateWindow";
+            this.buttonCreateWindow.Size = new System.Drawing.Size(46, 21);
+            this.buttonCreateWindow.TabIndex = 20;
+            this.buttonCreateWindow.Text = "   New";
+            this.buttonCreateWindow.UseVisualStyleBackColor = true;
+            this.buttonCreateWindow.Click += new System.EventHandler(this.buttonCreateWindow_Click);
+            // 
             // StroopMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1492,6 +1579,7 @@ namespace STROOP
             this.Controls.Add(this.buttonTabAdd);
             this.Controls.Add(this.buttonMoveTabLeft);
             this.Controls.Add(this.buttonMoveTabRight);
+            this.Controls.Add(this.buttonCreateWindow);
             this.Controls.Add(this.buttonShowLeftPane);
             this.Controls.Add(this.buttonDisconnect);
             this.Controls.Add(this.labelVersionNumber);
@@ -1674,6 +1762,7 @@ namespace STROOP
         private TabPage tabPageWater;
         private Tabs.WaterTab waterTab;
         internal Tabs.MapTab.MapTab mapTab;
+        private Button buttonCreateWindow;
     }
 }
 

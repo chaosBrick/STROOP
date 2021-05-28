@@ -6,14 +6,13 @@ using STROOP.Structs;
 using OpenTK;
 using System.Windows.Forms;
 using OpenTK.Graphics;
-using STROOP.Models;
 
 namespace STROOP.Tabs.MapTab
 {
     public abstract class MapObject
     {
-        public MapGraphics graphics => MapTab.instance.view.MapGraphics;
-        public Map3DGraphics graphics3D => MapTab.instance.view.Map3DGraphics;
+        public MapTab currentMapTab => AccessScope<MapTab>.content;
+        public MapGraphics graphics => currentMapTab.view.MapGraphics;
 
         public delegate IEnumerable<PositionAngle> PositionAngleProvider();
 
@@ -68,8 +67,6 @@ namespace STROOP.Tabs.MapTab
         }
 
         public abstract void DrawOn2DControl(MapGraphics graphics);
-
-        public virtual void DrawOn3DControl(Map3DGraphics graphics3D) { }
 
         public virtual Matrix4 GetModelMatrix()
         {
@@ -126,7 +123,7 @@ namespace STROOP.Tabs.MapTab
             return _contextMenuStrip;
         }
 
-        public virtual void InitSubTrackerContextMenuStrip(ContextMenuStrip targetStrip) { }
+        public virtual void InitSubTrackerContextMenuStrip(MapTab mapTab, ContextMenuStrip targetStrip) { }
 
         public virtual void Update() { }
 

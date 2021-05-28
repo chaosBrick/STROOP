@@ -48,7 +48,7 @@ namespace STROOP.Tabs.MapTab
             float rectangleCenterX = rectangle.X + rectangle.Width / 2;
             float rectangleCenterZ = rectangle.Y + rectangle.Height / 2;
             List<(float x, float z)> rectangleCenters = graphics.MapViewEnablePuView ?
-                StroopMainForm.instance.mapTab.GetPuCoordinates(rectangleCenterX, rectangleCenterZ) :
+                currentMapTab.GetPuCoordinates(rectangleCenterX, rectangleCenterZ) :
                 new List<(float x, float z)>() { (rectangleCenterX, rectangleCenterZ) };
 
             List<(PointF loc, SizeF size)> dimensions = rectangleCenters.ConvertAll(

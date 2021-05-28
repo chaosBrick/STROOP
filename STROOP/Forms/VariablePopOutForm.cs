@@ -46,6 +46,7 @@ namespace STROOP.Forms
             // initialize panel
             _watchVariablePanel.Initialize();
             _watchVariablePanel.AddVariables(controls);
+            _watchVariablePanel.DeferredInitialize();
 
             // add borderless item to panel
             ToolStripMenuItem itemBorderless = new ToolStripMenuItem("Borderless");

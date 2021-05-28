@@ -587,10 +587,10 @@ namespace STROOP.Structs
                 new List<string>() { "Regular", "Fixed", "Grouped by Base Address", "Grouped by Variable" },
                 new List<Action>()
                 {
-                    () => WatchVariableControl.AddVarsToTab(getVars(), StroopMainForm.instance.customTab.watchVariablePanelCustom, AddToTabTypeEnum.Regular),
-                    () => WatchVariableControl.AddVarsToTab(getVars(), StroopMainForm.instance.customTab.watchVariablePanelCustom, AddToTabTypeEnum.Fixed),
-                    () => WatchVariableControl.AddVarsToTab(getVars(), StroopMainForm.instance.customTab.watchVariablePanelCustom, AddToTabTypeEnum.GroupedByBaseAddress),
-                    () => WatchVariableControl.AddVarsToTab(getVars(), StroopMainForm.instance.customTab.watchVariablePanelCustom, AddToTabTypeEnum.GroupedByVariable),
+                    () => WatchVariableControl.AddVarsToTab(getVars(), AccessScope<StroopMainForm>.content.customTab.watchVariablePanelCustom, AddToTabTypeEnum.Regular),
+                    () => WatchVariableControl.AddVarsToTab(getVars(), AccessScope<StroopMainForm>.content.customTab.watchVariablePanelCustom, AddToTabTypeEnum.Fixed),
+                    () => WatchVariableControl.AddVarsToTab(getVars(), AccessScope<StroopMainForm>.content.customTab.watchVariablePanelCustom, AddToTabTypeEnum.GroupedByBaseAddress),
+                    () => WatchVariableControl.AddVarsToTab(getVars(), AccessScope<StroopMainForm>.content.customTab.watchVariablePanelCustom, AddToTabTypeEnum.GroupedByVariable),
                 });
 
             return new List<ToolStripItem>()

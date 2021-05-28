@@ -11,6 +11,8 @@ namespace STROOP
 {
     class LoadingHandler
     {
+        static bool initialized = false;
+
         //Delegate for cross thread call to close
         private delegate void CloseDelegate();
 
@@ -20,13 +22,16 @@ namespace STROOP
         static public void ShowLoadingForm()
         {
             // Make sure it is only launched once.
-            if (LoadingForm != null)
+            if (initialized)
                 return;
+            initialized = true;
 
             Thread thread = new Thread(new ThreadStart(LoadingHandler.ShowForm));
             thread.IsBackground = true;
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
+            while (LoadingForm == null)
+                Thread.Sleep(10);
         }
 
         static private void ShowForm()

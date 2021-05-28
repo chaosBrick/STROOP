@@ -170,7 +170,7 @@ namespace STROOP.Tabs
 
             if (watchVar.BaseAddressType == BaseAddressTypeEnum.Triangle)
             {
-                var trianglePointerAddress = StroopMainForm.instance.trianglesTab.TrianglePointerAddress;
+                var trianglePointerAddress = AccessScope<StroopMainForm>.content.trianglesTab.TrianglePointerAddress;
                 if (trianglePointerAddress.HasValue)
                 {
                     AddVariable(
