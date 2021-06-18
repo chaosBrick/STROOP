@@ -38,6 +38,8 @@
             this.panelMiscBorder = new System.Windows.Forms.Panel();
             this.pictureBoxMisc = new STROOP.Controls.IntPictureBox();
             this.watchVariablePanelMisc = new STROOP.Controls.WatchVariableFlowLayoutPanel();
+            this.txtRNGIncrement = new STROOP.BetterTextbox();
+            this.labelRNGIncrement = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMisc)).BeginInit();
             this.splitContainerMisc.Panel1.SuspendLayout();
             this.splitContainerMisc.Panel2.SuspendLayout();
@@ -79,11 +81,13 @@
             // 
             // groupBoxRNGIndexTester
             // 
+            this.groupBoxRNGIndexTester.Controls.Add(this.labelRNGIncrement);
+            this.groupBoxRNGIndexTester.Controls.Add(this.txtRNGIncrement);
             this.groupBoxRNGIndexTester.Controls.Add(this.textBoxRNGIndexTester);
             this.groupBoxRNGIndexTester.Controls.Add(this.buttonRNGIndexTester);
             this.groupBoxRNGIndexTester.Location = new System.Drawing.Point(3, 94);
             this.groupBoxRNGIndexTester.Name = "groupBoxRNGIndexTester";
-            this.groupBoxRNGIndexTester.Size = new System.Drawing.Size(107, 72);
+            this.groupBoxRNGIndexTester.Size = new System.Drawing.Size(107, 104);
             this.groupBoxRNGIndexTester.TabIndex = 33;
             this.groupBoxRNGIndexTester.TabStop = false;
             this.groupBoxRNGIndexTester.Text = "RNG Index Tester";
@@ -109,7 +113,7 @@
             // 
             // buttonMiscGoToCourse
             // 
-            this.buttonMiscGoToCourse.Location = new System.Drawing.Point(3, 180);
+            this.buttonMiscGoToCourse.Location = new System.Drawing.Point(3, 201);
             this.buttonMiscGoToCourse.Margin = new System.Windows.Forms.Padding(0);
             this.buttonMiscGoToCourse.Name = "buttonMiscGoToCourse";
             this.buttonMiscGoToCourse.Size = new System.Drawing.Size(107, 25);
@@ -163,13 +167,31 @@
             this.watchVariablePanelMisc.Size = new System.Drawing.Size(778, 457);
             this.watchVariablePanelMisc.TabIndex = 5;
             // 
+            // txtRNGIncrement
+            // 
+            this.txtRNGIncrement.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtRNGIncrement.Location = new System.Drawing.Point(70, 75);
+            this.txtRNGIncrement.Name = "txtRNGIncrement";
+            this.txtRNGIncrement.Size = new System.Drawing.Size(30, 20);
+            this.txtRNGIncrement.TabIndex = 33;
+            this.txtRNGIncrement.Text = "4";
+            this.txtRNGIncrement.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // labelRNGIncrement
+            // 
+            this.labelRNGIncrement.AutoSize = true;
+            this.labelRNGIncrement.Location = new System.Drawing.Point(7, 78);
+            this.labelRNGIncrement.Name = "labelRNGIncrement";
+            this.labelRNGIncrement.Size = new System.Drawing.Size(57, 13);
+            this.labelRNGIncrement.TabIndex = 36;
+            this.labelRNGIncrement.Text = "Increment:";
+            // 
             // MiscTab
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.splitContainerMisc);
             this.Name = "MiscTab";
-            this.Size = new System.Drawing.Size(915, 463);
             this.splitContainerMisc.Panel1.ResumeLayout(false);
             this.splitContainerMisc.Panel1.PerformLayout();
             this.splitContainerMisc.Panel2.ResumeLayout(false);
@@ -194,5 +216,7 @@
         private System.Windows.Forms.Panel panelMiscBorder;
         private Controls.IntPictureBox pictureBoxMisc;
         private Controls.WatchVariableFlowLayoutPanel watchVariablePanelMisc;
+        private System.Windows.Forms.Label labelRNGIncrement;
+        private BetterTextbox txtRNGIncrement;
     }
 }

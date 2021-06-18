@@ -44,12 +44,13 @@ namespace STROOP.Tabs
 
             buttonRNGIndexTester.Click += (sender, e) =>
             {
+                int? rngIncrementullable = ParsingUtilities.ParseIntNullable(txtRNGIncrement.Text);
                 int? rngIndexNullable = ParsingUtilities.ParseIntNullable(textBoxRNGIndexTester.Text);
-                if (!rngIndexNullable.HasValue) return;
+                if (!rngIndexNullable.HasValue || !rngIncrementullable.HasValue) return;
                 int rngIndex = rngIndexNullable.Value;
                 ushort rngValue = RngIndexer.GetRngValue(rngIndex);
                 Config.Stream.SetValue(rngValue, MiscConfig.RngAddress);
-                int nextRngIndex = rngIndex + 1;
+                int nextRngIndex = rngIndex + rngIncrementullable.Value;
                 textBoxRNGIndexTester.Text = nextRngIndex.ToString();
             };
 
@@ -133,6 +134,5 @@ namespace STROOP.Tabs
 
             base.Update(updateView);
         }
-
     }
 }
