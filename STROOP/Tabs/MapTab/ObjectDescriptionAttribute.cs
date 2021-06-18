@@ -2,7 +2,7 @@
 
 namespace STROOP.Tabs.MapTab
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
     public class ObjectDescriptionAttribute : Attribute
     {
         public readonly string DisplayName;
