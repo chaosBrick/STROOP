@@ -17,7 +17,23 @@ namespace STROOP.Tabs.MapTab
     [ObjectDescription("Previous Positions", "Movement")]
     public class MapPreviousPositionsObject : MapObject
     {
+        public struct DataPoint
+        {
+            public float x, y, z, angle;
+            public Lazy<Image> tex;
+            public DataPoint(float x, float y, float z, float angle, Lazy<Image> tex)
+            {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+                this.angle = angle;
+                this.tex = tex;
+            }
+        }
+
         private DateTime _showEachPointStartTime = DateTime.MinValue;
+        uint numFramesToShow = 1; uint firstRecord;
+        Dictionary<uint, List<DataPoint>> dataByFrame = new Dictionary<uint, List<DataPoint>>();
 
         public MapPreviousPositionsObject()
             : base()
@@ -41,12 +57,10 @@ namespace STROOP.Tabs.MapTab
         {
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
             {
-                List<(float x, float y, float z, float angle, Lazy<Image> tex, bool show)> data = GetData();
+                var data = GetData();
                 foreach (var dataPoint in data)
                 {
-                    (float x, float y, float z, float angle, Lazy<Image> tex, bool show) = dataPoint;
-                    if (!show) continue;
-                    DrawIcon(graphics, x, z, angle, tex.Value);
+                    DrawIcon(graphics, dataPoint.x, dataPoint.z, dataPoint.angle, dataPoint.tex.Value);
                 }
 
                 if (OutlineWidth != 0)
@@ -61,9 +75,11 @@ namespace STROOP.Tabs.MapTab
                 }
             });
         }
-
-        public List<(float x, float y, float z, float angle, Lazy<Image> image, bool show)> GetData()
+        int evenFunnier = 0;
+        public List<DataPoint> GetData()
         {
+            uint globalTimer = Config.Stream.GetUInt32(MiscConfig.GlobalTimerAddress);
+
             float pos01X = Config.Stream.GetSingle(0x80372F00);
             float pos01Y = Config.Stream.GetSingle(0x80372F04);
             float pos01Z = Config.Stream.GetSingle(0x80372F08);
@@ -79,113 +95,66 @@ namespace STROOP.Tabs.MapTab
             float pos03Z = Config.Stream.GetSingle(0x80372F28);
             float pos03A = Config.Stream.GetUInt16(0x80372F2E);
 
-            float pos04X = Config.Stream.GetSingle(0x80372F30);
-            float pos04Y = Config.Stream.GetSingle(0x80372F34);
-            float pos04Z = Config.Stream.GetSingle(0x80372F38);
-            float pos04A = Config.Stream.GetUInt16(0x80372F3E);
-
-            float pos05X = Config.Stream.GetSingle(0x80372F40);
-            float pos05Y = Config.Stream.GetSingle(0x80372F44);
-            float pos05Z = Config.Stream.GetSingle(0x80372F48);
-            float pos05A = Config.Stream.GetUInt16(0x80372F4E);
-
-            float pos06X = Config.Stream.GetSingle(0x80372F50);
-            float pos06Y = Config.Stream.GetSingle(0x80372F54);
-            float pos06Z = Config.Stream.GetSingle(0x80372F58);
-            float pos06A = Config.Stream.GetUInt16(0x80372F5E);
-
-            float pos07X = Config.Stream.GetSingle(0x80372F60);
-            float pos07Y = Config.Stream.GetSingle(0x80372F64);
-            float pos07Z = Config.Stream.GetSingle(0x80372F68);
-            float pos07A = Config.Stream.GetUInt16(0x80372F6E);
-
-            float pos08X = Config.Stream.GetSingle(0x80372F70);
-            float pos08Y = Config.Stream.GetSingle(0x80372F74);
-            float pos08Z = Config.Stream.GetSingle(0x80372F78);
-            float pos08A = Config.Stream.GetUInt16(0x80372F7E);
-
-            float pos09X = Config.Stream.GetSingle(0x80372F80);
-            float pos09Y = Config.Stream.GetSingle(0x80372F84);
-            float pos09Z = Config.Stream.GetSingle(0x80372F88);
-            float pos09A = Config.Stream.GetUInt16(0x80372F8E);
-
-            float pos10X = Config.Stream.GetSingle(0x80372F90);
-            float pos10Y = Config.Stream.GetSingle(0x80372F94);
-            float pos10Z = Config.Stream.GetSingle(0x80372F98);
-            float pos10A = Config.Stream.GetUInt16(0x80372F9E);
-
-            float pos11X = Config.Stream.GetSingle(0x80372FA0);
-            float pos11Y = Config.Stream.GetSingle(0x80372FA4);
-            float pos11Z = Config.Stream.GetSingle(0x80372FA8);
-            float pos11A = Config.Stream.GetUInt16(0x80372FAE);
-
-            float pos12X = Config.Stream.GetSingle(0x80372FB0);
-            float pos12Y = Config.Stream.GetSingle(0x80372FB4);
-            float pos12Z = Config.Stream.GetSingle(0x80372FB8);
-            float pos12A = Config.Stream.GetUInt16(0x80372FBE);
-
-            float pos13X = Config.Stream.GetSingle(0x80372FC0);
-            float pos13Y = Config.Stream.GetSingle(0x80372FC4);
-            float pos13Z = Config.Stream.GetSingle(0x80372FC8);
-            float pos13A = Config.Stream.GetUInt16(0x80372FCE);
-
-            float pos14X = Config.Stream.GetSingle(0x80372FD0);
-            float pos14Y = Config.Stream.GetSingle(0x80372FD4);
-            float pos14Z = Config.Stream.GetSingle(0x80372FD8);
-            float pos14A = Config.Stream.GetUInt16(0x80372FDE);
-
-            float pos15X = Config.Stream.GetSingle(0x80372FE0);
-            float pos15Y = Config.Stream.GetSingle(0x80372FE4);
-            float pos15Z = Config.Stream.GetSingle(0x80372FE8);
-            float pos15A = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
+            var qsData = new(float qsX, float qsY, float qsZ, ushort qsA)[4 * 3];
+            for (int i = 0; i < qsData.Length; i++)
+                qsData[i] = (
+                    Config.Stream.GetSingle((uint)(0x80372F30 + 0x10 * i)),
+                    Config.Stream.GetSingle((uint)(0x80372F34 + 0x10 * i)),
+                    Config.Stream.GetSingle((uint)(0x80372F38 + 0x10 * i)),
+                    Config.Stream.GetUInt16((uint)(0x80372F3E + 0x10 * i)));
+            qsData[11].qsA = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
 
             int numQFrames = Config.Stream.GetInt32(0x80372E3C) / 0x30;
-            int numPoints = numQFrames * 3;
 
-            List<(float x, float y, float z, float angle, Lazy<Image>)> allResults =
-                new List<(float x, float y, float z, float angle, Lazy<Image>)>()
+            List<DataPoint> allResults =
+                new List<DataPoint>()
                 {
-                    (pos01X, pos01Y, pos01Z, pos01A, Config.ObjectAssociations.PurpleMarioMapImage), // initial
-                    (pos02X, pos02Y, pos02Z, pos02A, Config.ObjectAssociations.BlueMarioMapImage), // wall1
-                    (pos03X, pos03Y, pos03Z, pos03A, Config.ObjectAssociations.GreenMarioMapImage), // wall2
-                    (pos04X, pos04Y, pos04Z, pos04A, Config.ObjectAssociations.OrangeMarioMapImage), // qstep1
-                    (pos05X, pos05Y, pos05Z, pos05A, Config.ObjectAssociations.BlueMarioMapImage), // wall1
-                    (pos06X, pos06Y, pos06Z, pos06A, Config.ObjectAssociations.GreenMarioMapImage), // wall2
-                    (pos07X, pos07Y, pos07Z, pos07A, Config.ObjectAssociations.OrangeMarioMapImage), //qstep2
-                    (pos08X, pos08Y, pos08Z, pos08A, Config.ObjectAssociations.BlueMarioMapImage), // wall1
-                    (pos09X, pos09Y, pos09Z, pos09A, Config.ObjectAssociations.GreenMarioMapImage), // wall2
-                    (pos10X, pos10Y, pos10Z, pos10A, Config.ObjectAssociations.OrangeMarioMapImage), // qstep3
-                    (pos11X, pos11Y, pos11Z, pos11A, Config.ObjectAssociations.BlueMarioMapImage), // wall1
-                    (pos12X, pos12Y, pos12Z, pos12A, Config.ObjectAssociations.GreenMarioMapImage), // wall2
-                    (pos13X, pos13Y, pos13Z, pos13A, Config.ObjectAssociations.OrangeMarioMapImage), // qstep4
-                    (pos14X, pos14Y, pos14Z, pos14A, Config.ObjectAssociations.BlueMarioMapImage), // wall1
-                    (pos15X, pos15Y, pos15Z, pos15A, Config.ObjectAssociations.MarioMapImage), // wall2
+                    new DataPoint(pos01X, pos01Y, pos01Z, pos01A, Config.ObjectAssociations.PurpleMarioMapImage), // initial
+                    new DataPoint(pos02X, pos02Y, pos02Z, pos02A, Config.ObjectAssociations.BlueMarioMapImage), // wall1
+                    new DataPoint(pos03X, pos03Y, pos03Z, pos03A, Config.ObjectAssociations.GreenMarioMapImage), // wall2
                 };
 
-            double secondsPerPoint = 0.5;
-            double totalSeconds = secondsPerPoint * numPoints;
-            double elapsedSeconds = DateTime.Now.Subtract(_showEachPointStartTime).TotalSeconds;
-            int? pointToShow;
-            if (elapsedSeconds < totalSeconds)
+            for (int i = 0; i < numQFrames - 1; i++)
             {
-                pointToShow = (int)(elapsedSeconds / secondsPerPoint);
-            }
-            else
-            {
-                _showEachPointStartTime = DateTime.MinValue;
-                pointToShow = null;
+                int baseIndex = i * 3;
+                allResults.AddRange(new[]
+                {
+                    new DataPoint(qsData[baseIndex].qsX, qsData[baseIndex].qsY, qsData[baseIndex].qsZ, qsData[baseIndex].qsA,
+                    Config.ObjectAssociations.OrangeMarioMapImage),
+                    new DataPoint(qsData[baseIndex + 1].qsX, qsData[baseIndex + 1].qsY, qsData[baseIndex + 1].qsZ, qsData[baseIndex + 1].qsA,
+                    Config.ObjectAssociations.BlueMarioMapImage),
+                    new DataPoint(qsData[baseIndex + 2].qsX, qsData[baseIndex + 2].qsY, qsData[baseIndex + 2].qsZ, qsData[baseIndex + 2].qsA,
+                    i == numQFrames - 1 ? Config.ObjectAssociations.MarioMapImage : Config.ObjectAssociations.GreenMarioMapImage)
+                });
             }
 
-            List<(float x, float y, float z, float angle, Lazy<Image> tex, bool show)> partialResults =
-                new List<(float x, float y, float z, float angle, Lazy<Image> tex, bool show)>();
-            for (int i = 0; i < numPoints; i++)
+            var funny = globalTimer - numFramesToShow;
+            for (uint record = firstRecord; record <= funny; record++)
+                dataByFrame.Remove(record);
+
+            dataByFrame[globalTimer] = allResults;
+            firstRecord = funny;
+            double secondsPerPoint = 0.5;
+            double elapsedSeconds = DateTime.Now.Subtract(_showEachPointStartTime).TotalSeconds;
+            int pointToShow = (int)(elapsedSeconds / secondsPerPoint);
+            bool showSinglePoint = _showEachPointStartTime == DateTime.MinValue;
+
+            List<DataPoint> combinedResults = new List<DataPoint>();
+            int count = 0;
+            for (long frame = globalTimer - numFramesToShow + 1; frame <= globalTimer; frame++)
             {
-                (float x, float y, float z, float angle, Lazy<Image> tex) = allResults[i];
-                tex = i == numPoints - 1 ? Config.ObjectAssociations.MarioMapImage : tex;
-                bool show = pointToShow.HasValue ? i == pointToShow.Value : true;
-                partialResults.Add((x, y, z, angle, tex, show));
+                if (dataByFrame.TryGetValue((uint)frame, out var datas))
+                    foreach (var dataPoint in datas)
+                    {
+                        if (showSinglePoint && count == pointToShow)
+                            return new List<DataPoint>(new[] { dataPoint });
+                        count++;
+                        combinedResults.Add(dataPoint);
+                    }
             }
-            return partialResults;
+
+            _showEachPointStartTime = DateTime.MinValue;
+            return combinedResults;
         }
 
         public override bool ParticipatesInGlobalIconSize()
@@ -208,8 +177,19 @@ namespace STROOP.Tabs.MapTab
                     _showEachPointStartTime = DateTime.Now;
                 };
 
+                ToolStripMenuItem itemSetNumFrames = new ToolStripMenuItem("Set Number of Frames");
+                itemSetNumFrames.Click += (sender, e) =>
+                {
+                    string text = DialogUtilities.GetStringFromDialog(labelText: "Enter num frames.");
+                    uint? numFramesNullable = ParsingUtilities.ParseUIntNullable(text);
+                    if (!numFramesNullable.HasValue) return;
+                    numFramesToShow = numFramesNullable.Value;
+
+                };
+
                 _contextMenuStrip = new ContextMenuStrip();
                 _contextMenuStrip.Items.Add(itemShowEachPoint);
+                _contextMenuStrip.Items.Add(itemSetNumFrames);
             }
 
             return _contextMenuStrip;

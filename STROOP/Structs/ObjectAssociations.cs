@@ -24,6 +24,7 @@ namespace STROOP.Structs
         List<SpawnHack> _spawnHacks = new List<SpawnHack>();
 
         Lazy<Image> _transparentDefaultImage;
+        ObjectBehaviorAssociation nullAssociation;
 
         public Lazy<Image>
             DefaultImage,
@@ -84,6 +85,13 @@ namespace STROOP.Structs
         public ObjectAssociations()
         {
             _transparentDefaultImage = new Lazy<Image>(() => DefaultImage.Value.GetOpaqueImage(0.5f));
+            nullAssociation = new ObjectBehaviorAssociation()
+            {
+                Criteria = new BehaviorCriteria(),
+                Image = DefaultImage,
+                Name = "null",
+                TransparentImage = _transparentDefaultImage
+            };
         }
 
         public bool AddAssociation(ObjectBehaviorAssociation objAsooc)
@@ -126,7 +134,8 @@ namespace STROOP.Structs
                 possibleAssoc = possibleAssoc.Where(objAssoc => !objAssoc.Criteria.BehaviorOnly());
 
             var behaviorAssoc = possibleAssoc.FirstOrDefault();
-
+            if (behaviorAssoc == null)
+                behaviorAssoc = nullAssociation;
             _cachedObjAssoc[behaviorCriteria] = behaviorAssoc;
 
             return behaviorAssoc;

@@ -46,14 +46,16 @@ namespace STROOP.Tabs.MapTab
             if (_contextMenuStrip == null)
             {
                 ToolStripMenuItem itemEnableDrawing = new ToolStripMenuItem("Enable Drawing");
+                var capturedMapTab = currentMapTab;
                 itemEnableDrawing.Click += (sender, e) =>
                 {
                     _drawingEnabled = !_drawingEnabled;
                     itemEnableDrawing.Checked = _drawingEnabled;
                     if (_drawingEnabled)
-                        currentMapTab.RegisterMouseEventListener(this);
+                        capturedMapTab.RegisterMouseEventListener(this);
                     else
-                        currentMapTab.UnregisterMouseEventListener(this);
+                        capturedMapTab.UnregisterMouseEventListener(this);
+                    OnCleanup += () => capturedMapTab.UnregisterMouseEventListener(this);
                 };
 
                 ToolStripMenuItem itemClearDrawing = new ToolStripMenuItem("Clear Drawing");
@@ -100,7 +102,6 @@ namespace STROOP.Tabs.MapTab
         public override void CleanUp()
         {
             _drawingEnabled = false;
-            currentMapTab.UnregisterMouseEventListener(this);
         }
     }
 }

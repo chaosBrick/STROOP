@@ -13,6 +13,7 @@ namespace STROOP.Tabs.MapTab
     {
         public MapTab currentMapTab => AccessScope<MapTab>.content;
         public MapGraphics graphics => currentMapTab.view.MapGraphics;
+        protected event Action OnCleanup = null;
 
         public delegate IEnumerable<PositionAngle> PositionAngleProvider();
 
@@ -133,6 +134,6 @@ namespace STROOP.Tabs.MapTab
 
         public virtual void NotifyMouseEvent(MouseEvent mouseEvent, bool isLeftButton, int mouseX, int mouseY) { }
 
-        public virtual void CleanUp() { }
+        public virtual void CleanUp() { OnCleanup?.Invoke(); }
     }
 }

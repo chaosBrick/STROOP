@@ -28,94 +28,96 @@ namespace STROOP.Tabs.MapTab
             MapObject mapObjectList)
         {
             this.mapTab = mapTab;
+            using (new AccessScope<MapTab>(mapTab))
+            {
+                InitializeComponent();
 
-            InitializeComponent();
+                mapObject = mapObjectList;
 
-            mapObject = mapObjectList;
+                _images = new List<Image>();
 
-            _images = new List<Image>();
+                _isVisible = true;
+                _showTriUnits = false;
 
-            _isVisible = true;
-            _showTriUnits = false;
-
-            pictureBoxPicture.ContextMenuStrip = new ContextMenuStrip();
-            ToolStripMenuItem itemUseTopDownImage = new ToolStripMenuItem("Use Top Down Image");
-            ToolStripMenuItem itemUseObjectSlotImage = new ToolStripMenuItem("Use Object Slot Image");
-            ToolStripMenuItem itemUseCustomImage = new ToolStripMenuItem("Use Custom Image");
-            List<ToolStripMenuItem> pictureBoxItems = new List<ToolStripMenuItem>()
+                pictureBoxPicture.ContextMenuStrip = new ContextMenuStrip();
+                ToolStripMenuItem itemUseTopDownImage = new ToolStripMenuItem("Use Top Down Image");
+                ToolStripMenuItem itemUseObjectSlotImage = new ToolStripMenuItem("Use Object Slot Image");
+                ToolStripMenuItem itemUseCustomImage = new ToolStripMenuItem("Use Custom Image");
+                List<ToolStripMenuItem> pictureBoxItems = new List<ToolStripMenuItem>()
             {
                 itemUseTopDownImage, itemUseObjectSlotImage, itemUseCustomImage
             };
-            itemUseTopDownImage.Click += (sender, e) =>
-            {
-                mapObject.SetIconType(MapTrackerIconType.TopDownImage);
-                pictureBoxItems.ForEach(item => item.Checked = item == itemUseTopDownImage);
-            };
-            itemUseObjectSlotImage.Click += (sender, e) =>
-            {
-                mapObject.SetIconType(MapTrackerIconType.ObjectSlotImage);
-                pictureBoxItems.ForEach(item => item.Checked = item == itemUseObjectSlotImage);
-            };
-            itemUseCustomImage.Click += (sender, e) =>
-            {
-                Image image = DialogUtilities.GetImage();
-                Lazy<Image> imageMap = new Lazy<Image>(() => image);
-                if (image == null) return;
-                mapObject.SetIconType(MapTrackerIconType.CustomImage, imageMap);
-                pictureBoxItems.ForEach(item => item.Checked = item == itemUseCustomImage);
-            };
-            itemUseTopDownImage.Checked = true;
-            pictureBoxPicture.ContextMenuStrip.Items.Add(itemUseTopDownImage);
-            pictureBoxPicture.ContextMenuStrip.Items.Add(itemUseObjectSlotImage);
-            pictureBoxPicture.ContextMenuStrip.Items.Add(itemUseCustomImage);
+                itemUseTopDownImage.Click += (sender, e) =>
+                {
+                    mapObject.SetIconType(MapTrackerIconType.TopDownImage);
+                    pictureBoxItems.ForEach(item => item.Checked = item == itemUseTopDownImage);
+                };
+                itemUseObjectSlotImage.Click += (sender, e) =>
+                {
+                    mapObject.SetIconType(MapTrackerIconType.ObjectSlotImage);
+                    pictureBoxItems.ForEach(item => item.Checked = item == itemUseObjectSlotImage);
+                };
+                itemUseCustomImage.Click += (sender, e) =>
+                {
+                    Image image = DialogUtilities.GetImage();
+                    Lazy<Image> imageMap = new Lazy<Image>(() => image);
+                    if (image == null) return;
+                    mapObject.SetIconType(MapTrackerIconType.CustomImage, imageMap);
+                    pictureBoxItems.ForEach(item => item.Checked = item == itemUseCustomImage);
+                };
+                itemUseTopDownImage.Checked = true;
+                pictureBoxPicture.ContextMenuStrip.Items.Add(itemUseTopDownImage);
+                pictureBoxPicture.ContextMenuStrip.Items.Add(itemUseObjectSlotImage);
+                pictureBoxPicture.ContextMenuStrip.Items.Add(itemUseCustomImage);
 
-            _customName = null;
-            textBoxName.AddEnterAction(() => _customName = textBoxName.Text);
-            textBoxName.AddLostFocusAction(() => _customName = textBoxName.Text);
-            textBoxName.AddDoubleClickAction(() => textBoxName.SelectAll());
-            textBoxName.ContextMenuStrip = new ContextMenuStrip();
-            ToolStripMenuItem itemResetCustomName = new ToolStripMenuItem("Reset Custom Name");
-            itemResetCustomName.Click += (sender, e) => _customName = null;
-            textBoxName.ContextMenuStrip.Items.Add(itemResetCustomName);
+                _customName = null;
+                textBoxName.AddEnterAction(() => _customName = textBoxName.Text);
+                textBoxName.AddLostFocusAction(() => _customName = textBoxName.Text);
+                textBoxName.AddDoubleClickAction(() => textBoxName.SelectAll());
+                textBoxName.ContextMenuStrip = new ContextMenuStrip();
+                ToolStripMenuItem itemResetCustomName = new ToolStripMenuItem("Reset Custom Name");
+                itemResetCustomName.Click += (sender, e) => _customName = null;
+                textBoxName.ContextMenuStrip.Items.Add(itemResetCustomName);
 
-            checkBoxRotates.Click += (sender, e) => mapObject.CustomRotates = checkBoxRotates.Checked;
-            checkBoxRotates.ContextMenuStrip = new ContextMenuStrip();
-            ToolStripMenuItem itemResetCustomRotates = new ToolStripMenuItem("Reset Custom Rotates");
-            itemResetCustomRotates.Click += (sender, e) => mapObject.CustomRotates = null;
-            checkBoxRotates.ContextMenuStrip.Items.Add(itemResetCustomRotates);
+                checkBoxRotates.Click += (sender, e) => mapObject.CustomRotates = checkBoxRotates.Checked;
+                checkBoxRotates.ContextMenuStrip = new ContextMenuStrip();
+                ToolStripMenuItem itemResetCustomRotates = new ToolStripMenuItem("Reset Custom Rotates");
+                itemResetCustomRotates.Click += (sender, e) => mapObject.CustomRotates = null;
+                checkBoxRotates.ContextMenuStrip.Items.Add(itemResetCustomRotates);
 
-            tableLayoutPanel.BorderWidth = 2;
-            tableLayoutPanel.ShowBorder = true;
+                tableLayoutPanel.BorderWidth = 2;
+                tableLayoutPanel.ShowBorder = true;
 
-            comboBoxVisibilityType.DataSource = Enum.GetValues(typeof(MapTrackerVisibilityType));
-            comboBoxVisibilityType.SelectedItem = MapTrackerVisibilityType.VisibleWhenLoaded;
+                comboBoxVisibilityType.DataSource = Enum.GetValues(typeof(MapTrackerVisibilityType));
+                comboBoxVisibilityType.SelectedItem = MapTrackerVisibilityType.VisibleWhenLoaded;
 
-            comboBoxOrderType.DataSource = Enum.GetValues(typeof(MapTrackerOrderType));
-            comboBoxOrderType.SelectedItem = MapTrackerOrderType.OrderByY;
+                comboBoxOrderType.DataSource = Enum.GetValues(typeof(MapTrackerOrderType));
+                comboBoxOrderType.SelectedItem = MapTrackerOrderType.OrderByY;
 
-            SetSize(null);
-            SetOpacity(null);
-            SetOutlineWidth(null);
-            SetColor(null);
-            SetOutlineColor(null);
+                SetSize(null);
+                SetOpacity(null);
+                SetOutlineWidth(null);
+                SetColor(null);
+                SetOutlineColor(null);
 
-            textBoxSize.AddEnterAction(() => textBoxSize_EnterAction());
-            trackBarSize.AddManualChangeAction(() => trackBarSize_ValueChanged());
-            textBoxOpacity.AddEnterAction(() => textBoxOpacity_EnterAction());
-            trackBarOpacity.AddManualChangeAction(() => trackBarOpacity_ValueChanged());
-            textBoxOutlineWidth.AddEnterAction(() => textBoxOutlineWidth_EnterAction());
-            trackBarOutlineWidth.AddManualChangeAction(() => trackBarOutlineWidth_ValueChanged());
-            colorSelector.AddColorChangeAction((Color color) => SetColor(color));
-            colorSelectorOutline.AddColorChangeAction((Color color) => SetOutlineColor(color));
+                textBoxSize.AddEnterAction(() => textBoxSize_EnterAction());
+                trackBarSize.AddManualChangeAction(() => trackBarSize_ValueChanged());
+                textBoxOpacity.AddEnterAction(() => textBoxOpacity_EnterAction());
+                trackBarOpacity.AddManualChangeAction(() => trackBarOpacity_ValueChanged());
+                textBoxOutlineWidth.AddEnterAction(() => textBoxOutlineWidth_EnterAction());
+                trackBarOutlineWidth.AddManualChangeAction(() => trackBarOutlineWidth_ValueChanged());
+                colorSelector.AddColorChangeAction((Color color) => SetColor(color));
+                colorSelectorOutline.AddColorChangeAction((Color color) => SetOutlineColor(color));
 
-            pictureBoxCog.ContextMenuStrip = mapObject.GetContextMenuStrip(this);
-            pictureBoxCog.Click += (sender, e) => pictureBoxCog.ContextMenuStrip.Show(Cursor.Position);
+                pictureBoxCog.ContextMenuStrip = mapObject.GetContextMenuStrip(this);
+                pictureBoxCog.Click += (sender, e) => pictureBoxCog.ContextMenuStrip.Show(Cursor.Position);
 
-            MapUtilities.CreateTrackBarContextMenuStrip(trackBarSize);
-            MapUtilities.CreateTrackBarContextMenuStrip(trackBarOutlineWidth);
-            InitializePlusContextMenuStrip();
+                MapUtilities.CreateTrackBarContextMenuStrip(trackBarSize);
+                MapUtilities.CreateTrackBarContextMenuStrip(trackBarOutlineWidth);
+                InitializePlusContextMenuStrip();
 
-            UpdateControl();
+                UpdateControl();
+            }
         }
 
         public static MapTracker CreateTracker(MapTab target, MapObject obj)

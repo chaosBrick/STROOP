@@ -29,14 +29,16 @@ namespace STROOP.Tabs.MapTab
             if (_contextMenuStrip == null)
             {
                 ToolStripMenuItem itemFreeze = new ToolStripMenuItem("Enable Drawing");
+                var capturedMapTab = currentMapTab;
                 itemFreeze.Click += (sender, e) =>
                 {
                     itemFreeze.Checked = !itemFreeze.Checked;
                     if (itemFreeze.Checked)
-                        currentMapTab.RegisterMouseEventListener(this);
+                        capturedMapTab.RegisterMouseEventListener(this);
                     else
-                        currentMapTab.UnregisterMouseEventListener(this);
+                        capturedMapTab.UnregisterMouseEventListener(this);
                 };
+                OnCleanup += () => capturedMapTab.UnregisterMouseEventListener(this);
 
                 _contextMenuStrip = new ContextMenuStrip();
                 _contextMenuStrip.Items.Add(itemFreeze);
@@ -67,13 +69,6 @@ namespace STROOP.Tabs.MapTab
                     b = coords.Xy;
                 targetTracker.textBoxSize.Text = (Size = (a - b).Length).ToString();
             }
-        }
-
-
-        public override void CleanUp()
-        {
-            base.CleanUp();
-            currentMapTab.UnregisterMouseEventListener(this);
         }
     }
 }

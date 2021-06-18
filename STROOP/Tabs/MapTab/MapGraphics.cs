@@ -178,6 +178,8 @@ namespace STROOP.Tabs.MapTab
         {
             if (Config.Stream == null)
                 return;
+
+            using (new AccessScope<StroopMainForm>((StroopMainForm)mapTab.FindForm()))
             using (new AccessScope<MapTab>(mapTab))
             {
                 Cursor cursor = mapTab.HasMouseListeners ? Cursors.Cross : Cursors.Hand;
@@ -483,11 +485,14 @@ namespace STROOP.Tabs.MapTab
 
         private void OnMouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            if (mapTab.HasMouseListeners)
+            using (new AccessScope<MapTab>(mapTab))
             {
-                mapTab.flowLayoutPanelMapTrackers.NotifyMouseEvent(
-                    MouseEvent.MouseDown, e.Button == MouseButtons.Left, e.X, e.Y);
-                return;
+                if (mapTab.HasMouseListeners)
+                {
+                    mapTab.flowLayoutPanelMapTrackers.NotifyMouseEvent(
+                        MouseEvent.MouseDown, e.Button == MouseButtons.Left, e.X, e.Y);
+                    return;
+                }
             }
 
             switch (e.Button)
@@ -510,11 +515,14 @@ namespace STROOP.Tabs.MapTab
 
         private void OnMouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            if (mapTab.HasMouseListeners)
+            using (new AccessScope<MapTab>(mapTab))
             {
-                mapTab.flowLayoutPanelMapTrackers.NotifyMouseEvent(
-                    MouseEvent.MouseUp, e.Button == MouseButtons.Left, e.X, e.Y);
-                return;
+                if (mapTab.HasMouseListeners)
+                {
+                    mapTab.flowLayoutPanelMapTrackers.NotifyMouseEvent(
+                        MouseEvent.MouseUp, e.Button == MouseButtons.Left, e.X, e.Y);
+                    return;
+                }
             }
 
             switch (e.Button)
@@ -530,11 +538,14 @@ namespace STROOP.Tabs.MapTab
 
         private void OnMouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            if (mapTab.HasMouseListeners)
+            using (new AccessScope<MapTab>(mapTab))
             {
-                mapTab.flowLayoutPanelMapTrackers.NotifyMouseEvent(
-                    MouseEvent.MouseMove, e.Button == MouseButtons.Left, e.X, e.Y);
-                return;
+                if (mapTab.HasMouseListeners)
+                {
+                    mapTab.flowLayoutPanelMapTrackers.NotifyMouseEvent(
+                        MouseEvent.MouseMove, e.Button == MouseButtons.Left, e.X, e.Y);
+                    return;
+                }
             }
 
             if (_isTranslating)

@@ -30,10 +30,18 @@ namespace STROOP.Tabs.MapTab
             {
                 foreach (var tri in this.GetTrianglesWithinDist())
                 {
+                    float p1_p2_x = (tri.X2 - tri.X1);
+                    float p1_p2_z = (tri.Z2 - tri.Z1);
+
+                    float p1_p3_x = (tri.X3 - tri.X1);
+                    float p1_p3_z = (tri.Z3 - tri.Z1);
+
+                    float cross = (p1_p2_z * p1_p3_x - p1_p2_x * p1_p3_z);
+
                     graphics.triangleRenderer.Add(
                         new Vector3(tri.X1, tri.Z1, 0),
-                        new Vector3(tri.X2, tri.Z2, 0),
-                        new Vector3(tri.X3, tri.Z3, 0),
+                        cross > 0 ? new Vector3(tri.X2, tri.Z2, 0) : new Vector3(tri.X3, tri.Z3, 0),
+                        cross > 0 ? new Vector3(tri.X3, tri.Z3, 0) : new Vector3(tri.X2, tri.Z2, 0),
                         ShowTriUnits,
                         new Vector4(Color.R / 255f, Color.G / 255f, Color.B / 255f, OpacityByte / 255f),
                         new Vector4(OutlineColor.R / 255f, OutlineColor.G / 255f, OutlineColor.B / 255f, OutlineColor.A / 255f),
