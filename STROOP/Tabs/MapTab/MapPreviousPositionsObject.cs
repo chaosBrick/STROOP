@@ -137,7 +137,7 @@ namespace STROOP.Tabs.MapTab
             double secondsPerPoint = 0.5;
             double elapsedSeconds = DateTime.Now.Subtract(_showEachPointStartTime).TotalSeconds;
             int pointToShow = (int)(elapsedSeconds / secondsPerPoint);
-            bool showSinglePoint = _showEachPointStartTime == DateTime.MinValue;
+            bool showSinglePoint = _showEachPointStartTime != DateTime.MinValue;
 
             List<DataPoint> combinedResults = new List<DataPoint>();
             int count = 0;
