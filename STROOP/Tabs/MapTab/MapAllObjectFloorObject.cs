@@ -18,20 +18,19 @@ namespace STROOP.Tabs.MapTab
     [ObjectDescription("All Object Floor Trianlges", "Triangles")]
     public class MapAllObjectFloorObject : MapFloorObject
     {
-        private readonly List<TriangleDataModel> _tris;
         private bool _autoUpdate;
 
         public MapAllObjectFloorObject()
             : base()
         {
-            _tris = TriangleUtilities.GetObjectTriangles()
-                .FindAll(tri => tri.IsFloor());
             _autoUpdate = true;
         }
 
         protected override List<TriangleDataModel> GetTrianglesOfAnyDist()
         {
-            return _tris;
+            if (_autoUpdate)
+                return TriangleUtilities.GetObjectTriangles().FindAll(tri => tri.IsFloor());
+            return null;
         }
 
         public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
@@ -57,16 +56,6 @@ namespace STROOP.Tabs.MapTab
             }
 
             return _contextMenuStrip;
-        }
-
-        public override void Update()
-        {
-            if (_autoUpdate)
-            {
-                _tris.Clear();
-                _tris.AddRange(TriangleUtilities.GetObjectTriangles()
-                    .FindAll(tri => tri.IsFloor()));
-            }
         }
 
         public override string GetName()

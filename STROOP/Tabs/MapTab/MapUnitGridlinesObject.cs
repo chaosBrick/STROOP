@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using OpenTK;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
 
@@ -16,12 +17,12 @@ namespace STROOP.Tabs.MapTab
             OutlineColor = Color.Black;
         }
 
-        protected override List<(float x, float y, float z)> GetVertices(MapGraphics graphics)
+        protected override List<Vector3> GetVertices(MapGraphics graphics)
         {
             // failsafe to prevent filling the whole screen
             if (!graphics.hasUnitPrecision)
             {
-                return new List<(float x, float y, float z)>();
+                return new List<Vector3>();
             }
 
             float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
@@ -31,24 +32,21 @@ namespace STROOP.Tabs.MapTab
             int zMin = (int)graphics.MapViewZMin - 1;
             int zMax = (int)graphics.MapViewZMax + 1;
 
-            List<(float x, float y, float z)> vertices = new List<(float x, float y, float z)>();
+            var vertices = new List<Vector3>();
             for (int x = xMin; x <= xMax; x += 1)
             {
-                vertices.Add((x, marioY, zMin));
-                vertices.Add((x, marioY, zMax));
+                vertices.Add(new Vector3(x, marioY, zMin));
+                vertices.Add(new Vector3(x, marioY, zMax));
             }
             for (int z = zMin; z <= zMax; z += 1)
             {
-                vertices.Add((xMin, marioY, z));
-                vertices.Add((xMax, marioY, z));
+                vertices.Add(new Vector3(xMin, marioY, z));
+                vertices.Add(new Vector3(xMax, marioY, z));
             }
             return vertices;
         }
 
-        public override string GetName()
-        {
-            return "Unit Gridlines";
-        }
+        public override string GetName() => "Unit Gridlines";
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.UnitGridlinesImage;
     }

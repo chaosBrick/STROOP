@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using OpenTK;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 
@@ -20,9 +21,9 @@ namespace STROOP.Tabs.MapTab
             OutlineColor = Color.Red;
         }
 
-        protected override List<(float x, float y, float z)> GetVertices(MapGraphics graphics)
+        protected override List<Vector3> GetVertices(MapGraphics graphics)
         {
-            var lst = new List<(float, float, float)>();
+            var lst = new List<Vector3>();
             foreach (var _posAngle in positionAngleProvider())
             {
                 (float x, float y, float z, float angle) = ((float, float, float, float))_posAngle.GetValues();
@@ -32,8 +33,8 @@ namespace STROOP.Tabs.MapTab
                 (float x2, float z2) =
                     ((float, float))MoreMath.AddVectorToPoint(Size, angle + 16384, x, z);
 
-                lst.Add((x1, y, z1));
-                lst.Add((x2, y, z2));
+                lst.Add(new Vector3(x1, y, z1));
+                lst.Add(new Vector3(x2, y, z2));
             };
             return lst;
         }

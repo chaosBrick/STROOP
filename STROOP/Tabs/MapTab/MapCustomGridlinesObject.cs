@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using OpenTK.Graphics.OpenGL;
-using STROOP.Utilities;
+using OpenTK;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
-using OpenTK;
 
 namespace STROOP.Tabs.MapTab
 {
@@ -23,7 +18,7 @@ namespace STROOP.Tabs.MapTab
             OutlineColor = Color.Black;
         }
 
-        protected override List<(float x, float y, float z)> GetVertices(MapGraphics graphics)
+        protected override List<Vector3> GetVertices(MapGraphics graphics)
         {
             float marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
 
@@ -50,18 +45,18 @@ namespace STROOP.Tabs.MapTab
             int zMaxMultiple = Math.Min((int)((viewZMax - gridlineMin) / increment) + 1, (int)size);
             int numZLines = zMaxMultiple - zMinMultiple + 1;
                         
-            List<(float x, float y, float z)> vertices = new List<(float x, float y, float z)>();
+            List<Vector3> vertices = new List<Vector3>();
             for (int multiple = xMinMultiple; multiple <= xMaxMultiple; multiple++)
             {
                 float x = (float)(multiple * increment + gridlineMin);
-                vertices.Add((x, marioY, gridlineMin));
-                vertices.Add((x, marioY, gridlineMax));
+                vertices.Add(new Vector3(x, marioY, gridlineMin));
+                vertices.Add(new Vector3(x, marioY, gridlineMax));
             }
             for (int multiple = zMinMultiple; multiple <= zMaxMultiple; multiple++)
             {
                 float z = (float)(multiple * increment + gridlineMin);
-                vertices.Add((gridlineMin, marioY, z));
-                vertices.Add((gridlineMax, marioY, z));
+                vertices.Add(new Vector3(gridlineMin, marioY, z));
+                vertices.Add(new Vector3(gridlineMax, marioY, z));
             }
             return vertices;
         }

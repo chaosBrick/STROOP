@@ -3,9 +3,8 @@ using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Windows.Forms;
+using OpenTK;
 
 namespace STROOP.Utilities
 {
@@ -577,6 +576,11 @@ namespace STROOP.Utilities
 
 
 
+        public Vector3 position
+        {
+            get { return new Vector3((float)X, (float)Y, (float)Z); }
+            set { SetX(value.X); SetY(value.Y); SetZ(value.Z); }
+        }
 
 
         public virtual double X

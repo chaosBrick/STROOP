@@ -12,7 +12,7 @@ namespace STROOP.Tabs.MapTab
         private static readonly Image ImageEyeOpen = Properties.Resources.image_eye_open2;
         private static readonly Image ImageEyeClosed = Properties.Resources.image_eye_closed2;
 
-        private readonly MapObject mapObject;
+        public readonly MapObject mapObject;
         public readonly MapTab mapTab;
 
         private List<Image> _images;
@@ -289,11 +289,6 @@ namespace STROOP.Tabs.MapTab
         public override string ToString()
         {
             return string.Join(", ", mapObject);
-        }
-
-        public void NotifyMouseEvent(MouseEvent mouseEvent, bool isLeftButton, int mouseX, int mouseY)
-        {
-            mapObject.NotifyMouseEvent(mouseEvent, isLeftButton, mouseX, mouseY);
         }
     }
 }

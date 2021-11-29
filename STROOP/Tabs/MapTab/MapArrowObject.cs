@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using OpenTK;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
@@ -38,9 +39,9 @@ namespace STROOP.Tabs.MapTab
             OutlineColor = Color.Yellow;
         }
 
-        protected override List<(float x, float y, float z)> GetVertices(MapGraphics graphics)
+        protected override List<Vector3> GetVertices(MapGraphics graphics)
         {
-            List<(float x, float y, float z)> vertices = new List<(float x, float y, float z)>();
+            List<Vector3> vertices = new List<Vector3>();
             foreach (var posAngle in positionAngleProvider())
             {
                 float x = (float)posAngle.X;
@@ -56,14 +57,14 @@ namespace STROOP.Tabs.MapTab
                 (float pointSide2X, float pointSide2Z) =
                     ((float, float))MoreMath.AddVectorToPoint(_arrowHeadSideLength, yaw + 32768 - 8192, arrowHeadX, arrowHeadZ);
 
-                vertices.Add((x, y, z));
-                vertices.Add((arrowHeadX, y, arrowHeadZ));
+                vertices.Add(new Vector3(x, y, z));
+                vertices.Add(new Vector3(arrowHeadX, y, arrowHeadZ));
 
-                vertices.Add((arrowHeadX, y, arrowHeadZ));
-                vertices.Add((pointSide1X, y, pointSide1Z));
+                vertices.Add(new Vector3(arrowHeadX, y, arrowHeadZ));
+                vertices.Add(new Vector3(pointSide1X, y, pointSide1Z));
 
-                vertices.Add((arrowHeadX, y, arrowHeadZ));
-                vertices.Add((pointSide2X, y, pointSide2Z));
+                vertices.Add(new Vector3(arrowHeadX, y, arrowHeadZ));
+                vertices.Add(new Vector3(pointSide2X, y, pointSide2Z));
             }
             return vertices;
         }

@@ -11,6 +11,91 @@ namespace STROOP.Tabs.MapTab
 {
     public abstract class MapObject
     {
+        class MapObjectHoverData : IHoverData
+        {
+            ContextMenuStrip rightClickMenu = new ContextMenuStrip();
+            readonly MapObject parent;
+            public MapObjectHoverData(MapObject parent)
+            {
+                this.parent = parent;
+
+                var copyPositionItem = new ToolStripMenuItem("Copy Position");
+                copyPositionItem.Click += (_, __) =>
+                {
+                    if (currentPositionAngle != null)
+                    {
+                        DataObject vec3Data = new DataObject("Position", currentPositionAngle.position);
+                        vec3Data.SetText($"{currentPositionAngle.X}; {currentPositionAngle.Y}; {currentPositionAngle.Z}");
+                        Clipboard.SetDataObject(vec3Data);
+                    }
+                };
+                rightClickMenu.Items.Add(copyPositionItem);
+
+                var pastePositionItem = new ToolStripMenuItem("Paste Position");
+                pastePositionItem.Click += (_, __) =>
+                {
+                    if (currentPositionAngle != null)
+                    {
+                        bool hasData = false;
+                        var clipboardObj = Clipboard.GetDataObject();
+                        Vector3 textVector;
+                        if (!(hasData |= ParsingUtilities.TryParseVector3(clipboardObj.GetData(DataFormats.Text) as string, out textVector)))
+                        {
+                            if (Clipboard.GetData("Position") is Vector3 dataVector)
+                            {
+                                hasData = true;
+                                textVector = dataVector;
+                            }
+                        }
+
+                        bool success = currentPositionAngle.SetX(textVector.X)
+                        | currentPositionAngle.SetY(textVector.Y)
+                        | currentPositionAngle.SetZ(textVector.Z);
+                    }
+                };
+                rightClickMenu.Items.Add(pastePositionItem);
+            }
+            public PositionAngle currentPositionAngle;
+
+            public void DragTo(Vector3 newPosition)
+            {
+                if (parent.enableDragging.Checked)
+                {
+                    currentPositionAngle.SetX(newPosition.X);
+                    currentPositionAngle.SetZ(newPosition.Z);
+                }
+            }
+
+            public void LeftClick()
+            {
+            }
+
+            public void RightClick()
+            {
+                rightClickMenu.Show(Cursor.Position);
+            }
+        }
+
+        MapObjectHoverData hoverData;
+        ToolStripMenuItem enableDragging = new ToolStripMenuItem("Enable dragging");
+
+        public virtual IHoverData GetHoverData()
+        {
+            var radius = Size / graphics.MapViewScaleValue;
+            var cursorPos = graphics.mapCursorPosition;
+            if (!graphics.IsMouseDown(0))
+            {
+                hoverData.currentPositionAngle = null;
+                foreach (var a in positionAngleProvider())
+                    if ((new Vector3((float)a.X, cursorPos.Y, (float)a.Z) - cursorPos).LengthSquared < radius * radius)
+                    {
+                        hoverData.currentPositionAngle = a;
+                        break;
+                    }
+            }
+            return hoverData.currentPositionAngle != null ? hoverData : null;
+        }
+
         public MapTab currentMapTab => AccessScope<MapTab>.content;
         public MapGraphics graphics => currentMapTab.view.MapGraphics;
         protected event Action OnCleanup = null;
@@ -50,7 +135,7 @@ namespace STROOP.Tabs.MapTab
 
         protected ContextMenuStrip _contextMenuStrip = null;
 
-        public MapObject() { }
+        public MapObject() { hoverData = new MapObjectHoverData(this); }
 
         public void DrawIcon(MapGraphics graphics, float x, float z, float angle, Image image)
         {
@@ -115,10 +200,10 @@ namespace STROOP.Tabs.MapTab
         {
             if (_contextMenuStrip == null)
             {
-                ToolStripMenuItem item = new ToolStripMenuItem("There are no additional options");
-                item.Enabled = false;
+                enableDragging.Checked = false;
+                enableDragging.Click += (_, __) => enableDragging.Checked = !enableDragging.Checked;
                 _contextMenuStrip = new ContextMenuStrip();
-                _contextMenuStrip.Items.Add(item);
+                _contextMenuStrip.Items.Add(enableDragging);
             }
 
             return _contextMenuStrip;
@@ -131,8 +216,6 @@ namespace STROOP.Tabs.MapTab
         public virtual bool ParticipatesInGlobalIconSize() => false;
 
         public virtual void ApplySettings(MapObjectSettings settings) { }
-
-        public virtual void NotifyMouseEvent(MouseEvent mouseEvent, bool isLeftButton, int mouseX, int mouseY) { }
 
         public virtual void CleanUp() { OnCleanup?.Invoke(); }
     }

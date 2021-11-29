@@ -13,7 +13,6 @@ namespace STROOP.Tabs.MapTab
     [ObjectDescription("Level Ceiling Triangles", "Triangles")]
     public class MapLevelCeilingObject : MapCeilingObject, MapLevelTriangleObjectI
     {
-        private readonly List<uint> _triAddressList;
         private bool _removeCurrentTri;
         private TriangleListForm _triangleListForm;
         private bool _autoUpdate;
@@ -22,18 +21,15 @@ namespace STROOP.Tabs.MapTab
         public MapLevelCeilingObject()
             : base()
         {
-            _triAddressList = TriangleUtilities.GetLevelTriangles()
-                .FindAll(tri => tri.IsCeiling())
-                .ConvertAll(tri => tri.Address);
             _removeCurrentTri = false;
             _triangleListForm = null;
             _autoUpdate = true;
-            _numLevelTris = _triAddressList.Count;
+            AutoUpdate();
         }
 
         protected override List<TriangleDataModel> GetTrianglesOfAnyDist()
         {
-            return MapUtilities.GetTriangles(_triAddressList);
+            return _bufferedTris;
         }
 
         public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
@@ -61,8 +57,7 @@ namespace STROOP.Tabs.MapTab
                 ToolStripMenuItem itemShowTriData = new ToolStripMenuItem("Show Tri Data");
                 itemShowTriData.Click += (sender, e) =>
                 {
-                    List<TriangleDataModel> tris = _triAddressList.ConvertAll(address => TriangleDataModel.Create(address));
-                    TriangleUtilities.ShowTriangles(tris);
+                    TriangleUtilities.ShowTriangles(_bufferedTris);
                 };
 
                 ToolStripMenuItem itemOpenForm = new ToolStripMenuItem("Open Form");
@@ -70,7 +65,7 @@ namespace STROOP.Tabs.MapTab
                 {
                     if (_triangleListForm != null) return;
                     _triangleListForm = new TriangleListForm(
-                        this, TriangleClassification.Ceiling, _triAddressList);
+                        this, TriangleClassification.Ceiling, _bufferedTris.ConvertAll(_ => _.Address));
                     _triangleListForm.Show();
                 };
 
@@ -91,10 +86,12 @@ namespace STROOP.Tabs.MapTab
 
         private void ResetTriangles()
         {
-            _triAddressList.Clear();
-            _triAddressList.AddRange(TriangleUtilities.GetLevelTriangles()
-                .FindAll(tri => tri.IsCeiling())
-                .ConvertAll(tri => tri.Address));
+            _bufferedTris.Clear();
+            uint currentTriAddress = Config.Stream.GetUInt32(MarioConfig.StructAddress + MarioConfig.CeilingTriangleOffset);
+            foreach (var tri in TriangleUtilities.GetLevelTriangles())
+                if (tri.IsCeiling() && !(_removeCurrentTri && _removeCurrentTri && tri.Address == currentTriAddress))
+                    _bufferedTris.Add(tri);
+
             _triangleListForm?.RefreshAndSort();
         }
 
@@ -106,23 +103,16 @@ namespace STROOP.Tabs.MapTab
         public override void Update()
         {
             if (_autoUpdate)
-            {
-                int numLevelTriangles = Config.Stream.GetInt32(TriangleConfig.LevelTriangleCountAddress);
-                if (_numLevelTris != numLevelTriangles)
-                {
-                    _numLevelTris = numLevelTriangles;
-                    ResetTriangles();
-                }
-            }
+                AutoUpdate();
+        }
 
-            if (_removeCurrentTri)
+        void AutoUpdate()
+        {
+            int numLevelTriangles = Config.Stream.GetInt32(TriangleConfig.LevelTriangleCountAddress);
+            if (_numLevelTris != numLevelTriangles)
             {
-                uint currentTriAddress = Config.Stream.GetUInt32(MarioConfig.StructAddress + MarioConfig.CeilingTriangleOffset);
-                if (_triAddressList.Contains(currentTriAddress))
-                {
-                    _triAddressList.Remove(currentTriAddress);
-                    _triangleListForm?.RefreshDataGridViewAfterRemoval();
-                }
+                _numLevelTris = numLevelTriangles;
+                ResetTriangles();
             }
         }
 

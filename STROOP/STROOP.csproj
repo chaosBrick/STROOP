@@ -217,7 +217,6 @@
     <Compile Include="Controls\WatchVariableStringWrapper.cs" />
     <Compile Include="Enums\AggregateMathOperation.cs" />
     <Compile Include="Enums\CompassPosition.cs" />
-    <Compile Include="Enums\MouseEvent.cs" />
     <Compile Include="Enums\CoordinateAngle.cs" />
     <Compile Include="Enums\CopyTypeEnum.cs" />
     <Compile Include="Enums\MapTrackerIconType.cs" />
@@ -425,6 +424,7 @@
     <Compile Include="Managers\IVariableAdder.cs" />
     <Compile Include="Managers\VariableAdder.cs" />
     <Compile Include="Tabs\MapTab\GraphicsUtil.cs" />
+    <Compile Include="Tabs\MapTab\IHoverData.cs" />
     <Compile Include="Tabs\MapTab\MapAllObjectCeilingObject.cs" />
     <Compile Include="Tabs\MapTab\MapAllObjectFloorObject.cs" />
     <Compile Include="Tabs\MapTab\MapAllObjectWallObject.cs" />
@@ -896,6 +896,7 @@
     <Compile Include="Utilities\InGameFunctionCall.cs" />
     <Compile Include="Utilities\MathOperationUtilities.cs" />
     <Compile Include="Calculators\WallDisplacementCalculator.cs" />
+    <Compile Include="Utilities\MouseUtility.cs" />
     <Compile Include="Utilities\ObjectRngUtilities.cs" />
     <Compile Include="Utilities\PlushUtilities.cs" />
     <Compile Include="Utilities\SegmentationUtilities.cs" />

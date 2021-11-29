@@ -88,24 +88,14 @@ namespace STROOP.Tabs.MapTab
         public View view = new View();
 
         private List<int> _currentObjIndexes = new List<int>();
+        public IHoverData hoverData { get; private set; }
 
         public bool PauseMapUpdating = false;
         private bool _isLoaded2D = false;
 
-        public bool HasMouseListeners => mouseEventListeners.Count > 0;
-        HashSet<MapObject> mouseEventListeners = new HashSet<MapObject>();
+        public bool HasMouseListeners => hoverData != null;
         Dictionary<object, MapTracker> semaphoreTrackers = new Dictionary<object, MapTracker>();
         List<(CheckBox checkBox, MapTracker tracker)> quickSemaphores = new List<(CheckBox checkBox, MapTracker tracker)>();
-
-        public void RegisterMouseEventListener(MapObject tracker)
-        {
-            mouseEventListeners.Add(tracker);
-        }
-
-        public void UnregisterMouseEventListener(MapObject tracker)
-        {
-            mouseEventListeners.Remove(tracker);
-        }
 
         public MapTab()
         {
@@ -229,13 +219,13 @@ namespace STROOP.Tabs.MapTab
 
             buttonMapOptionsAddNewTracker.ContextMenuStrip = new ContextMenuStrip();
 
-            foreach (var schnotzel in adders)
+            foreach (var trackerAddFunction in adders)
             {
-                var lolz = new ToolStripMenuItem(schnotzel.Key);
-                schnotzel.Value.Sort((a, b) => a.Text.CompareTo(b.Text));
-                foreach (var knonw in schnotzel.Value)
-                    lolz.DropDownItems.Add(knonw);
-                buttonMapOptionsAddNewTracker.ContextMenuStrip.Items.Add(lolz);
+                var addTrackerCategory = new ToolStripMenuItem(trackerAddFunction.Key);
+                trackerAddFunction.Value.Sort((a, b) => a.Text.CompareTo(b.Text));
+                foreach (var addTrackerItem in trackerAddFunction.Value)
+                    addTrackerCategory.DropDownItems.Add(addTrackerItem);
+                buttonMapOptionsAddNewTracker.ContextMenuStrip.Items.Add(addTrackerCategory);
             }
 
             //foreach (var adder in adders)
@@ -379,6 +369,26 @@ namespace STROOP.Tabs.MapTab
             trackBarMapOptionsGlobalIconSize.AddManualChangeAction(() =>
                SetGlobalIconSize(trackBarMapOptionsGlobalIconSize.Value));
             MapUtilities.CreateTrackBarContextMenuStrip(trackBarMapOptionsGlobalIconSize);
+
+            Point onClickPosition = new Point();
+            var menu = new ContextMenu();
+            glControlMap2D.MouseDown += (sender, e) =>
+            {
+                if (e.Button == MouseButtons.Right && hoverData == null)
+                {
+                    onClickPosition = e.Location;
+                    menu.Show(glControlMap2D, e.Location);
+                }
+            };
+            var copyPositionItem = new MenuItem("Copy Position");
+            copyPositionItem.Click += (e, args) =>
+            {
+                Vector3 coords = Vector3.TransformPosition(
+                    new Vector3(2 * (float)onClickPosition.X / glControlMap2D.Width - 1, 1 - 2 * (float)onClickPosition.Y / glControlMap2D.Height, 0),
+                    Matrix4.Invert(view.MapGraphics.ViewMatrix));
+                Clipboard.SetText($"{coords.X} 0 {coords.Y}");
+            };
+            menu = new ContextMenu(new MenuItem[] { copyPositionItem });
         }
 
         private void ResetToInitialState()
@@ -413,6 +423,14 @@ namespace STROOP.Tabs.MapTab
 
             using (new AccessScope<MapTab>(this))
             {
+                hoverData = null;
+                foreach (var tracker in flowLayoutPanelMapTrackers.EnumerateTrackers())
+                {
+                    var newHover = tracker.mapObject.GetHoverData();
+                    if (newHover != null)
+                        hoverData = newHover;
+                }
+
                 flowLayoutPanelMapTrackers.UpdateControl();
 
                 if (!active) return;
@@ -461,7 +479,7 @@ namespace STROOP.Tabs.MapTab
         private void UpdateBasedOnObjectsSelectedOnMap()
         {
             // Determine which obj slots have been checked/unchecked since the last update
-            List<int> currentObjIndexes = Config.ObjectSlotsManager.SelectedOnMapSlotsAddresses
+            List<int> currentObjIndexes = Config.StroopMainForm.ObjectSlotsManager.SelectedOnMapSlotsAddresses
                 .ConvertAll(address => ObjectUtilities.GetObjectIndex(address))
                 .FindAll(address => address.HasValue)
                 .ConvertAll(address => address.Value);

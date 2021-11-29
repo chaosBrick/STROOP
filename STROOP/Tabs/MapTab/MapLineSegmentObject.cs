@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using OpenTK;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
@@ -41,7 +42,7 @@ namespace STROOP.Tabs.MapTab
             return new MapLineSegmentObject(posAngle1, posAngle2);
         }
 
-        protected override List<(float x, float y, float z)> GetVertices(MapGraphics graphics)
+        protected override List<Vector3> GetVertices(MapGraphics graphics)
         {
             (double x1, double y1, double z1, double angle1) = _posAngle1.GetValues();
             (double x2, double y2, double z2, double angle2) = _posAngle2.GetValues();
@@ -49,9 +50,9 @@ namespace STROOP.Tabs.MapTab
             (double startX, double startZ) = MoreMath.ExtrapolateLine2D(x2, z2, x1, z1, dist + _backwardsSize);
             (double endX, double endZ) = MoreMath.ExtrapolateLine2D(x1, z1, x2, z2, (_useFixedSize ? 0 : dist) + Size);
 
-            List<(float x, float y, float z)> vertices = new List<(float x, float y, float z)>();
-            vertices.Add(((float)startX, 0, (float)startZ));
-            vertices.Add(((float)endX, 0, (float)endZ));
+            var vertices = new List<Vector3>();
+            vertices.Add(new Vector3((float)startX, 0, (float)startZ));
+            vertices.Add(new Vector3((float)endX, 0, (float)endZ));
             return vertices;
         }
 

@@ -4,7 +4,6 @@ using System.Drawing;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
-using OpenTK;
 using STROOP.Models;
 using System.Windows.Forms;
 
@@ -24,7 +23,7 @@ namespace STROOP.Tabs.MapTab
             _objName = name;
             _objImage = image;
             _objMapImage = mapImage;
-            positionAngleProvider = () => Config.ObjectSlotsManager.GetLoadedObjectsWithPredicate(predicate).ConvertAll(_ => PositionAngle.Obj(_.Address)).ToArray();
+            positionAngleProvider = () => Config.StroopMainForm.ObjectSlotsManager.GetLoadedObjectsWithPredicate(predicate).ConvertAll(_ => PositionAngle.Obj(_.Address)).ToArray();
         }
 
         public static MapMultipleObjects CreateByName()
@@ -51,7 +50,7 @@ namespace STROOP.Tabs.MapTab
             MapObjectObject.AddObjectSubTrackers(mapTab,
                 _objName,
                 targetStrip,
-                () => Config.ObjectSlotsManager.GetLoadedObjectsWithPredicate(predicate).ConvertAll(obj => PositionAngle.Obj(obj.Address))
+                () => Config.StroopMainForm.ObjectSlotsManager.GetLoadedObjectsWithPredicate(predicate).ConvertAll(obj => PositionAngle.Obj(obj.Address))
                 );
         }
 
@@ -80,7 +79,7 @@ namespace STROOP.Tabs.MapTab
 
         public virtual List<(float x, float y, float z, float angle, Lazy<Image> tex)> GetData()
         {
-            List<ObjectDataModel> objs = Config.ObjectSlotsManager.GetLoadedObjectsWithPredicate(predicate);
+            List<ObjectDataModel> objs = Config.StroopMainForm.ObjectSlotsManager.GetLoadedObjectsWithPredicate(predicate);
             return objs.ConvertAll(obj => (obj.X, obj.Y, obj.Z, (float)obj.FacingYaw, Config.ObjectAssociations.GetObjectMapImage(obj.BehaviorCriteria)));
         }
 

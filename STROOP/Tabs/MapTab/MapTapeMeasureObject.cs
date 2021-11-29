@@ -33,12 +33,7 @@ namespace STROOP.Tabs.MapTab
                 itemFreeze.Click += (sender, e) =>
                 {
                     itemFreeze.Checked = !itemFreeze.Checked;
-                    if (itemFreeze.Checked)
-                        capturedMapTab.RegisterMouseEventListener(this);
-                    else
-                        capturedMapTab.UnregisterMouseEventListener(this);
                 };
-                OnCleanup += () => capturedMapTab.UnregisterMouseEventListener(this);
 
                 _contextMenuStrip = new ContextMenuStrip();
                 _contextMenuStrip.Items.Add(itemFreeze);
@@ -52,23 +47,23 @@ namespace STROOP.Tabs.MapTab
 
         public override string GetName() => "Tape Measure";
 
-        protected override List<(float x, float y, float z)> GetVertices(MapGraphics graphics) =>
-            new List<(float x, float y, float z)>(new(float, float, float)[] { (a.X, 0, a.Y), (b.X, 0, b.Y) });
+        protected override List<Vector3> GetVertices(MapGraphics graphics) =>
+            new List<Vector3>(new [] { new Vector3(a.X, 0, a.Y), new Vector3(b.X, 0, b.Y) });
 
 
-        public override void NotifyMouseEvent(MouseEvent mouseEvent, bool isLeftButton, int mouseX, int mouseY)
-        {
-            Vector3 coords = Vector3.TransformPosition(
-                new Vector3(2 * (float)mouseX / graphics.glControl.Width - 1, 1 - 2 * (float)mouseY / graphics.glControl.Height, 0),
-                Matrix4.Invert(graphics.ViewMatrix));
-            if (mouseEvent == MouseEvent.MouseDown)
-            {
-                if (isLeftButton)
-                    a = coords.Xy;
-                else
-                    b = coords.Xy;
-                targetTracker.textBoxSize.Text = (Size = (a - b).Length).ToString();
-            }
-        }
+        //public override void NotifyMouseEvent(MouseEvent mouseEvent, bool isLeftButton, int mouseX, int mouseY)
+        //{
+        //    Vector3 coords = Vector3.TransformPosition(
+        //        new Vector3(2 * (float)mouseX / graphics.glControl.Width - 1, 1 - 2 * (float)mouseY / graphics.glControl.Height, 0),
+        //        Matrix4.Invert(graphics.ViewMatrix));
+        //    if (mouseEvent == MouseEvent.MouseDown)
+        //    {
+        //        if (isLeftButton)
+        //            a = coords.Xy;
+        //        else
+        //            b = coords.Xy;
+        //        targetTracker.textBoxSize.Text = (Size = (a - b).Length).ToString();
+        //    }
+        //}
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using OpenTK;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
@@ -23,7 +24,7 @@ namespace STROOP.Tabs.MapTab
             _setting = PuGridlineSetting.SETTING1;
         }
 
-        protected override List<(float x, float y, float z)> GetVertices(MapGraphics graphics)
+        protected override List<Vector3> GetVertices(MapGraphics graphics)
         {
             switch (_setting)
             {
@@ -36,16 +37,16 @@ namespace STROOP.Tabs.MapTab
                         int zMin = ((((int)graphics.MapViewZMin) / 65536) - 1) * 65536;
                         int zMax = ((((int)graphics.MapViewZMax) / 65536) + 1) * 65536;
 
-                        List<(float x, float y, float z)> vertices = new List<(float x, float y, float z)>();
+                        var vertices = new List<Vector3>();
                         for (int x = xMin; x <= xMax; x += 65536)
                         {
-                            vertices.Add((x, marioY, zMin));
-                            vertices.Add((x, marioY, zMax));
+                            vertices.Add(new Vector3(x, marioY, zMin));
+                            vertices.Add(new Vector3(x, marioY, zMax));
                         }
                         for (int z = zMin; z <= zMax; z += 65536)
                         {
-                            vertices.Add((xMin, marioY, z));
-                            vertices.Add((xMax, marioY, z));
+                            vertices.Add(new Vector3(xMin, marioY, z));
+                            vertices.Add(new Vector3(xMax, marioY, z));
                         }
                         return vertices;
                     }
@@ -58,16 +59,16 @@ namespace STROOP.Tabs.MapTab
                         int zMin = ((((int)graphics.MapViewZMin) / 65536) - 1) * 65536 - 32768;
                         int zMax = ((((int)graphics.MapViewZMax) / 65536) + 1) * 65536 + 32768;
 
-                        List<(float x, float y, float z)> vertices = new List<(float x, float y, float z)>();
+                        var vertices = new List<Vector3>();
                         for (int x = xMin; x <= xMax; x += 65536)
                         {
-                            vertices.Add((x, marioY, zMin));
-                            vertices.Add((x, marioY, zMax));
+                            vertices.Add(new Vector3(x, marioY, zMin));
+                            vertices.Add(new Vector3(x, marioY, zMax));
                         }
                         for (int z = zMin; z <= zMax; z += 65536)
                         {
-                            vertices.Add((xMin, marioY, z));
-                            vertices.Add((xMax, marioY, z));
+                            vertices.Add(new Vector3(xMin, marioY, z));
+                            vertices.Add(new Vector3(xMax, marioY, z));
                         }
                         return vertices;
                     }
@@ -80,7 +81,7 @@ namespace STROOP.Tabs.MapTab
                         int zMin = ((((int)graphics.MapViewZMin) / 65536) - 1) * 65536;
                         int zMax = ((((int)graphics.MapViewZMax) / 65536) + 1) * 65536;
 
-                        List<(float x, float y, float z)> vertices = new List<(float x, float y, float z)>();
+                        List<Vector3> vertices = new List<Vector3>();
                         for (int x = xMin; x <= xMax; x += 65536)
                         {
                             for (int z = zMin; z <= zMax; z += 65536)
@@ -90,17 +91,17 @@ namespace STROOP.Tabs.MapTab
                                 float z1 = z - 8192;
                                 float z2 = z + 8192;
 
-                                vertices.Add((x1, marioY, z1));
-                                vertices.Add((x1, marioY, z2));
+                                vertices.Add(new Vector3(x1, marioY, z1));
+                                vertices.Add(new Vector3(x1, marioY, z2));
 
-                                vertices.Add((x2, marioY, z1));
-                                vertices.Add((x2, marioY, z2));
+                                vertices.Add(new Vector3(x2, marioY, z1));
+                                vertices.Add(new Vector3(x2, marioY, z2));
 
-                                vertices.Add((x1, marioY, z1));
-                                vertices.Add((x2, marioY, z1));
+                                vertices.Add(new Vector3(x1, marioY, z1));
+                                vertices.Add(new Vector3(x2, marioY, z1));
 
-                                vertices.Add((x1, marioY, z2));
-                                vertices.Add((x2, marioY, z2));
+                                vertices.Add(new Vector3(x1, marioY, z2));
+                                vertices.Add(new Vector3(x2, marioY, z2));
                             }
                         }
                         return vertices;

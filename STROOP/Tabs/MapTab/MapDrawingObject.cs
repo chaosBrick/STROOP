@@ -11,11 +11,37 @@ namespace STROOP.Tabs.MapTab
     [ObjectDescription("Drawing", "Custom")]
     public class MapDrawingObject : MapLineObject
     {
-        private readonly List<(float x, float y, float z)> _vertices;
+        class Drawing : IHoverData
+        {
+            MapDrawingObject parent;
+            public Drawing(MapDrawingObject target) { this.parent = target; }
+
+            public void DragTo(Vector3 newPosition)
+            {
+                Vector3 currentVertex = parent.graphics.mapCursorPosition;
+                if (currentVertex != parent._lastVertex)
+                {
+                    parent._vertices.Add(parent._lastVertex);
+                    parent._vertices.Add(currentVertex);
+                }
+                parent._lastVertex = currentVertex;
+            }
+
+            public void LeftClick()
+            {
+                parent._lastVertex = parent.graphics.mapCursorPosition;
+            }
+
+            public void RightClick()
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        private readonly List<Vector3> _vertices;
         private bool _drawingEnabled;
 
-        private bool _mouseIsDown;
-        private (float x, float y, float z) _lastVertex;
+        private Vector3 _lastVertex;
 
         public MapDrawingObject()
             : base()
@@ -23,21 +49,13 @@ namespace STROOP.Tabs.MapTab
             OutlineWidth = 3;
             OutlineColor = Color.Red;
 
-            _vertices = new List<(float x, float y, float z)>();
+            _vertices = new List<Vector3>();
             _drawingEnabled = false;
-
-            _mouseIsDown = false;
         }
 
-        protected override List<(float x, float y, float z)> GetVertices(MapGraphics graphics)
-        {
-            return _vertices;
-        }
+        protected override List<Vector3> GetVertices(MapGraphics graphics) => _vertices;
 
-        public override string GetName()
-        {
-            return "Drawing";
-        }
+        public override string GetName() => "Drawing";
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.PathImage;
 
@@ -51,11 +69,6 @@ namespace STROOP.Tabs.MapTab
                 {
                     _drawingEnabled = !_drawingEnabled;
                     itemEnableDrawing.Checked = _drawingEnabled;
-                    if (_drawingEnabled)
-                        capturedMapTab.RegisterMouseEventListener(this);
-                    else
-                        capturedMapTab.UnregisterMouseEventListener(this);
-                    OnCleanup += () => capturedMapTab.UnregisterMouseEventListener(this);
                 };
 
                 ToolStripMenuItem itemClearDrawing = new ToolStripMenuItem("Clear Drawing");
@@ -72,32 +85,7 @@ namespace STROOP.Tabs.MapTab
             return _contextMenuStrip;
         }
 
-        public override void NotifyMouseEvent(MouseEvent mouseEvent, bool isLeftButton, int mouseX, int mouseY)
-        {
-            Vector3 coords = Vector3.TransformPosition(
-                new Vector3(2 * mouseX / graphics.glControl.Width - 1, 2 * mouseY / graphics.glControl.Height, 0),
-                Matrix4.Invert(graphics.ViewMatrix));
-            (float x, float y, float z) currentVertex = (coords.X, 0, coords.Z);
-            switch (mouseEvent)
-            {
-                case MouseEvent.MouseDown:
-                    _mouseIsDown = true;
-                    break;
-                case MouseEvent.MouseMove:
-                    if (_drawingEnabled && _mouseIsDown)
-                    {
-                        _vertices.Add(_lastVertex);
-                        _vertices.Add(currentVertex);
-                    }
-                    break;
-                case MouseEvent.MouseUp:
-                    _mouseIsDown = false;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-            _lastVertex = currentVertex;
-        }
+        public override IHoverData GetHoverData() => _drawingEnabled ? new Drawing(this) : null;
 
         public override void CleanUp()
         {

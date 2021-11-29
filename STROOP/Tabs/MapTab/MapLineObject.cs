@@ -18,22 +18,21 @@ namespace STROOP.Tabs.MapTab
 
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
             {
-                bool initdjwökla = false;
-                Vector3 oldSwha = default(Vector3);
+                bool isFirstVertex = false;
+                Vector3 lastVertex = default(Vector3);
                 foreach (var vert in GetVertices(graphics))
                 {
-                    var newVert = new Vector3(vert.x, vert.z, 0);
-                    if (initdjwökla)
-                        graphics.lineRenderer.Add(oldSwha, newVert, ColorUtilities.ColorToVec4(OutlineColor, OpacityByte), OutlineWidth);
-                    
-                        initdjwökla = !initdjwökla;
-                    oldSwha = newVert;
+                    var newVertex = new Vector3(vert.X, vert.Z, 0);
+                    if (isFirstVertex)
+                        graphics.lineRenderer.Add(lastVertex, newVertex, ColorUtilities.ColorToVec4(OutlineColor, OpacityByte), OutlineWidth);
 
+                    isFirstVertex = !isFirstVertex;
+                    lastVertex = newVertex;
                 }
             });
         }
 
-        protected abstract List<(float x, float y, float z)> GetVertices(MapGraphics graphics);
+        protected abstract List<Vector3> GetVertices(MapGraphics graphics);
 
         public override MapDrawType GetDrawType()
         {

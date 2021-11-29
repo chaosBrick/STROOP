@@ -19,20 +19,19 @@ namespace STROOP.Tabs.MapTab
     [ObjectDescription("All Object Ceiling Triangles", "Triangles")]
     public class MapAllObjectCeilingObject : MapCeilingObject
     {
-        private readonly List<TriangleDataModel> _tris;
         private bool _autoUpdate;
 
         public MapAllObjectCeilingObject()
             : base()
         {
-            _tris = TriangleUtilities.GetObjectTriangles()
-                .FindAll(tri => tri.IsCeiling());
             _autoUpdate = true;
         }
 
         protected override List<TriangleDataModel> GetTrianglesOfAnyDist()
         {
-            return _tris;
+            if (_autoUpdate)
+                return TriangleUtilities.GetObjectTriangles().FindAll(tri => tri.IsCeiling());
+            return null;
         }
 
         public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
@@ -56,16 +55,6 @@ namespace STROOP.Tabs.MapTab
             }
 
             return _contextMenuStrip;
-        }
-
-        public override void Update()
-        {
-            if (_autoUpdate)
-            {
-                _tris.Clear();
-                _tris.AddRange(TriangleUtilities.GetObjectTriangles()
-                    .FindAll(tri => tri.IsCeiling()));
-            }
         }
 
         public override string GetName()

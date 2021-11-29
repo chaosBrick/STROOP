@@ -6,6 +6,7 @@ using STROOP.Structs;
 using STROOP.Models;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using OpenTK;
 
 namespace STROOP.Tabs.MapTab
 {
@@ -217,6 +218,7 @@ namespace STROOP.Tabs.MapTab
                 InternalRotates |= Config.ObjectAssociations.GetObjectMapRotates(_obj.BehaviorCriteria);
             }
         }
+
         public override void InitSubTrackerContextMenuStrip(MapTab mapTab, ContextMenuStrip targetStrip)
         {
             base.InitSubTrackerContextMenuStrip(mapTab, targetStrip);

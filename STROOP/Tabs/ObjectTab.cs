@@ -1,14 +1,12 @@
 ﻿using STROOP.Structs;
 using STROOP.Utilities;
+using STROOP.Managers;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using STROOP.Controls;
-using STROOP.Extensions;
 using STROOP.Structs.Configurations;
 using STROOP.Forms;
 using STROOP.Models;
@@ -118,12 +116,10 @@ namespace STROOP.Tabs
 
         private List<uint> _addresses
         {
-            get => Config.ObjectSlotsManager.SelectedSlotsAddresses;
+            get => Config.StroopMainForm.ObjectSlotsManager.SelectedSlotsAddresses;
         }
-        private List<ObjectDataModel> _objects
-        {
-            get => Config.ObjectSlotsManager.SelectedObjects;
-        }
+        ObjectSlotsManager _objectSlots;
+        private List<ObjectDataModel> _objects => _objectSlots.SelectedObjects;
 
         private static readonly List<VariableGroup> ALL_VAR_GROUPS =
             new List<VariableGroup>()
@@ -158,6 +154,7 @@ namespace STROOP.Tabs
         {
             base.InitializeTab();
             this.watchVariablePanelObject.SetGroups(ALL_VAR_GROUPS, VISIBLE_VAR_GROUPS);
+            _objectSlots = Config.StroopMainForm.ObjectSlotsManager;
 
             labelObjBhvValue.Click += _objBehaviorLabel_Click;
 
@@ -505,7 +502,7 @@ namespace STROOP.Tabs
                 Image = Config.ObjectAssociations.GetObjectImage(newBehavior).Value;
                 ObjectBackColor = ObjectSlotsConfig.GetProcessingGroupColor(obj.CurrentProcessGroup);
                 int slotPos = obj.VacantSlotIndex ?? obj.ProcessIndex;
-                SlotIndex = (Config.ObjectSlotsManager.GetSlotIndexFromObj(obj)
+                SlotIndex = (Config.StroopMainForm.ObjectSlotsManager.GetSlotIndexFromObj(obj)
                     + (SavedSettingsConfig.StartSlotIndexsFromOne ? 1 : 0))?.ToString() ?? "";
                 SlotPos = $"{(obj.VacantSlotIndex.HasValue ? "VS " : "")}{slotPos + (SavedSettingsConfig.StartSlotIndexsFromOne ? 1 : 0)}";
                 labelObjAddValue.Text = $"0x{_objects.First().Address:X8}";

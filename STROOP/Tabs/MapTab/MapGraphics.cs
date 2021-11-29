@@ -96,6 +96,10 @@ namespace STROOP.Tabs.MapTab
                 MAX_COURSE_SIZE_X_MAX - MAX_COURSE_SIZE_X_MIN,
                 MAX_COURSE_SIZE_Z_MAX - MAX_COURSE_SIZE_Z_MIN);
 
+        public Vector3 mapCursorPosition;
+        bool[] mouseDown = new bool[3];
+        public bool IsMouseDown(int button) => mouseDown[button];
+
         public MapGraphics(MapTab mapTab, GLControl glControl)
         {
             this.mapTab = mapTab;
@@ -114,8 +118,6 @@ namespace STROOP.Tabs.MapTab
                 root = ctrl;
             return root.ActiveControl;
         }
-        [System.Runtime.InteropServices.DllImport("user32.dll")]
-        static extern int SetForegroundWindow(int hwnd);
 
         public void Load()
         {
@@ -472,104 +474,100 @@ namespace STROOP.Tabs.MapTab
             mapTab.textBoxMapControllersAngleCustom.SubmitText(value.ToString());
         }
 
-        private bool _isTranslating = false;
         private int _translateStartMouseX = 0;
         private int _translateStartMouseY = 0;
         private float _translateStartCenterX = 0;
         private float _translateStartCenterZ = 0;
 
-        private bool _isRotating = false;
         private int _rotateStartMouseX = 0;
         private int _rotateStartMouseY = 0;
         private float _rotateStartAngle = 0;
 
-        private void OnMouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+        private void OnMouseDown(object sender, MouseEventArgs e)
         {
-            using (new AccessScope<MapTab>(mapTab))
-            {
-                if (mapTab.HasMouseListeners)
-                {
-                    mapTab.flowLayoutPanelMapTrackers.NotifyMouseEvent(
-                        MouseEvent.MouseDown, e.Button == MouseButtons.Left, e.X, e.Y);
-                    return;
-                }
-            }
-
             switch (e.Button)
             {
                 case MouseButtons.Left:
-                    _isTranslating = true;
+                    mouseDown[0] = true;
+                    _rotateStartMouseX = e.X;
+                    _rotateStartMouseY = e.Y;
+                    _rotateStartAngle = MapViewAngleValue;
                     _translateStartMouseX = e.X;
                     _translateStartMouseY = e.Y;
                     _translateStartCenterX = MapViewCenterXValue;
                     _translateStartCenterZ = MapViewCenterZValue;
                     break;
                 case MouseButtons.Right:
-                    _isRotating = true;
-                    _rotateStartMouseX = e.X;
-                    _rotateStartMouseY = e.Y;
-                    _rotateStartAngle = MapViewAngleValue;
+                    mouseDown[1] = true;
                     break;
             }
-        }
 
-        private void OnMouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
             using (new AccessScope<MapTab>(mapTab))
             {
                 if (mapTab.HasMouseListeners)
                 {
-                    mapTab.flowLayoutPanelMapTrackers.NotifyMouseEvent(
-                        MouseEvent.MouseUp, e.Button == MouseButtons.Left, e.X, e.Y);
-                    return;
+                    if (e.Button == MouseButtons.Left)
+                        mapTab.hoverData.LeftClick();
+                    else if (e.Button == MouseButtons.Right)
+                        mapTab.hoverData.RightClick();
                 }
             }
+        }
 
+        private void OnMouseUp(object sender, MouseEventArgs e)
+        {
             switch (e.Button)
             {
                 case MouseButtons.Left:
-                    _isTranslating = false;
+                    mouseDown[0] = false;
                     break;
                 case MouseButtons.Right:
-                    _isRotating = false;
+                    mouseDown[1] = false;
                     break;
             }
         }
 
-        private void OnMouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
+        private void OnMouseMove(object sender, MouseEventArgs e)
         {
+            for (int i = 0; i < mouseDown.Length; i++)
+                mouseDown[i] &= MouseUtility.IsMouseDown(i);
+
+            mapCursorPosition = Vector3.TransformPosition(new Vector3(2.0f * e.X / glControl.Width - 1, 1 - 2.0f * e.Y / glControl.Height, 0), Matrix4.Invert(ViewMatrix));
+            mapCursorPosition = new Vector3(mapCursorPosition.X, mapCursorPosition.Z, mapCursorPosition.Y);
             using (new AccessScope<MapTab>(mapTab))
             {
-                if (mapTab.HasMouseListeners)
+                if (mapTab.HasMouseListeners && mouseDown[0])
                 {
-                    mapTab.flowLayoutPanelMapTrackers.NotifyMouseEvent(
-                        MouseEvent.MouseMove, e.Button == MouseButtons.Left, e.X, e.Y);
+                    mapTab.hoverData.DragTo(mapCursorPosition);
                     return;
                 }
             }
 
-            if (_isTranslating)
+            if (mouseDown[0])
             {
-                int pixelDiffX = e.X - _translateStartMouseX;
-                int pixelDiffY = e.Y - _translateStartMouseY;
-                pixelDiffX = mapTab.MaybeReverse(pixelDiffX);
-                pixelDiffY = mapTab.MaybeReverse(pixelDiffY);
-                float unitDiffX = pixelDiffX / MapViewScaleValue;
-                float unitDiffY = pixelDiffY / MapViewScaleValue;
-                (float rotatedX, float rotatedY) = ((float, float))
-                    MoreMath.RotatePointAboutPointAnAngularDistance(
-                        unitDiffX, unitDiffY, 0, 0, MapViewAngleValue);
-                float newCenterX = _translateStartCenterX - rotatedX;
-                float newCenterZ = _translateStartCenterZ - rotatedY;
-                SetCustomCenter(newCenterX + ";" + newCenterZ);
-            }
-
-            if (_isRotating)
-            {
-                float angleToMouse = (float)MoreMath.AngleTo_AngleUnits(
-                    _rotateStartMouseX, _rotateStartMouseY, e.X, e.Y) * mapTab.MaybeReverse(-1) + 32768;
-                float newAngle = _rotateStartAngle + angleToMouse;
-                SetCustomAngle(newAngle);
+                if (!KeyboardUtilities.IsCtrlHeld())
+                {
+                    int pixelDiffX = e.X - _translateStartMouseX;
+                    int pixelDiffY = e.Y - _translateStartMouseY;
+                    pixelDiffX = mapTab.MaybeReverse(pixelDiffX);
+                    pixelDiffY = mapTab.MaybeReverse(pixelDiffY);
+                    float unitDiffX = pixelDiffX / MapViewScaleValue;
+                    float unitDiffY = pixelDiffY / MapViewScaleValue;
+                    (float rotatedX, float rotatedY) = ((float, float))
+                        MoreMath.RotatePointAboutPointAnAngularDistance(
+                            unitDiffX, unitDiffY, 0, 0, MapViewAngleValue);
+                    float newCenterX = _translateStartCenterX - rotatedX;
+                    float newCenterZ = _translateStartCenterZ - rotatedY;
+                    SetCustomCenter(newCenterX + ";" + newCenterZ);
+                }
+                else
+                {
+                    double oldAngle = Math.Atan2(glControl.Height / 2 - _rotateStartMouseY, _rotateStartMouseX - glControl.Width / 2);
+                    double thingAngle = Math.Atan2(glControl.Height / 2 - e.Y, e.X - glControl.Width / 2);
+                    float angleToMouse = (float)MoreMath.RadiansToAngleUnits(thingAngle - oldAngle) * mapTab.MaybeReverse(-1);
+                    float newAngle = _rotateStartAngle + angleToMouse;
+                    SetCustomAngle(newAngle);
+                }
             }
         }
 
@@ -583,9 +581,9 @@ namespace STROOP.Tabs.MapTab
             if (mapTab.HasMouseListeners)
                 return;
 
-            mapTab.radioButtonMapControllersScaleCourseDefault.Checked = true;
-            mapTab.radioButtonMapControllersCenterBestFit.Checked = true;
-            mapTab.radioButtonMapControllersAngle32768.Checked = true;
+            //mapTab.radioButtonMapControllersScaleCourseDefault.Checked = true;
+            //mapTab.radioButtonMapControllersCenterBestFit.Checked = true;
+            //mapTab.radioButtonMapControllersAngle32768.Checked = true;
         }
     }
 }

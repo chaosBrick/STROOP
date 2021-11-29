@@ -33,6 +33,7 @@ namespace STROOP.Tabs.MapTab
             return nullableUIntList.ConvertAll(nullableUInt => nullableUInt.Value);
         }
 
+        protected List<TriangleDataModel> _bufferedTris { get; private set; } = new List<TriangleDataModel>();
         private float? _withinDist;
         private float? _withinCenter;
         protected bool _excludeDeathBarriers;
@@ -53,8 +54,7 @@ namespace STROOP.Tabs.MapTab
         protected List<TriangleDataModel> GetTrianglesWithinDist()
         {
             float centerY = _withinCenter ?? Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
-            List<TriangleDataModel> tris = GetTrianglesOfAnyDist()
-                .FindAll(tri => tri.IsTriWithinVerticalDistOfCenter(_withinDist, centerY));
+            List<TriangleDataModel> tris = _bufferedTris.FindAll(tri => tri.IsTriWithinVerticalDistOfCenter(_withinDist, centerY));
             if (_excludeDeathBarriers)
             {
                 tris = tris.FindAll(tri => tri.SurfaceType != 0x0A);
@@ -64,10 +64,12 @@ namespace STROOP.Tabs.MapTab
 
         protected abstract List<TriangleDataModel> GetTrianglesOfAnyDist();
 
-        protected static (float x, float y, float z) OffsetVertex(
-            (float x, float y, float z) vertex, float xOffset, float yOffset, float zOffset)
+        public override void Update()
         {
-            return (vertex.x + xOffset, vertex.y + yOffset, vertex.z + zOffset);
+            base.Update();
+            var newList = GetTrianglesOfAnyDist();
+            if (newList != null)
+                _bufferedTris = newList;
         }
 
         protected List<ToolStripMenuItem> GetTriangleToolStripMenuItems()

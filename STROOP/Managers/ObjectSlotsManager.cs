@@ -493,7 +493,7 @@ namespace STROOP.Managers
         public string GetSlotLabelFromAddress(uint objAddress)
         {
             ObjectDataModel obj = GetObjectFromAddress(objAddress);
-            return Config.ObjectSlotsManager.GetSlotLabelFromObject(obj);
+            return GetSlotLabelFromObject(obj);
         }
 
         public string GetDescriptiveSlotLabelFromAddress(uint objAddress, bool concise)

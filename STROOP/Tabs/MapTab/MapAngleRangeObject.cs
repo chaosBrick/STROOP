@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using OpenTK;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
@@ -29,9 +30,9 @@ namespace STROOP.Tabs.MapTab
             OutlineColor = Color.Black;
         }
 
-        protected override List<(float x, float y, float z)> GetVertices(MapGraphics graphics)
+        protected override List<Vector3> GetVertices(MapGraphics graphics)
         {
-            List<(float x, float y, float z)> vertices = new List<(float x, float y, float z)>();
+            List<Vector3> vertices = new List<Vector3>();
             foreach (var _posAngle in positionAngleProvider())
             {
                 int startingAngle = _useRelativeAngles ? MoreMath.NormalizeAngleTruncated(_posAngle.Angle) : 0;
@@ -39,14 +40,14 @@ namespace STROOP.Tabs.MapTab
                 {
                     (double x1, double y1, double z1, double a) = _posAngle.GetValues();
                     (double x2, double z2) = MoreMath.AddVectorToPoint(Size, angle, x1, z1);
-                    vertices.Add(((float)x1, (float)y1, (float)z1));
-                    vertices.Add(((float)x2, (float)y1, (float)z2));
+                    vertices.Add(new Vector3((float)x1, (float)y1, (float)z1));
+                    vertices.Add(new Vector3((float)x2, (float)y1, (float)z2));
                 }
             }
             return vertices;
         }
 
-        public override string GetName() =>$"Angle Range for {name}";
+        public override string GetName() => $"Angle Range for {name}";
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.CustomGridlinesImage;
 

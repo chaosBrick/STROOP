@@ -1,12 +1,10 @@
 ﻿using OpenTK;
-
+using STROOP.Utilities;
 
 namespace STROOP.Tabs.MapTab
 {
     public abstract class MapIconPointObject : MapIconObject
     {
-        public MapIconPointObject() : base() { }
-
         public override void DrawOn2DControl(MapGraphics graphics)
         {
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>

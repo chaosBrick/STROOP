@@ -45,7 +45,7 @@ namespace STROOP.Utilities
         {
             _ram = new byte[Config.RamSize];
         }
-        
+
         public void Run()
         {
             ProcessUpdate();
@@ -72,22 +72,6 @@ namespace STROOP.Utilities
             { typeof(WindowsProcessRamIO),  (p, e) => new WindowsProcessRamIO(p, e) },
             { typeof(DolphinProcessIO),     (p, e) => new DolphinProcessIO(p, e) },
         };
-
-        [DllImport("user32.dll")]
-        static extern bool SetForegroundWindow(IntPtr hWnd);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-        private static extern IntPtr GetForegroundWindow();
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int GetWindowThreadProcessId(IntPtr handle, out int processId);
-
-        public void FocusOnEmulator()
-        {
-            Process process = _io.Process;
-            if (process == null) return;
-            SetForegroundWindow(process.MainWindowHandle);
-        }
 
         public bool SwitchIO(IEmuRamIO newIO)
         {
@@ -564,7 +548,6 @@ namespace STROOP.Utilities
                 if (safeWrite && !preSuspended)
                     _io?.Resume();
 
-                //FocusOnEmulator();
                 return result;
             }
         }

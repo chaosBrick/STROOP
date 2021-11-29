@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Globalization;
-using System.Xml;
+using OpenTK;
 using System.Text.RegularExpressions;
 
 namespace STROOP.Utilities
@@ -506,7 +503,15 @@ namespace STROOP.Utilities
             return (uint)MoreMath.GetIntegerInRangeCapped(value, 1.0 + uint.MaxValue - uint.MinValue, false);
         }
 
-
-
+        public static bool TryParseVector3(string text, out Vector3 value)
+        {
+            value = default(Vector3);
+            if (text == null) return false;
+            string[] split = text.Split(';');
+            return (split.Length == 3
+                && float.TryParse(split[0].Trim(), out value.X)
+                && float.TryParse(split[1].Trim(), out value.Y)
+                && float.TryParse(split[2].Trim(), out value.Z));
+        }
     }
 }

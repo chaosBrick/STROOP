@@ -1,19 +1,8 @@
 ﻿using STROOP.Controls;
-using STROOP.Forms;
-using STROOP.Interfaces;
 using STROOP.Structs;
-using STROOP.Structs.Configurations;
-using STROOP.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Xml.Linq;
-using OpenTK;
-using OpenTK.Graphics.OpenGL;
 
 namespace STROOP.Tabs.MapTab
 {
@@ -82,13 +71,16 @@ namespace STROOP.Tabs.MapTab
         {
             _mapObjMap?.Update();
             _mapObjBackground?.Update();
+            foreach (var tracker in EnumerateTrackers())
+                tracker.UpdateControl();
+        }
 
+        public IEnumerable<MapTracker> EnumerateTrackers()
+        {
             lock (_objectLock)
             {
                 foreach (MapTracker tracker in Controls)
-                {
-                    tracker.UpdateControl();
-                }
+                    yield return tracker;
             }
         }
 
@@ -148,17 +140,6 @@ namespace STROOP.Tabs.MapTab
                 foreach (MapTracker tracker in Controls)
                 {
                     tracker.SetGlobalIconSize(size);
-                }
-            }
-        }
-
-        public void NotifyMouseEvent(MouseEvent mouseEvent, bool isLeftButton, int mouseX, int mouseY)
-        {
-            lock (_objectLock)
-            {
-                foreach (MapTracker mapTracker in Controls)
-                {
-                    mapTracker.NotifyMouseEvent(mouseEvent, isLeftButton, mouseX, mouseY);
                 }
             }
         }
