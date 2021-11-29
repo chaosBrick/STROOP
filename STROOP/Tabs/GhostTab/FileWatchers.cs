@@ -55,38 +55,45 @@ namespace STROOP.Tabs.GhostTab
             DateTime oldFileChangedDate = DateTime.Now;
             string file = Path.GetFullPath(path);
             int i = 0;
-            if (Directory.Exists(path) || File.Exists(path))
+            try
             {
-                var folder = Path.GetDirectoryName(path);
-                FileSystemWatcher watcher = new FileSystemWatcher(folder);
-                file = folder + "\\tmp.ghost";
-                activeFileWatchers[path] = watcher;
-                var ghostName = "auto-rec";
-                watcher.NotifyFilter = NotifyFilters.LastWrite;
-                watcher.EnableRaisingEvents = true;
-                watcher.Changed += (a, aa) =>
+                if (File.Exists(path) || Directory.Exists(path))
                 {
-                    if (aa.FullPath == file)
+                    var folder = Path.GetDirectoryName(Path.GetFullPath(path));
+                    FileSystemWatcher watcher = new FileSystemWatcher(folder);
+                    file = folder + "\\tmp.ghost";
+                    activeFileWatchers[path] = watcher;
+                    var ghostName = "auto-rec";
+                    watcher.NotifyFilter = NotifyFilters.LastWrite;
+                    watcher.EnableRaisingEvents = true;
+                    watcher.Changed += (a, aa) =>
                     {
-                        var newFileChangedDate = File.GetLastWriteTime(file);
-                        if (newFileChangedDate - oldFileChangedDate > new TimeSpan(0, 0, 1))
+                        if (aa.FullPath == file)
                         {
-                            BinaryReader rd = null;
-                            try
+                            var newFileChangedDate = File.GetLastWriteTime(file);
+                            if (newFileChangedDate - oldFileChangedDate > new TimeSpan(0, 0, 1))
                             {
-                                rd = new BinaryReader(new FileStream(file, FileMode.Open));
-                                var newGhost = Ghost.FromFile(rd);
-                                groupBoxGhosts.Invoke((Action)(() => AddGhost($"{ghostName} {i++}", newGhost)));
-                                oldFileChangedDate = newFileChangedDate;
-                            }
-                            catch { }
-                            finally
-                            {
-                                rd?.Close();
+                                BinaryReader rd = null;
+                                try
+                                {
+                                    rd = new BinaryReader(new FileStream(file, FileMode.Open));
+                                    var newGhost = Ghost.FromFile(rd);
+                                    groupBoxGhosts.Invoke((Action)(() => AddGhost($"{ghostName} {i++}", newGhost)));
+                                    oldFileChangedDate = newFileChangedDate;
+                                }
+                                catch { }
+                                finally
+                                {
+                                    rd?.Close();
+                                }
                             }
                         }
-                    }
-                };
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to watch Directory:{path}\n\n{ex.ToString()}");
             }
         }
 
