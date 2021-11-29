@@ -89,7 +89,8 @@ namespace STROOP
             base.OnShown(e);
             BringToFront();
             Activate();
-            Config.Stream.Run();
+            using (new AccessScope<StroopMainForm>(this))
+                Config.Stream.Run();
         }
 
         private void InitializeTabRemoval()
@@ -284,7 +285,7 @@ namespace STROOP
                 UpdateComboBoxes();
                 DataModels.Update();
                 FormManager.Update();
-                Config.ObjectSlotsManager.Update();
+                ObjectSlotsManager.Update();
                 //Config.InjectionManager.Update();
 
                 foreach (TabPage page in tabControlMain.TabPages)
@@ -388,18 +389,6 @@ namespace STROOP
             }
         }
 
-        private void buttonCreateWindow_Click(object sender, EventArgs e)
-        {
-            var newForm = new StroopMainForm(false);
-            FormClosedEventHandler vfa = (_, __) => newForm.Close(); ;
-            FormClosed += vfa;
-            newForm.Controls.Remove(newForm.buttonDisconnect);
-            newForm.panelConnect.Visible = false;
-            FormClosing += (_, __) => newForm.Close();
-            newForm.Show();
-            newForm.FormClosed += (_, __) => FormClosed -= vfa;
-        }
-
         private void MoveTab(bool rightwards)
         {
             TabPage currentTab = tabControlMain.SelectedTab;
@@ -498,7 +487,7 @@ namespace STROOP
             });
 
             WatchVariablePanelObjects.Visible = false;
-            Config.ObjectSlotsManager.ChangeSlotSize(size);
+            ObjectSlotsManager.ChangeSlotSize(size);
             WatchVariablePanelObjects.Visible = true;
             _objSlotResizing = false;
         }

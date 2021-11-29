@@ -148,7 +148,6 @@ namespace STROOP
             this.buttonMoveTabLeft = new System.Windows.Forms.Button();
             this.buttonMoveTabRight = new System.Windows.Forms.Button();
             this.buttonShowLeftPane = new System.Windows.Forms.Button();
-            this.buttonCreateWindow = new System.Windows.Forms.Button();
             this.panelConnect.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
@@ -1547,20 +1546,6 @@ namespace STROOP
             this.buttonShowLeftPane.UseVisualStyleBackColor = true;
             this.buttonShowLeftPane.Click += new System.EventHandler(this.buttonShowLeftPanel_Click);
             // 
-            // buttonCreateWindow
-            // 
-            this.buttonCreateWindow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonCreateWindow.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buttonCreateWindow.BackgroundImage")));
-            this.buttonCreateWindow.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.buttonCreateWindow.Location = new System.Drawing.Point(641, 11);
-            this.buttonCreateWindow.Margin = new System.Windows.Forms.Padding(2);
-            this.buttonCreateWindow.Name = "buttonCreateWindow";
-            this.buttonCreateWindow.Size = new System.Drawing.Size(46, 21);
-            this.buttonCreateWindow.TabIndex = 20;
-            this.buttonCreateWindow.Text = "   New";
-            this.buttonCreateWindow.UseVisualStyleBackColor = true;
-            this.buttonCreateWindow.Click += new System.EventHandler(this.buttonCreateWindow_Click);
-            // 
             // StroopMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1579,7 +1564,6 @@ namespace STROOP
             this.Controls.Add(this.buttonTabAdd);
             this.Controls.Add(this.buttonMoveTabLeft);
             this.Controls.Add(this.buttonMoveTabRight);
-            this.Controls.Add(this.buttonCreateWindow);
             this.Controls.Add(this.buttonShowLeftPane);
             this.Controls.Add(this.buttonDisconnect);
             this.Controls.Add(this.labelVersionNumber);
@@ -1762,7 +1746,6 @@ namespace STROOP
         private TabPage tabPageWater;
         private Tabs.WaterTab waterTab;
         internal Tabs.MapTab.MapTab mapTab;
-        private Button buttonCreateWindow;
     }
 }
 
