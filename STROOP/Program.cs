@@ -29,15 +29,16 @@ namespace STROOP
             LoadingHandler.ShowLoadingForm();
 
 
-            var mainForm = new StroopMainForm(true);
-            InitializeShit(mainForm);
+            StroopMainForm mainForm;
+            InitializeShit(out mainForm);
 
             LoadingHandler.CloseForm();
             Application.Run(mainForm);
         }
 
-        static void InitializeShit(StroopMainForm mainForm)
+        static void InitializeShit(out StroopMainForm mainForm)
         {
+            StroopMainForm tmpMainForm = null;
             LoadingHandler.LoadingForm.RunLoadingTasks(
                 ("Creating Process Stream",
                 () => Config.Stream = new ProcessStream()
@@ -80,13 +81,13 @@ namespace STROOP
                 }
             ),
                 ("Initialize Main Form",
-                () => mainForm = new StroopMainForm(true)
+                () => tmpMainForm = new StroopMainForm(true)
             )
             //    ("Creating Managers",
             //    () => Config.InjectionManager = new InjectionManager(_scriptParser, optionsTab.checkBoxUseRomHack);
             //)
             );
-
+            mainForm = tmpMainForm;
         }
     }
 }
