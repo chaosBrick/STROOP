@@ -197,18 +197,24 @@ namespace STROOP.Tabs.MapTab
                     if (attr.Initializer == null)
                         toolStripItem.Click += (sender, e) =>
                         {
-                            MapObject obj = (MapObject)Activator.CreateInstance(capturedType);
-                            flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(this, obj));
+                            using (new AccessScope<MapTab>(this))
+                            {
+                                MapObject obj = (MapObject)Activator.CreateInstance(capturedType);
+                                flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(this, obj));
+                            }
                         };
                     else
                         toolStripItem.Click += (sender, e) =>
                         {
-                            MapObject obj = (MapObject)
+                            using (new AccessScope<MapTab>(this))
+                            {
+                                MapObject obj = (MapObject)
                                         (capturedType.GetMethod(attr.Initializer, BindingFlags.Public | BindingFlags.Static)
                                         ?.Invoke(null, new object[0])
                                         ?? null);
-                            if (obj != null)
-                                flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(this, obj));
+                                if (obj != null)
+                                    flowLayoutPanelMapTrackers.AddNewControl(new MapTracker(this, obj));
+                            }
                         };
                     List<ToolStripMenuItem> categoryList;
                     if (!adders.TryGetValue(attr.Category, out categoryList))
