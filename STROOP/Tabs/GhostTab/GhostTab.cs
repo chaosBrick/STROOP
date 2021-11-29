@@ -1,11 +1,13 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using OpenTK;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
+using System.Xml.Linq;
 
 namespace STROOP.Tabs.GhostTab
 {
@@ -28,6 +30,39 @@ namespace STROOP.Tabs.GhostTab
             target.Add("GhostRoll", ((uint _) => displayGhostVarFloat(frame => frame.oRoll)(), (object _, uint __) => false));
         }
 
+        static XElement configNode;
+        static HashSet<string> fileWatcherPaths = new HashSet<string>();
+        [Utilities.InitializeConfigParser]
+        static void InitConfigParser()
+        {
+            Utilities.XmlConfigParser.AddConfigParser("GhostFileWatchers", ParseGhostConfig);
+        }
+
+        static void ParseGhostConfig(XElement node)
+        {
+            configNode = node;
+            foreach (var watcherNode in node.Elements().Where(_ => _.Name == "FileWatcher"))
+            {
+                var attr = watcherNode.Attribute(XName.Get("path"));
+                if (attr != null)
+                    fileWatcherPaths.Add(attr.Value);
+            }
+        }
+
+        static void SaveConfig()
+        {
+            configNode.RemoveAll();
+            foreach (var path in fileWatcherPaths)
+            {
+                var n = new XElement(XName.Get("FileWatcher"));
+                n.SetAttributeValue(XName.Get("path"), path);
+                configNode.Add(n);
+            }
+            configNode.Document.Save("Config/Config.xml");
+        }
+
+        Dictionary<string, FileSystemWatcher> activeFileWatchers = new Dictionary<string, FileSystemWatcher>();
+
         uint bufferBaseAddress = 0x80408200;
 
         Task recordingTask;
@@ -36,7 +71,6 @@ namespace STROOP.Tabs.GhostTab
 
         int recIndex;
 
-        Ghost instantReplayOld;
         Ghost selectedGhost => listBoxGhosts.SelectedItem as Ghost;
         GhostFrame lastValidPlaybackFrame => selectedGhost?.lastValidPlaybackFrame ?? default(GhostFrame);
         GhostFrame currentGhostFrame;
@@ -53,6 +87,56 @@ namespace STROOP.Tabs.GhostTab
 
             instance = this;
             hack = new RomHack("Resources/Hacks/GhostHack.hck", "Ghost Hack");
+            UpdateFileWatchers();
+        }
+
+        void UpdateFileWatchers()
+        {
+            foreach (var entry in activeFileWatchers)
+                entry.Value.Dispose();
+            activeFileWatchers.Clear();
+            foreach (var path in fileWatcherPaths)
+                AddFileWatcher(path);
+        }
+
+        void AddFileWatcher(string path)
+        {
+            DateTime oldFileChangedDate = DateTime.Now;
+            string file = Path.GetFullPath(path);
+            int i = 0;
+            if (Directory.Exists(path) || File.Exists(path))
+            {
+                var folder = Path.GetDirectoryName(path);
+                FileSystemWatcher watcher = new FileSystemWatcher(folder);
+                file = folder + "\\tmp.ghost";
+                activeFileWatchers[path] = watcher;
+                var ghostName = "auto-rec";
+                watcher.NotifyFilter = NotifyFilters.LastWrite;
+                watcher.EnableRaisingEvents = true;
+                watcher.Changed += (a, aa) =>
+                {
+                    if (aa.FullPath == file)
+                    {
+                        var newFileChangedDate = File.GetLastWriteTime(file);
+                        if (newFileChangedDate - oldFileChangedDate > new TimeSpan(0, 0, 1))
+                        {
+                            BinaryReader rd = null;
+                            try
+                            {
+                                rd = new BinaryReader(new FileStream(file, FileMode.Open));
+                                var newGhost = Ghost.FromFile(rd);
+                                groupBoxGhosts.Invoke((Action)(() => AddGhost($"{ghostName} {i++}", newGhost)));
+                                oldFileChangedDate = newFileChangedDate;
+                            }
+                            catch { }
+                            finally
+                            {
+                                rd?.Close();
+                            }
+                        }
+                    }
+                };
+            }
         }
 
         void AddGhost(string name, Ghost newGhost)
@@ -168,17 +252,6 @@ namespace STROOP.Tabs.GhostTab
                                          "Ghost hack is disabled.");
 
             var globalTimer = Config.Stream.GetInt32(MiscConfig.GlobalTimerAddress);
-            if (globalTimer < lastGlobalTimer)
-            {
-                if (buttonInstantReplayMode.Checked)
-                {
-                    EndRecording();
-                    if (buttonDiscardOld.Checked && instantReplayOld != null)
-                        listBoxGhosts.Items.Remove(instantReplayOld);
-                    instantReplayOld = listBoxGhosts.SelectedItem as Ghost;
-                    StartRecording();
-                }
-            }
 
             if (selectedGhost != null)
             {
@@ -292,7 +365,6 @@ namespace STROOP.Tabs.GhostTab
                 ((Button)sender).Text = "Stop Recording";
                 StartRecording();
             }
-            buttonInstantReplayMode.Enabled = !recordingGhost;
         }
 
         private void buttonLoadGhost_Click(object sender, EventArgs e)
@@ -302,60 +374,70 @@ namespace STROOP.Tabs.GhostTab
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 Ghost newGhost;
-                var rd = new BinaryReader(new FileStream(dlg.FileName, FileMode.Open));
-                try
-                {
+                using (var rd = new BinaryReader(new FileStream(dlg.FileName, FileMode.Open)))
                     newGhost = Ghost.FromFile(rd);
-                    if (newGhost != null)
-                    {
-                        newGhost.fileName = dlg.FileName;
-                        AddGhost(Path.GetFileNameWithoutExtension(dlg.FileName), newGhost);
-                    }
-                }
-                finally
+                if (newGhost != null)
                 {
-                    rd.Close();
+                    newGhost.fileName = dlg.FileName;
+                    AddGhost(Path.GetFileNameWithoutExtension(dlg.FileName), newGhost);
                 }
             }
         }
 
         private void buttonWatchGhostFile_Click(object sender, EventArgs e)
         {
-            var dlg = new OpenFileDialog();
-            dlg.Filter = "ghost files (*.ghost)|*.ghost";
-            if (dlg.ShowDialog() == DialogResult.OK)
+            var frm = new Form();
+            frm.FormBorderStyle = FormBorderStyle.SizableToolWindow;
+            frm.Width = 750;
+            var lst = new ListBox();
+            lst.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom | AnchorStyles.Top;
+            lst.Size = frm.ClientRectangle.Size;
+            lst.Location = new System.Drawing.Point(frm.ClientRectangle.Left + 5, frm.ClientRectangle.Top + 5);
+            lst.Height -= 50;
+            lst.Width -= 10;
+            foreach (var path in fileWatcherPaths)
+                lst.Items.Add(path);
+            frm.Controls.Add(lst);
+
+            var btnAdd = new Button();
+            btnAdd.Text = "Add...";
+            btnAdd.Location = new System.Drawing.Point(lst.Left, lst.Bottom + 5);
+            btnAdd.Width = lst.Width / 2 - 2;
+            btnAdd.Anchor = AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right;
+            frm.Controls.Add(btnAdd);
+
+            var btnRemove = new Button();
+            btnRemove.Text = "Remove";
+            btnRemove.Width = lst.Width / 2 - 2;
+            btnRemove.Location = new System.Drawing.Point(btnAdd.Right + 5, lst.Bottom + 5);
+            btnRemove.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            frm.Controls.Add(btnRemove);
+
+            btnAdd.Click += (_, __) =>
             {
-                DateTime oldFileChangedDate = DateTime.Now;
-                string file = dlg.FileName;
-                int i = 0;
-                FileSystemWatcher watcher = new FileSystemWatcher(Path.GetDirectoryName(dlg.FileName));
-                var ghostName = Path.GetFileNameWithoutExtension(dlg.FileName);
-                watcher.NotifyFilter = NotifyFilters.LastWrite;
-                watcher.EnableRaisingEvents = true;
-                watcher.Changed += (a, aa) =>
+                var dlg = new OpenFileDialog();
+                dlg.Filter = "recordghost file (*.lua)|*.lua";
+                if (dlg.ShowDialog() == DialogResult.OK)
                 {
-                    if (aa.FullPath == file)
-                    {
-                        var newFileChangedDate = File.GetLastWriteTime(file);
-                        if (newFileChangedDate - oldFileChangedDate > new TimeSpan(0, 0, 1))
-                        {
-                            BinaryReader rd = null;
-                            try
-                            {
-                                rd = new BinaryReader(new FileStream(file, FileMode.Open));
-                                var newGhost = Ghost.FromFile(rd);
-                                groupBoxGhosts.Invoke((Action)(() => AddGhost($"{ghostName} {i++}", newGhost)));
-                                oldFileChangedDate = newFileChangedDate;
-                            }
-                            catch { }
-                            finally
-                            {
-                                rd?.Close();
-                            }
-                        }
-                    }
-                };
-            }
+                    fileWatcherPaths.Add(dlg.FileName);
+                    lst.Items.Clear();
+                    foreach (var path in fileWatcherPaths)
+                        lst.Items.Add(path);
+                }
+            };
+
+            btnRemove.Click += (_, __) =>
+            {
+                if (lst.SelectedItem != null)
+                    fileWatcherPaths.Remove((string)lst.SelectedItem);
+                lst.Items.Clear();
+                foreach (var path in fileWatcherPaths)
+                    lst.Items.Add(path);
+            };
+
+            frm.ShowDialog();
+            UpdateFileWatchers();
+            SaveConfig();
         }
 
         private void buttonSaveGhost_Click(object sender, EventArgs e)
@@ -386,8 +468,11 @@ namespace STROOP.Tabs.GhostTab
             }
         }
 
+        bool suspendSelectedIndexChanged = false;
         private void listBoxGhosts_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (suspendSelectedIndexChanged)
+                return;
             Ghost ghost = listBoxGhosts.SelectedItem as Ghost;
             labelGhostFile.Text = $"File: {ghost?.fileName ?? "-"}";
             labelNumFrames.Text = $"Number of frames: {ghost?.numFrames.ToString() ?? "-"}";
@@ -424,15 +509,6 @@ namespace STROOP.Tabs.GhostTab
             SetStartOfPlayback((uint)numericUpDownStartOfPlayback.Value);
         }
 
-        private void buttonInstantReplayMode_CheckedChanged(object sender, EventArgs e)
-        {
-            buttonRecordGhost.Enabled = !buttonInstantReplayMode.Checked;
-            if (buttonInstantReplayMode.Checked)
-                StartRecording();
-            else
-                EndRecording();
-        }
-
         private void textBoxGhostName_TextChanged(object sender, EventArgs e)
         {
             if (selectedGhost != null)
@@ -442,24 +518,91 @@ namespace STROOP.Tabs.GhostTab
             {
                 if (obj == selectedGhost)
                 {
+                    suspendSelectedIndexChanged = true;
                     listBoxGhosts.Items[i] = selectedGhost;
+                    suspendSelectedIndexChanged = false;
                     break;
                 }
                 i++;
             }
         }
 
-        private void buttonTutorial_Click(object sender, EventArgs e)
+        private void buttonTutorialRecord_Click(object sender, EventArgs e)
         {
-            STROOP.Forms.InfoForm frm = new Forms.InfoForm();
-            frm.SetText("Watch Ghost File Tutorial",
-                        "How watching ghost files works",
-@"Create a file called tmp.ghost next to recordghost.lua.
-(If the file already exists, you don't need to do anything).
-Click the 'Watch Ghost File' button and choose that same file.
-Start an instance of recordghost.lua - Every time you hit 'Start',
-a new ghost will start recording. Once you hit 'Stop', the ghost will be 
-saved to tmp.ghost and automatically added to the list of ghosts.");
+            Forms.InfoForm frm = new Forms.InfoForm();
+            frm.Size = new System.Drawing.Size(850, 400);
+            frm.SetText("Ghost Help",
+                        "How to record ghosts",
+@"The best way to record a ghost file is to use the 'recordghost.lua' script.
+This script should be located next to your STROOP executable. (You can move it to a different location though.)
+When you press 'Start', a new recording will begin at the current frame.
+Hitting 'Stop' will save the ghost to 'tmp.ghost' at the location of the script file.
+You can then load this file into STROOP to play it back later, or store it somewhere else.
+
+Alternatively, you can record a ghost directly using STROOP using the 'Record Ghost' button.
+To do this, you must first enable the ghost hack such that the respective panel reads 'Ghost hack is running'.
+Then, when you hit 'Record Ghost', a new recording will begin at the current frame.
+'Stop Recording' will end the recording and create a new entry in the ghost list directly.
+You can then watch this ghost back immediately or save it to a file using the 'Save Selected' button.
+IMPORTANT: Using this method to record ghosts may (and likely will) generate game lag to record all frame data.
+Because of this, movie VI counts can desync and end movie playback prematurely.");
+            frm.ShowDialog();
+        }
+
+        private void buttonTutorialPlayback_Click(object sender, EventArgs e)
+        {
+            Forms.InfoForm frm = new Forms.InfoForm();
+            frm.Size = new System.Drawing.Size(900, 500);
+            frm.SetText("Ghost Help",
+                        "How to play ghosts back",
+@"To play back a ghost, you must first enable the ghost hack.
+If no ghost recording is currently selected, STROOP will instead inject a ghost that will hover around Mario.
+This way you can see if the hack is enabled and working correctly.
+
+You can then load up any ghost file or select a previously recorded ghost from the list of ghosts.
+Each recording has a 'Playback Start' value that indicates SM64's Global Timer value on the first frame of recorded data.
+This value is used to determine when STROOP should inject which ghost frame, so if you're comparing against a ghost recorded from the same savestate as you're currently playing from the ghost should always be synchronized.
+
+If, however, the Global Timer has a different value (i.e. different savestate, different star order, ...), you can resync the playback by modifying the 'Start Playback at Global Timer' value to match the Global Timer of your current run.
+For convenience, you can check the game's current Global Timer value in the data view on the right.
+Depending on when in the game the ghost recording started (i.e. Star Select screen, First frame of running, ...) you may need to adjust this value until your runs sync up properly.
+
+IMPORTANT: Enabling the ghost hack may break some in-game objects.
+Do not start m64's from savestates with the hack already enabled.
+Always make sure your runs work from a clean savestate.
+");
+            frm.ShowDialog();
+        }
+
+        private void buttonTutorialNotes_Click(object sender, EventArgs e)
+        {
+            Forms.InfoForm frm = new Forms.InfoForm();
+            frm.Size = new System.Drawing.Size(900, 350);
+            frm.SetText("Ghost Help",
+                        "Notes",
+@"The ghost hack currently works only on the US version of Super Mario 64 (and therefore also on numerous ROM hacks).
+
+While in most cases the use of the ghost hack is unproblematic, there are several instances in which enabling the ghost hack may alter game behavior. It is therefore recommended that you only use the hack during a recording or playback, but never in a savestate from which an m64 file stars.
+Always verify that your runs work without the hack.
+
+Ghost recordings are purely visual recordings. Some visual effects, such as Mario's upper body tilt, will not perfectly match.
+Certain data may look misleading in the map tab. (For instance, the ghost's 'graphics angle' during a sideflip looks inverted.)
+The cap state of the ghost is the same as the real Mario's, except that the vanish cap effect will always be active.
+");
+            frm.ShowDialog();
+        }
+
+        private void buttonTutorialFileWatch_Click(object sender, EventArgs e)
+        {
+            Forms.InfoForm frm = new Forms.InfoForm();
+            frm.Size = new System.Drawing.Size(700, 300);
+            frm.SetText("Ghost Help",
+                        "Using the file watch list",
+@"You can let STROOP automatically detect when 'recordghost.lua' saves a new ghost recording.
+To do so, click the 'Edit File Watch List' button, then hit 'Add...' and navigate to wherever you have located your 'recordghost.lua' file and select it.
+
+You can add as many instances of the script as you please. The information for paths will be stored in 'Config/Config.xml'
+");
             frm.ShowDialog();
         }
     }

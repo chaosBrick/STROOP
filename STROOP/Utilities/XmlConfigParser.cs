@@ -1,24 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using System.IO;
 using System.Reflection;
 using STROOP.Structs;
 using System.Drawing;
-using System.Windows.Forms;
 using STROOP.Extensions;
 using System.Xml;
-using System.Net;
 using STROOP.Structs.Configurations;
 using STROOP.Controls;
-using STROOP.Models;
 
 namespace STROOP.Utilities
 {
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
+    public class InitializeConfigParser : Attribute { }
+
     public static class XmlConfigParser
     {
         public class ResourceXmlResolver : XmlResolver
@@ -42,9 +40,20 @@ namespace STROOP.Utilities
             }
         }
 
+        public delegate void ConfigElementParser(XElement node);
+        static Dictionary<string, ConfigElementParser> configParsers = new Dictionary<string, ConfigElementParser>();
+        public static void AddConfigParser(string elementName, ConfigElementParser parser)
+        {
+            configParsers[elementName] = parser;
+        }
+
         public static void OpenConfig(string path)
         {
             var assembly = Assembly.GetExecutingAssembly();
+            foreach (var t in assembly.GetTypes())
+                foreach (var m in t.GetMethods(BindingFlags.NonPublic | BindingFlags.Static))
+                    if (m.GetCustomAttribute<InitializeConfigParser>() != null && m.GetParameters().Length == 0)
+                        m.Invoke(null, new object[0]);
 
             // Create schema set
             var schemaSet = new XmlSchemaSet() { XmlResolver = new ResourceXmlResolver() };
@@ -83,6 +92,10 @@ namespace STROOP.Utilities
                         break;
                     case "RefreshRateFreq":
                         RefreshRateConfig.RefreshRateFreq = uint.Parse(element.Value);
+                        break;
+                    default:
+                        if (configParsers.TryGetValue(element.Name.ToString(), out ConfigElementParser parser))
+                            parser(element);
                         break;
                 }
             }
@@ -533,7 +546,6 @@ namespace STROOP.Utilities
             foreach (var field in ObjectAssociations.GetImageFields())
                 if (assocDictionary.TryGetValue(field.Name, out string imagePath))
                     field.SetValue(assoc, ImageUtilities.FromPathOrNull(AssocConfig.ImageDirectory + imagePath));
-
             assoc.MarioBehavior = marioBehavior;
 
 
