@@ -22,6 +22,8 @@ namespace STROOP.Tabs.MapTab
 
         private string _customName;
 
+        public bool IsVisible => _isVisible;
+
 
         public MapTracker(
             MapTab mapTab,

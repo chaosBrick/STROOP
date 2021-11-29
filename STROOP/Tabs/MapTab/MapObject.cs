@@ -66,14 +66,14 @@ namespace STROOP.Tabs.MapTab
                 }
             }
 
-            public void LeftClick()
-            {
-            }
+            public void LeftClick() { }
 
             public void RightClick()
             {
                 rightClickMenu.Show(Cursor.Position);
             }
+
+            public bool CanDrag() => parent.enableDragging.Checked;
         }
 
         MapObjectHoverData hoverData;

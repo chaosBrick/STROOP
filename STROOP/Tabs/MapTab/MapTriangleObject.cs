@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
-using OpenTK.Graphics.OpenGL;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
 using OpenTK;
-using System.Drawing.Imaging;
 using STROOP.Models;
 using System.Windows.Forms;
 
@@ -17,6 +12,53 @@ namespace STROOP.Tabs.MapTab
 {
     public abstract class MapTriangleObject : MapObject
     {
+        protected class TriangleHoverData : IHoverData
+        {
+            ContextMenuStrip ctxMenu = new ContextMenuStrip();
+            MapTriangleObject parent;
+            public TriangleDataModel triangle;
+            Vector3 mapCursorOnRightClick;
+
+            public TriangleHoverData(MapTriangleObject parent)
+            {
+                this.parent = parent;
+                var itemCopyTriangleAddress = new ToolStripMenuItem("Copy Triangle Address");
+                itemCopyTriangleAddress.Click += (_, __) =>
+                {
+                    if (triangle != null)
+                        Clipboard.SetText($"0x{triangle.Address.ToString("x8")}");
+                };
+                ctxMenu.Items.Add(itemCopyTriangleAddress);
+
+                var itemCopyPosition = new ToolStripMenuItem("Copy Position");
+                itemCopyPosition.Click += (_, __) =>
+                {
+                    if (triangle != null)
+                    {
+                        float y = triangle.IsWall() ? mapCursorOnRightClick.Y : (float)triangle.GetHeightOnTriangle(mapCursorOnRightClick.X, mapCursorOnRightClick.Z);
+                        var pos = new Vector3(mapCursorOnRightClick.X, y, mapCursorOnRightClick.Z);
+                        DataObject vec3Data = new DataObject("Position", pos);
+                        vec3Data.SetText($"{pos.X}; {pos.Y}; {pos.Z}");
+                        Clipboard.SetDataObject(vec3Data);
+                    }
+                };
+                ctxMenu.Items.Add(itemCopyPosition);
+            }
+
+            public void DragTo(Vector3 newPosition) { }
+
+            public void LeftClick() { }
+
+            public void RightClick()
+            {
+                mapCursorOnRightClick = parent.graphics.mapCursorPosition;
+                if (triangle != null)
+                    ctxMenu.Show(Cursor.Position);
+            }
+
+            public bool CanDrag() => false;
+        }
+
         protected static List<uint> GetTrianglesFromDialog(uint defaultTriangle)
         {
             string text = DialogUtilities.GetStringFromDialog(labelText: "Enter triangle addresses as hex uints.");
@@ -37,10 +79,12 @@ namespace STROOP.Tabs.MapTab
         private float? _withinDist;
         private float? _withinCenter;
         protected bool _excludeDeathBarriers;
+        protected TriangleHoverData hoverData;
 
         public MapTriangleObject()
             : base()
         {
+            hoverData = new TriangleHoverData(this);
             _withinDist = null;
             _withinCenter = null;
             _excludeDeathBarriers = false;

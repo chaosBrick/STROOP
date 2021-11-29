@@ -24,6 +24,19 @@ namespace STROOP.Tabs.MapTab
             _maxHeight = null;
         }
 
+        public override IHoverData GetHoverData()
+        {
+            foreach (var tri in GetTrianglesWithinDist())
+            {
+                if (tri.GetTruncatedHeightOnTriangleIfInsideTriangle(graphics.mapCursorPosition.X, graphics.mapCursorPosition.Z) != null)
+                {
+                    hoverData.triangle = tri;
+                    return hoverData;
+                }
+            }
+            return null;
+        }
+
         public override void DrawOn2DControl(MapGraphics graphics)
         {
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
@@ -49,7 +62,7 @@ namespace STROOP.Tabs.MapTab
                 }
             });
         }
-        
+
         protected List<ToolStripMenuItem> GetHorizontalTriangleToolStripMenuItems(MapTracker targetTracker)
         {
             ToolStripMenuItem itemSetMinHeight = new ToolStripMenuItem("Set Min Height");

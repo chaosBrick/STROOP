@@ -536,7 +536,7 @@ namespace STROOP.Tabs.MapTab
             mapCursorPosition = new Vector3(mapCursorPosition.X, mapCursorPosition.Z, mapCursorPosition.Y);
             using (new AccessScope<MapTab>(mapTab))
             {
-                if (mapTab.HasMouseListeners && mouseDown[0])
+                if (mapTab.HasMouseListeners && mouseDown[0] && mapTab.hoverData.CanDrag())
                 {
                     mapTab.hoverData.DragTo(mapCursorPosition);
                     return;

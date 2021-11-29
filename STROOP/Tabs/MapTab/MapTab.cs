@@ -425,11 +425,12 @@ namespace STROOP.Tabs.MapTab
             {
                 hoverData = null;
                 foreach (var tracker in flowLayoutPanelMapTrackers.EnumerateTrackers())
-                {
-                    var newHover = tracker.mapObject.GetHoverData();
-                    if (newHover != null)
-                        hoverData = newHover;
-                }
+                    if (tracker.IsVisible)
+                    {
+                        var newHover = tracker.mapObject.GetHoverData();
+                        if (newHover != null)
+                            hoverData = newHover;
+                    }
 
                 flowLayoutPanelMapTrackers.UpdateControl();
 

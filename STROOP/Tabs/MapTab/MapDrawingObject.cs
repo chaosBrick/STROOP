@@ -16,6 +16,8 @@ namespace STROOP.Tabs.MapTab
             MapDrawingObject parent;
             public Drawing(MapDrawingObject target) { this.parent = target; }
 
+            public bool CanDrag() => true;
+
             public void DragTo(Vector3 newPosition)
             {
                 Vector3 currentVertex = parent.graphics.mapCursorPosition;

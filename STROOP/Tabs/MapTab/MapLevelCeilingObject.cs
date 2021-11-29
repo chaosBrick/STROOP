@@ -102,6 +102,7 @@ namespace STROOP.Tabs.MapTab
 
         public override void Update()
         {
+            base.Update();
             if (_autoUpdate)
                 AutoUpdate();
         }

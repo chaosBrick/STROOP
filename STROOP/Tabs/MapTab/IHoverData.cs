@@ -6,5 +6,6 @@ namespace STROOP.Tabs.MapTab
         void LeftClick();
         void RightClick();
         void DragTo(Vector3 newPosition);
+        bool CanDrag();
     }
 }

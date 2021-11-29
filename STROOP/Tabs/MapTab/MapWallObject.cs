@@ -33,6 +33,35 @@ namespace STROOP.Tabs.MapTab
             _absoluteHeight = null;
         }
 
+        public override IHoverData GetHoverData()
+        {
+            foreach (var tri in GetTrianglesWithinDist())
+            {
+                var dat = MapUtilities.Get2DWallDataFromTri(tri);
+                if (dat != null)
+                {
+                    bool zProjection = !dat.Value.xProjection;
+                    float v = zProjection ? graphics.mapCursorPosition.X : graphics.mapCursorPosition.Z;
+                    float vOther = zProjection ? graphics.mapCursorPosition.Z : graphics.mapCursorPosition.X;
+                    float one = zProjection ? dat.Value.x1 : dat.Value.z1;
+                    float two = zProjection ? dat.Value.x2 : dat.Value.z2;
+                    float min = Math.Min(one, two);
+                    float max = Math.Max(one, two);
+                    float otherOne = zProjection ? dat.Value.z1 : dat.Value.x1;
+                    float otherTwo = zProjection ? dat.Value.z2 : dat.Value.x2;
+                    float interpolatedOther = otherOne + ((v - one) / (two - one)) * (otherTwo - otherOne);
+                    var angle = MoreMath.AngleTo_Radians(dat.Value.x1, dat.Value.z1, dat.Value.x2, dat.Value.z2);
+                    float projectionDist = Size / (float)Math.Abs(!zProjection ? Math.Cos(angle) : Math.Sin(angle));
+                    if (v >= min && v <= max && Math.Abs(vOther - interpolatedOther) < projectionDist)
+                    {
+                        hoverData.triangle = tri;
+                        return hoverData;
+                    }
+                }
+            }
+            return null;
+        }
+
         public override void DrawOn2DControl(MapGraphics graphics)
         {
 
