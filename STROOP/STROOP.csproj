@@ -423,6 +423,12 @@
     <Compile Include="LoadingHandler.cs" />
     <Compile Include="Managers\IVariableAdder.cs" />
     <Compile Include="Managers\VariableAdder.cs" />
+    <Compile Include="Tabs\GhostTab\FileWatchers.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Tabs\GhostTab\GhostTabHelp.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Tabs\MapTab\GraphicsUtil.cs" />
     <Compile Include="Tabs\MapTab\IHoverData.cs" />
     <Compile Include="Tabs\MapTab\MapAllObjectCeilingObject.cs" />
