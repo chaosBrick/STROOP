@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using OpenTK.Graphics.OpenGL;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
@@ -75,61 +71,59 @@ namespace STROOP.Tabs.MapTab
                 }
             });
         }
-        int evenFunnier = 0;
+
         public List<DataPoint> GetData()
         {
+            Lazy<Image>[] marioImages = new[] {
+                Config.ObjectAssociations.PinkMarioMapImage,
+                Config.ObjectAssociations.YellowMarioMapImage,
+                Config.ObjectAssociations.PurpleMarioMapImage,
+                Config.ObjectAssociations.GreyMarioMapImage,
+                Config.ObjectAssociations.TurquoiseMarioMapImage,
+                Config.ObjectAssociations.GreenMarioMapImage,
+                Config.ObjectAssociations.BrownMarioMapImage,
+
+                Config.ObjectAssociations.OrangeMarioMapImage,
+                Config.ObjectAssociations.TurquoiseMarioMapImage,
+                Config.ObjectAssociations.GreenMarioMapImage,
+                Config.ObjectAssociations.BlueMarioMapImage,
+            };
+
+            uint READ_INITIAL_OFFSET = RomVersionConfig.Version == RomVersion.US ? 0x80372F00 : 0x80400010;
+
+            var dsjaoisd = Config.Stream.GetUInt32(0x803733c0);
+
             uint globalTimer = Config.Stream.GetUInt32(MiscConfig.GlobalTimerAddress);
 
-            float pos01X = Config.Stream.GetSingle(0x80372F00);
-            float pos01Y = Config.Stream.GetSingle(0x80372F04);
-            float pos01Z = Config.Stream.GetSingle(0x80372F08);
-            float pos01A = Config.Stream.GetUInt16(0x80372F0E);
-
-            float pos02X = Config.Stream.GetSingle(0x80372F10);
-            float pos02Y = Config.Stream.GetSingle(0x80372F14);
-            float pos02Z = Config.Stream.GetSingle(0x80372F18);
-            float pos02A = Config.Stream.GetUInt16(0x80372F1E);
-
-            float pos03X = Config.Stream.GetSingle(0x80372F20);
-            float pos03Y = Config.Stream.GetSingle(0x80372F24);
-            float pos03Z = Config.Stream.GetSingle(0x80372F28);
-            float pos03A = Config.Stream.GetUInt16(0x80372F2E);
-
-            var qsData = new(float qsX, float qsY, float qsZ, ushort qsA)[4 * 3];
+            var qsData = new(float qsX, float qsY, float qsZ, ushort qsA)[7 + 4 * 4];
             for (int i = 0; i < qsData.Length; i++)
                 qsData[i] = (
-                    Config.Stream.GetSingle((uint)(0x80372F30 + 0x10 * i)),
-                    Config.Stream.GetSingle((uint)(0x80372F34 + 0x10 * i)),
-                    Config.Stream.GetSingle((uint)(0x80372F38 + 0x10 * i)),
-                    Config.Stream.GetUInt16((uint)(0x80372F3E + 0x10 * i)));
-            qsData[11].qsA = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
+                    Config.Stream.GetSingle((uint)(READ_INITIAL_OFFSET + 0x10 * i)),
+                    Config.Stream.GetSingle((uint)(READ_INITIAL_OFFSET + 4 + 0x10 * i)),
+                    Config.Stream.GetSingle((uint)(READ_INITIAL_OFFSET + 8 + 0x10 * i)),
+                    Config.Stream.GetUInt16((uint)(READ_INITIAL_OFFSET + 0xE + 0x10 * i)));
 
-            int numQFrames = Config.Stream.GetInt32(0x80372E3C) / 0x30;
+            int numBaseFrames = 7;
 
-            List<DataPoint> allResults =
-                new List<DataPoint>()
-                {
-                    new DataPoint(pos01X, pos01Y, pos01Z, pos01A, Config.ObjectAssociations.PurpleMarioMapImage), // initial
-                    new DataPoint(pos02X, pos02Y, pos02Z, pos02A, Config.ObjectAssociations.BlueMarioMapImage), // wall1
-                    new DataPoint(pos03X, pos03Y, pos03Z, pos03A, Config.ObjectAssociations.GreenMarioMapImage), // wall2
-                };
+            var val = Config.Stream.GetInt32(RomVersionConfig.Version == RomVersion.US ? 0x80372E3C : 0x80400000);
+            int numQFrames = (val - 0x10 * numBaseFrames) / 0x40;
 
-            for (int i = 0; i < numQFrames - 1; i++)
+
+
+            List<DataPoint> allResults = new List<DataPoint>();
+            for (int i = 0; i < numBaseFrames; i++)
+                allResults.Add(new DataPoint(qsData[i].qsX, qsData[i].qsY, qsData[i].qsZ, qsData[i].qsA, marioImages[i]));
+            numQFrames = Math.Min(numQFrames, 4);
+            for (int i = 0; i < numQFrames; i++)
             {
-                int baseIndex = i * 3;
-                allResults.AddRange(new[]
-                {
-                    new DataPoint(qsData[baseIndex].qsX, qsData[baseIndex].qsY, qsData[baseIndex].qsZ, qsData[baseIndex].qsA,
-                    Config.ObjectAssociations.OrangeMarioMapImage),
-                    new DataPoint(qsData[baseIndex + 1].qsX, qsData[baseIndex + 1].qsY, qsData[baseIndex + 1].qsZ, qsData[baseIndex + 1].qsA,
-                    Config.ObjectAssociations.BlueMarioMapImage),
-                    new DataPoint(qsData[baseIndex + 2].qsX, qsData[baseIndex + 2].qsY, qsData[baseIndex + 2].qsZ, qsData[baseIndex + 2].qsA,
-                    i == numQFrames - 1 ? Config.ObjectAssociations.MarioMapImage : Config.ObjectAssociations.GreenMarioMapImage)
-                });
+                int baseIndex = numBaseFrames + i * 4;
+                for (int k = 0; k < 4; k++)
+                    allResults.Add(new DataPoint(qsData[baseIndex + k].qsX, qsData[baseIndex + k].qsY, qsData[baseIndex + k].qsZ, qsData[baseIndex + k].qsA, marioImages[k + 7]));
             }
 
             var funny = globalTimer - numFramesToShow;
-            for (uint record = firstRecord; record <= funny; record++)
+            int maxDelettions = 0;
+            for (uint record = firstRecord; record <= funny && maxDelettions++ < 100; record++)
                 dataByFrame.Remove(record);
 
             dataByFrame[globalTimer] = allResults;
@@ -149,7 +143,7 @@ namespace STROOP.Tabs.MapTab
                         if (showSinglePoint && count == pointToShow)
                             return new List<DataPoint>(new[] { dataPoint });
                         count++;
-                        combinedResults.Add(dataPoint);
+                        combinedResults.Insert(0, dataPoint);
                     }
             }
 

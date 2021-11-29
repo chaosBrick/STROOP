@@ -20,10 +20,18 @@
   <MapImage name="Holp" path = "HOLP.png"/>
   <MapImage name="Home" path = "Home.png"/>
   <MapImage name="IntendedNextPosition" path = "Intended Next Position.png"/>
-  <MapImage name="BlueMarioMap" path = "Mario Blue.png"/>
-  <MapImage name="GreenMarioMap" path = "Mario Green.png"/>
-  <MapImage name="OrangeMarioMap" path = "Mario Orange.png"/>
-  <MapImage name="PurpleMarioMap" path = "Mario Purple.png"/>
+
+  <MapImage name="GreenMarioMap"     path="Mario Green.png"/>
+  <MapImage name="OrangeMarioMap"    path="Mario Orange.png"/>
+  <MapImage name="PurpleMarioMap"    path="Mario Purple.png"/>
+  <MapImage name="BlueMarioMap"      path="Mario Blue.png"/>
+  <MapImage name="TurquoiseMarioMap" path="Mario Turquoise.png"/>
+  <MapImage name="YellowMarioMap"    path="Mario Yellow.png"/>
+  <MapImage name="PinkMarioMap"      path="Mario Pink.png"/>
+  <MapImage name="BrownMarioMap"     path="Mario Brown.png"/>
+  <MapImage name="WhiteMarioMap"     path="Mario White.png"/>
+  <MapImage name="GreyMarioMap"      path="Mario Grey.png"/>
+  
   <MapImage name="TriangleFloor" path = "Triangle Floor.png"/>
   <MapImage name="TriangleWall" path = "Triangle Wall.png"/>
   <MapImage name="TriangleCeiling" path = "Triangle Ceiling.png"/>
