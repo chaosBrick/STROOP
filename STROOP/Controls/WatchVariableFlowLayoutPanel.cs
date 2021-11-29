@@ -31,6 +31,8 @@ namespace STROOP.Controls
 
         private List<ToolStripItem> _selectionToolStripItems;
 
+        ToolStripMenuItem filterVariablesItem = new ToolStripMenuItem("Filter Variables...");
+
 
         string _dataPath;
         [Category("Data"), Browsable(true)]
@@ -216,10 +218,6 @@ namespace STROOP.Controls
                 () => GetCurrentVariableControls(), this)
                 .ForEach(item => doToAllVariablesItem.DropDownItems.Add(item));
 
-            ToolStripMenuItem filterVariablesItem = new ToolStripMenuItem("Filter Variables...");
-            _filteringDropDownItems = _allGroups.ConvertAll(varGroup => CreateFilterItem(varGroup));
-            UpdateFilterItemCheckedStatuses();
-            _filteringDropDownItems.ForEach(item => filterVariablesItem.DropDownItems.Add(item));
             filterVariablesItem.DropDown.MouseEnter += (sender, e) =>
             {
                 filterVariablesItem.DropDown.AutoClose = false;
@@ -289,6 +287,11 @@ namespace STROOP.Controls
                     if (ShouldShow(watchVarControl))
                         Controls.Add(watchVarControl);
                 });
+
+                filterVariablesItem.DropDownItems.Clear();
+                _filteringDropDownItems = _allGroups.ConvertAll(varGroup => CreateFilterItem(varGroup));
+                UpdateFilterItemCheckedStatuses();
+                _filteringDropDownItems.ForEach(item => filterVariablesItem.DropDownItems.Add(item));
             }
         }
 
