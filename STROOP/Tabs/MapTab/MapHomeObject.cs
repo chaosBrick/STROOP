@@ -32,17 +32,6 @@ namespace STROOP.Tabs.MapTab
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.HomeImage;
 
-        public override string GetName()
-        {
-            string firstString = null;
-            foreach (var _ in positionAngleProvider())
-            {
-                if (firstString == null)
-                    firstString = _.GetMapName();
-                else
-                    firstString = "Many";
-            }
-            return "Home of " + firstString;
-        }
+        public override string GetName() => $"Home of {PositionAngle.NameOfMultiple(positionAngleProvider())}";
     }
 }

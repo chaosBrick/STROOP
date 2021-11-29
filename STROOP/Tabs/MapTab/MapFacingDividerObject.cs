@@ -9,11 +9,9 @@ namespace STROOP.Tabs.MapTab
 {
     public class MapFacingDividerObject : MapLineObject
     {
-        string name;
-        public MapFacingDividerObject(PositionAngleProvider positionAngleProvider, string name)
+        public MapFacingDividerObject(PositionAngleProvider positionAngleProvider)
             : base()
         {
-            this.name = name;
             this.positionAngleProvider = positionAngleProvider;
 
             Size = 1000;
@@ -41,6 +39,6 @@ namespace STROOP.Tabs.MapTab
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.ArrowImage;
 
-        public override string GetName() => $"Facing Divider for {name}";
+        public override string GetName() => $"Facing Divider for {PositionAngle.NameOfMultiple(positionAngleProvider())}";
     }
 }

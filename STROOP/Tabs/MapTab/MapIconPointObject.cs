@@ -15,5 +15,22 @@ namespace STROOP.Tabs.MapTab
         }
 
         public override bool ParticipatesInGlobalIconSize() => true;
+
+        public override IHoverData GetHoverData()
+        {
+            var radius = Size / graphics.MapViewScaleValue;
+            var cursorPos = graphics.mapCursorPosition;
+            if (!graphics.IsMouseDown(0))
+            {
+                hoverData.currentPositionAngle = null;
+                foreach (var a in positionAngleProvider())
+                    if ((new Vector3((float)a.X, cursorPos.Y, (float)a.Z) - cursorPos).LengthSquared < radius * radius)
+                    {
+                        hoverData.currentPositionAngle = a;
+                        break;
+                    }
+            }
+            return hoverData.currentPositionAngle != null ? hoverData : null;
+        }
     }
 }

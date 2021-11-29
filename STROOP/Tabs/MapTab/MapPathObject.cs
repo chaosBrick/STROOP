@@ -281,7 +281,7 @@ namespace STROOP.Tabs.MapTab
             }
         }
 
-        public override string GetName() => "Path for " + _posAngle.GetMapName();
+        public override string GetName() => $"Path for {PositionAngle.NameOfMultiple(positionAngleProvider())}";
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.PathImage;
 

@@ -120,7 +120,7 @@ namespace STROOP.Tabs.MapTab
             }
         }
 
-        public override string GetName() => name;
+        public override string GetName() => $"{name} for {PositionAngle.NameOfMultiple(positionAngleProvider())}";
 
         public class ArrowSource
         {

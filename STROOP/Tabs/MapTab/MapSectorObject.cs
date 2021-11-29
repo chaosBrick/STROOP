@@ -14,13 +14,11 @@ namespace STROOP.Tabs.MapTab
         protected readonly static int NUM_POINTS_2D = 257;
 
         private float _angleRadius;
-        string name;
 
-        public MapSectorObject(PositionAngleProvider positionAngleProvider, string name)
+        public MapSectorObject(PositionAngleProvider positionAngleProvider)
             : base()
         {
             this.positionAngleProvider = positionAngleProvider;
-            this.name = name;
             _angleRadius = 4096;
 
             Size = 1000;
@@ -67,7 +65,7 @@ namespace STROOP.Tabs.MapTab
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.ArrowImage;
 
-        public override string GetName() => "Sector for " + name;
+        public override string GetName() => $"Sector for {PositionAngle.NameOfMultiple(positionAngleProvider())}";
 
         public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {

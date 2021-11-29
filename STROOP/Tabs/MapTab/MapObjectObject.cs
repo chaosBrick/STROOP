@@ -19,25 +19,25 @@ namespace STROOP.Tabs.MapTab
                 () => MapTracker.CreateTracker(mapTab, new MapObjectCylinderObject(
                     positionAngleProvider,
                     MapObjectCylinderObject.Dimensions.HitBox,
-                    "Hitbox Cylinders for " + name)));
+                    "Hitbox Cylinders")));
 
             cylindersItem.DropDownItems.AddHandlerToItem("Add Tracker for Effective Hitbox Cylinders",
                 () => MapTracker.CreateTracker(mapTab, new MapObjectCylinderObject(
                     positionAngleProvider,
                     MapObjectCylinderObject.Dimensions.EffectiveHitBox,
-                    "Effective Hitbox Cylinders for " + name)));
+                    "Effective Hitbox Cylinders")));
 
             cylindersItem.DropDownItems.AddHandlerToItem("Add Tracker for Hurtbox Cylinders",
                 () => MapTracker.CreateTracker(mapTab, new MapObjectCylinderObject(
                     positionAngleProvider,
                     MapObjectCylinderObject.Dimensions.HurtBox,
-                    "Effective Hurtbox Cylinders for " + name)));
+                    "Hurtbox Cylinders")));
 
             cylindersItem.DropDownItems.AddHandlerToItem("Add Tracker for Effective Hurtbox Cylinders",
                 () => MapTracker.CreateTracker(mapTab, new MapObjectCylinderObject(
                     positionAngleProvider,
                     MapObjectCylinderObject.Dimensions.EffectiveHitBox,
-                    "Effective Hurtbox Cylinders for " + name)));
+                    "Effective Hurtbox Cylinders")));
 
             cylindersItem.DropDownItems.AddHandlerToItem("Add Tracker for Custom Cylinders",
                 () =>
@@ -45,7 +45,7 @@ namespace STROOP.Tabs.MapTab
                     var customCylinderObject = new MapObjectCylinderObject(
                             positionAngleProvider,
                             null,
-                            "Custom Cylinders for " + name);
+                            "Custom Cylinders");
                     var tracker = MapTracker.CreateTracker(mapTab, customCylinderObject);
                     customCylinderObject.getDimensions = MapObjectCylinderObject.Dimensions.CustomSize(() => (customCylinderObject.Size, 0, 100));
                 });
@@ -57,7 +57,7 @@ namespace STROOP.Tabs.MapTab
                     var customCylinderObject = new MapObjectCylinderObject(
                             () => positionAngleProvider().ConvertAndRemoveNull(obj => PositionAngle.ObjHome(obj.GetObjAddress())),
                             null,
-                            "Custom Cylinders for Home of " + name);
+                            "Custom Cylinders");
                     MapTracker.CreateTracker(mapTab, customCylinderObject);
                     customCylinderObject.getDimensions = MapObjectCylinderObject.Dimensions.CustomSize(() => (customCylinderObject.Size, 0, 100));
                 });
@@ -71,13 +71,13 @@ namespace STROOP.Tabs.MapTab
                 () => MapTracker.CreateTracker(mapTab, new MapObjectSphereObject(
                     positionAngleProvider,
                     MapObjectSphereObject.Dimensions.Tangibility,
-                    "Tangibility Spheres for " + name)));
+                    "Tangibility Spheres")));
 
             spheresItem.DropDownItems.AddHandlerToItem("Add Tracker for Draw Distance Sphere",
                 () => MapTracker.CreateTracker(mapTab, new MapObjectSphereObject(
                     positionAngleProvider,
                     MapObjectSphereObject.Dimensions.DrawDistance,
-                    "Draw Distance Spheres for " + name)));
+                    "Draw Distance Spheres")));
 
             spheresItem.DropDownItems.AddHandlerToItem("Add Tracker for Custom Spheres for Home",
                 () =>
@@ -85,7 +85,7 @@ namespace STROOP.Tabs.MapTab
                     var customSpheresObject = new MapObjectSphereObject(
                             () => positionAngleProvider().ConvertAndRemoveNull(obj => PositionAngle.ObjHome(obj.GetObjAddress())),
                             null,
-                            "Custom Spheres for Home of " + name);
+                            "Custom Spheres");
                     customSpheresObject.getDimensions = MapObjectSphereObject.Dimensions.CustomSize(() => customSpheresObject.Size);
                     MapTracker.CreateTracker(mapTab, customSpheresObject);
                 });
@@ -96,7 +96,7 @@ namespace STROOP.Tabs.MapTab
                     var customSpheresObject = new MapObjectSphereObject(
                             positionAngleProvider,
                             null,
-                            "Custom Spheres for " + name);
+                            "Custom Spheres");
                     customSpheresObject.getDimensions = MapObjectSphereObject.Dimensions.CustomSize(() => customSpheresObject.Size);
                     MapTracker.CreateTracker(mapTab, customSpheresObject);
                 });
@@ -134,23 +134,23 @@ namespace STROOP.Tabs.MapTab
                     $"Object Angle to Mario for {name}")));
 
             anglesItem.DropDownItems.AddHandlerToItem("Add Tracker for Angle Range",
-                () => MapTracker.CreateTracker(mapTab, new MapAngleRangeObject(positionAngleProvider, name)));
+                () => MapTracker.CreateTracker(mapTab, new MapAngleRangeObject(positionAngleProvider)));
 
             anglesItem.DropDownItems.AddHandlerToItem("Add Tracker for Facing Divider",
-                () => MapTracker.CreateTracker(mapTab, new MapFacingDividerObject(positionAngleProvider, name)));
+                () => MapTracker.CreateTracker(mapTab, new MapFacingDividerObject(positionAngleProvider)));
 
             anglesItem.DropDownItems.AddHandlerToItem("Add Tracker for Home Line",
-                () => MapTracker.CreateTracker(mapTab, new MapHomeLineObject(positionAngleProvider, name)));
+                () => MapTracker.CreateTracker(mapTab, new MapHomeLineObject(positionAngleProvider)));
 
             anglesItem.DropDownItems.AddHandlerToItem("Add Tracker for Sector",
-                () => MapTracker.CreateTracker(mapTab, new MapSectorObject(positionAngleProvider, name)));
+                () => MapTracker.CreateTracker(mapTab, new MapSectorObject(positionAngleProvider)));
 
             targetStrip.Items.Add(anglesItem);
 
             var currentItem = new ToolStripMenuItem("Current");
 
             currentItem.DropDownItems.AddHandlerToItem("Add Tracker for Current Unit",
-                () => MapTracker.CreateTracker(mapTab, new MapCurrentUnitsObject(positionAngleProvider, name)));
+                () => MapTracker.CreateTracker(mapTab, new MapCurrentUnitsObject(positionAngleProvider)));
 
             targetStrip.Items.Add(currentItem);
         }
@@ -197,16 +197,7 @@ namespace STROOP.Tabs.MapTab
             return result ?? Config.ObjectAssociations.EmptyImage;
         }
 
-        public override string GetName()
-        {
-            string name = null;
-            foreach (var posAngle in positionAngleProvider())
-                if (name == null)
-                    name = posAngle.GetMapName();
-                else if (name != posAngle.GetMapName())
-                    name = "Multiple Objects";
-            return name ?? "<null>";
-        }
+        public override string GetName() => PositionAngle.NameOfMultiple(positionAngleProvider());
 
         public override void Update()
         {

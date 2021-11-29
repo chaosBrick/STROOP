@@ -33,7 +33,7 @@ namespace STROOP.Tabs.MapTab
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.SphereImage;
 
-        public override string GetName() => name;
+        public override string GetName() => $"{name} for {PositionAngle.NameOfMultiple(positionAngleProvider())}";
 
         public static class Dimensions
         {

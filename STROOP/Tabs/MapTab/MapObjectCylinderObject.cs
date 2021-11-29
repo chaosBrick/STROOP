@@ -11,14 +11,13 @@ namespace STROOP.Tabs.MapTab
     {
         public delegate (float centerX, float centerZ, float radius, float minY, float maxY) GetDimensions(PositionAngle positionAngle);
 
-        public PositionAngleProvider posAngle;
         public GetDimensions getDimensions;
         public string name;
 
         public MapObjectCylinderObject(PositionAngleProvider positionAngleProvider, GetDimensions getDimensions, string name)
             : base()
         {
-            this.posAngle = positionAngleProvider;
+            this.positionAngleProvider = positionAngleProvider;
             this.getDimensions = getDimensions;
             this.name = name;
         }
@@ -26,14 +25,14 @@ namespace STROOP.Tabs.MapTab
         protected override List<(float centerX, float centerZ, float radius, float minY, float maxY)> Get3DDimensions()
         {
             var lst = new List<(float centerX, float centerZ, float radius, float minY, float maxY)>();
-            foreach (var obj in posAngle())
+            foreach (var obj in positionAngleProvider())
                 lst.Add(getDimensions(obj));
             return lst;
         }
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.CylinderImage;
 
-        public override string GetName() => name;
+        public override string GetName() => $"{name} for {PositionAngle.NameOfMultiple(positionAngleProvider())}";
 
         public static class Dimensions
         {

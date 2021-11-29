@@ -10,10 +10,8 @@ namespace STROOP.Tabs.MapTab
     [ObjectDescription("Current Unit", "Current")]
     public class MapCurrentUnitsObject : MapQuadObject
     {
-        string name;
-
-        public MapCurrentUnitsObject() : this(() => new List<PositionAngle>(new[] { PositionAngle.Mario }), "Mario") { }
-        public MapCurrentUnitsObject(PositionAngleProvider positionAngleProvider, string name)
+        public MapCurrentUnitsObject() : this(() => new List<PositionAngle>(new[] { PositionAngle.Mario })) { }
+        public MapCurrentUnitsObject(PositionAngleProvider positionAngleProvider)
             : base()
         {
             this.positionAngleProvider = positionAngleProvider;
@@ -39,7 +37,7 @@ namespace STROOP.Tabs.MapTab
             return quads;
         }
 
-        public override string GetName() => $"Current Unit for {name}";
+        public override string GetName() => $"Current Unit for {PositionAngle.NameOfMultiple(positionAngleProvider())}";
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.CurrentUnitImage;
     }

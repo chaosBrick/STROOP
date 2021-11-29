@@ -13,14 +13,12 @@ namespace STROOP.Tabs.MapTab
     {
         private bool _useRelativeAngles;
         private int _angleDiff;
-        string name;
 
         private ToolStripMenuItem _itemUseRelativeAngles;
 
-        public MapAngleRangeObject(PositionAngleProvider positionAngleProvider, string name)
+        public MapAngleRangeObject(PositionAngleProvider positionAngleProvider)
         {
             this.positionAngleProvider = positionAngleProvider;
-            this.name = name;
 
             _useRelativeAngles = false;
             _angleDiff = 16;
@@ -47,7 +45,7 @@ namespace STROOP.Tabs.MapTab
             return vertices;
         }
 
-        public override string GetName() => $"Angle Range for {name}";
+        public override string GetName() => $"Angle Range for {PositionAngle.NameOfMultiple(positionAngleProvider())}";
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.CustomGridlinesImage;
 

@@ -11,7 +11,7 @@ namespace STROOP.Tabs.MapTab
 {
     [ObjectDescription("Objects with Name", "Objects", nameof(CreateByName))]
     [ObjectDescription("All Objects", "Objects", nameof(CreateAllObjects))]
-    public class MapMultipleObjects : MapObject
+    public class MapMultipleObjects : MapIconPointObject
     {
         private readonly string _objName;
         private readonly Lazy<Image> _objImage;
@@ -61,7 +61,7 @@ namespace STROOP.Tabs.MapTab
                 _objMapImage;
         }
 
-        public override string GetName() => _objName;
+        public override string GetName() => PositionAngle.NameOfMultiple(positionAngleProvider());
 
         public override void DrawOn2DControl(MapGraphics graphics)
         {

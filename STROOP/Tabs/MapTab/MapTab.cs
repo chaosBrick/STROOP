@@ -423,14 +423,17 @@ namespace STROOP.Tabs.MapTab
 
             using (new AccessScope<MapTab>(this))
             {
-                hoverData = null;
-                foreach (var tracker in flowLayoutPanelMapTrackers.EnumerateTrackers())
-                    if (tracker.IsVisible)
-                    {
-                        var newHover = tracker.mapObject.GetHoverData();
-                        if (newHover != null)
-                            hoverData = newHover;
-                    }
+                if (!view.MapGraphics.IsMouseDown(0))
+                {
+                    hoverData = null;
+                    foreach (var tracker in flowLayoutPanelMapTrackers.EnumerateTrackers())
+                        if (tracker.IsVisible)
+                        {
+                            var newHover = tracker.mapObject.GetHoverData();
+                            if (newHover != null)
+                                hoverData = newHover;
+                        }
+                }
 
                 flowLayoutPanelMapTrackers.UpdateControl();
 

@@ -494,7 +494,6 @@
     <Compile Include="Tabs\MapTab\MapWallObject.cs" />
     <Compile Include="Tabs\MapTab\MapSelfObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjectSphereObject.cs" />
-    <Compile Include="Tabs\MapTab\MapCustomCylinderObject.cs" />
     <Compile Include="Tabs\MapTab\MapCurrentUnitObject.cs" />
     <Compile Include="Tabs\MapTab\MapGraphics.cs" />
     <Compile Include="Tabs\MapTab\MapLineObject.cs" />

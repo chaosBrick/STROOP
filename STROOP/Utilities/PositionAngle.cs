@@ -514,6 +514,46 @@ namespace STROOP.Utilities
             return string.Format("[{0}] {1}", slotLabel, objectName);
         }
 
+        public static string NameOfMultiple(IEnumerable<PositionAngle> positionAngles)
+        {
+            int count = 0;
+            string result = "None";
+            bool objects = true;
+            bool isHome = true;
+            string singleObjectName = "None";
+            foreach (var posAngle in positionAngles)
+            {
+                isHome &= posAngle.PosAngleType == PositionAngleTypeEnum.ObjHome;
+                objects &= posAngle.IsObjectOrMario();
+                string n;
+                if (posAngle.IsObject())
+                {
+                    ObjectDataModel obj = new ObjectDataModel(posAngle.Address.Value, true);
+                    n = Config.ObjectAssociations.GetObjectName(obj.BehaviorCriteria);
+                }
+                else
+                    n = posAngle.GetMapName();
+                if (count == 0)
+                {
+                    result = n;
+                    singleObjectName = posAngle.GetMapName();
+                }
+                else
+                {
+                    if (result != n)
+                        result = "Objects";
+                }
+                count++;
+            }
+            if (count == 1)
+                result = singleObjectName;
+
+            if (isHome)
+                result = "Home of " + result;
+
+            return count > 1 ? "Multiple " + result : result;
+        }
+
         public bool IsObject()
         {
             return PosAngleType == PositionAngleTypeEnum.Obj;

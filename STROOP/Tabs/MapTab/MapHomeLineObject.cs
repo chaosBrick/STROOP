@@ -9,16 +9,10 @@ namespace STROOP.Tabs.MapTab
 {
     public class MapHomeLineObject : MapLineObject
     {
-        private readonly PositionAngle _objPosAngle;
-        private readonly PositionAngle _homePosAngle;
-
-        string name;
-
-        public MapHomeLineObject(PositionAngleProvider positionAngleProvider, string name)
+        public MapHomeLineObject(PositionAngleProvider positionAngleProvider)
             : base()
         {
             this.positionAngleProvider = positionAngleProvider;
-            this.name = name;
             OutlineWidth = 3;
             OutlineColor = Color.Black;
         }
@@ -37,7 +31,7 @@ namespace STROOP.Tabs.MapTab
             return vertices;
         }
 
-        public override string GetName() => $"Home Line for {name}";
+        public override string GetName() => $"Home Line for {PositionAngle.NameOfMultiple(positionAngleProvider())}";
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.ArrowImage;
     }

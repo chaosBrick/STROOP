@@ -33,6 +33,8 @@ namespace STROOP.Tabs.MapTab
             });
         }
 
+        public override IHoverData GetHoverData() => null;
+
         protected abstract List<(float centerX, float centerZ, float radius)> Get2DDimensions();
 
         public override MapDrawType GetDrawType()

@@ -32,20 +32,7 @@ namespace STROOP.Tabs.MapTab
             return lst;
         }
 
-        public override string GetName()
-        {
-            string objName = null;
-            foreach (var uurgh in positionAngleProvider())
-            {
-                var tmpName = PositionAngle.GetMapNameForObject(uurgh.GetObjAddress());
-                if (objName == null)
-                    objName = tmpName;
-                else if (objName != tmpName)
-                    objName = "Many";
-            }
-
-            return "Floor Tris for " + objName;
-        }
+        public override string GetName() => $"Floor Tris for {PositionAngle.NameOfMultiple(positionAngleProvider())}";
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.TriangleFloorImage;
 
