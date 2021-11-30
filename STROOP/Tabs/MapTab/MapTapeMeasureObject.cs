@@ -80,7 +80,7 @@ namespace STROOP.Tabs.MapTab
         }
 
         Vector2 a, b;
-        new TapeHoverData hoverData;
+        TapeHoverData hoverData;
 
         public MapTapeMeasureObject()
         {
