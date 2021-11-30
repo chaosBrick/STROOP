@@ -5,7 +5,7 @@ namespace STROOP.Tabs.MapTab
 {
     public abstract class MapIconPointObject : MapIconObject
     {
-        public override void DrawOn2DControl(MapGraphics graphics)
+        protected override void DrawTopDown(MapGraphics graphics)
         {
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
             {

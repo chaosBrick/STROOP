@@ -26,13 +26,13 @@ namespace STROOP.Tabs.MapTab
 
         public override Lazy<Image> GetInternalImage() => GetMapLayout().MapImage;
 
-        public override void DrawOn2DControl(MapGraphics graphics)
+        protected override void DrawTopDown(MapGraphics graphics)
         {
             renderer.texture = GraphicsUtil.TextureFromImage(GetInternalImage().Value);
             renderer.SetDrawCalls(graphics);
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
             {
-                var dimooof = GetDimensions();
+                var dimooof = GetDimensions(graphics);
                 foreach (var dim in dimooof)
                     renderer.AddInstance(
                         Matrix4.CreateScale(dim.size.Width, dim.size.Height, 1)
@@ -42,13 +42,13 @@ namespace STROOP.Tabs.MapTab
             });
         }
 
-        protected override List<(PointF loc, SizeF size)> GetDimensions()
+        protected override List<(PointF loc, SizeF size)> GetDimensions(MapGraphics graphics)
         {
             RectangleF rectangle = GetMapLayout().Coordinates;
             float rectangleCenterX = rectangle.X + rectangle.Width / 2;
             float rectangleCenterZ = rectangle.Y + rectangle.Height / 2;
             List<(float x, float z)> rectangleCenters = graphics.MapViewEnablePuView ?
-                currentMapTab.GetPuCoordinates(rectangleCenterX, rectangleCenterZ) :
+                currentMapTab.GetPuCoordinates(graphics, rectangleCenterX, rectangleCenterZ) :
                 new List<(float x, float z)>() { (rectangleCenterX, rectangleCenterZ) };
 
             List<(PointF loc, SizeF size)> dimensions = rectangleCenters.ConvertAll(

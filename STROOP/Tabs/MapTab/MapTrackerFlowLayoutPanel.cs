@@ -86,8 +86,8 @@ namespace STROOP.Tabs.MapTab
 
         public void DrawOn2DControl(MapGraphics graphics)
         {
-            _mapObjBackground?.DrawOn2DControl(graphics);
-            _mapObjMap?.DrawOn2DControl(graphics);
+            _mapObjBackground?.Draw(graphics);
+            _mapObjMap?.Draw(graphics);
 
             List<MapObject> listOrderOnTop = new List<MapObject>();
             List<MapObject> listOrderOnBottom = new List<MapObject>();
@@ -120,17 +120,13 @@ namespace STROOP.Tabs.MapTab
             listOrderByY = listOrderByY.OrderBy(obj => obj.GetY()).ToList();
 
             foreach (MapObject obj in listOrderOnBottom)
-            {
-                obj.DrawOn2DControl(graphics);
-            }
+               obj.Draw(graphics);
+
             foreach (MapObject obj in listOrderByY)
-            {
-                obj.DrawOn2DControl(graphics);
-            }
+                obj.Draw(graphics);
+
             foreach (MapObject obj in listOrderOnTop)
-            {
-                obj.DrawOn2DControl(graphics);
-            }
+                obj.Draw(graphics);
         }
 
         public void SetGlobalIconSize(float size)

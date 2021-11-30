@@ -7,6 +7,6 @@ namespace STROOP.Tabs.MapTab
     {
         public MapIconRectangleObject() : base() { }
 
-        protected abstract List<(PointF loc, SizeF size)> GetDimensions();
+        protected abstract List<(PointF loc, SizeF size)> GetDimensions(MapGraphics graphics);
     }
 }

@@ -76,13 +76,12 @@ namespace STROOP.Tabs.MapTab
             public bool CanDrag() => parent.enableDragging.Checked;
         }
 
-        protected MapObjectHoverData hoverData;
         ToolStripMenuItem enableDragging = new ToolStripMenuItem("Enable dragging");
 
         public virtual IHoverData GetHoverData() => null;
 
         public MapTab currentMapTab => AccessScope<MapTab>.content;
-        public MapGraphics graphics => currentMapTab.view.MapGraphics;
+        public MapGraphics graphics => currentMapTab.graphics;
         protected event Action OnCleanup = null;
 
         public delegate IEnumerable<PositionAngle> PositionAngleProvider();
@@ -120,7 +119,7 @@ namespace STROOP.Tabs.MapTab
 
         protected ContextMenuStrip _contextMenuStrip = null;
 
-        public MapObject() { hoverData = new MapObjectHoverData(this); }
+        public MapObject() { }
 
         public void DrawIcon(MapGraphics graphics, float x, float z, float angle, Image image)
         {
@@ -137,12 +136,19 @@ namespace STROOP.Tabs.MapTab
             graphics.objectRenderer.AddInstance(transform, graphics.GetObjectTextureLayer(image));
         }
 
-        public abstract void DrawOn2DControl(MapGraphics graphics);
-
-        public virtual Matrix4 GetModelMatrix()
+        public void Draw(MapGraphics graphics)
         {
-            return Matrix4.Identity;
+            switch (graphics.view.mode)
+            {
+                case MapView.ViewMode.TopDown:
+                    DrawTopDown(graphics);
+                    break;
+            }
         }
+
+        protected abstract void DrawTopDown(MapGraphics graphics);
+        //protected abstract void DrawOrthogonal(MapGraphics graphics);
+
 
         public abstract string GetName();
 

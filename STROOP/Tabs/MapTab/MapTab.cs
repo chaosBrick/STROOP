@@ -14,78 +14,8 @@ namespace STROOP.Tabs.MapTab
 {
     public partial class MapTab : STROOPTab, IDisposable
     {
-        public class View
-        {
-            public MapGraphics MapGraphics;
-
-            public bool TranslateMapCameraPosition(float xOffset, float yOffset, float zOffset, bool useRelative)
-            {
-                MapUtilities.MaybeChangeMapCameraMode();
-                List<PositionAngle> posAngles = new List<PositionAngle> { PositionAngle.MapCamera };
-                return ButtonUtilities.ChangeValues(posAngles, xOffset, yOffset, zOffset, ButtonUtilities.Change.ADD, useRelative);
-            }
-
-            public bool TranslateMapCameraSpherical(float radiusOffset, float thetaOffset, float phiOffset)
-            {
-                MapUtilities.MaybeChangeMapCameraMode();
-                ButtonUtilities.HandleScaling(ref thetaOffset, ref phiOffset);
-
-                (double newX, double newY, double newZ) =
-                    MoreMath.OffsetSphericallyAboutPivot(
-                        SpecialConfig.Map3DCameraX, SpecialConfig.Map3DCameraY, SpecialConfig.Map3DCameraZ,
-                        radiusOffset, thetaOffset, phiOffset,
-                        SpecialConfig.Map3DFocusX, SpecialConfig.Map3DFocusY, SpecialConfig.Map3DFocusZ);
-
-                SpecialConfig.Map3DCameraX = (float)newX;
-                SpecialConfig.Map3DCameraY = (float)newY;
-                SpecialConfig.Map3DCameraZ = (float)newZ;
-
-                return true;
-            }
-
-            public bool TranslateMapFocusPosition(float xOffset, float yOffset, float zOffset, bool useRelative)
-            {
-                MapUtilities.MaybeChangeMapCameraMode();
-                List<PositionAngle> posAngles = new List<PositionAngle> { PositionAngle.MapFocus };
-                return ButtonUtilities.ChangeValues(posAngles, xOffset, yOffset, zOffset, ButtonUtilities.Change.ADD, useRelative);
-            }
-
-            public bool TranslateMapFocusSpherical(float radiusOffset, float thetaOffset, float phiOffset)
-            {
-                MapUtilities.MaybeChangeMapCameraMode();
-                ButtonUtilities.HandleScaling(ref thetaOffset, ref phiOffset);
-
-                if (SpecialConfig.Map3DMode == Map3DCameraMode.CameraPosAndAngle)
-                {
-                    SpecialConfig.Map3DCameraYaw += thetaOffset;
-                    SpecialConfig.Map3DCameraPitch += phiOffset;
-                    return true;
-                }
-
-                (double newX, double newY, double newZ) =
-                    MoreMath.OffsetSphericallyAboutPivot(
-                        SpecialConfig.Map3DFocusX, SpecialConfig.Map3DFocusY, SpecialConfig.Map3DFocusZ,
-                        radiusOffset, thetaOffset, phiOffset,
-                        SpecialConfig.Map3DCameraX, SpecialConfig.Map3DCameraY, SpecialConfig.Map3DCameraZ);
-
-                SpecialConfig.Map3DFocusX = (float)newX;
-                SpecialConfig.Map3DFocusY = (float)newY;
-                SpecialConfig.Map3DFocusZ = (float)newZ;
-
-                return true;
-            }
-
-            public bool TranslateMapCameraFocus(float xOffset, float yOffset, float zOffset, bool useRelative)
-            {
-                MapUtilities.MaybeChangeMapCameraMode();
-                List<PositionAngle> posAngles = new List<PositionAngle> { PositionAngle.MapCamera, PositionAngle.MapFocus };
-                return ButtonUtilities.ChangeValues(posAngles, xOffset, yOffset, zOffset, ButtonUtilities.Change.ADD, useRelative);
-            }
-        }
-
         public GLControl glControlMap2D { get; private set; }
-
-        public View view = new View();
+        public MapGraphics graphics { get; private set; }
 
         private List<int> _currentObjIndexes = new List<int>();
         public IHoverData hoverData { get; private set; }
@@ -112,8 +42,8 @@ namespace STROOP.Tabs.MapTab
             glControlMap2D.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
             glControlMap2D.Location = new Point(0, 0);
             parentControl.Controls.Add(glControlMap2D);
-            view.MapGraphics = new MapGraphics(this, glControlMap2D);
-            view.MapGraphics.Load();
+            graphics = new MapGraphics(this, glControlMap2D);
+            graphics.Load();
             _isLoaded2D = true;
 
             InitializeControls();
@@ -130,12 +60,12 @@ namespace STROOP.Tabs.MapTab
             return Config.MapAssociations.GetBestMap().BackgroundImage;
         }
 
-        public List<(float x, float z)> GetPuCenters()
+        public List<(float x, float z)> GetPuCenters(MapGraphics graphics)
         {
-            int xMin = ((((int)view.MapGraphics.MapViewXMin) / 65536) - 1) * 65536;
-            int xMax = ((((int)view.MapGraphics.MapViewXMax) / 65536) + 1) * 65536;
-            int zMin = ((((int)view.MapGraphics.MapViewZMin) / 65536) - 1) * 65536;
-            int zMax = ((((int)view.MapGraphics.MapViewZMax) / 65536) + 1) * 65536;
+            int xMin = ((((int)graphics.MapViewXMin) / 65536) - 1) * 65536;
+            int xMax = ((((int)graphics.MapViewXMax) / 65536) + 1) * 65536;
+            int zMin = ((((int)graphics.MapViewZMin) / 65536) - 1) * 65536;
+            int zMax = ((((int)graphics.MapViewZMax) / 65536) + 1) * 65536;
             List<(float x, float z)> centers = new List<(float x, float z)>();
             for (int x = xMin; x <= xMax; x += 65536)
             {
@@ -147,10 +77,8 @@ namespace STROOP.Tabs.MapTab
             return centers;
         }
 
-        public List<(float x, float z)> GetPuCoordinates(float relX, float relZ)
-        {
-            return GetPuCenters().ConvertAll(center => (center.x + relX, center.z + relZ));
-        }
+        public List<(float x, float z)> GetPuCoordinates(MapGraphics graphics, float relX, float relZ)
+            => GetPuCenters(graphics).ConvertAll(center => (center.x + relX, center.z + relZ));
 
         public int MaybeReverse(int value) => checkBoxMapOptionsReverseDragging.Checked ? -1 * value : value;
 
@@ -253,14 +181,10 @@ namespace STROOP.Tabs.MapTab
                 });
 
             // Buttons for Changing Scale
-            buttonMapControllersScaleMinus.Click += (sender, e) =>
-               view.MapGraphics.ChangeScale(-1, textBoxMapControllersScaleChange.Text);
-            buttonMapControllersScalePlus.Click += (sender, e) =>
-               view.MapGraphics.ChangeScale(1, textBoxMapControllersScaleChange.Text);
-            buttonMapControllersScaleDivide.Click += (sender, e) =>
-               view.MapGraphics.ChangeScale2(-1, textBoxMapControllersScaleChange2.Text);
-            buttonMapControllersScaleTimes.Click += (sender, e) =>
-               view.MapGraphics.ChangeScale2(1, textBoxMapControllersScaleChange2.Text);
+            buttonMapControllersScaleMinus.Click += (sender, e) => graphics.ChangeScale(-1, textBoxMapControllersScaleChange.Text);
+            buttonMapControllersScalePlus.Click += (sender, e) => graphics.ChangeScale(1, textBoxMapControllersScaleChange.Text);
+            buttonMapControllersScaleDivide.Click += (sender, e) => graphics.ChangeScale2(-1, textBoxMapControllersScaleChange2.Text);
+            buttonMapControllersScaleTimes.Click += (sender, e) => graphics.ChangeScale2(1, textBoxMapControllersScaleChange2.Text);
             ControlUtilities.AddContextMenuStripFunctions(
                  groupBoxMapControllersScale,
                 new List<string>()
@@ -273,30 +197,22 @@ namespace STROOP.Tabs.MapTab
                 },
                 new List<Action>()
                 {
-                    () => view.MapGraphics.SetCustomScale(6),
-                    () => view.MapGraphics.SetCustomScale(12),
-                    () => view.MapGraphics.SetCustomScale(18),
-                    () => view.MapGraphics.SetCustomScale(24),
-                    () => view.MapGraphics.SetCustomScale(40),
+                    () => graphics.SetCustomScale(6),
+                    () => graphics.SetCustomScale(12),
+                    () => graphics.SetCustomScale(18),
+                    () => graphics.SetCustomScale(24),
+                    () => graphics.SetCustomScale(40),
                 });
 
             // Buttons for Changing Center
-            buttonMapControllersCenterUp.Click += (sender, e) =>
-               view.MapGraphics.ChangeCenter(0, -1, textBoxMapControllersCenterChange.Text);
-            buttonMapControllersCenterDown.Click += (sender, e) =>
-               view.MapGraphics.ChangeCenter(0, 1, textBoxMapControllersCenterChange.Text);
-            buttonMapControllersCenterLeft.Click += (sender, e) =>
-               view.MapGraphics.ChangeCenter(-1, 0, textBoxMapControllersCenterChange.Text);
-            buttonMapControllersCenterRight.Click += (sender, e) =>
-               view.MapGraphics.ChangeCenter(1, 0, textBoxMapControllersCenterChange.Text);
-            buttonMapControllersCenterUpLeft.Click += (sender, e) =>
-               view.MapGraphics.ChangeCenter(-1, -1, textBoxMapControllersCenterChange.Text);
-            buttonMapControllersCenterUpRight.Click += (sender, e) =>
-               view.MapGraphics.ChangeCenter(1, -1, textBoxMapControllersCenterChange.Text);
-            buttonMapControllersCenterDownLeft.Click += (sender, e) =>
-               view.MapGraphics.ChangeCenter(-1, 1, textBoxMapControllersCenterChange.Text);
-            buttonMapControllersCenterDownRight.Click += (sender, e) =>
-               view.MapGraphics.ChangeCenter(1, 1, textBoxMapControllersCenterChange.Text);
+            buttonMapControllersCenterUp.Click += (sender, e) => graphics.ChangeCenter(0, -1, textBoxMapControllersCenterChange.Text);
+            buttonMapControllersCenterDown.Click += (sender, e) => graphics.ChangeCenter(0, 1, textBoxMapControllersCenterChange.Text);
+            buttonMapControllersCenterLeft.Click += (sender, e) => graphics.ChangeCenter(-1, 0, textBoxMapControllersCenterChange.Text);
+            buttonMapControllersCenterRight.Click += (sender, e) => graphics.ChangeCenter(1, 0, textBoxMapControllersCenterChange.Text);
+            buttonMapControllersCenterUpLeft.Click += (sender, e) => graphics.ChangeCenter(-1, -1, textBoxMapControllersCenterChange.Text);
+            buttonMapControllersCenterUpRight.Click += (sender, e) => graphics.ChangeCenter(1, -1, textBoxMapControllersCenterChange.Text);
+            buttonMapControllersCenterDownLeft.Click += (sender, e) => graphics.ChangeCenter(-1, 1, textBoxMapControllersCenterChange.Text);
+            buttonMapControllersCenterDownRight.Click += (sender, e) => graphics.ChangeCenter(1, 1, textBoxMapControllersCenterChange.Text);
             ControlUtilities.AddContextMenuStripFunctions(
                  groupBoxMapControllersCenter,
                 new List<string>() { "Center on Mario" },
@@ -306,15 +222,13 @@ namespace STROOP.Tabs.MapTab
                     {
                         float marioX = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.XOffset);
                         float marioZ = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.ZOffset);
-                        view.MapGraphics.SetCustomCenter(marioX + ";" + marioZ);
+                        graphics.SetCustomCenter(marioX + ";" + marioZ);
                     }
                 });
 
             // Buttons for Changing Angle
-            buttonMapControllersAngleCCW.Click += (sender, e) =>
-               view.MapGraphics.ChangeAngle(-1, textBoxMapControllersAngleChange.Text);
-            buttonMapControllersAngleCW.Click += (sender, e) =>
-               view.MapGraphics.ChangeAngle(1, textBoxMapControllersAngleChange.Text);
+            buttonMapControllersAngleCCW.Click += (sender, e) => graphics.ChangeAngle(-1, textBoxMapControllersAngleChange.Text);
+            buttonMapControllersAngleCW.Click += (sender, e) => graphics.ChangeAngle(1, textBoxMapControllersAngleChange.Text);
             ControlUtilities.AddContextMenuStripFunctions(
                  groupBoxMapControllersAngle,
                 new List<string>()
@@ -328,41 +242,29 @@ namespace STROOP.Tabs.MapTab
                     () =>
                     {
                         ushort marioAngle = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
-                        view.MapGraphics.SetCustomAngle(marioAngle);
+                        graphics.SetCustomAngle(marioAngle);
                     },
                     () =>
                     {
                         ushort cameraAngle = Config.Stream.GetUInt16(CameraConfig.StructAddress + CameraConfig.FacingYawOffset);
-                        view.MapGraphics.SetCustomAngle(cameraAngle);
+                        graphics.SetCustomAngle(cameraAngle);
                     },
                     () =>
                     {
                         ushort centripetalAngle = Config.Stream.GetUInt16(CameraConfig.StructAddress + CameraConfig.CentripetalAngleOffset);
                         double centripetalAngleReversed = MoreMath.ReverseAngle(centripetalAngle);
-                        view.MapGraphics.SetCustomAngle(centripetalAngleReversed);
+                        graphics.SetCustomAngle(centripetalAngleReversed);
                     },
                 });
 
             // TextBoxes for Custom Values
-            textBoxMapControllersScaleCustom.AddEnterAction(() =>
-           {
-               radioButtonMapControllersScaleCustom.Checked = true;
-           });
-            textBoxMapControllersCenterCustom.AddEnterAction(() =>
-           {
-               radioButtonMapControllersCenterCustom.Checked = true;
-           });
-            textBoxMapControllersAngleCustom.AddEnterAction(() =>
-           {
-               radioButtonMapControllersAngleCustom.Checked = true;
-           });
+            textBoxMapControllersScaleCustom.AddEnterAction(() => radioButtonMapControllersScaleCustom.Checked = true);
+            textBoxMapControllersCenterCustom.AddEnterAction(() => radioButtonMapControllersCenterCustom.Checked = true);
+            textBoxMapControllersAngleCustom.AddEnterAction(() => radioButtonMapControllersAngleCustom.Checked = true);
 
-            checkBoxMapOptionsEnablePuView.Click += (sender, e) =>
-               view.MapGraphics.MapViewEnablePuView = checkBoxMapOptionsEnablePuView.Checked;
-            checkBoxMapOptionsScaleIconSizes.Click += (sender, e) =>
-               view.MapGraphics.MapViewScaleIconSizes = checkBoxMapOptionsScaleIconSizes.Checked;
-            checkBoxMapControllersCenterChangeByPixels.Click += (sender, e) =>
-               view.MapGraphics.MapViewCenterChangeByPixels = checkBoxMapControllersCenterChangeByPixels.Checked;
+            checkBoxMapOptionsEnablePuView.Click += (sender, e) => graphics.MapViewEnablePuView = checkBoxMapOptionsEnablePuView.Checked;
+            checkBoxMapOptionsScaleIconSizes.Click += (sender, e) => graphics.MapViewScaleIconSizes = checkBoxMapOptionsScaleIconSizes.Checked;
+            checkBoxMapControllersCenterChangeByPixels.Click += (sender, e) => graphics.MapViewCenterChangeByPixels = checkBoxMapControllersCenterChangeByPixels.Checked;
 
             // Global Icon Size
             textBoxMapOptionsGlobalIconSize.AddEnterAction(() =>
@@ -391,7 +293,7 @@ namespace STROOP.Tabs.MapTab
             {
                 Vector3 coords = Vector3.TransformPosition(
                     new Vector3(2 * (float)onClickPosition.X / glControlMap2D.Width - 1, 1 - 2 * (float)onClickPosition.Y / glControlMap2D.Height, 0),
-                    Matrix4.Invert(view.MapGraphics.ViewMatrix));
+                    Matrix4.Invert(graphics.ViewMatrix));
                 Clipboard.SetText($"{coords.X} 0 {coords.Y}");
             };
             menu = new ContextMenu(new MenuItem[] { copyPositionItem });
@@ -429,7 +331,7 @@ namespace STROOP.Tabs.MapTab
 
             using (new AccessScope<MapTab>(this))
             {
-                if (!view.MapGraphics.IsMouseDown(0))
+                if (!graphics.IsMouseDown(0))
                 {
                     hoverData = null;
                     foreach (var tracker in flowLayoutPanelMapTrackers.EnumerateTrackers())

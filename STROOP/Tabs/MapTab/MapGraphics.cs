@@ -78,6 +78,7 @@ namespace STROOP.Tabs.MapTab
 
         public readonly GLControl glControl;
         public readonly MapTab mapTab;
+        public readonly MapView view;
 
         public float MapViewRadius => (float)MoreMath.GetHypotenuse(glControl.Width / 2, glControl.Height / 2) / MapViewScaleValue;
         public float MapViewXMin { get => MapViewCenterXValue - MapViewRadius * glControl.AspectRatio; }
@@ -104,6 +105,7 @@ namespace STROOP.Tabs.MapTab
         {
             this.mapTab = mapTab;
             this.glControl = glControl;
+            view = new MapView();
             drawLayers = new List<Action>[Enum.GetNames(typeof(DrawLayers)).Length];
             for (int i = 0; i < drawLayers.Length; i++)
                 drawLayers[i] = new List<Action>();

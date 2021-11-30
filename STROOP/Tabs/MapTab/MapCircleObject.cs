@@ -14,7 +14,7 @@ namespace STROOP.Tabs.MapTab
             Color = Color.Red;
         }
 
-        public override void DrawOn2DControl(MapGraphics graphics)
+        protected override void DrawTopDown(MapGraphics graphics)
         {
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
             {

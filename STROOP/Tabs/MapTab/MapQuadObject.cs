@@ -12,7 +12,7 @@ namespace STROOP.Tabs.MapTab
     {
         public MapQuadObject() : base() { }
 
-        public override void DrawOn2DControl(MapGraphics graphics)
+        protected override void DrawTopDown(MapGraphics graphics)
         {
             //List<List<(float x, float y, float z)>> quadList = GetQuadList();
             //List<List<(float x, float z)>> quadListForControl =

@@ -62,7 +62,7 @@ namespace STROOP.Tabs.MapTab
             return null;
         }
 
-        public override void DrawOn2DControl(MapGraphics graphics)
+        protected override void DrawTopDown(MapGraphics graphics)
         {
 
             float marioHeight = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);

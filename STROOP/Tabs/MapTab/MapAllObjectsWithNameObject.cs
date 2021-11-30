@@ -63,7 +63,7 @@ namespace STROOP.Tabs.MapTab
 
         public override string GetName() => PositionAngle.NameOfMultiple(positionAngleProvider());
 
-        public override void DrawOn2DControl(MapGraphics graphics)
+        protected override void DrawTopDown(MapGraphics graphics)
         {
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
             {

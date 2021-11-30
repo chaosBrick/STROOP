@@ -12,7 +12,7 @@ namespace STROOP.Tabs.MapTab
         {
         }
 
-        public override void DrawOn2DControl(MapGraphics graphics)
+        protected override void DrawTopDown(MapGraphics graphics)
         {
             if (OutlineWidth == 0) return;
 

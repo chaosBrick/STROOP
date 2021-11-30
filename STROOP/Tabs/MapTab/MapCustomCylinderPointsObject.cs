@@ -100,9 +100,9 @@ namespace STROOP.Tabs.MapTab
             }
         }
 
-        public override void DrawOn2DControl(MapGraphics graphics)
+        protected override void DrawTopDown(MapGraphics graphics)
         {
-            base.DrawOn2DControl(graphics);
+            base.DrawTopDown(graphics);
         }
     }
 }

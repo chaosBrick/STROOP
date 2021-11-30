@@ -12,7 +12,7 @@ namespace STROOP.Tabs.MapTab
     {
         public MapAggregatedPathObject() : base() { }
 
-        public override void DrawOn2DControl(MapGraphics graphics)
+        protected override void DrawTopDown(MapGraphics graphics)
         {
             List<MapPathObject> paths = new List<MapPathObject>();
             //foreach (MapTracker mapTracker in currentMapTab.flowLayoutPanelMapTrackers.Controls)

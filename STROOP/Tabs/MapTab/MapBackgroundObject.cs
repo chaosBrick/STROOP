@@ -23,7 +23,7 @@ namespace STROOP.Tabs.MapTab
             renderer.texture = 0;
         }
 
-        public override void DrawOn2DControl(MapGraphics graphics)
+        protected override void DrawTopDown(MapGraphics graphics)
         {
             var image = GetInternalImage();
             renderer.ignoreView = true;

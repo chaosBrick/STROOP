@@ -436,6 +436,7 @@
     <Compile Include="Tabs\MapTab\MapAllObjectWallObject.cs" />
     <Compile Include="Tabs\MapTab\MapCustomPositionAngleArrowObject.cs" />
     <Compile Include="Tabs\MapTab\MapTapeMeasureObject.cs" />
+    <Compile Include="Tabs\MapTab\MapView.cs" />
     <Compile Include="Tabs\MapTab\MapWatersObject.cs" />
     <Compile Include="Tabs\MapTab\MapCustomSpherePointsObject.cs" />
     <Compile Include="Tabs\MapTab\MapFacingDividerObject.cs" />
