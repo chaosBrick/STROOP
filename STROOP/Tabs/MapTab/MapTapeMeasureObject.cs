@@ -70,11 +70,11 @@ namespace STROOP.Tabs.MapTab
                 parent.targetTracker.textBoxSize.Text = (parent.Size = (parent.a - parent.b).Length).ToString();
             }
 
-            public void LeftClick() { }
+            public void LeftClick(Vector3 position) { }
 
-            public void RightClick()
+            public void RightClick(Vector3 position)
             {
-                cursorY = parent.graphics.mapCursorPosition.Y;
+                cursorY = position.Y;
                 rightClickMenu.Show(Cursor.Position);
             }
         }
@@ -86,8 +86,8 @@ namespace STROOP.Tabs.MapTab
         {
             OutlineColor = Color.Orange;
             OutlineWidth = 3;
-            a = new Vector2(graphics.MapViewCenterXValue - 50, graphics.MapViewCenterZValue);
-            b = new Vector2(graphics.MapViewCenterXValue + 50, graphics.MapViewCenterZValue);
+            a = new Vector2(currentMapTab.graphics.MapViewCenterXValue - 50, currentMapTab.graphics.MapViewCenterZValue);
+            b = new Vector2(currentMapTab.graphics.MapViewCenterXValue + 50, currentMapTab.graphics.MapViewCenterZValue);
             hoverData = new TapeHoverData(this);
         }
 
@@ -121,7 +121,7 @@ namespace STROOP.Tabs.MapTab
         protected override List<Vector3> GetVertices(MapGraphics graphics) =>
             new List<Vector3>(new[] { new Vector3(a.X, 0, a.Y), new Vector3(b.X, 0, b.Y) });
 
-        public override IHoverData GetHoverData()
+        public override IHoverData GetHoverData(MapGraphics graphics)
         {
             var cursor2D = new Vector2(graphics.mapCursorPosition.X, graphics.mapCursorPosition.Z);
             var rad = (5 / graphics.MapViewScaleValue);

@@ -509,9 +509,9 @@ namespace STROOP.Tabs.MapTab
                 if (mapTab.HasMouseListeners)
                 {
                     if (e.Button == MouseButtons.Left)
-                        mapTab.hoverData.LeftClick();
+                        mapTab.hoverData.LeftClick(mapCursorPosition);
                     else if (e.Button == MouseButtons.Right)
-                        mapTab.hoverData.RightClick();
+                        mapTab.hoverData.RightClick(mapCursorPosition);
                 }
             }
         }

@@ -33,7 +33,7 @@ namespace STROOP.Tabs.MapTab
             _absoluteHeight = null;
         }
 
-        public override IHoverData GetHoverData()
+        public override IHoverData GetHoverData(MapGraphics graphics)
         {
             foreach (var tri in GetTrianglesWithinDist())
             {

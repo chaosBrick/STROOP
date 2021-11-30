@@ -20,7 +20,7 @@ namespace STROOP.Tabs.MapTab
 
             public void DragTo(Vector3 newPosition)
             {
-                Vector3 currentVertex = parent.graphics.mapCursorPosition;
+                Vector3 currentVertex = newPosition;
                 if (currentVertex != parent._lastVertex)
                 {
                     parent._vertices.Add(parent._lastVertex);
@@ -29,15 +29,12 @@ namespace STROOP.Tabs.MapTab
                 parent._lastVertex = currentVertex;
             }
 
-            public void LeftClick()
+            public void LeftClick(Vector3 position)
             {
-                parent._lastVertex = parent.graphics.mapCursorPosition;
+                parent._lastVertex = position;
             }
 
-            public void RightClick()
-            {
-                throw new NotImplementedException();
-            }
+            public void RightClick(Vector3 position) { }
         }
 
         private readonly List<Vector3> _vertices;
@@ -87,7 +84,7 @@ namespace STROOP.Tabs.MapTab
             return _contextMenuStrip;
         }
 
-        public override IHoverData GetHoverData() => _drawingEnabled ? new Drawing(this) : null;
+        public override IHoverData GetHoverData(MapGraphics graphics) => _drawingEnabled ? new Drawing(this) : null;
 
         public override void CleanUp()
         {

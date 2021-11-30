@@ -16,7 +16,7 @@ namespace STROOP.Tabs.MapTab
 
         public override bool ParticipatesInGlobalIconSize() => true;
 
-        public override IHoverData GetHoverData()
+        public override IHoverData GetHoverData(MapGraphics graphics)
         {
             var radius = Size / graphics.MapViewScaleValue;
             var cursorPos = graphics.mapCursorPosition;

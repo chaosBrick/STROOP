@@ -66,9 +66,9 @@ namespace STROOP.Tabs.MapTab
                 }
             }
 
-            public void LeftClick() { }
+            public void LeftClick(Vector3 position) { }
 
-            public void RightClick()
+            public void RightClick(Vector3 position)
             {
                 rightClickMenu.Show(Cursor.Position);
             }
@@ -78,10 +78,9 @@ namespace STROOP.Tabs.MapTab
 
         ToolStripMenuItem enableDragging = new ToolStripMenuItem("Enable dragging");
 
-        public virtual IHoverData GetHoverData() => null;
+        public virtual IHoverData GetHoverData(MapGraphics graphics) => null;
 
         public MapTab currentMapTab => AccessScope<MapTab>.content;
-        public MapGraphics graphics => currentMapTab.graphics;
         protected event Action OnCleanup = null;
 
         public delegate IEnumerable<PositionAngle> PositionAngleProvider();

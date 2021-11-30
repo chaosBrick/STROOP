@@ -3,9 +3,9 @@ namespace STROOP.Tabs.MapTab
 {
     public interface IHoverData
     {
-        void LeftClick();
-        void RightClick();
-        void DragTo(Vector3 newPosition);
+        void LeftClick(Vector3 position);
+        void RightClick(Vector3 position);
+        void DragTo(Vector3 position);
         bool CanDrag();
     }
 }

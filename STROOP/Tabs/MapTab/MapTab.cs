@@ -337,7 +337,7 @@ namespace STROOP.Tabs.MapTab
                     foreach (var tracker in flowLayoutPanelMapTrackers.EnumerateTrackers())
                         if (tracker.IsVisible)
                         {
-                            var newHover = tracker.mapObject.GetHoverData();
+                            var newHover = tracker.mapObject.GetHoverData(graphics);
                             if (newHover != null)
                                 hoverData = newHover;
                         }

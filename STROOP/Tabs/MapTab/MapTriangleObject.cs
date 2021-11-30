@@ -45,13 +45,13 @@ namespace STROOP.Tabs.MapTab
                 ctxMenu.Items.Add(itemCopyPosition);
             }
 
-            public void DragTo(Vector3 newPosition) { }
+            public void DragTo(Vector3 position) { }
 
-            public void LeftClick() { }
+            public void LeftClick(Vector3 position) { }
 
-            public void RightClick()
+            public void RightClick(Vector3 position)
             {
-                mapCursorOnRightClick = parent.graphics.mapCursorPosition;
+                mapCursorOnRightClick = position;
                 if (triangle != null)
                     ctxMenu.Show(Cursor.Position);
             }
