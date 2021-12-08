@@ -3,6 +3,7 @@ using STROOP.Structs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using STROOP.Tabs.MapTab.MapObjects;
 
 namespace STROOP.Tabs.MapTab
 {
@@ -120,7 +121,7 @@ namespace STROOP.Tabs.MapTab
             listOrderByY = listOrderByY.OrderBy(obj => obj.GetY()).ToList();
 
             foreach (MapObject obj in listOrderOnBottom)
-               obj.Draw(graphics);
+                obj.Draw(graphics);
 
             foreach (MapObject obj in listOrderByY)
                 obj.Draw(graphics);
