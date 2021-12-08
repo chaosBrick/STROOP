@@ -2,9 +2,8 @@
 using STROOP.Structs;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
+using OpenTK;
 
 namespace STROOP.Utilities
 {
@@ -133,6 +132,29 @@ namespace STROOP.Utilities
             {
                 Clipboard.SetText(string.Join("\r\n", lines));
             }
+        }
+
+        public static void CopyPosition(Vector3 v)
+        {
+            DataObject vec3Data = new DataObject("Position", v);
+            vec3Data.SetText($"{v.X}; {v.Y}; {v.Z}");
+            Clipboard.SetDataObject(vec3Data);
+        }
+
+        public static bool TryPastePosition(out Vector3 v)
+        {
+            v = default(Vector3);
+            bool hasData = false;
+            var clipboardObj = Clipboard.GetDataObject();
+            if (!(hasData |= ParsingUtilities.TryParseVector3(clipboardObj.GetData(DataFormats.Text) as string, out v)))
+            {
+                if (Clipboard.GetData("Position") is Vector3 dataVector)
+                {
+                    hasData = true;
+                    v = dataVector;
+                }
+            }
+            return hasData;
         }
     }
 }

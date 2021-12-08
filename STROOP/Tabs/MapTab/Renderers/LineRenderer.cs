@@ -15,7 +15,7 @@ namespace STROOP.Tabs.MapTab.Renderers
             public float width;
             public Vector4 color;
         }
-        
+
         int uniform_viewportSize;
 
         public LineRenderer(int numExpectedLines = 1024)
@@ -55,12 +55,14 @@ namespace STROOP.Tabs.MapTab.Renderers
         public override void SetDrawCalls(MapGraphics graphics)
         {
             instances.Clear();
-            graphics.drawLayers[(int)MapGraphics.DrawLayers.Overlay].Add(() =>
+            graphics.drawLayers[(int)MapGraphics.DrawLayers.Geometry].Add(() =>
             {
                 if (instances.Count == 0)
                     return;
                 UpdateBuffer(instances.Count);
                 BeginDraw(graphics);
+                GL.Enable(EnableCap.DepthTest);
+                GL.DepthFunc(DepthFunction.Lequal);
                 Vector2 viewportSize = new Vector2(graphics.glControl.Width, graphics.glControl.Height);
                 GL.Uniform2(uniform_viewportSize, viewportSize);
 

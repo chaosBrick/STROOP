@@ -24,7 +24,7 @@ namespace STROOP.Tabs.MapTab
             _removeCurrentTri = false;
             _triangleListForm = null;
             _autoUpdate = true;
-            AutoUpdate();
+            ResetTriangles();
         }
 
         protected override List<TriangleDataModel> GetTrianglesOfAnyDist()
@@ -109,12 +109,8 @@ namespace STROOP.Tabs.MapTab
 
         void AutoUpdate()
         {
-            int numLevelTriangles = Config.Stream.GetInt32(TriangleConfig.LevelTriangleCountAddress);
-            if (_numLevelTris != numLevelTriangles)
-            {
-                _numLevelTris = numLevelTriangles;
+            if (currentMapTab.NeedsGeometryRefresh())
                 ResetTriangles();
-            }
         }
 
         public override string GetName()

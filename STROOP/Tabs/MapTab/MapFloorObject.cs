@@ -25,6 +25,8 @@ namespace STROOP.Tabs.MapTab
             Color = Color.Blue;
         }
 
+        protected override Vector3[] GetVolumeDisplacements(TriangleDataModel tri) => new[] { new Vector3(0, -Size, 0) };
+
         protected List<ToolStripMenuItem> GetFloorToolStripMenuItems()
         {
             ToolStripMenuItem itemExcludeDeathBarriers = new ToolStripMenuItem("Exclude Death Barriers");

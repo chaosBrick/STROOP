@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
-using OpenTK.Graphics.OpenGL;
-using STROOP.Utilities;
-using STROOP.Structs.Configurations;
-using STROOP.Structs;
-using OpenTK;
+﻿using OpenTK;
 
 namespace STROOP.Tabs.MapTab
 {
@@ -32,9 +22,8 @@ namespace STROOP.Tabs.MapTab
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() => renderer.AddInstance(Matrix4.CreateScale(2), 0));
         }
 
-        public override MapDrawType GetDrawType()
-        {
-            return MapDrawType.Background;
-        }
+        protected override void DrawOrthogonal(MapGraphics graphics) => DrawTopDown(graphics);
+
+        public override MapDrawType GetDrawType() => MapDrawType.Background;
     }
 }

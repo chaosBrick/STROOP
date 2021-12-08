@@ -35,12 +35,15 @@ namespace STROOP.Tabs.MapTab
                 var dimooof = GetDimensions(graphics);
                 foreach (var dim in dimooof)
                     renderer.AddInstance(
-                        Matrix4.CreateScale(dim.size.Width, dim.size.Height, 1)
-                        * Matrix4.CreateTranslation(dim.loc.X, dim.loc.Y, 0),
+                        graphics.BillboardMatrix 
+                        * Matrix4.CreateScale(dim.size.Width, 1, dim.size.Height)
+                        * Matrix4.CreateTranslation(dim.loc.X, 0, dim.loc.Y),
                         0
                     );
             });
         }
+
+        protected override void DrawOrthogonal(MapGraphics graphics) { }
 
         protected override List<(PointF loc, SizeF size)> GetDimensions(MapGraphics graphics)
         {

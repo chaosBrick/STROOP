@@ -72,7 +72,7 @@ namespace STROOP.Tabs.MapTab
                 foreach (var dataPoint in data)
                 {
                     (float x, float y, float z, float angle, Lazy<Image> tex) = dataPoint;
-                    DrawIcon(graphics, x, z, angle, tex.Value);
+                    DrawIcon(graphics, true, x, y, z, angle, tex.Value);
                 }
             });
         }

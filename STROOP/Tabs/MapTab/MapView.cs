@@ -15,8 +15,23 @@ namespace STROOP.Tabs.MapTab
             ThreeDimensional
         }
 
+        public enum Camera3DMode
+        {
+            InGame,
+            FocusOnPositionAngle,
+            Free,
+        }
+
         public MapGraphics MapGraphics;
         public ViewMode mode = ViewMode.TopDown;
+        public Camera3DMode camera3DMode = Camera3DMode.FocusOnPositionAngle;
+
+        public Vector3 position;
+        public float yaw, pitch, camera3DDistanceController = 50;
+        public float movementSpeed = 2000.0f;
+
+        public Matrix4 ComputeViewOrientation() => Matrix4.CreateRotationX(pitch) * Matrix4.CreateRotationY(yaw);
+        public Vector3 ComputeViewDirection() => Vector3.TransformPosition(new Vector3(0, 0, 1), ComputeViewOrientation());
 
         public bool TranslateMapCameraPosition(float xOffset, float yOffset, float zOffset, bool useRelative)
         {

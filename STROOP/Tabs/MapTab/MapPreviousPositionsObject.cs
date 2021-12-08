@@ -56,7 +56,7 @@ namespace STROOP.Tabs.MapTab
                 var data = GetData();
                 foreach (var dataPoint in data)
                 {
-                    DrawIcon(graphics, dataPoint.x, dataPoint.z, dataPoint.angle, dataPoint.tex.Value);
+                    DrawIcon(graphics, true, dataPoint.x, dataPoint.y, dataPoint.z, dataPoint.angle, dataPoint.tex.Value);
                 }
 
                 if (OutlineWidth != 0)
@@ -64,13 +64,15 @@ namespace STROOP.Tabs.MapTab
                     var color = ColorUtilities.ColorToVec4(OutlineColor, OpacityByte);
                     for (int i = 0; i < data.Count - 1; i++)
                         graphics.lineRenderer.Add(
-                            new Vector3(data[i].x, data[i].z, 0),
-                            new Vector3(data[i + 1].x, data[i + 1].z, 0),
+                            new Vector3(data[i].x, data[i].y, data[i].z),
+                            new Vector3(data[i + 1].x, data[i + 1].y, data[i + 1].z),
                             color,
                             OutlineWidth);
                 }
             });
         }
+
+        protected override void DrawOrthogonal(MapGraphics graphics) => DrawTopDown(graphics);
 
         public List<DataPoint> GetData()
         {

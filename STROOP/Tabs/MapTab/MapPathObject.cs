@@ -110,18 +110,19 @@ namespace STROOP.Tabs.MapTab
 
                 List<(float x, float y, float z)> vertices = GetDictionaryValues();
                 List<(float x, float z)> veriticesForControl = vertices.ConvertAll(vertex => (vertex.x, vertex.z));
-                Vector3 oldShitLol = default(Vector3);
-                int jkl = 0;
+                Vector3 lastVertex = default(Vector3);
+                int counter = 0;
                 foreach (var vertex in vertices)
                 {
-                    Vector4 color = ColorUtilities.ColorToVec4(_useBlending ? ColorUtilities.InterpolateColor(OutlineColor, Color, (double)jkl / vertices.Count) : Color, OpacityByte);
-                    if (jkl > 0)
-                        graphics.lineRenderer.Add(new Vector3(vertex.x, 0, vertex.z), oldShitLol, color, OutlineWidth);
-                    jkl++;
-                    oldShitLol = new Vector3(vertex.x, 0, vertex.z);
+                    Vector4 color = ColorUtilities.ColorToVec4(_useBlending ? ColorUtilities.InterpolateColor(OutlineColor, Color, (double)counter / vertices.Count) : Color, OpacityByte);
+                    if (counter > 0)
+                        graphics.lineRenderer.Add(new Vector3(vertex.x, vertex.y, vertex.z), lastVertex, color, OutlineWidth);
+                    counter++;
+                    lastVertex = new Vector3(vertex.x, 0, vertex.z);
                 }
             });
         }
+        protected override void DrawOrthogonal(MapGraphics graphics) => DrawTopDown(graphics);
 
         public override void Update()
         {

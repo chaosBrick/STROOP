@@ -1,11 +1,8 @@
-﻿using STROOP.Structs.Configurations;
-using STROOP.Utilities;
-using STROOP.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using OpenTK;
+using STROOP.Structs.Configurations;
+using STROOP.Utilities;
 using STROOP.Structs;
 
 namespace STROOP.Models
@@ -37,6 +34,10 @@ namespace STROOP.Models
         public readonly float NormY;
         public readonly float NormZ;
         public readonly float NormOffset;
+
+        public Vector3 p1 => new Vector3(X1, Y1, Z1);
+        public Vector3 p2 => new Vector3(X2, Y2, Z2);
+        public Vector3 p3 => new Vector3(X3, Y3, Z3);
 
         public readonly uint AssociatedObject;
 
@@ -209,6 +210,30 @@ namespace STROOP.Models
             XProjection = NormX < -0.707 || NormX > 0.707;
         }
 
+        public bool Intersect(Vector3 rayOrigin, Vector3 rayDirection, out Vector3 intersection)
+        {
+            intersection = default(Vector3);
+            bool result = IntersectTriangle(rayOrigin, rayDirection, p1, p2, p3, out float t, out float u, out float v, out Vector3 n);
+            if (result)
+                intersection = rayOrigin + t * rayDirection;
+            return result;
+        }
+
+        public static bool IntersectTriangle(Vector3 RayOrigin, Vector3 RayDirection, Vector3 A, Vector3 B, Vector3 C, out float t, out float u, out float v, out Vector3 N)
+        {
+            Vector3 E1 = B - A;
+            Vector3 E2 = C - A;
+            N = Vector3.Cross(E1, E2);
+            float det = -Vector3.Dot(RayDirection, N);
+            float invdet = 1.0f / det;
+            Vector3 AO = RayOrigin - A;
+            Vector3 DAO = Vector3.Cross(AO, RayDirection);
+            u = Vector3.Dot(E2, DAO) * invdet;
+            v = -Vector3.Dot(E1, DAO) * invdet;
+            t = Vector3.Dot(AO, N) * invdet;
+            return (Math.Abs(det) >= 1e-6 && t >= 0.0 && u >= 0.0 && v >= 0.0 && (u + v) <= 1.0);
+        }
+
         public override string ToString()
         {
             return String.Join("\t", FieldValueList);
@@ -362,7 +387,7 @@ namespace STROOP.Models
             short shortZ = (short)doubleZ;
 
             if (!MoreMath.IsPointInsideTriangle(shortX, shortZ, X1, Z1, X2, Z2, X3, Z3)) return false;
-            
+
             double heightOnTriangle = GetHeightOnTriangle(shortX, shortZ, NormX, NormY, NormZ, NormOffset);
             if (shortY < heightOnTriangle - 78) return false;
 

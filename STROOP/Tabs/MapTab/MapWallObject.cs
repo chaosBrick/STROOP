@@ -35,31 +35,44 @@ namespace STROOP.Tabs.MapTab
 
         public override IHoverData GetHoverData(MapGraphics graphics)
         {
-            foreach (var tri in GetTrianglesWithinDist())
-            {
-                var dat = MapUtilities.Get2DWallDataFromTri(tri);
-                if (dat != null)
+            if (graphics.view.mode == MapView.ViewMode.TopDown)
+                foreach (var tri in GetTrianglesWithinDist())
                 {
-                    bool zProjection = !dat.Value.xProjection;
-                    float v = zProjection ? graphics.mapCursorPosition.X : graphics.mapCursorPosition.Z;
-                    float vOther = zProjection ? graphics.mapCursorPosition.Z : graphics.mapCursorPosition.X;
-                    float one = zProjection ? dat.Value.x1 : dat.Value.z1;
-                    float two = zProjection ? dat.Value.x2 : dat.Value.z2;
-                    float min = Math.Min(one, two);
-                    float max = Math.Max(one, two);
-                    float otherOne = zProjection ? dat.Value.z1 : dat.Value.x1;
-                    float otherTwo = zProjection ? dat.Value.z2 : dat.Value.x2;
-                    float interpolatedOther = otherOne + ((v - one) / (two - one)) * (otherTwo - otherOne);
-                    var angle = MoreMath.AngleTo_Radians(dat.Value.x1, dat.Value.z1, dat.Value.x2, dat.Value.z2);
-                    float projectionDist = Size / (float)Math.Abs(!zProjection ? Math.Cos(angle) : Math.Sin(angle));
-                    if (v >= min && v <= max && Math.Abs(vOther - interpolatedOther) < projectionDist)
+                    var dat = MapUtilities.Get2DWallDataFromTri(tri);
+                    if (dat != null)
                     {
-                        hoverData.triangle = tri;
-                        return hoverData;
+                        bool zProjection = !dat.Value.xProjection;
+                        float v = zProjection ? graphics.mapCursorPosition.X : graphics.mapCursorPosition.Z;
+                        float vOther = zProjection ? graphics.mapCursorPosition.Z : graphics.mapCursorPosition.X;
+                        float one = zProjection ? dat.Value.x1 : dat.Value.z1;
+                        float two = zProjection ? dat.Value.x2 : dat.Value.z2;
+                        float min = Math.Min(one, two);
+                        float max = Math.Max(one, two);
+                        float otherOne = zProjection ? dat.Value.z1 : dat.Value.x1;
+                        float otherTwo = zProjection ? dat.Value.z2 : dat.Value.x2;
+                        float interpolatedOther = otherOne + ((v - one) / (two - one)) * (otherTwo - otherOne);
+                        var angle = MoreMath.AngleTo_Radians(dat.Value.x1, dat.Value.z1, dat.Value.x2, dat.Value.z2);
+                        float projectionDist = Size / (float)Math.Abs(!zProjection ? Math.Cos(angle) : Math.Sin(angle));
+                        if (v >= min && v <= max && Math.Abs(vOther - interpolatedOther) < projectionDist)
+                        {
+                            hoverData.triangle = tri;
+                            return hoverData;
+                        }
                     }
                 }
-            }
             return null;
+        }
+
+        protected override Vector3[] GetVolumeDisplacements(TriangleDataModel tri)
+        {
+            float d = Size / (tri.XProjection ? tri.NormX : tri.NormZ);
+            return tri.XProjection ? new Vector3[] { new Vector3(d, 0, 0), new Vector3(-d, 0, 0) } : new Vector3[] { new Vector3(0, 0, d), new Vector3(0, 0, -d) };
+        }
+
+        protected override (Vector3[] faceVertices, Vector4 color)[] GetBaseFaceVertices(TriangleDataModel tri)
+        {
+            var d = new Vector3(0, _relativeHeight.HasValue ? _relativeHeight.Value : -30, 0);
+            return new[] { (new[] { tri.p1 + d, tri.p2 + d, tri.p3 + d }, new Vector4(1)) };
         }
 
         protected override void DrawTopDown(MapGraphics graphics)
@@ -86,38 +99,42 @@ namespace STROOP.Tabs.MapTab
                     float angle = (float)MoreMath.AngleTo_Radians(x1, z1, x2, z2);
                     float projectionDist = Size / (float)Math.Abs(xProjection ? Math.Cos(angle) : Math.Sin(angle));
                     List<List<(float x, float z)>> quads = new List<List<(float x, float z)>>();
-                    Vector3 projection1Plus = new Vector3(x1 + (xProjection ? projectionDist : 0), z1 + (xProjection ? 0 : projectionDist), 0);
-                    Vector3 projection2Plus = new Vector3(x2 + (xProjection ? projectionDist : 0), z2 + (xProjection ? 0 : projectionDist), 0);
-                    Vector3 projection1Minus = new Vector3(x1 - (xProjection ? projectionDist : 0), z1 - (xProjection ? 0 : projectionDist), 0);
-                    Vector3 projection2Minus = new Vector3(x2 - (xProjection ? projectionDist : 0), z2 - (xProjection ? 0 : projectionDist), 0);
+                    Vector3 projection1Plus = new Vector3(x1 + (xProjection ? projectionDist : 0), 0, z1 + (xProjection ? 0 : projectionDist));
+                    Vector3 projection2Plus = new Vector3(x2 + (xProjection ? projectionDist : 0), 0, z2 + (xProjection ? 0 : projectionDist));
+                    Vector3 projection1Minus = new Vector3(x1 - (xProjection ? projectionDist : 0), 0, z1 - (xProjection ? 0 : projectionDist));
+                    Vector3 projection2Minus = new Vector3(x2 - (xProjection ? projectionDist : 0), 0, z2 - (xProjection ? 0 : projectionDist));
 
                     graphics.triangleRenderer.Add(
-                        new Vector3(x1, z1, 0),
-                        new Vector3(x2, z2, 0),
+                        new Vector3(x1, 0, z1),
+                        new Vector3(x2, 0, z2),
                         projection1Plus,
                         false, color, outlineColor,
-                        new Vector3(OutlineWidth, OutlineWidth, 0));
+                        new Vector3(0, OutlineWidth, OutlineWidth),
+                        true);
 
                     graphics.triangleRenderer.Add(
-                        new Vector3(x2, z2, 0),
+                        new Vector3(x2, 0, z2),
                         projection2Plus,
                         projection1Plus,
                         false, color, outlineColor,
-                        new Vector3(0, OutlineWidth, OutlineWidth));
+                        new Vector3(OutlineWidth, 0, OutlineWidth),
+                        true);
 
                     graphics.triangleRenderer.Add(
-                        new Vector3(x2, z2, 0),
-                        new Vector3(x1, z1, 0),
+                        new Vector3(x2, 0, z2),
+                        new Vector3(x1, 0, z1),
                         projection1Minus,
                         false, color, outlineColor,
-                    new Vector3(0, OutlineWidth, OutlineWidth));
+                        new Vector3(OutlineWidth, 0, OutlineWidth),
+                        true);
 
                     graphics.triangleRenderer.Add(
-                        new Vector3(x2, z2, 0),
+                        new Vector3(x2, 0, z2),
                         projection1Minus,
                         projection2Minus,
                         false, color, outlineColor,
-                    new Vector3(OutlineWidth, 0, OutlineWidth));
+                        new Vector3(OutlineWidth, OutlineWidth, 0),
+                        true);
                 }
             });
         }

@@ -18,12 +18,13 @@ namespace STROOP.Tabs.MapTab
         public MapGraphics graphics { get; private set; }
 
         private List<int> _currentObjIndexes = new List<int>();
-        public IHoverData hoverData { get; private set; }
+        public List<IHoverData> hoverData { get; private set; } = new List<IHoverData>();
 
         public bool PauseMapUpdating = false;
         private bool _isLoaded2D = false;
+        int _numLevelTriangles = 0;
 
-        public bool HasMouseListeners => hoverData != null;
+        public bool HasMouseListeners => hoverData.Count > 0;
         Dictionary<object, MapTracker> semaphoreTrackers = new Dictionary<object, MapTracker>();
         List<(CheckBox checkBox, MapTracker tracker)> quickSemaphores = new List<(CheckBox checkBox, MapTracker tracker)>();
 
@@ -47,10 +48,17 @@ namespace STROOP.Tabs.MapTab
             _isLoaded2D = true;
 
             InitializeControls();
+
+            comboBoxViewMode.SelectedIndex = 0;
         }
 
         public MapLayout GetMapLayout(object mapLayoutChoice = null) =>
             (mapLayoutChoice ?? comboBoxMapOptionsLevel.SelectedItem) as MapLayout ?? Config.MapAssociations.GetBestMap();
+
+
+        bool needsGeometryRefresh, _needsGeometryRefreshInternal;
+        public bool NeedsGeometryRefresh() => needsGeometryRefresh;
+        public void RequireGeometryUpdate() => _needsGeometryRefreshInternal = true;
 
 
         public Lazy<Image> GetBackgroundImage(object backgroundChoice = null)
@@ -161,9 +169,6 @@ namespace STROOP.Tabs.MapTab
                     addTrackerCategory.DropDownItems.Add(addTrackerItem);
                 buttonMapOptionsAddNewTracker.ContextMenuStrip.Items.Add(addTrackerCategory);
             }
-
-            //foreach (var adder in adders)
-            //    buttonMapOptionsAddNewTracker.ContextMenuStrip.Items.Add(adder);
 
             buttonMapOptionsAddNewTracker.Click += (sender, e) =>
                 buttonMapOptionsAddNewTracker.ContextMenuStrip.Show(Cursor.Position);
@@ -278,25 +283,28 @@ namespace STROOP.Tabs.MapTab
                SetGlobalIconSize(trackBarMapOptionsGlobalIconSize.Value));
             MapUtilities.CreateTrackBarContextMenuStrip(trackBarMapOptionsGlobalIconSize);
 
-            Point onClickPosition = new Point();
-            var menu = new ContextMenu();
             glControlMap2D.MouseDown += (sender, e) =>
             {
-                if (e.Button == MouseButtons.Right && hoverData == null)
-                {
-                    onClickPosition = e.Location;
-                    menu.Show(glControlMap2D, e.Location);
-                }
+                if (e.Button == MouseButtons.Right)
+                    ShowRightClickMenu();
             };
-            var copyPositionItem = new MenuItem("Copy Position");
-            copyPositionItem.Click += (e, args) =>
-            {
-                Vector3 coords = Vector3.TransformPosition(
-                    new Vector3(2 * (float)onClickPosition.X / glControlMap2D.Width - 1, 1 - 2 * (float)onClickPosition.Y / glControlMap2D.Height, 0),
-                    Matrix4.Invert(graphics.ViewMatrix));
-                Clipboard.SetText($"{coords.X} 0 {coords.Y}");
-            };
-            menu = new ContextMenu(new MenuItem[] { copyPositionItem });
+        }
+
+        bool IsContextMenuOpen() => contextMenu != null && contextMenu.Visible;
+        ContextMenuStrip contextMenu;
+        void ShowRightClickMenu()
+        {
+            contextMenu = new ContextMenuStrip();
+            var onClickPosition = graphics.mapCursorPosition;
+            var copyPositionItem = new ToolStripMenuItem("Copy Cursor Position");
+            copyPositionItem.Click += (e, args) => CopyUtilities.CopyPosition(onClickPosition);
+            contextMenu.Items.Add(copyPositionItem);
+            contextMenu.Items.Add(new ToolStripSeparator());
+
+            foreach (var a in hoverData)
+                a.AddContextMenuItems(this, contextMenu);
+
+            contextMenu.Show(Cursor.Position);
         }
 
         private void ResetToInitialState()
@@ -331,28 +339,41 @@ namespace STROOP.Tabs.MapTab
 
             using (new AccessScope<MapTab>(this))
             {
-                if (!graphics.IsMouseDown(0))
+                if (!graphics.IsMouseDown(0) && !IsContextMenuOpen())
                 {
-                    hoverData = null;
+                    hoverData.Clear();
                     foreach (var tracker in flowLayoutPanelMapTrackers.EnumerateTrackers())
                         if (tracker.IsVisible)
                         {
                             var newHover = tracker.mapObject.GetHoverData(graphics);
                             if (newHover != null)
-                                hoverData = newHover;
+                                hoverData.Add(newHover);
                         }
                 }
 
                 flowLayoutPanelMapTrackers.UpdateControl();
 
-                if (!active) return;
+                if (active)
+                {
+                    base.Update(active);
+                    UpdateBasedOnObjectsSelectedOnMap();
+                    UpdateDataTab();
 
-                base.Update(active);
-                UpdateBasedOnObjectsSelectedOnMap();
-                UpdateDataTab();
+                    if (!PauseMapUpdating)
+                        glControlMap2D.Invalidate();
+                }
 
-                if (!PauseMapUpdating)
-                    glControlMap2D.Invalidate();
+                int numLevelTriangles = Config.Stream.GetInt32(TriangleConfig.LevelTriangleCountAddress);
+                if (numLevelTriangles != _numLevelTriangles)
+                    RequireGeometryUpdate();
+
+                if (_needsGeometryRefreshInternal)
+                {
+                    needsGeometryRefresh = true;
+                    _needsGeometryRefreshInternal = false;
+                }
+                else
+                    needsGeometryRefresh = false;
             }
         }
 
@@ -467,5 +488,10 @@ namespace STROOP.Tabs.MapTab
                 [Map3DCameraMode.FollowFocusRelativeAngle] = followFocusRelativeAngleColoredVars,
                 [Map3DCameraMode.FollowFocusAbsoluteAngle] = followFocusAbsoluteAngleColoredVars,
             };
+
+        private void comboBoxViewMode_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            graphics.view.mode = (MapView.ViewMode)comboBoxViewMode.SelectedIndex;
+        }
     }
 }

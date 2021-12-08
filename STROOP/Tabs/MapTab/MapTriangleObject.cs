@@ -14,7 +14,6 @@ namespace STROOP.Tabs.MapTab
     {
         protected class TriangleHoverData : IHoverData
         {
-            ContextMenuStrip ctxMenu = new ContextMenuStrip();
             MapTriangleObject parent;
             public TriangleDataModel triangle;
             Vector3 mapCursorOnRightClick;
@@ -22,41 +21,44 @@ namespace STROOP.Tabs.MapTab
             public TriangleHoverData(MapTriangleObject parent)
             {
                 this.parent = parent;
-                var itemCopyTriangleAddress = new ToolStripMenuItem("Copy Triangle Address");
-                itemCopyTriangleAddress.Click += (_, __) =>
-                {
-                    if (triangle != null)
-                        Clipboard.SetText($"0x{triangle.Address.ToString("x8")}");
-                };
-                ctxMenu.Items.Add(itemCopyTriangleAddress);
-
-                var itemCopyPosition = new ToolStripMenuItem("Copy Position");
-                itemCopyPosition.Click += (_, __) =>
-                {
-                    if (triangle != null)
-                    {
-                        float y = triangle.IsWall() ? mapCursorOnRightClick.Y : (float)triangle.GetHeightOnTriangle(mapCursorOnRightClick.X, mapCursorOnRightClick.Z);
-                        var pos = new Vector3(mapCursorOnRightClick.X, y, mapCursorOnRightClick.Z);
-                        DataObject vec3Data = new DataObject("Position", pos);
-                        vec3Data.SetText($"{pos.X}; {pos.Y}; {pos.Z}");
-                        Clipboard.SetDataObject(vec3Data);
-                    }
-                };
-                ctxMenu.Items.Add(itemCopyPosition);
             }
 
             public void DragTo(Vector3 position) { }
 
             public void LeftClick(Vector3 position) { }
 
-            public void RightClick(Vector3 position)
-            {
-                mapCursorOnRightClick = position;
-                if (triangle != null)
-                    ctxMenu.Show(Cursor.Position);
-            }
+            public void RightClick(Vector3 position) { }
 
             public bool CanDrag() => false;
+
+            public void AddContextMenuItems(MapTab tab, ContextMenuStrip menu)
+            {
+                var myItem = new ToolStripMenuItem($"{triangle.Classification} Triangle 0x{triangle.Address.ToString("x8")}");
+
+                var itemCopyTriangleAddress = new ToolStripMenuItem("Copy Triangle Address");
+                itemCopyTriangleAddress.Click += (_, __) =>
+                {
+                    if (triangle != null)
+                        Clipboard.SetText($"0x{triangle.Address.ToString("x8")}");
+                };
+                myItem.DropDownItems.Add(itemCopyTriangleAddress);
+
+                var itemCopyPosition = new ToolStripMenuItem("Copy Position");
+                itemCopyPosition.Click += (_, __) =>
+                {
+                    if (triangle != null)
+                    {
+                        if (tab.graphics.view.mode == MapView.ViewMode.TopDown)
+                        {
+                            float y = triangle.IsWall() ? mapCursorOnRightClick.Y : (float)triangle.GetHeightOnTriangle(mapCursorOnRightClick.X, mapCursorOnRightClick.Z);
+                            CopyUtilities.CopyPosition(new Vector3(mapCursorOnRightClick.X, y, mapCursorOnRightClick.Z));
+                        }
+                    }
+                };
+                myItem.DropDownItems.Add(itemCopyPosition);
+
+                menu.Items.Add(myItem);
+            }
         }
 
         protected static List<uint> GetTrianglesFromDialog(uint defaultTriangle)
@@ -115,6 +117,95 @@ namespace STROOP.Tabs.MapTab
             if (newList != null)
                 _bufferedTris = newList;
         }
+
+        protected override void DrawOrthogonal(MapGraphics graphics)
+        {
+            graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
+            {
+                var colorMultipliers = new float[] { 1.0f, 0.5f, 0.25f };
+                var baseColor = new Vector4(Color.R / 255f, Color.G / 255f, Color.B / 255f, OpacityByte / 255f);
+                foreach (var tri in GetTrianglesWithinDist())
+                {
+                    graphics.triangleRenderer.Add(
+                        new Vector3(tri.X1, tri.Y1, tri.Z1),
+                        new Vector3(tri.X2, tri.Y2, tri.Z2),
+                        new Vector3(tri.X3, tri.Y3, tri.Z3),
+                        false,
+                        new Vector4(baseColor.Xyz * 1.0f, baseColor.W),
+                        new Vector4(baseColor.Xyz * 0.5f, baseColor.W),
+                        new Vector4(baseColor.Xyz * 0.25f, baseColor.W),
+                        new Vector4(OutlineColor.R / 255f, OutlineColor.G / 255f, OutlineColor.B / 255f, OutlineColor.A / 255f),
+                        new Vector3(OutlineWidth),
+                        true);
+                }
+            });
+        }
+
+        protected override void Draw3D(MapGraphics graphics)
+        {
+            graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
+            {
+                var colorMultipliers = new float[] { 1.0f, 0.5f, 0.25f };
+                var baseColor = new Vector4(Color.R / 255f, Color.G / 255f, Color.B / 255f, OpacityByte / 255f);
+                var projectionColor = new Vector4(baseColor.Xyz, 0.5f * baseColor.W);
+                foreach (var tri in GetTrianglesWithinDist())
+                {
+                    //graphics.triangleRenderer.Add(
+                    //    tri.p1,
+                    //    tri.p2,
+                    //    tri.p3,
+                    //    false,
+                    //    baseColor,
+                    //    new Vector4(OutlineColor.R / 255f, OutlineColor.G / 255f, OutlineColor.B / 255f, OutlineColor.A / 255f),
+                    //    new Vector3(OutlineWidth),
+                    //    true);
+
+                    Vector4 outlineColor = new Vector4(OutlineColor.R / 255f, OutlineColor.G / 255f, OutlineColor.B / 255f, OutlineColor.A / 255f);
+                    foreach (var baseDisplacement in GetBaseFaceVertices(tri))
+                    {
+                        Vector3[] baseVectors = baseDisplacement.faceVertices;
+                        foreach (Vector3 displacement in GetVolumeDisplacements(tri))
+                        {
+
+                            for (int i = 0; i < baseVectors.Length; i++)
+                            {
+                                if (i > 1)
+                                    graphics.triangleRenderer.Add(
+                                        baseVectors[0] + displacement,
+                                        baseVectors[i - 1] + displacement,
+                                        baseVectors[i] + displacement,
+                                        false,
+                                        baseColor,
+                                        outlineColor,
+                                        new Vector3(OutlineWidth),
+                                        true);
+
+                                Vector3 a = baseVectors[i], b = baseVectors[(i + 1) % baseVectors.Length];
+
+                                graphics.triangleRenderer.Add(
+                                    a,
+                                    b,
+                                    a + displacement,
+                                    false, projectionColor, outlineColor,
+                                    new Vector3(0, OutlineWidth, OutlineWidth),
+                                    true);
+
+                                graphics.triangleRenderer.Add(
+                                    b,
+                                    b + displacement,
+                                    a + displacement,
+                                    false, projectionColor, outlineColor,
+                                    new Vector3(OutlineWidth, 0, OutlineWidth),
+                                    true);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        protected abstract Vector3[] GetVolumeDisplacements(TriangleDataModel tri);
+        protected virtual (Vector3[] faceVertices, Vector4 color)[] GetBaseFaceVertices(TriangleDataModel tri) => new[] { (new[] { tri.p1, tri.p2, tri.p3 }, new Vector4(1)) };
 
         protected List<ToolStripMenuItem> GetTriangleToolStripMenuItems()
         {

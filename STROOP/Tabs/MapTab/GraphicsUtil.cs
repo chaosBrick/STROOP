@@ -13,10 +13,11 @@ namespace STROOP.Tabs.MapTab
         static void ThrowOrLog(string debug)
         {
 #if ThrowExceptions
-            throw new Exception(debug);
+            System.Diagnostics.Debugger.Break();
 #else
             System.Diagnostics.Debug.WriteLine(debug);
 #endif
+            ;
         }
 
         static Dictionary<(string, string, string), int> simpleShaders = new Dictionary<(string, string, string), int>();

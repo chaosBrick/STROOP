@@ -23,7 +23,7 @@ namespace STROOP.Tabs.MapTab
                 var outlineColor = ColorUtilities.ColorToVec4(OutlineColor);
                 foreach (var dim in dimensionList)
                 {
-                    var transform = Matrix4.CreateScale(dim.radius) * Matrix4.CreateTranslation(dim.centerX, dim.centerZ, 0);
+                    var transform = graphics.BillboardMatrix * Matrix4.CreateScale(dim.radius) * Matrix4.CreateTranslation(dim.centerX, 0, dim.centerZ);
                     graphics.circleRenderer.AddInstance(
                         transform,
                         OutlineWidth,

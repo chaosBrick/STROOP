@@ -16,6 +16,19 @@ namespace STROOP.Tabs.MapTab
             MapDrawingObject parent;
             public Drawing(MapDrawingObject target) { this.parent = target; }
 
+            public void AddContextMenuItems(MapTab tab, ContextMenuStrip menu)
+            {
+                var myItem = new ToolStripMenuItem("Drawing");
+                var clearDrawingItem = new ToolStripMenuItem("Clear");
+                clearDrawingItem.Click += (_, __) => parent.ClearDrawing();
+                myItem.DropDownItems.Add(clearDrawingItem);
+
+                var stopDrawingItem = new ToolStripMenuItem("Stop Drawing");
+                stopDrawingItem.Click += (_, __) => parent.drawingEnabled = false;
+                myItem.DropDownItems.Add(stopDrawingItem);
+                menu.Items.Add(myItem);
+            }
+
             public bool CanDrag() => true;
 
             public void DragTo(Vector3 newPosition)
@@ -38,7 +51,9 @@ namespace STROOP.Tabs.MapTab
         }
 
         private readonly List<Vector3> _vertices;
-        private bool _drawingEnabled;
+
+        ToolStripMenuItem itemEnableDrawing;
+        private bool drawingEnabled { get { return itemEnableDrawing.Checked; } set { itemEnableDrawing.Checked = value; } }
 
         private Vector3 _lastVertex;
 
@@ -49,7 +64,6 @@ namespace STROOP.Tabs.MapTab
             OutlineColor = Color.Red;
 
             _vertices = new List<Vector3>();
-            _drawingEnabled = false;
         }
 
         protected override List<Vector3> GetVertices(MapGraphics graphics) => _vertices;
@@ -62,19 +76,12 @@ namespace STROOP.Tabs.MapTab
         {
             if (_contextMenuStrip == null)
             {
-                ToolStripMenuItem itemEnableDrawing = new ToolStripMenuItem("Enable Drawing");
+                itemEnableDrawing = new ToolStripMenuItem("Enable Drawing");
                 var capturedMapTab = currentMapTab;
-                itemEnableDrawing.Click += (sender, e) =>
-                {
-                    _drawingEnabled = !_drawingEnabled;
-                    itemEnableDrawing.Checked = _drawingEnabled;
-                };
+                itemEnableDrawing.Click += (sender, e) => drawingEnabled = !drawingEnabled;
 
                 ToolStripMenuItem itemClearDrawing = new ToolStripMenuItem("Clear Drawing");
-                itemClearDrawing.Click += (sender, e) =>
-                {
-                    _vertices.Clear();
-                };
+                itemClearDrawing.Click += (sender, e) => ClearDrawing();
 
                 _contextMenuStrip = new ContextMenuStrip();
                 _contextMenuStrip.Items.Add(itemEnableDrawing);
@@ -84,11 +91,8 @@ namespace STROOP.Tabs.MapTab
             return _contextMenuStrip;
         }
 
-        public override IHoverData GetHoverData(MapGraphics graphics) => _drawingEnabled ? new Drawing(this) : null;
+        public void ClearDrawing() => _vertices.Clear();
 
-        public override void CleanUp()
-        {
-            _drawingEnabled = false;
-        }
+        public override IHoverData GetHoverData(MapGraphics graphics) => drawingEnabled ? new Drawing(this) : null;
     }
 }

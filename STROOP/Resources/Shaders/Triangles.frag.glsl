@@ -12,6 +12,7 @@ layout(location=0) out vec4 color;
 
 uniform vec2 pixelsPerUnit;
 uniform float unitDivisor;
+uniform vec2 gridOffset;
 
 uniform sampler2DArray sampler;
 
@@ -44,7 +45,7 @@ void main()
 		f = edgeFactor();
 	else 
 	{
-		vec2 dasDaHalt = fs_worldPosition_showunits.xy / unitDivisor;
+		vec2 dasDaHalt = (fs_worldPosition_showunits.xz + gridOffset) / unitDivisor;
 		ivec2 unit = ivec2(dasDaHalt);
 		ivec2 p1 = ivec2(fs_coord01.xy / unitDivisor);
 		ivec2 p2 = ivec2(fs_coord01.zw / unitDivisor);

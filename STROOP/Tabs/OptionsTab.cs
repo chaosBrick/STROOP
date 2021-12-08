@@ -74,7 +74,7 @@ namespace STROOP.Tabs
                 (bool value) => SavedSettingsConfig.NeutralizeTrianglesWith0x15 = value,
                 (bool value) => SavedSettingsConfig.CloningUpdatesHolpType = value,
                 (bool value) => SavedSettingsConfig.UseInGameTrigForAngleLogic = value,
-                (bool value) => SavedSettingsConfig.UseExtendedLevelBoundaries = value,
+                (bool value) => {SavedSettingsConfig.UseExtendedLevelBoundaries = value; AccessScope<StroopMainForm>.content?.mapTab.RequireGeometryUpdate(); },
                 (bool value) => SavedSettingsConfig.UseExpandedRamSize = value,
             };
 

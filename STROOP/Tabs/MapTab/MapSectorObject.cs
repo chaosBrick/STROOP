@@ -36,19 +36,21 @@ namespace STROOP.Tabs.MapTab
                     var pfft = MoreMath.AngleUnitsToRadians(angle - angleRadius);
                     var pfft2 = MoreMath.AngleUnitsToRadians(angle + angleRadius);
                     graphics.lineRenderer.Add(
-                        new Vector3(centerX, centerZ, 0),
-                        new Vector3(centerX + (float)Math.Sin(pfft) * radius, centerZ + (float)Math.Cos(pfft) * radius, 0),
+                        new Vector3(centerX, 0, centerZ),
+                        new Vector3(centerX + (float)Math.Sin(pfft) * radius, 0, centerZ + (float)Math.Cos(pfft) * radius),
                         ColorUtilities.ColorToVec4(OutlineColor),
                         OutlineWidth);
 
                     graphics.lineRenderer.Add(
-                        new Vector3(centerX, centerZ, 0),
-                        new Vector3(centerX + (float)Math.Sin(pfft2) * radius, centerZ + (float)Math.Cos(pfft2) * radius, 0),
+                        new Vector3(centerX, 0, centerZ),
+                        new Vector3(centerX + (float)Math.Sin(pfft2) * radius, 0, centerZ + (float)Math.Cos(pfft2) * radius),
                         ColorUtilities.ColorToVec4(OutlineColor),
                         OutlineWidth);
                 }
             });
         }
+
+        protected override void DrawOrthogonal(MapGraphics graphics) => DrawTopDown(graphics);
 
         protected List<(float centerX, float centerZ, float radius, float angle, float angleRadius)> GetDimensions()
         {

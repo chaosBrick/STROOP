@@ -26,14 +26,15 @@ namespace STROOP.Tabs.MapTab
 
         public override IHoverData GetHoverData(MapGraphics graphics)
         {
-            foreach (var tri in GetTrianglesWithinDist())
-            {
-                if (tri.GetTruncatedHeightOnTriangleIfInsideTriangle(graphics.mapCursorPosition.X, graphics.mapCursorPosition.Z) != null)
+            if (graphics.view.mode == MapView.ViewMode.TopDown)
+                foreach (var tri in GetTrianglesWithinDist())
                 {
-                    hoverData.triangle = tri;
-                    return hoverData;
+                    if (tri.GetTruncatedHeightOnTriangleIfInsideTriangle(graphics.mapCursorPosition.X, graphics.mapCursorPosition.Z) != null)
+                    {
+                        hoverData.triangle = tri;
+                        return hoverData;
+                    }
                 }
-            }
             return null;
         }
 
@@ -52,13 +53,14 @@ namespace STROOP.Tabs.MapTab
                     float cross = (p1_p2_z * p1_p3_x - p1_p2_x * p1_p3_z);
 
                     graphics.triangleRenderer.Add(
-                        new Vector3(tri.X1, tri.Z1, 0),
-                        cross > 0 ? new Vector3(tri.X2, tri.Z2, 0) : new Vector3(tri.X3, tri.Z3, 0),
-                        cross > 0 ? new Vector3(tri.X3, tri.Z3, 0) : new Vector3(tri.X2, tri.Z2, 0),
+                        new Vector3(tri.X1, 0, tri.Z1),
+                        cross > 0 ? new Vector3(tri.X2, 0, tri.Z2) : new Vector3(tri.X3, 0, tri.Z3),
+                        cross > 0 ? new Vector3(tri.X3, 0, tri.Z3) : new Vector3(tri.X2, 0, tri.Z2),
                         ShowTriUnits,
                         new Vector4(Color.R / 255f, Color.G / 255f, Color.B / 255f, OpacityByte / 255f),
                         new Vector4(OutlineColor.R / 255f, OutlineColor.G / 255f, OutlineColor.B / 255f, OutlineColor.A / 255f),
-                        OutlineWidth);
+                        OutlineWidth,
+                        graphics.view.mode != MapView.ViewMode.TopDown);
                 }
             });
         }

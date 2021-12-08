@@ -656,10 +656,12 @@
     </Compile>
     <Compile Include="Tabs\MapTab\ObjectDescriptionAttribute.cs" />
     <Compile Include="Tabs\MapTab\Renderers\CircleRenderer.cs" />
+    <Compile Include="Tabs\MapTab\Renderers\CylinderRenderer.cs" />
     <Compile Include="Tabs\MapTab\Renderers\InstanceRenderer.cs" />
     <Compile Include="Tabs\MapTab\Renderers\LineRenderer.cs" />
     <Compile Include="Tabs\MapTab\Renderers\Renderer.cs" />
     <Compile Include="Tabs\MapTab\Renderers\SpriteRenderer.cs" />
+    <Compile Include="Tabs\MapTab\Renderers\TransparencyRenderer.cs" />
     <Compile Include="Tabs\MapTab\Renderers\TriangleRenderer.cs" />
     <Compile Include="Tabs\MarioTab.cs">
       <SubType>UserControl</SubType>

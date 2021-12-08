@@ -7,10 +7,7 @@ namespace STROOP.Tabs.MapTab
 {
     public abstract class MapLineObject : MapObject
     {
-        public MapLineObject()
-            : base()
-        {
-        }
+        public MapLineObject() : base() { }
 
         protected override void DrawTopDown(MapGraphics graphics)
         {
@@ -22,7 +19,7 @@ namespace STROOP.Tabs.MapTab
                 Vector3 lastVertex = default(Vector3);
                 foreach (var vert in GetVertices(graphics))
                 {
-                    var newVertex = new Vector3(vert.X, vert.Z, 0);
+                    var newVertex = vert;
                     if (isFirstVertex)
                         graphics.lineRenderer.Add(lastVertex, newVertex, ColorUtilities.ColorToVec4(OutlineColor, OpacityByte), OutlineWidth);
 
@@ -32,11 +29,10 @@ namespace STROOP.Tabs.MapTab
             });
         }
 
+        protected override void DrawOrthogonal(MapGraphics graphics) => DrawTopDown(graphics);
+
         protected abstract List<Vector3> GetVertices(MapGraphics graphics);
 
-        public override MapDrawType GetDrawType()
-        {
-            return MapDrawType.Perspective;
-        }
+        public override MapDrawType GetDrawType() => MapDrawType.Perspective;
     }
 }

@@ -10,11 +10,24 @@ namespace STROOP.Tabs.MapTab
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
             {
                 foreach (var a in positionAngleProvider())
-                    DrawIcon(graphics, (float)a.X, (float)a.Z, Rotates ? (float)a.Angle : 0x8000 - graphics.MapViewAngleValue, GetInternalImage()?.Value);
+                    DrawIcon(graphics,
+                        true,
+                        (float)a.X, (float)a.Y, (float)a.Z,
+                        Rotates ? (float)a.Angle : 0x8000 - graphics.MapViewAngleValue,
+                        GetInternalImage()?.Value);
             });
         }
 
+        protected override void DrawOrthogonal(MapGraphics graphics) => DrawTopDown(graphics);
+
         public override bool ParticipatesInGlobalIconSize() => true;
+
+        static Vector3 ProjectOnLineSegment(Vector3 p, Vector3 A, Vector3 B)
+        {
+            Vector3 d = B - A;
+            float distThing = Vector3.Dot(p - A, d) / Vector3.Dot(d, d);
+            return A + d * System.Math.Max(0, System.Math.Min(1, distThing));
+        }
 
         public override IHoverData GetHoverData(MapGraphics graphics)
         {
@@ -24,10 +37,22 @@ namespace STROOP.Tabs.MapTab
             {
                 hoverData.currentPositionAngle = null;
                 foreach (var a in positionAngleProvider())
-                    if ((new Vector3((float)a.X, cursorPos.Y, (float)a.Z) - cursorPos).LengthSquared < radius * radius)
+                    if (graphics.view.mode == MapView.ViewMode.TopDown)
                     {
-                        hoverData.currentPositionAngle = a;
-                        break;
+                        if ((new Vector3((float)a.X, cursorPos.Y, (float)a.Z) - cursorPos).LengthSquared < radius * radius)
+                        {
+                            hoverData.currentPositionAngle = a;
+                            break;
+                        }
+                    }
+                    else if (graphics.view.mode == MapView.ViewMode.ThreeDimensional)
+                    {
+                        var rad = Size * Get3DIconScale(graphics, (float)a.X, (float)a.Y, (float)a.Z);
+                        if ((ProjectOnLineSegment(a.position, graphics.view.position, graphics.mapCursorPosition) - a.position).Length < rad)
+                        {
+                            hoverData.currentPositionAngle = a;
+                            break;
+                        }
                     }
             }
             return hoverData.currentPositionAngle != null ? hoverData : null;

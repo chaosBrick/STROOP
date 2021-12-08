@@ -9,6 +9,41 @@ namespace STROOP.Tabs.MapTab.Renderers
 {
     public class TriangleRenderer : Renderer
     {
+
+        class TransparentTriangleRenderer : TriangleRenderer, TransparencyRenderer.Transparent
+        {
+            TriangleRenderer parent;
+
+            protected override int GetShader() => GraphicsUtil.GetShaderProgram("Resources/Shaders/Triangles.vert.glsl", "Resources/Shaders/DepthMask.frag.glsl", "Resources/Shaders/Triangles.geom.glsl");
+            public TransparentTriangleRenderer(TriangleRenderer parent) : base()
+            {
+                this.parent = parent;
+            }
+
+            public void DrawMask(TransparencyRenderer renderer)
+            {
+                if (triangles.Count == 0)
+                    return;
+                GL.UseProgram(shader);
+                renderer.SetUniforms(shader);
+                DrawTriangles(renderer.graphics, shader);
+            }
+
+            public void DrawTransparent(TransparencyRenderer renderer)
+            {
+                if (triangles.Count == 0)
+                    return;
+                DrawTriangles(renderer.graphics, parent.shader);
+            }
+
+            public void Prepare(TransparencyRenderer renderer)
+            {
+                if (triangles.Count == 0)
+                    return;
+                WriteDataToBuffer();
+            }
+        }
+
         struct TriangleVertex
         {
             public const int Size = sizeof(float) * 4 + sizeof(float) * 4 + sizeof(float) * 4 + sizeof(float) * 3;
@@ -22,8 +57,9 @@ namespace STROOP.Tabs.MapTab.Renderers
         struct Triangle
         {
             public Vector3[] positions;
+            public Vector4[] colors;
             public bool showUnitSquares;
-            public Vector4 color, outlineColor;
+            public Vector4 outlineColor;
             public Vector3 outlineThickness;
         }
 
@@ -36,7 +72,24 @@ namespace STROOP.Tabs.MapTab.Renderers
         List<Triangle> triangles = new List<Triangle>();
 
         int uniform_viewProjection, uniform_pixelsPerUnit, uniform_unitDivisor;
+        protected virtual int GetShader() => GraphicsUtil.GetShaderProgram(
+                "Resources/Shaders/Triangles.vert.glsl",
+                "Resources/Shaders/Triangles.frag.glsl",
+                "Resources/Shaders/Triangles.geom.glsl");
+
+        TransparentTriangleRenderer transparentRenderer;
+        public TransparencyRenderer.Transparent transparent => transparentRenderer;
+
+        protected TriangleRenderer() { }
+
         public TriangleRenderer(int maxExpectedTriangles)
+        {
+            InitInternal(maxExpectedTriangles);
+            transparentRenderer = new TransparentTriangleRenderer(this);
+            transparentRenderer.InitInternal(maxExpectedTriangles);
+        }
+
+        void InitInternal(int maxExpectedTriangles)
         {
             int expectedSize = maxExpectedTriangles * TriangleVertex.Size * 3;
             vao = GL.GenVertexArray();
@@ -44,7 +97,7 @@ namespace STROOP.Tabs.MapTab.Renderers
 
             GL.BindVertexArray(vao);
             GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)expectedSize, IntPtr.Zero, BufferUsageHint.StreamDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)expectedSize, IntPtr.Zero, BufferUsageHint.DynamicDraw);
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
             GL.EnableVertexAttribArray(2);
@@ -56,10 +109,7 @@ namespace STROOP.Tabs.MapTab.Renderers
 
             GL.BindVertexArray(0);
 
-            shader = GraphicsUtil.GetShaderProgram(
-                "Resources/Shaders/Triangles.vert.glsl",
-                "Resources/Shaders/Triangles.frag.glsl",
-                "Resources/Shaders/Triangles.geom.glsl");
+            shader = GetShader();
             uniform_viewProjection = GL.GetUniformLocation(shader, "viewProjection");
             uniform_pixelsPerUnit = GL.GetUniformLocation(shader, "pixelsPerUnit");
             uniform_unitDivisor = GL.GetUniformLocation(shader, "unitDivisor");
@@ -70,36 +120,53 @@ namespace STROOP.Tabs.MapTab.Renderers
         public override void SetDrawCalls(MapGraphics graphics)
         {
             triangles.Clear();
+            transparentRenderer.triangles.Clear();
             graphics.drawLayers[(int)MapGraphics.DrawLayers.Geometry].Add(() =>
             {
                 if (triangles.Count == 0)
                     return;
 
-                Vector2 pixelsPerUnit = graphics.pixelsPerUnit;
-
-                var error = GL.GetError();
                 WriteDataToBuffer();
-                GL.UseProgram(shader);
-                GL.BindVertexArray(vao);
-                var mat = graphics.ViewMatrix;
-                GL.UniformMatrix4(uniform_viewProjection, false, ref mat);
-                GL.Uniform2(uniform_pixelsPerUnit, ref pixelsPerUnit);
-                float unitDivisor = Structs.Configurations.SavedSettingsConfig.UseExtendedLevelBoundaries ? 4 : 1;
-                GL.Uniform1(uniform_unitDivisor, unitDivisor);
-                GL.DrawArrays(PrimitiveType.Triangles, 0, triangles.Count * 3);
-                error = GL.GetError();
-                GL.BindVertexArray(0);
+                if (graphics.view.mode == MapView.ViewMode.ThreeDimensional)
+                {
+                    GL.Enable(EnableCap.DepthTest);
+                    GL.DepthFunc(DepthFunction.Lequal);
+                }
+                DrawTriangles(graphics, shader);
             });
         }
 
-        public void Add(Vector3 v1, Vector3 v2, Vector3 v3, bool showTriUnits, Vector4 color, Vector4 outlineColor, float outlineThickness) =>
-            Add(v1, v2, v3, showTriUnits, color, outlineColor, new Vector3(outlineThickness));
-        public void Add(Vector3 v1, Vector3 v2, Vector3 v3, bool showTriUnits, Vector4 color, Vector4 outlineColor, Vector3 outlineThickness)
+        protected void DrawTriangles(MapGraphics graphics, int program)
         {
-            triangles.Add(new Triangle
+            Vector2 pixelsPerUnit = graphics.pixelsPerUnit;
+            var error = GL.GetError();
+            GL.UseProgram(program);
+            GL.BindVertexArray(vao);
+            var mat = graphics.ViewMatrix;
+            GL.UniformMatrix4(GL.GetUniformLocation(program, "viewProjection"), false, ref mat);
+            GL.Uniform2(uniform_pixelsPerUnit, ref pixelsPerUnit);
+            float unitDivisor = Structs.Configurations.SavedSettingsConfig.UseExtendedLevelBoundaries ? 4 : 1;
+            GL.Uniform1(uniform_unitDivisor, unitDivisor);
+
+            GL.Uniform2(GL.GetUniformLocation(program, "gridOffset"), new Vector2(0)); // new Vector2(-3, -3));
+
+            GL.Disable(EnableCap.CullFace);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, triangles.Count * 3);
+            error = GL.GetError();
+            GL.BindVertexArray(0);
+        }
+
+        public void Add(Vector3 v1, Vector3 v2, Vector3 v3, bool showTriUnits, Vector4 color, Vector4 outlineColor, float outlineThickness, bool transparent) =>
+            Add(v1, v2, v3, showTriUnits, color, outlineColor, new Vector3(outlineThickness), transparent);
+        public void Add(Vector3 v1, Vector3 v2, Vector3 v3, bool showTriUnits, Vector4 color, Vector4 outlineColor, Vector3 outlineThickness, bool transparent) =>
+            Add(v1, v2, v3, showTriUnits, color, color, color, outlineColor, outlineThickness, transparent);
+
+        public void Add(Vector3 v1, Vector3 v2, Vector3 v3, bool showTriUnits, Vector4 color1, Vector4 color2, Vector4 color3, Vector4 outlineColor, Vector3 outlineThickness, bool transparent)
+        {
+            (transparent ? transparentRenderer.triangles : triangles).Add(new Triangle
             {
                 positions = new[] { v1, v2, v3 },
-                color = color,
+                colors = new[] { color1, color2, color3 },
                 outlineColor = outlineColor,
                 showUnitSquares = showTriUnits,
                 outlineThickness = outlineThickness
@@ -116,7 +183,7 @@ namespace STROOP.Tabs.MapTab.Renderers
                     Marshal.StructureToPtr(new TriangleVertex
                     {
                         position = instance.positions[i],
-                        color = instance.color,
+                        color = instance.colors[i],
                         outlineColor = instance.outlineColor,
                         showUnitSquares = instance.showUnitSquares ? 1.0f : 0.0f,
                         outlineThickness = instance.outlineThickness
@@ -127,7 +194,6 @@ namespace STROOP.Tabs.MapTab.Renderers
             }
             GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
             GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, (IntPtr)(TriangleVertex.Size * triangles.Count * 3), dataPtr);
-
         }
     }
 }

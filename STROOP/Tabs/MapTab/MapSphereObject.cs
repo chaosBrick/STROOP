@@ -29,5 +29,10 @@ namespace STROOP.Tabs.MapTab
         }
 
         protected abstract List<(float centerX, float centerY, float centerZ, float radius3D)> Get3DDimensions();
+
+        protected override void DrawOrthogonal(MapGraphics graphics)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

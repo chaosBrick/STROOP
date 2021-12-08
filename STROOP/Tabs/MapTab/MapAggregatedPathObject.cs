@@ -4,6 +4,7 @@ using System.Linq;
 using System.Drawing;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
+using OpenTK;
 
 namespace STROOP.Tabs.MapTab
 {
@@ -12,7 +13,7 @@ namespace STROOP.Tabs.MapTab
     {
         public MapAggregatedPathObject() : base() { }
 
-        protected override void DrawTopDown(MapGraphics graphics)
+        void Draw2D(MapGraphics graphics)
         {
             List<MapPathObject> paths = new List<MapPathObject>();
             //foreach (MapTracker mapTracker in currentMapTab.flowLayoutPanelMapTrackers.Controls)
@@ -29,13 +30,16 @@ namespace STROOP.Tabs.MapTab
                     {
                         if (i >= segmentList.Count) continue;
                         graphics.lineRenderer.Add(
-                            new OpenTK.Vector3(segmentList[i].StartX, segmentList[i].StartZ, 0),
-                            new OpenTK.Vector3(segmentList[i].StartX, segmentList[i].StartZ, 0),
+                            new Vector3(segmentList[i].StartX, 0, segmentList[i].StartZ),
+                            new Vector3(segmentList[i].StartX, 0, segmentList[i].StartZ),
                             ColorUtilities.ColorToVec4(segmentList[i].Color, segmentList[i].Opacity),
                             segmentList[i].LineWidth);
                     }
             });
         }
+
+        protected override void DrawTopDown(MapGraphics graphics) => Draw2D(graphics);
+        protected override void DrawOrthogonal(MapGraphics graphics) => Draw2D(graphics);
 
         public override string GetName()
         {

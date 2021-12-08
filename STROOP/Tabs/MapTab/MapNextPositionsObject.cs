@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Drawing;
-using OpenTK.Graphics.OpenGL;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
@@ -44,9 +43,11 @@ namespace STROOP.Tabs.MapTab
                 List<(float x, float y, float z, float angle, Lazy<Image> tex)> data = GetData();
                 data.Reverse();
                 foreach (var dataPoint in data)
-                    DrawIcon(graphics, dataPoint.x, dataPoint.z, dataPoint.angle, dataPoint.tex?.Value);
+                    DrawIcon(graphics, true, dataPoint.x, dataPoint.y, dataPoint.z, dataPoint.angle, dataPoint.tex?.Value);
             });
         }
+
+        protected override void DrawOrthogonal(MapGraphics graphics) => DrawTopDown(graphics);
 
         public List<(float x, float y, float z, float angle, Lazy<Image> tex)> GetData()
         {
@@ -86,7 +87,7 @@ namespace STROOP.Tabs.MapTab
             }
             return data;
         }
-        
+
         public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)

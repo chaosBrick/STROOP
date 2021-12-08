@@ -14,7 +14,7 @@ namespace STROOP.Tabs.MapTab.Renderers
         protected int maxInstances { get; private set; }
         protected IntPtr dataPtr { get; private set; }
 
-        int uniform_viewProjection;
+        public int uniform_viewProjection { get; private set; }
 
         protected int shader;
         protected int instanceBuffer, vertexArray;
@@ -64,9 +64,10 @@ namespace STROOP.Tabs.MapTab.Renderers
             }
         }
 
-        protected void BeginDraw(MapGraphics graphics)
+        protected void BeginDraw(MapGraphics graphics, bool updateBuffer = true)
         {
-            UpdateBuffer(instances.Count);
+            if (updateBuffer)
+                UpdateBuffer(instances.Count);
 
             GL.UseProgram(shader);
             GL.BindVertexArray(vertexArray);

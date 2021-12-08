@@ -17,46 +17,10 @@ namespace STROOP.Tabs.MapTab
         {
             MapTapeMeasureObject parent;
             public bool dragA;
-            ContextMenuStrip rightClickMenu = new ContextMenuStrip();
             float cursorY;
             public TapeHoverData(MapTapeMeasureObject parent)
             {
                 this.parent = parent;
-
-                var copyPositionItem = new ToolStripMenuItem("Copy Position");
-                copyPositionItem.Click += (_, __) =>
-                {
-                    Vector2 src = dragA ? parent.a : parent.b;
-                    Vector3 vec3 = new Vector3(src.X, cursorY, src.Y);
-                    DataObject vec3Data = new DataObject("Position", vec3);
-                    vec3Data.SetText($"{vec3.X}; {vec3.Y}; {vec3.Z}");
-                    Clipboard.SetDataObject(vec3Data);
-                };
-                rightClickMenu.Items.Add(copyPositionItem);
-
-                var pastePositionItem = new ToolStripMenuItem("Paste Position");
-                pastePositionItem.Click += (_, __) =>
-                {
-                    bool hasData = false;
-                    var clipboardObj = Clipboard.GetDataObject();
-                    Vector3 textVector;
-                    if (!(hasData |= ParsingUtilities.TryParseVector3(clipboardObj.GetData(DataFormats.Text) as string, out textVector)))
-                    {
-                        if (Clipboard.GetData("Position") is Vector3 dataVector)
-                        {
-                            hasData = true;
-                            textVector = dataVector;
-                        }
-                    }
-                    if (hasData)
-                    {
-                        if (dragA)
-                            parent.a = new Vector2(textVector.X, textVector.Z);
-                        else
-                            parent.b = new Vector2(textVector.X, textVector.Z);
-                    }
-                };
-                rightClickMenu.Items.Add(pastePositionItem);
             }
 
             public bool CanDrag() => parent.itemEnableDragging.Checked;
@@ -75,7 +39,32 @@ namespace STROOP.Tabs.MapTab
             public void RightClick(Vector3 position)
             {
                 cursorY = position.Y;
-                rightClickMenu.Show(Cursor.Position);
+            }
+
+            public void AddContextMenuItems(MapTab tab, ContextMenuStrip menu)
+            {
+                var myItem = new ToolStripMenuItem("Tape Measure");
+                var copyPositionItem = new ToolStripMenuItem("Copy Position");
+                copyPositionItem.Click += (_, __) =>
+                {
+                    Vector2 src = dragA ? parent.a : parent.b;
+                    CopyUtilities.CopyPosition(new Vector3(src.X, cursorY, src.Y));
+                };
+                myItem.DropDownItems.Add(copyPositionItem);
+
+                var pastePositionItem = new ToolStripMenuItem("Paste Position");
+                pastePositionItem.Click += (_, __) =>
+                {
+                    if (CopyUtilities.TryPastePosition(out Vector3 textVector))
+                    {
+                        if (dragA)
+                            parent.a = new Vector2(textVector.X, textVector.Z);
+                        else
+                            parent.b = new Vector2(textVector.X, textVector.Z);
+                    }
+                };
+                myItem.DropDownItems.Add(pastePositionItem);
+                menu.Items.Add(myItem);
             }
         }
 
@@ -86,8 +75,8 @@ namespace STROOP.Tabs.MapTab
         {
             OutlineColor = Color.Orange;
             OutlineWidth = 3;
-            a = new Vector2(currentMapTab.graphics.MapViewCenterXValue - 50, currentMapTab.graphics.MapViewCenterZValue);
-            b = new Vector2(currentMapTab.graphics.MapViewCenterXValue + 50, currentMapTab.graphics.MapViewCenterZValue);
+            a = new Vector2(currentMapTab.graphics.view.position.X - 50, currentMapTab.graphics.view.position.Z);
+            b = new Vector2(currentMapTab.graphics.view.position.X + 50, currentMapTab.graphics.view.position.Z);
             hoverData = new TapeHoverData(this);
         }
 

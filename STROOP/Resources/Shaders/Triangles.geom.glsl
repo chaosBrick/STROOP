@@ -59,19 +59,33 @@ vec2 Intersection(vec2 p1, vec2 d1, vec2 p2, vec2 d2)
 
 void main()
 {
-	vec4 lines[3] = vec4[](
-		TranslateToInflate(gl_in[0].gl_Position.xy, gl_in[1].gl_Position.xy),
-		TranslateToInflate(gl_in[1].gl_Position.xy, gl_in[2].gl_Position.xy),
-		TranslateToInflate(gl_in[2].gl_Position.xy, gl_in[0].gl_Position.xy)
-	);
-	vec4 coord01 = vec4(gl_in[0].gl_Position.xy, gl_in[1].gl_Position.xy);
-	vec2 coord2 = gl_in[2].gl_Position.xy;
-
+	vec4 lines[3];
+	vec4 srcVertex[3];
+	if (gs_worldPosition_showunits[0].w != 0) {
+		lines = vec4[](
+			TranslateToInflate(gl_in[0].gl_Position.xz, gl_in[1].gl_Position.xz),
+			TranslateToInflate(gl_in[1].gl_Position.xz, gl_in[2].gl_Position.xz),
+			TranslateToInflate(gl_in[2].gl_Position.xz, gl_in[0].gl_Position.xz)
+		);
+		for (int i = 0; i < 3; i++) {
+			int nextIndex = (i + 1) % 3;
+			float vertexY = gl_in[nextIndex].gl_Position.y;
+			vec2 intersection = Intersection(lines[i].xy, lines[i].zw, lines[nextIndex].xy, lines[nextIndex].zw);
+			srcVertex[i] = vec4(intersection.x, vertexY, intersection.y, 1);
+		}
+	}
+	else {
+		for (int i = 0; i < 3; i++) {
+			srcVertex[i] = gl_in[i].gl_Position;
+		}
+	}
+	
+	vec4 coord01 = vec4(gl_in[0].gl_Position.xz, gl_in[1].gl_Position.xz);
+	vec2 coord2 = gl_in[2].gl_Position.xz;
+	
 	for (int i = 0; i < 3; i++) {
-		int nextIndex = (i + 1) % 3;
-		vec2 intersection = Intersection(lines[i].xy, lines[i].zw, lines[nextIndex].xy, lines[nextIndex].zw);
-		gl_Position = viewProjection * vec4(intersection, 0, 1);
-		fs_worldPosition_showunits = vec4(intersection.xy, 0, gs_worldPosition_showunits[0].w);
+		gl_Position = viewProjection * srcVertex[i];
+		fs_worldPosition_showunits = vec4(srcVertex[i].xyz, gs_worldPosition_showunits[0].w);
 		fs_coord01 = coord01;
 		fs_coord2 = coord2;
 		fs_color = gs_color[i];
