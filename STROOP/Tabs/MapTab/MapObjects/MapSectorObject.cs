@@ -63,8 +63,6 @@ namespace STROOP.Tabs.MapTab.MapObjects
             return lst;
         }
 
-        public override MapDrawType GetDrawType() => MapDrawType.Perspective;
-
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.ArrowImage;
 
         public override string GetName() => $"Sector for {PositionAngle.NameOfMultiple(positionAngleProvider())}";

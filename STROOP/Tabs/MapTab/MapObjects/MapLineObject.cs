@@ -32,7 +32,5 @@ namespace STROOP.Tabs.MapTab.MapObjects
         protected override void DrawOrthogonal(MapGraphics graphics) => DrawTopDown(graphics);
 
         protected abstract List<Vector3> GetVertices(MapGraphics graphics);
-
-        public override MapDrawType GetDrawType() => MapDrawType.Perspective;
     }
 }

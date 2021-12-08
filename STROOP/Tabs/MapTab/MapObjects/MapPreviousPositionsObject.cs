@@ -109,9 +109,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
             var val = Config.Stream.GetInt32(RomVersionConfig.Version == RomVersion.US ? 0x80372E3C : 0x80400000);
             int numQFrames = (val - 0x10 * numBaseFrames) / 0x40;
-
-
-
+            
             List<DataPoint> allResults = new List<DataPoint>();
             for (int i = 0; i < numBaseFrames; i++)
                 allResults.Add(new DataPoint(qsData[i].qsX, qsData[i].qsY, qsData[i].qsZ, qsData[i].qsA, marioImages[i]));
@@ -153,15 +151,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             return combinedResults;
         }
 
-        public override bool ParticipatesInGlobalIconSize()
-        {
-            return true;
-        }
-
-        public override MapDrawType GetDrawType()
-        {
-            return MapDrawType.Overlay;
-        }
+        public override bool ParticipatesInGlobalIconSize() => true;
 
         public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {

@@ -455,9 +455,6 @@
     <Compile Include="Tabs\MapTab\MapObjects\MapPreviousPositionsObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapArrowObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapMapObject.cs" />
-    <Compile Include="Tabs\MapTab\MapDrawType.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapAggregatedPathObject.cs" />
-    <Compile Include="Tabs\MapTab\MapPathObjectSegment.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapCustomPositionAngleObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapSphereObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapCylinderObject.cs" />

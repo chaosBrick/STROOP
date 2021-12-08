@@ -16,15 +16,13 @@ namespace STROOP.Tabs.MapTab.MapObjects
         readonly List<TriangleDataModel> _tris = new List<TriangleDataModel>();
         private bool _removeCurrentTri;
         private TriangleListForm _triangleListForm;
-        private bool _autoUpdate;
-        private int _numLevelTris;
+        ToolStripMenuItem itemAutoUpdate;
 
         public MapLevelFloorObject()
             : base()
         {
             _removeCurrentTri = false;
             _triangleListForm = null;
-            _autoUpdate = true;
             ResetTriangles();
         }
 
@@ -37,13 +35,9 @@ namespace STROOP.Tabs.MapTab.MapObjects
         {
             if (_contextMenuStrip == null)
             {
-                ToolStripMenuItem itemAutoUpdate = new ToolStripMenuItem("Auto Update");
-                itemAutoUpdate.Click += (sender, e) =>
-                {
-                    _autoUpdate = !_autoUpdate;
-                    itemAutoUpdate.Checked = _autoUpdate;
-                };
-                itemAutoUpdate.Checked = _autoUpdate;
+                itemAutoUpdate = new ToolStripMenuItem("Auto Update");
+                itemAutoUpdate.Click += (sender, e) => itemAutoUpdate.Checked = !itemAutoUpdate.Checked;
+                itemAutoUpdate.Checked = true;
 
                 ToolStripMenuItem itemReset = new ToolStripMenuItem("Reset");
                 itemReset.Click += (sender, e) => ResetTriangles();
@@ -105,7 +99,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         public override void Update()
         {
             base.Update();
-            if (_autoUpdate)
+            if (itemAutoUpdate.Checked)
                 AutoUpdate();
         }
 

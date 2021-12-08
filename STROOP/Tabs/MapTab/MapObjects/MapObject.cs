@@ -171,8 +171,6 @@ namespace STROOP.Tabs.MapTab.MapObjects
             _customImage = image;
         }
 
-        public abstract MapDrawType GetDrawType();
-
         public virtual float GetY()
         {
             if (positionAngleProvider == null)
@@ -205,7 +203,11 @@ namespace STROOP.Tabs.MapTab.MapObjects
             return _contextMenuStrip;
         }
 
-        public virtual void InitSubTrackerContextMenuStrip(MapTab mapTab, ContextMenuStrip targetStrip) { }
+        public virtual void InitSubTrackerContextMenuStrip(MapTab mapTab, ContextMenuStrip targetStrip)
+        {
+            targetStrip.Items.AddHandlerToItem("Add Tracker for aggregated Path",
+                () => MapTracker.CreateTracker(mapTab, new MapPathObject(positionAngleProvider)));
+        }
 
         public virtual void Update() { }
 

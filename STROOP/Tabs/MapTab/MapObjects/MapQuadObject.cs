@@ -38,10 +38,5 @@ namespace STROOP.Tabs.MapTab.MapObjects
         protected override void DrawOrthogonal(MapGraphics graphics) => DrawTopDown(graphics);
 
         protected abstract List<(float xMin, float zMin, float xMax, float zMax)> GetQuadList();
-
-        public override MapDrawType GetDrawType()
-        {
-            return MapDrawType.Perspective;
-        }
     }
 }

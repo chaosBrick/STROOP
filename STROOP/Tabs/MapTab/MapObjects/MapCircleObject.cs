@@ -36,10 +36,5 @@ namespace STROOP.Tabs.MapTab.MapObjects
         public override IHoverData GetHoverData(MapGraphics graphics) => null;
 
         protected abstract List<(float centerX, float centerZ, float radius)> Get2DDimensions();
-
-        public override MapDrawType GetDrawType()
-        {
-            return MapDrawType.Perspective;
-        }
     }
 }

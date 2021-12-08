@@ -82,6 +82,8 @@ namespace STROOP.Utilities
             get => PosAngleType == PositionAngleTypeEnum.Selected;
         }
 
+        public bool CompareType(PositionAngle other) => PosAngleType == other.PosAngleType;
+
         private bool ShouldHaveAddress(PositionAngleTypeEnum posAngleType)
         {
             return posAngleType == PositionAngleTypeEnum.Obj ||

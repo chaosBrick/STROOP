@@ -250,10 +250,5 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 itemClearWithinCenter,
             };
         }
-
-        public override MapDrawType GetDrawType()
-        {
-            return MapDrawType.Perspective;
-        }
     }
 }

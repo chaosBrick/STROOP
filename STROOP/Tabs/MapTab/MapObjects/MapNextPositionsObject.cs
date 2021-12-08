@@ -5,7 +5,6 @@ using System.Drawing;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
-using OpenTK;
 using System.Windows.Forms;
 
 
@@ -26,15 +25,9 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.NextPositionsImage;
 
-        public override string GetName()
-        {
-            return "Next Positions";
-        }
+        public override string GetName() => "Next Positions";
 
-        public override float GetY()
-        {
-            return (float)PositionAngle.Mario.Y;
-        }
+        public override float GetY() => (float)PositionAngle.Mario.Y;
 
         protected override void DrawTopDown(MapGraphics graphics)
         {
@@ -127,14 +120,6 @@ namespace STROOP.Tabs.MapTab.MapObjects
             return _contextMenuStrip;
         }
 
-        public override bool ParticipatesInGlobalIconSize()
-        {
-            return true;
-        }
-
-        public override MapDrawType GetDrawType()
-        {
-            return MapDrawType.Overlay;
-        }
+        public override bool ParticipatesInGlobalIconSize() => true;
     }
 }

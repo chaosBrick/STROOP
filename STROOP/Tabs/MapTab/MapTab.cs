@@ -1,15 +1,15 @@
 ﻿using System;
+using System.Reflection;
 using System.Collections.Generic;
 using STROOP.Structs;
 using STROOP.Utilities;
 using System.Windows.Forms;
 using System.Drawing;
 using OpenTK;
-using STROOP.Structs.Configurations;
 using OpenTK.Graphics;
-using System.Reflection;
-
+using STROOP.Structs.Configurations;
 using STROOP.Tabs.MapTab.MapObjects;
+
 
 namespace STROOP.Tabs.MapTab
 {

@@ -84,7 +84,5 @@ namespace STROOP.Tabs.MapTab.MapObjects
         }
 
         public override bool ParticipatesInGlobalIconSize() => true;
-
-        public override MapDrawType GetDrawType() => MapDrawType.Overlay;
     }
 }

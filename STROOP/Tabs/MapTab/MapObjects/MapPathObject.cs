@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using OpenTK.Graphics.OpenGL;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
@@ -16,12 +13,26 @@ namespace STROOP.Tabs.MapTab.MapObjects
 {
     public class MapPathObject : MapObject
     {
-        private readonly PositionAngle _posAngle;
-        private readonly Dictionary<uint, (float x, float y, float z)> _dictionary;
+        class PositionAngleComparer : IEqualityComparer<PositionAngle>
+        {
+            public bool Equals(PositionAngle x, PositionAngle y)
+            {
+                if (!x.CompareType(y))
+                    return false;
+                if (x.IsObject() && x.GetObjAddress() == y.GetObjAddress() && x.GetMapName() == y.GetMapName())
+                    return true;
+                return false;
+            }
+
+            public int GetHashCode(PositionAngle obj) => obj.ToString().GetHashCode();
+        }
+
+        private readonly Dictionary<PositionAngle, Dictionary<uint, Vector3>> _dictionary = new Dictionary<PositionAngle, Dictionary<uint, Vector3>>(new PositionAngleComparer());
+
         private (byte level, byte area, ushort loadingPoint, ushort missionLayout) _currentLocationStats;
         private bool _resetPathOnLevelChange;
         private int _numSkips;
-        private List<uint> _skippedKeys;
+        private HashSet<uint> _skippedKeys;
         private bool _useBlending;
         private bool _isPaused;
         private uint _highestGlobalTimerValue;
@@ -31,15 +42,14 @@ namespace STROOP.Tabs.MapTab.MapObjects
         private ToolStripMenuItem _itemUseBlending;
         private ToolStripMenuItem _itemPause;
 
-        public MapPathObject(PositionAngle posAngle)
+        public MapPathObject(PositionAngleProvider positionAngleProvider)
             : base()
         {
-            _posAngle = posAngle;
-            _dictionary = new Dictionary<uint, (float x, float y, float z)>();
+            base.positionAngleProvider = positionAngleProvider;
             _currentLocationStats = Config.MapAssociations.GetCurrentLocationStats();
             _resetPathOnLevelChange = false;
             _numSkips = 0;
-            _skippedKeys = new List<uint>();
+            _skippedKeys = new HashSet<uint>();
             _useBlending = true;
             _isPaused = false;
             _highestGlobalTimerValue = 0;
@@ -51,74 +61,32 @@ namespace STROOP.Tabs.MapTab.MapObjects
             OutlineColor = Color.Red;
         }
 
-        private List<(float x, float y, float z)> GetDictionaryValues()
+        private List<Vector3> GetDictionaryValues(Dictionary<uint, Vector3> dic)
         {
-            return _dictionary.Keys.ToList()
+            return dic.Keys.ToList()
                 .FindAll(key => key % _modulo == 0)
-                .ConvertAll(key => _dictionary[key]);
-        }
-
-        public List<MapPathObjectSegment> GetSegments()
-        {
-            List<MapPathObjectSegment> segments = new List<MapPathObjectSegment>();
-
-            if (OutlineWidth == 0) return segments;
-
-            List<(float x, float y, float z)> vertices = GetDictionaryValues();
-            List<(float x, float z)> veriticesForControl =
-                vertices.ConvertAll(vertex => (vertex.x, vertex.z));
-
-            for (int i = 0; i < veriticesForControl.Count - 1; i++)
-            {
-                Color color = OutlineColor;
-                if (_useBlending)
-                {
-                    int distFromEnd = veriticesForControl.Count - i - 2;
-                    if (distFromEnd < Size)
-                    {
-                        color = ColorUtilities.InterpolateColor(
-                            OutlineColor, Color, distFromEnd / (double)Size);
-                    }
-                    else
-                    {
-                        color = Color;
-                    }
-                }
-                (float x1, float z1) = veriticesForControl[i];
-                (float x2, float z2) = veriticesForControl[i + 1];
-                MapPathObjectSegment segment = new MapPathObjectSegment(
-                    index: i,
-                    startX: x1,
-                    startZ: z1,
-                    endX: x2,
-                    endZ: z2,
-                    lineWidth: OutlineWidth,
-                    color: color,
-                    opacity: OpacityByte);
-                segments.Add(segment);
-            }
-
-            return segments;
+                .ConvertAll(key => dic[key]);
         }
 
         protected override void DrawTopDown(MapGraphics graphics)
         {
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
             {
-
                 if (OutlineWidth == 0) return;
 
-                List<(float x, float y, float z)> vertices = GetDictionaryValues();
-                List<(float x, float z)> veriticesForControl = vertices.ConvertAll(vertex => (vertex.x, vertex.z));
-                Vector3 lastVertex = default(Vector3);
-                int counter = 0;
-                foreach (var vertex in vertices)
+                foreach (var dic in _dictionary)
                 {
-                    Vector4 color = ColorUtilities.ColorToVec4(_useBlending ? ColorUtilities.InterpolateColor(OutlineColor, Color, (double)counter / vertices.Count) : Color, OpacityByte);
-                    if (counter > 0)
-                        graphics.lineRenderer.Add(new Vector3(vertex.x, vertex.y, vertex.z), lastVertex, color, OutlineWidth);
-                    counter++;
-                    lastVertex = new Vector3(vertex.x, 0, vertex.z);
+                    List<Vector3> vertices = GetDictionaryValues(dic.Value);
+                    Vector3 lastVertex = default(Vector3);
+                    int counter = 0;
+                    foreach (var vertex in vertices)
+                    {
+                        Vector4 color = ColorUtilities.ColorToVec4(_useBlending ? ColorUtilities.InterpolateColor(OutlineColor, Color, (double)counter / (vertices.Count - 1)) : Color, OpacityByte);
+                        if (counter > 0)
+                            graphics.lineRenderer.Add(vertex, lastVertex, color, OutlineWidth);
+                        counter++;
+                        lastVertex = vertex;
+                    }
                 }
             });
         }
@@ -145,42 +113,48 @@ namespace STROOP.Tabs.MapTab.MapObjects
             if (!_isPaused)
             {
                 uint globalTimer = Config.Stream.GetUInt32(MiscConfig.GlobalTimerAddress);
-                float x = (float)_posAngle.X;
-                float y = (float)_posAngle.Y;
-                float z = (float)_posAngle.Z;
-
-                if (globalTimer < _highestGlobalTimerValue)
+                foreach (var _posAngle in positionAngleProvider())
                 {
-                    Dictionary<uint, (float x, float y, float z)> tempDictionary = new Dictionary<uint, (float x, float y, float z)>();
-                    foreach (uint key in _dictionary.Keys)
+                    float x = (float)_posAngle.X;
+                    float y = (float)_posAngle.Y;
+                    float z = (float)_posAngle.Z;
+                    Dictionary<uint, Vector3> dic;
+                    if (!_dictionary.TryGetValue(_posAngle, out dic))
+                        _dictionary[_posAngle] = dic = new Dictionary<uint, Vector3>();
+
+                    if (globalTimer < _highestGlobalTimerValue)
                     {
-                        tempDictionary[key] = _dictionary[key];
-                    }
-                    _dictionary.Clear();
-                    foreach (uint key in tempDictionary.Keys)
-                    {
-                        if (key <= globalTimer)
+                        var tempDictionary = new Dictionary<uint, Vector3>();
+                        foreach (uint key in dic.Keys)
                         {
-                            _dictionary[key] = tempDictionary[key];
-                            _highestGlobalTimerValue = key;
+                            tempDictionary[key] = dic[key];
+                        }
+                        _dictionary.Clear();
+                        foreach (uint key in tempDictionary.Keys)
+                        {
+                            if (key <= globalTimer)
+                            {
+                                dic[key] = tempDictionary[key];
+                                _highestGlobalTimerValue = key;
+                            }
                         }
                     }
-                }
 
-                if (!_dictionary.ContainsKey(globalTimer))
-                {
-                    if (_numSkips > 0)
+                    if (!dic.ContainsKey(globalTimer))
                     {
-                        if (!_skippedKeys.Contains(globalTimer))
+                        if (_numSkips > 0)
                         {
-                            _skippedKeys.Add(globalTimer);
-                            _numSkips--;
+                            if (!_skippedKeys.Contains(globalTimer))
+                            {
+                                _skippedKeys.Add(globalTimer);
+                                _numSkips--;
+                            }
                         }
-                    }
-                    else
-                    {
-                        _dictionary[globalTimer] = (x, y, z);
-                        _highestGlobalTimerValue = globalTimer;
+                        else
+                        {
+                            dic[globalTimer] = new Vector3(x, y, z);
+                            _highestGlobalTimerValue = globalTimer;
+                        }
                     }
                 }
             }
@@ -285,7 +259,5 @@ namespace STROOP.Tabs.MapTab.MapObjects
         public override string GetName() => $"Path for {PositionAngle.NameOfMultiple(positionAngleProvider())}";
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.PathImage;
-
-        public override MapDrawType GetDrawType() => MapDrawType.Perspective;
     }
 }

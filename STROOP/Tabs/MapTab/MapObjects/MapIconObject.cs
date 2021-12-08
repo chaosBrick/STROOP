@@ -26,11 +26,6 @@ namespace STROOP.Tabs.MapTab.MapObjects
             }
         }
 
-        public override MapDrawType GetDrawType()
-        {
-            return MapDrawType.Overlay;
-        }
-
         public override void Update()
         {
             UpdateImage();
