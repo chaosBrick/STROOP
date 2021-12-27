@@ -148,16 +148,17 @@ namespace STROOP.Tabs.MapTab.Renderers
 
         public override void SetDrawCalls(MapGraphics graphics)
         {
-            graphics.drawLayers[(int)MapGraphics.DrawLayers.Transparency].Add(() =>
-            {
-                var error = GL.GetError();
-                GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
-                GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, originalDepthFBO);
+            if (graphics.view.mode != MapView.ViewMode.TopDown)
+                graphics.drawLayers[(int)MapGraphics.DrawLayers.Transparency].Add(() =>
+                {
+                    var error = GL.GetError();
+                    GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
+                    GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, originalDepthFBO);
 
-                GL.BlitFramebuffer(0, 0, graphics.glControl.Width, graphics.glControl.Height, 0, 0, width, height, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
-                var newRrror = GL.GetError();
-                Render(graphics, originalDepth);
-            });
+                    GL.BlitFramebuffer(0, 0, graphics.glControl.Width, graphics.glControl.Height, 0, 0, width, height, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
+                    var newRrror = GL.GetError();
+                    Render(graphics, originalDepth);
+                });
         }
 
         public void Render(MapGraphics graphics, int worldDepthBuffer)
