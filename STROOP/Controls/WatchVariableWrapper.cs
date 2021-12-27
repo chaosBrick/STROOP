@@ -95,6 +95,8 @@ namespace STROOP.Controls
 
             _startsAsCheckbox = useCheckbox;
             _contextMenuStrip = new BetterContextMenuStrip();
+
+            _contextMenuStrip.SuspendLayout();
             AddContextMenuStripItems();
             AddExternalContextMenuStripItems();
             AddCustomContextMenuStripItems();
@@ -107,6 +109,7 @@ namespace STROOP.Controls
 
         public ContextMenuStrip GetContextMenuStrip()
         {
+            _contextMenuStrip.ResumeLayout();
             return _contextMenuStrip;
         }
 

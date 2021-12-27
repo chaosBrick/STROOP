@@ -90,6 +90,8 @@ namespace STROOP.Controls
                 return;
             DeferActionToUpdate(nameof(Initialize), () =>
             {
+                SuspendLayout();
+
                 _selectionToolStripItems =
                     WatchVariableSelectionUtilities.CreateSelectionToolStripItems(
                         () => new List<WatchVariableControl>(_selectedWatchVarControls), this);
@@ -97,18 +99,23 @@ namespace STROOP.Controls
                 List<WatchVariableControlPrecursor> precursors = _varFilePath == null
                     ? new List<WatchVariableControlPrecursor>()
                     : XmlConfigParser.OpenWatchVariableControlPrecursors(_varFilePath);
+
                 foreach (var watchVarControl in precursors.ConvertAll(precursor => precursor.CreateWatchVariableControl()))
                 {
                     _watchVarControls.Add(watchVarControl);
                     watchVarControl.SetPanel(this);
                 }
-                AddItemsToContextMenuStrip();
+
+
+                MouseDown += (_, __) => { if (__.Button == MouseButtons.Right) ShowContextMenu(); };
 
                 _allGroups.AddRange(new List<VariableGroup>(new[] { VariableGroup.Custom }));
                 _initialVisibleGroups.AddRange(new List<VariableGroup>(new[] { VariableGroup.Custom }));
                 _visibleGroups.AddRange(new List<VariableGroup>(new[] { VariableGroup.Custom }));
                 if (!hasGroups)
                     UpdateControlsBasedOnFilters();
+
+                ResumeLayout();
             });
         }
 
@@ -123,8 +130,8 @@ namespace STROOP.Controls
         {
             deferredActions.Add(action);
         }
-
-        private void AddItemsToContextMenuStrip()
+        
+        private void ShowContextMenu()
         {
             ToolStripMenuItem resetVariablesItem = new ToolStripMenuItem("Reset Variables");
             resetVariablesItem.Click += (sender, e) => ResetVariables();
@@ -228,15 +235,17 @@ namespace STROOP.Controls
                 filterVariablesItem.DropDown.Close();
             };
 
-            ContextMenuStrip.Items.Add(resetVariablesItem);
-            ContextMenuStrip.Items.Add(clearAllButHighlightedItem);
-            ContextMenuStrip.Items.Add(fixVerticalScrollItem);
-            ContextMenuStrip.Items.Add(addCustomVariablesItem);
-            ContextMenuStrip.Items.Add(addMappingVariablesItem);
-            ContextMenuStrip.Items.Add(addDummyVariableItem);
-            ContextMenuStrip.Items.Add(openSaveClearItem);
-            ContextMenuStrip.Items.Add(doToAllVariablesItem);
-            ContextMenuStrip.Items.Add(filterVariablesItem);
+            var strip = new ContextMenuStrip();
+            strip.Items.Add(resetVariablesItem);
+            strip.Items.Add(clearAllButHighlightedItem);
+            strip.Items.Add(fixVerticalScrollItem);
+            strip.Items.Add(addCustomVariablesItem);
+            strip.Items.Add(addMappingVariablesItem);
+            strip.Items.Add(addDummyVariableItem);
+            strip.Items.Add(openSaveClearItem);
+            strip.Items.Add(doToAllVariablesItem);
+            strip.Items.Add(filterVariablesItem);
+            strip.Show(Cursor.Position);
         }
 
         public List<ToolStripItem> GetSelectionToolStripItems()
