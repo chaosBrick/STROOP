@@ -109,9 +109,9 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         public static float Get3DIconScale(MapGraphics graphics, float x, float y, float z) => (0.5f * (float)Math.Tan(1) * (new Vector3(x, y, z) - graphics.view.position).Length) / graphics.glControl.Height;
 
-        public void DrawIcon(MapGraphics graphics, bool sortTransparent, float x, float y, float z, float angle, Image image) =>
-            DrawIcon(graphics, sortTransparent, x, y, z, graphics.view.mode != MapView.ViewMode.TopDown ? 0x8000 : angle, Size, image);
-        public static void DrawIcon(MapGraphics graphics, bool sortTransparent, float x, float y, float z, float angle, float size, Image image)
+        public void DrawIcon(MapGraphics graphics, bool sortTransparent, float x, float y, float z, float angle, Image image, float alpha) =>
+            DrawIcon(graphics, sortTransparent, x, y, z, graphics.view.mode != MapView.ViewMode.TopDown ? 0x8000 : angle, Size, image, alpha);
+        public static void DrawIcon(MapGraphics graphics, bool sortTransparent, float x, float y, float z, float angle, float size, Image image, float alpha)
         {
             if (image == null)
                 return;
@@ -129,9 +129,9 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
             var textureIndex = graphics.GetObjectTextureLayer(image);
             if (sortTransparent)
-                graphics.objectRenderer.AddTransparentInstance(transform, textureIndex);
+                graphics.objectRenderer.AddTransparentInstance(transform, textureIndex, alpha);
             else
-                graphics.objectRenderer.AddInstance(transform, textureIndex);
+                graphics.objectRenderer.AddInstance(transform, textureIndex, alpha);
         }
 
         public void Draw(MapGraphics graphics)

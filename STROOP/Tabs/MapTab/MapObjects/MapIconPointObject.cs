@@ -11,10 +11,11 @@ namespace STROOP.Tabs.MapTab.MapObjects
             {
                 foreach (var a in positionAngleProvider())
                     DrawIcon(graphics,
-                        true,
+                        graphics.view.mode != MapView.ViewMode.TopDown,
                         (float)a.X, (float)a.Y, (float)a.Z,
                         Rotates ? (float)a.Angle : 0x8000 - graphics.MapViewAngleValue,
-                        GetInternalImage()?.Value);
+                        GetInternalImage()?.Value,
+                        hoverData.currentPositionAngle == a ? ObjectUtilities.HoverAlpha() : 1);
             });
         }
 

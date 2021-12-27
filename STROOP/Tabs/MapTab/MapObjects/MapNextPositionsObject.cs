@@ -36,7 +36,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 List<(float x, float y, float z, float angle, Lazy<Image> tex)> data = GetData();
                 data.Reverse();
                 foreach (var dataPoint in data)
-                    DrawIcon(graphics, true, dataPoint.x, dataPoint.y, dataPoint.z, dataPoint.angle, dataPoint.tex?.Value);
+                    DrawIcon(graphics, graphics.view.mode != MapView.ViewMode.TopDown, dataPoint.x, dataPoint.y, dataPoint.z, dataPoint.angle, dataPoint.tex?.Value, 1);
             });
         }
 

@@ -53,9 +53,10 @@ namespace STROOP.Tabs.MapTab.Renderers
 
         public struct InstanceData
         {
-            public const int Size = sizeof(float) * 4 * 4 + sizeof(float);
+            public const int Size = sizeof(float) * 4 * 4 + 2 * sizeof(float);
             public Matrix4 transform;
             public float textureIndex;
+            public float alpha;
         }
 
 
@@ -72,7 +73,7 @@ namespace STROOP.Tabs.MapTab.Renderers
             GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, InstanceData.Size, sizeof(float) * 4);
             GL.VertexAttribPointer(2, 4, VertexAttribPointerType.Float, false, InstanceData.Size, sizeof(float) * 8);
             GL.VertexAttribPointer(3, 4, VertexAttribPointerType.Float, false, InstanceData.Size, sizeof(float) * 12);
-            GL.VertexAttribPointer(4, 1, VertexAttribPointerType.Float, false, InstanceData.Size, sizeof(float) * 16);
+            GL.VertexAttribPointer(4, 2, VertexAttribPointerType.Float, false, InstanceData.Size, sizeof(float) * 16);
 
             GL.BindVertexArray(0);
         }
@@ -101,12 +102,12 @@ namespace STROOP.Tabs.MapTab.Renderers
             transparentRenderer = new TransparentSpriteRenderer(this, maxExpectedInstances);
         }
 
-        public void AddInstance(Matrix4 transform, int textureIndex)
+        public void AddInstance(Matrix4 transform, int textureIndex, float alpha)
         {
-            instances.Add(new InstanceData { transform = transform, textureIndex = textureIndex });
+            instances.Add(new InstanceData { transform = transform, textureIndex = textureIndex, alpha = alpha });
         }
 
-        public void AddTransparentInstance(Matrix4 transform, int textureIndex) => transparentRenderer.AddInstance(transform, textureIndex);
+        public void AddTransparentInstance(Matrix4 transform, int textureIndex, float alpha) => transparentRenderer.AddInstance(transform, textureIndex, alpha);
 
         public override void SetDrawCalls(MapGraphics graphics)
         {

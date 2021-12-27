@@ -87,5 +87,7 @@ namespace STROOP.Utilities
             Color color = ObjectSlotsConfig.GetProcessingGroupColor(processGroup);
             return color;
         }
+
+        public static float HoverAlpha() => (float)Math.Sin(DateTime.Now.Ticks / 2000000.0) *0.25f + 0.75f;
     }
 }

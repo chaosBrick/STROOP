@@ -19,7 +19,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             renderer.ignoreView = true;
             renderer.texture = image != null ? GraphicsUtil.TextureFromImage(image.Value) : 0;
             renderer.SetDrawCalls(graphics);
-            graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() => renderer.AddInstance(Matrix4.CreateScale(2), 0));
+            graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() => renderer.AddInstance(Matrix4.CreateScale(2), 0, 1));
         }
 
         protected override void DrawOrthogonal(MapGraphics graphics) => DrawTopDown(graphics);

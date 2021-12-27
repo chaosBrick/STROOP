@@ -38,7 +38,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
                         graphics.BillboardMatrix 
                         * Matrix4.CreateScale(dim.size.Width, 1, dim.size.Height)
                         * Matrix4.CreateTranslation(dim.loc.X, 0, dim.loc.Y),
-                        0
+                        graphics.GetObjectTextureLayer(GetInternalImage().Value),
+                        1
                     );
             });
         }
