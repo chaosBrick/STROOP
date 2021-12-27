@@ -9,8 +9,6 @@ namespace STROOP.Tabs.MapTab
 {
     public class MapTrackerFlowLayoutPanel : NoTearFlowLayoutPanel
     {
-        private readonly object _objectLock = new object();
-
         private MapObject _mapObjMap;
         private MapObject _mapObjBackground;
 
@@ -22,50 +20,16 @@ namespace STROOP.Tabs.MapTab
 
         public void MoveUpControl(MapTracker mapTracker, int numMoves)
         {
-            lock (_objectLock)
-            {
-                int index = Controls.IndexOf(mapTracker);
-                int newIndex = numMoves == 0 ? 0 : Math.Max(index - numMoves, 0);
-                Controls.SetChildIndex(mapTracker, newIndex);
-            }
+            int index = Controls.IndexOf(mapTracker);
+            int newIndex = numMoves == 0 ? 0 : Math.Max(index - numMoves, 0);
+            Controls.SetChildIndex(mapTracker, newIndex);
         }
 
         public void MoveDownControl(MapTracker mapTracker, int numMoves)
         {
-            lock (_objectLock)
-            {
-                int index = Controls.IndexOf(mapTracker);
-                int newIndex = numMoves == 0 ? Controls.Count - 1 : Math.Min(index + numMoves, Controls.Count - 1);
-                Controls.SetChildIndex(mapTracker, newIndex);
-            }
-        }
-
-        public void RemoveControl(MapTracker mapTracker)
-        {
-            lock (_objectLock)
-            {
-                mapTracker.CleanUp();
-                Controls.Remove(mapTracker);
-            }
-        }
-
-        public void AddNewControl(MapTracker mapTracker)
-        {
-            lock (_objectLock)
-            {
-                Controls.Add(mapTracker);
-            }
-        }
-
-        public void ClearControls()
-        {
-            lock (_objectLock)
-            {
-                while (Controls.Count > 0)
-                {
-                    RemoveControl(Controls[0] as MapTracker);
-                }
-            }
+            int index = Controls.IndexOf(mapTracker);
+            int newIndex = numMoves == 0 ? Controls.Count - 1 : Math.Min(index + numMoves, Controls.Count - 1);
+            Controls.SetChildIndex(mapTracker, newIndex);
         }
 
         public void UpdateControl()
@@ -78,11 +42,8 @@ namespace STROOP.Tabs.MapTab
 
         public IEnumerable<MapTracker> EnumerateTrackers()
         {
-            lock (_objectLock)
-            {
-                foreach (MapTracker tracker in Controls)
-                    yield return tracker;
-            }
+            foreach (MapTracker tracker in Controls)
+                yield return tracker;
         }
 
         public void DrawOn2DControl(MapGraphics graphics)
@@ -94,24 +55,21 @@ namespace STROOP.Tabs.MapTab
             List<MapObject> listOrderOnBottom = new List<MapObject>();
             List<MapObject> listOrderByY = new List<MapObject>();
 
-            lock (_objectLock)
+            foreach (var mapTracker in EnumerateTrackers())
             {
-                foreach (MapTracker mapTracker in Controls)
+                switch (mapTracker.GetOrderType())
                 {
-                    switch (mapTracker.GetOrderType())
-                    {
-                        case MapTrackerOrderType.OrderOnTop:
-                            listOrderOnTop.AddRange(mapTracker.GetMapObjectsToDisplay());
-                            break;
-                        case MapTrackerOrderType.OrderOnBottom:
-                            listOrderOnBottom.AddRange(mapTracker.GetMapObjectsToDisplay());
-                            break;
-                        case MapTrackerOrderType.OrderByY:
-                            listOrderByY.AddRange(mapTracker.GetMapObjectsToDisplay());
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
+                    case MapTrackerOrderType.OrderOnTop:
+                        listOrderOnTop.AddRange(mapTracker.GetMapObjectsToDisplay());
+                        break;
+                    case MapTrackerOrderType.OrderOnBottom:
+                        listOrderOnBottom.AddRange(mapTracker.GetMapObjectsToDisplay());
+                        break;
+                    case MapTrackerOrderType.OrderByY:
+                        listOrderByY.AddRange(mapTracker.GetMapObjectsToDisplay());
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
 
@@ -132,13 +90,8 @@ namespace STROOP.Tabs.MapTab
 
         public void SetGlobalIconSize(float size)
         {
-            lock (_objectLock)
-            {
-                foreach (MapTracker tracker in Controls)
-                {
-                    tracker.SetGlobalIconSize(size);
-                }
-            }
+            foreach (MapTracker tracker in Controls)
+                tracker.SetGlobalIconSize(size);
         }
     }
 }

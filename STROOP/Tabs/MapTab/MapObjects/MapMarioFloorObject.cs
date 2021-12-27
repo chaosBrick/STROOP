@@ -35,7 +35,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.TriangleFloorImage;
 
-        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
+        protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {

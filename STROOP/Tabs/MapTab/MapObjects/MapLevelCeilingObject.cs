@@ -30,7 +30,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             return _bufferedTris;
         }
 
-        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
+        protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {
@@ -97,7 +97,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         public override void Update()
         {
             base.Update();
-            if (itemAutoUpdate.Checked)
+            if (itemAutoUpdate == null || itemAutoUpdate.Checked)
                 AutoUpdate();
         }
 

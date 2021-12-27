@@ -185,12 +185,16 @@ namespace STROOP.Tabs.MapTab.MapObjects
         public bool ShouldDisplay(MapTrackerVisibilityType visiblityType) => true;
         public virtual PositionAngleProvider GetPositionAngleProvider() => null;
 
-        public override string ToString()
+        public override string ToString() => GetName();
+
+        public MapTracker tracker { get; private set; }
+        public ContextMenuStrip BindToTracker(MapTracker tracker)
         {
-            return GetName();
+            this.tracker = tracker;
+            return GetContextMenuStrip(this.tracker);
         }
 
-        public virtual ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
+        protected virtual ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {
@@ -206,14 +210,35 @@ namespace STROOP.Tabs.MapTab.MapObjects
         public virtual void InitSubTrackerContextMenuStrip(MapTab mapTab, ContextMenuStrip targetStrip)
         {
             targetStrip.Items.AddHandlerToItem("Add Tracker for aggregated Path",
-                () => MapTracker.CreateTracker(mapTab, new MapPathObject(positionAngleProvider)));
+                tracker.MakeCreateTrackerHandler(mapTab, "AggregatedPath", () => new MapPathObject(positionAngleProvider)));
         }
 
         public virtual void Update() { }
 
         public virtual bool ParticipatesInGlobalIconSize() => false;
 
-        public virtual void ApplySettings(MapObjectSettings settings) { }
+        public delegate void SaveSettings(System.Xml.XmlNode node);
+        public delegate void LoadSettings(System.Xml.XmlNode node);
+
+        public virtual (SaveSettings save, LoadSettings load) SettingsSaveLoad => (_ => { }, _ => { });
+
+        protected void SaveValueNode(System.Xml.XmlNode parentNode, string valueName, string value)
+        {
+            var valueNode = parentNode.OwnerDocument.CreateElement(valueName);
+            valueNode.SetAttribute("value", value);
+            parentNode.AppendChild(valueNode);
+        }
+
+        protected string LoadValueNode(System.Xml.XmlNode parentNode, string valueName)
+        {
+            var valueNode = parentNode.SelectSingleNode(valueName);
+            if (valueNode == null)
+                return null;
+            foreach (System.Xml.XmlAttribute attr in valueNode.Attributes)
+                if (attr.Name == "value")
+                    return attr.Value;
+            return null;
+        }
 
         public virtual void CleanUp() { OnCleanup?.Invoke(); }
     }

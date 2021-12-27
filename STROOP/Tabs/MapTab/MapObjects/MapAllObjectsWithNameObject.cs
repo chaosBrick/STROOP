@@ -47,7 +47,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         public override void InitSubTrackerContextMenuStrip(MapTab mapTab, ContextMenuStrip targetStrip)
         {
             base.InitSubTrackerContextMenuStrip(mapTab, targetStrip);
-            MapObjectObject.AddObjectSubTrackers(mapTab,
+            MapObjectObject.AddObjectSubTrackers(tracker,
                 _objName,
                 targetStrip,
                 () => Config.StroopMainForm.ObjectSlotsManager.GetLoadedObjectsWithPredicate(predicate).ConvertAll(obj => PositionAngle.Obj(obj.Address))
@@ -67,20 +67,22 @@ namespace STROOP.Tabs.MapTab.MapObjects
         {
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
             {
-                List<(float x, float y, float z, float angle, Lazy<Image> tex)> data = GetData();
+                List<(float x, float y, float z, float angle, Lazy<Image> tex, float alpha)> data = GetData();
                 data.Reverse();
-                foreach (var dataPoint in data)
-                {
-                    (float x, float y, float z, float angle, Lazy<Image> tex) = dataPoint;
-                    DrawIcon(graphics, true, x, y, z, angle, tex.Value);
-                }
+                foreach (var d in data)
+                    DrawIcon(graphics, graphics.view.mode != MapView.ViewMode.TopDown, d.x, d.y, d.z, d.angle, d.tex.Value, d.alpha);
             });
         }
 
-        public virtual List<(float x, float y, float z, float angle, Lazy<Image> tex)> GetData()
+        public virtual List<(float x, float y, float z, float angle, Lazy<Image> tex, float alpha)> GetData()
         {
             List<ObjectDataModel> objs = Config.StroopMainForm.ObjectSlotsManager.GetLoadedObjectsWithPredicate(predicate);
-            return objs.ConvertAll(obj => (obj.X, obj.Y, obj.Z, (float)obj.FacingYaw, Config.ObjectAssociations.GetObjectMapImage(obj.BehaviorCriteria)));
+            return objs.ConvertAll(obj => 
+                    (obj.X, obj.Y, obj.Z, 
+                    (float)obj.FacingYaw, 
+                    Config.ObjectAssociations.GetObjectMapImage(obj.BehaviorCriteria),
+                    hoverData.currentPositionAngle != null && obj.Address == hoverData.currentPositionAngle.GetObjAddress() ? ObjectUtilities.HoverAlpha() : 1
+                    ));
         }
 
         public override bool ParticipatesInGlobalIconSize() => true;

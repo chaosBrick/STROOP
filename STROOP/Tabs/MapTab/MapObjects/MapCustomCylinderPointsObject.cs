@@ -51,7 +51,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             return "Custom Cylinder Points";
         }
 
-        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
+        protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {
@@ -60,10 +60,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 {
                     string text = DialogUtilities.GetStringFromDialog(labelText: "Enter a number.");
                     float? relativeMinY = ParsingUtilities.ParseFloatNullable(text);
-                    if (!relativeMinY.HasValue) return;
-                    MapObjectSettings settings = new MapObjectSettings(
-                        customCylinderChangeRelativeMinY: true, customCylinderNewRelativeMinY: relativeMinY.Value);
-                    targetTracker.ApplySettings(settings);
+                    if (relativeMinY.HasValue)
+                        _relativeMinY = relativeMinY.Value;
                 };
 
                 ToolStripMenuItem itemSetRelativeMaxY = new ToolStripMenuItem("Set Relative Max Y...");
@@ -71,10 +69,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 {
                     string text = DialogUtilities.GetStringFromDialog(labelText: "Enter a number.");
                     float? relativeMaxY = ParsingUtilities.ParseFloatNullable(text);
-                    if (!relativeMaxY.HasValue) return;
-                    MapObjectSettings settings = new MapObjectSettings(
-                        customCylinderChangeRelativeMaxY: true, customCylinderNewRelativeMaxY: relativeMaxY.Value);
-                    targetTracker.ApplySettings(settings);
+                    if (relativeMaxY.HasValue)
+                        _relativeMaxY = relativeMaxY.Value;
                 };
 
                 _contextMenuStrip = new ContextMenuStrip();
@@ -85,24 +81,22 @@ namespace STROOP.Tabs.MapTab.MapObjects
             return _contextMenuStrip;
         }
 
-        public override void ApplySettings(MapObjectSettings settings)
-        {
-            base.ApplySettings(settings);
-
-            if (settings.CustomCylinderChangeRelativeMinY)
+        public override (SaveSettings save, LoadSettings load) SettingsSaveLoad => (
+            (System.Xml.XmlNode node) =>
             {
-                _relativeMinY = settings.CustomCylinderNewRelativeMinY;
+                base.SettingsSaveLoad.save(node);
+                SaveValueNode(node, "RelativeMinY", _relativeMinY.ToString());
+                SaveValueNode(node, "RelativeMaxY", _relativeMaxY.ToString());
             }
-
-            if (settings.CustomCylinderChangeRelativeMaxY)
+        ,
+            (System.Xml.XmlNode node) =>
             {
-                _relativeMaxY = settings.CustomCylinderNewRelativeMaxY;
+                base.SettingsSaveLoad.load(node);
+                if (float.TryParse(LoadValueNode(node, "RelativeMinY"), out float relativeMinY))
+                    _relativeMinY = relativeMinY;
+                if (float.TryParse(LoadValueNode(node, "RelativeMaxY"), out float relativeMaxY))
+                    _relativeMaxY = relativeMaxY;
             }
-        }
-
-        protected override void DrawTopDown(MapGraphics graphics)
-        {
-            base.DrawTopDown(graphics);
-        }
+        );
     }
 }

@@ -83,7 +83,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         MapTracker targetTracker;
         ToolStripMenuItem itemEnableDragging;
 
-        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
+        protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             this.targetTracker = targetTracker;
             if (_contextMenuStrip == null)

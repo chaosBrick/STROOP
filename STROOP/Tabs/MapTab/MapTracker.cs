@@ -24,18 +24,46 @@ namespace STROOP.Tabs.MapTab
         private string _customName;
 
         public bool IsVisible => _isVisible;
+        public readonly string creationIdentifier;
+        public readonly MapTracker parentTracker;
+        List<MapTracker> childTrackers = new List<MapTracker>();
+        Dictionary<string, Func<MapTracker>> createChildTrackers = new Dictionary<string, Func<MapTracker>>();
 
+        public delegate void RemovedFromMapEventHandler();
+        public event RemovedFromMapEventHandler RemovedFromMap;
 
-        public MapTracker(
-            MapTab mapTab,
-            MapObject mapObjectList)
+        public IEnumerable<MapTracker> EnumerateChildTrackers()
+        {
+            foreach (var t in childTrackers)
+                yield return t;
+        }
+
+        public MapTracker(MapTracker parentTracker, string creationIdentifier, MapObject mapObject)
+            : this(parentTracker.mapTab, creationIdentifier, mapObject)
+        {
+            this.parentTracker = parentTracker;
+            parentTracker.childTrackers.Add(this);
+            parentTracker.RemovedFromMap += RemoveFromMap;
+        }
+
+        public void RemoveFromMap()
+        {
+            CleanUp();
+            mapTab.flowLayoutPanelMapTrackers.Controls.Remove(this);
+            parentTracker?.childTrackers.Remove(this);
+            RemovedFromMap?.Invoke();
+        }
+
+        public MapTracker(MapTab mapTab, string creationIdentifier, MapObject mapObject)
         {
             this.mapTab = mapTab;
+            this.creationIdentifier = creationIdentifier;
+
             using (new AccessScope<MapTab>(mapTab))
             {
                 InitializeComponent();
 
-                mapObject = mapObjectList;
+                this.mapObject = mapObject;
 
                 _images = new List<Image>();
 
@@ -52,12 +80,12 @@ namespace STROOP.Tabs.MapTab
             };
                 itemUseTopDownImage.Click += (sender, e) =>
                 {
-                    mapObject.SetIconType(MapTrackerIconType.TopDownImage);
+                    this.mapObject.SetIconType(MapTrackerIconType.TopDownImage);
                     pictureBoxItems.ForEach(item => item.Checked = item == itemUseTopDownImage);
                 };
                 itemUseObjectSlotImage.Click += (sender, e) =>
                 {
-                    mapObject.SetIconType(MapTrackerIconType.ObjectSlotImage);
+                    this.mapObject.SetIconType(MapTrackerIconType.ObjectSlotImage);
                     pictureBoxItems.ForEach(item => item.Checked = item == itemUseObjectSlotImage);
                 };
                 itemUseCustomImage.Click += (sender, e) =>
@@ -65,7 +93,7 @@ namespace STROOP.Tabs.MapTab
                     Image image = DialogUtilities.GetImage();
                     Lazy<Image> imageMap = new Lazy<Image>(() => image);
                     if (image == null) return;
-                    mapObject.SetIconType(MapTrackerIconType.CustomImage, imageMap);
+                    this.mapObject.SetIconType(MapTrackerIconType.CustomImage, imageMap);
                     pictureBoxItems.ForEach(item => item.Checked = item == itemUseCustomImage);
                 };
                 itemUseTopDownImage.Checked = true;
@@ -82,10 +110,10 @@ namespace STROOP.Tabs.MapTab
                 itemResetCustomName.Click += (sender, e) => _customName = null;
                 textBoxName.ContextMenuStrip.Items.Add(itemResetCustomName);
 
-                checkBoxRotates.Click += (sender, e) => mapObject.CustomRotates = checkBoxRotates.Checked;
+                checkBoxRotates.Click += (sender, e) => this.mapObject.CustomRotates = checkBoxRotates.Checked;
                 checkBoxRotates.ContextMenuStrip = new ContextMenuStrip();
                 ToolStripMenuItem itemResetCustomRotates = new ToolStripMenuItem("Reset Custom Rotates");
-                itemResetCustomRotates.Click += (sender, e) => mapObject.CustomRotates = null;
+                itemResetCustomRotates.Click += (sender, e) => this.mapObject.CustomRotates = null;
                 checkBoxRotates.ContextMenuStrip.Items.Add(itemResetCustomRotates);
 
                 tableLayoutPanel.BorderWidth = 2;
@@ -112,7 +140,7 @@ namespace STROOP.Tabs.MapTab
                 colorSelector.AddColorChangeAction((Color color) => SetColor(color));
                 colorSelectorOutline.AddColorChangeAction((Color color) => SetOutlineColor(color));
 
-                pictureBoxCog.ContextMenuStrip = mapObject.GetContextMenuStrip(this);
+                pictureBoxCog.ContextMenuStrip = this.mapObject.BindToTracker(this);
                 pictureBoxCog.Click += (sender, e) => pictureBoxCog.ContextMenuStrip.Show(Cursor.Position);
 
                 MapUtilities.CreateTrackBarContextMenuStrip(trackBarSize);
@@ -123,11 +151,44 @@ namespace STROOP.Tabs.MapTab
             }
         }
 
-        public static MapTracker CreateTracker(MapTab target, MapObject obj)
+        public Action MakeCreateTrackerHandler(MapTab target, string identifier, Func<MapObject> newObjFunc)
         {
-            MapTracker tracker = new MapTracker(target, obj);
-            target.flowLayoutPanelMapTrackers.AddNewControl(tracker);
-            return tracker;
+            Func<MapTracker> createTracker = () => new MapTracker(this, identifier, newObjFunc());
+            createChildTrackers[identifier] = createTracker;
+            return () => target.flowLayoutPanelMapTrackers.Controls.Add(createTracker());
+        }
+
+        public void SaveChildTrackers(System.Xml.XmlNode node)
+        {
+            if (childTrackers.Count == 0)
+                return;
+            var childTrackersNode = node.OwnerDocument.CreateElement("Trackers");
+            foreach (var childTracker in EnumerateChildTrackers())
+            {
+                var childNode = node.OwnerDocument.CreateElement(childTracker.creationIdentifier);
+                childTracker.mapObject.SettingsSaveLoad.save(childNode);
+                childTracker.SaveChildTrackers(childNode);
+                childTrackersNode.AppendChild(childNode);
+            }
+            node.AppendChild(childTrackersNode);
+        }
+
+        public List<MapTracker> LoadChildTrackers(System.Xml.XmlNode node)
+        {
+            mapObject.SettingsSaveLoad.load(node);
+            var childTrackersNode = node.SelectSingleNode("Trackers");
+            if (childTrackersNode == null)
+                return new List<MapTracker>();
+            var childTrackers = new List<MapTracker>();
+            foreach (System.Xml.XmlNode n in childTrackersNode.ChildNodes)
+                if (n.NodeType == System.Xml.XmlNodeType.Element
+                    && createChildTrackers.TryGetValue(n.Name, out var newTrackerFunc))
+                {
+                    var t = newTrackerFunc();
+                    childTrackers.Add(t);
+                    childTrackers.AddRange(t.LoadChildTrackers(n));
+                }
+            return childTrackers;
         }
 
         private void InitializePlusContextMenuStrip()
@@ -135,11 +196,6 @@ namespace STROOP.Tabs.MapTab
             pictureBoxPlus.ContextMenuStrip = new ContextMenuStrip();
             mapObject.InitSubTrackerContextMenuStrip(mapTab, pictureBoxPlus.ContextMenuStrip);
             pictureBoxPlus.Click += (sender, e) => pictureBoxPlus.ContextMenuStrip.Show(Cursor.Position);
-        }
-
-        public void ApplySettings(MapObjectSettings settings)
-        {
-            mapObject.ApplySettings(settings);
         }
 
         public List<MapObject> GetMapObjectsToDisplay()
@@ -251,7 +307,7 @@ namespace STROOP.Tabs.MapTab
 
         private void pictureBoxRedX_Click(object sender, EventArgs e)
         {
-            mapTab.flowLayoutPanelMapTrackers.RemoveControl(this);
+            RemoveFromMap();
         }
 
         private void pictureBoxEye_Click(object sender, EventArgs e)

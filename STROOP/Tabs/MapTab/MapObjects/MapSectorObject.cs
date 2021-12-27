@@ -67,7 +67,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         public override string GetName() => $"Sector for {PositionAngle.NameOfMultiple(positionAngleProvider())}";
 
-        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
+        protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {
@@ -76,10 +76,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 {
                     string text = DialogUtilities.GetStringFromDialog(labelText: "Enter the angle radius for sector:");
                     float? angleRadius = ParsingUtilities.ParseFloatNullable(text);
-                    if (!angleRadius.HasValue) return;
-                    MapObjectSettings settings = new MapObjectSettings(
-                        sectorChangeAngleRadius: true, sectorNewAngleRadius: angleRadius.Value);
-                    targetTracker.ApplySettings(settings);
+                    if (angleRadius.HasValue)
+                        _angleRadius = angleRadius.Value;
                 };
 
                 _contextMenuStrip = new ContextMenuStrip();
@@ -89,14 +87,19 @@ namespace STROOP.Tabs.MapTab.MapObjects
             return _contextMenuStrip;
         }
 
-        public override void ApplySettings(MapObjectSettings settings)
-        {
-            base.ApplySettings(settings);
-
-            if (settings.SectorChangeAngleRadius)
+        public override (SaveSettings save, LoadSettings load) SettingsSaveLoad => (
+            (System.Xml.XmlNode node) =>
             {
-                _angleRadius = settings.SectorNewAngleRadius;
+                base.SettingsSaveLoad.save(node);
+                SaveValueNode(node, "AngleRadius", _angleRadius.ToString());
             }
-        }
+        ,
+            (System.Xml.XmlNode node) =>
+            {
+                base.SettingsSaveLoad.load(node);
+                if (float.TryParse(LoadValueNode(node, "AngleRadius"), out float angleRadius))
+                    _angleRadius = angleRadius;
+            }
+        );
     }
 }

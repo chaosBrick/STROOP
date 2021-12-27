@@ -30,11 +30,11 @@ namespace STROOP.Tabs.MapTab.MapObjects
         private readonly Dictionary<PositionAngle, Dictionary<uint, Vector3>> _dictionary = new Dictionary<PositionAngle, Dictionary<uint, Vector3>>(new PositionAngleComparer());
 
         private (byte level, byte area, ushort loadingPoint, ushort missionLayout) _currentLocationStats;
-        private bool _resetPathOnLevelChange;
+        private bool resetPathOnLevelChange => _itemResetPathOnLevelChange.Checked;
+        private bool useBlending => _itemUseBlending.Checked;
+        private bool isPaused => _itemPause.Checked;
         private int _numSkips;
         private HashSet<uint> _skippedKeys;
-        private bool _useBlending;
-        private bool _isPaused;
         private uint _highestGlobalTimerValue;
         private int _modulo;
 
@@ -47,11 +47,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
         {
             base.positionAngleProvider = positionAngleProvider;
             _currentLocationStats = Config.MapAssociations.GetCurrentLocationStats();
-            _resetPathOnLevelChange = false;
             _numSkips = 0;
             _skippedKeys = new HashSet<uint>();
-            _useBlending = true;
-            _isPaused = false;
             _highestGlobalTimerValue = 0;
             _modulo = 1;
 
@@ -81,7 +78,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                     int counter = 0;
                     foreach (var vertex in vertices)
                     {
-                        Vector4 color = ColorUtilities.ColorToVec4(_useBlending ? ColorUtilities.InterpolateColor(OutlineColor, Color, (double)counter / (vertices.Count - 1)) : Color, OpacityByte);
+                        Vector4 color = ColorUtilities.ColorToVec4(useBlending ? ColorUtilities.InterpolateColor(OutlineColor, Color, (double)counter / (vertices.Count - 1)) : Color, OpacityByte);
                         if (counter > 0)
                             graphics.lineRenderer.Add(vertex, lastVertex, color, OutlineWidth);
                         counter++;
@@ -102,7 +99,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 currentLocationStats.missionLayout != _currentLocationStats.missionLayout)
             {
                 _currentLocationStats = currentLocationStats;
-                if (_resetPathOnLevelChange)
+                if (resetPathOnLevelChange)
                 {
                     _dictionary.Clear();
                     _numSkips = 5;
@@ -110,7 +107,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 }
             }
 
-            if (!_isPaused)
+            if (!isPaused)
             {
                 uint globalTimer = Config.Stream.GetUInt32(MiscConfig.GlobalTimerAddress);
                 foreach (var _posAngle in positionAngleProvider())
@@ -160,56 +157,30 @@ namespace STROOP.Tabs.MapTab.MapObjects
             }
         }
 
-        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
+        protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {
                 ToolStripMenuItem itemResetPath = new ToolStripMenuItem("Reset Path");
-                itemResetPath.Click += (sender, e) =>
-                {
-                    MapObjectSettings settings = new MapObjectSettings(pathDoReset: true);
-                    targetTracker.ApplySettings(settings);
-                };
+                itemResetPath.Click += (sender, e) => _dictionary.Clear();
 
                 _itemResetPathOnLevelChange = new ToolStripMenuItem("Reset Path on Level Change");
-                _itemResetPathOnLevelChange.Click += (sender, e) =>
-                {
-                    MapObjectSettings settings = new MapObjectSettings(
-                        pathChangeResetPathOnLevelChange: true,
-                        pathNewResetPathOnLevelChange: !_resetPathOnLevelChange);
-                    targetTracker.ApplySettings(settings);
-                };
-                _itemResetPathOnLevelChange.Checked = _resetPathOnLevelChange;
+                _itemResetPathOnLevelChange.Click += (sender, e) => _itemResetPathOnLevelChange.Checked = !_itemResetPathOnLevelChange.Checked;
 
                 _itemUseBlending = new ToolStripMenuItem("Use Blending");
-                _itemUseBlending.Click += (sender, e) =>
-                {
-                    MapObjectSettings settings = new MapObjectSettings(
-                        pathChangeUseBlending: true,
-                        pathNewUseBlending: !_useBlending);
-                    targetTracker.ApplySettings(settings);
-                };
-                _itemUseBlending.Checked = _useBlending;
+                _itemUseBlending.Click += (sender, e) => _itemUseBlending.Checked = !_itemUseBlending.Checked;
+                _itemUseBlending.Checked = true;
 
                 _itemPause = new ToolStripMenuItem("Pause");
-                _itemPause.Click += (sender, e) =>
-                {
-                    MapObjectSettings settings = new MapObjectSettings(
-                        pathChangePaused: true,
-                        pathNewPaused: !_isPaused);
-                    targetTracker.ApplySettings(settings);
-                };
-                _itemPause.Checked = _isPaused;
+                _itemPause.Click += (sender, e) => _itemPause.Checked = !_itemPause.Checked;
 
                 ToolStripMenuItem itemSetModulo = new ToolStripMenuItem("Set Modulo");
                 itemSetModulo.Click += (sender, e) =>
                 {
                     string text = DialogUtilities.GetStringFromDialog(labelText: "Enter modulo.");
                     int? moduloNullable = ParsingUtilities.ParseIntNullable(text);
-                    if (!moduloNullable.HasValue || moduloNullable.Value <= 0) return;
-                    MapObjectSettings settings = new MapObjectSettings(
-                        pathChangeModulo: true, pathNewModulo: moduloNullable.Value);
-                    targetTracker.ApplySettings(settings);
+                    if (moduloNullable.HasValue && moduloNullable.Value > 0)
+                        _modulo = moduloNullable.Value;
                 };
 
                 _contextMenuStrip = new ContextMenuStrip();
@@ -223,38 +194,29 @@ namespace STROOP.Tabs.MapTab.MapObjects
             return _contextMenuStrip;
         }
 
-        public override void ApplySettings(MapObjectSettings settings)
-        {
-            base.ApplySettings(settings);
-
-            if (settings.PathDoReset)
+        public override (SaveSettings save, LoadSettings load) SettingsSaveLoad => (
+            (System.Xml.XmlNode node) =>
             {
-                _dictionary.Clear();
+                base.SettingsSaveLoad.save(node);
+                SaveValueNode(node, "ResetPathOnLevelChange", resetPathOnLevelChange.ToString());
+                SaveValueNode(node, "UseBlending", useBlending.ToString());
+                SaveValueNode(node, "Pause", isPaused.ToString());
+                SaveValueNode(node, "GlobalTimerModulo", _modulo.ToString());
             }
-
-            if (settings.PathChangeResetPathOnLevelChange)
+        ,
+            (System.Xml.XmlNode node) =>
             {
-                _resetPathOnLevelChange = settings.PathNewResetPathOnLevelChange;
-                _itemResetPathOnLevelChange.Checked = _resetPathOnLevelChange;
+                base.SettingsSaveLoad.load(node);
+                if (bool.TryParse(LoadValueNode(node, "ResetPathOnLevelChange"), out var v))
+                    _itemResetPathOnLevelChange.Checked = v;
+                if (bool.TryParse(LoadValueNode(node, "UseBlending"), out v))
+                    _itemUseBlending.Checked = v;
+                if (bool.TryParse(LoadValueNode(node, "Pause"), out v))
+                    _itemPause.Checked = v;
+                if (int.TryParse(LoadValueNode(node, "ResetPathOnLevelChange"), out int modulo))
+                    _modulo = modulo;
             }
-
-            if (settings.PathChangeUseBlending)
-            {
-                _useBlending = settings.PathNewUseBlending;
-                _itemUseBlending.Checked = _useBlending;
-            }
-
-            if (settings.PathChangePaused)
-            {
-                _isPaused = settings.PathNewPaused;
-                _itemPause.Checked = _isPaused;
-            }
-
-            if (settings.PathChangeModulo)
-            {
-                _modulo = settings.PathNewModulo;
-            }
-        }
+        );
 
         public override string GetName() => $"Path for {PositionAngle.NameOfMultiple(positionAngleProvider())}";
 

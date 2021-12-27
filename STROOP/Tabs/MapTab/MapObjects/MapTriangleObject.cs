@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
@@ -27,7 +26,10 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
             public void LeftClick(Vector3 position) { }
 
-            public void RightClick(Vector3 position) { }
+            public void RightClick(Vector3 position)
+            {
+                mapCursorOnRightClick = position;
+            }
 
             public bool CanDrag() => false;
 

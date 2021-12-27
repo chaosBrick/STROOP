@@ -34,7 +34,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             return null;
         }
 
-        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
+        protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {

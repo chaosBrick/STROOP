@@ -153,7 +153,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         public override bool ParticipatesInGlobalIconSize() => true;
 
-        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
+        protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {

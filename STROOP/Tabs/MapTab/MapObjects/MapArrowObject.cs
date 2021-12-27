@@ -17,10 +17,10 @@ namespace STROOP.Tabs.MapTab.MapObjects
         public GetYaw getYaw;
         public GetRecommendedSize getRecommendedSize;
 
-        private bool _useRecommendedArrowLength;
         private float _arrowHeadSideLength;
 
-        private ToolStripMenuItem _itemUseSpeedForArrowLength;
+        private ToolStripMenuItem _itemRecommendedArrowLength;
+        private bool useRecommendedArrowLength => _itemRecommendedArrowLength.Checked;
 
         string name;
 
@@ -31,7 +31,6 @@ namespace STROOP.Tabs.MapTab.MapObjects
             this.getYaw = getYaw;
             this.getRecommendedSize = getRecommendedSize;
             this.name = name;
-            _useRecommendedArrowLength = false;
             _arrowHeadSideLength = 100;
 
             Size = 300;
@@ -48,7 +47,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 float y = (float)posAngle.Y;
                 float z = (float)posAngle.Z;
                 float yaw = (float)getYaw(posAngle);
-                float size = _useRecommendedArrowLength ? (float)getRecommendedSize(posAngle) : Size;
+                float size = useRecommendedArrowLength ? (float)getRecommendedSize(posAngle) : Size;
                 (float arrowHeadX, float arrowHeadZ) =
                     ((float, float))MoreMath.AddVectorToPoint(size, yaw, x, z);
 
@@ -71,54 +70,47 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.ArrowImage;
 
-        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
+        protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {
-                _itemUseSpeedForArrowLength = new ToolStripMenuItem("Use Recommended Arrow Size");
-                _itemUseSpeedForArrowLength.Click += (sender, e) =>
-                {
-                    MapObjectSettings settings = new MapObjectSettings(
-                        arrowChangeUseRecommendedLength: true,
-                        arrowNewUseRecommendedLength: !_useRecommendedArrowLength);
-                    targetTracker.ApplySettings(settings);
-                };
-                _itemUseSpeedForArrowLength.Checked = _useRecommendedArrowLength;
+                _itemRecommendedArrowLength = new ToolStripMenuItem("Use Recommended Arrow Size");
+                _itemRecommendedArrowLength.Click += (sender, e) => _itemRecommendedArrowLength.Checked = !_itemRecommendedArrowLength.Checked;
 
                 ToolStripMenuItem itemSetArrowHeadSideLength = new ToolStripMenuItem("Set Arrow Head Side Length");
                 itemSetArrowHeadSideLength.Click += (sender, e) =>
                 {
                     string text = DialogUtilities.GetStringFromDialog(labelText: "Enter the side length of the arrow head:");
                     float? arrowHeadSideLength = ParsingUtilities.ParseFloatNullable(text);
-                    if (!arrowHeadSideLength.HasValue) return;
-                    MapObjectSettings settings = new MapObjectSettings(
-                        arrowChangeHeadSideLength: true, arrowNewHeadSideLength: arrowHeadSideLength.Value);
-                    targetTracker.ApplySettings(settings);
+                    if (arrowHeadSideLength.HasValue)
+                        _arrowHeadSideLength = arrowHeadSideLength.Value;
                 };
 
                 _contextMenuStrip = new ContextMenuStrip();
-                _contextMenuStrip.Items.Add(_itemUseSpeedForArrowLength);
+                _contextMenuStrip.Items.Add(_itemRecommendedArrowLength);
                 _contextMenuStrip.Items.Add(itemSetArrowHeadSideLength);
             }
 
             return _contextMenuStrip;
         }
 
-        public override void ApplySettings(MapObjectSettings settings)
-        {
-            base.ApplySettings(settings);
-
-            if (settings.ArrowChangeUseRecommendedLength)
+        public override (SaveSettings, LoadSettings) SettingsSaveLoad => (
+            (System.Xml.XmlNode node) =>
             {
-                _useRecommendedArrowLength = settings.ArrowNewUseRecommendedLength;
-                _itemUseSpeedForArrowLength.Checked = _useRecommendedArrowLength;
+                base.SettingsSaveLoad.save(node);
+                SaveValueNode(node, "UseRecommendedArrowLength", useRecommendedArrowLength.ToString());
+                SaveValueNode(node, "ArrowHeadSideLength", _arrowHeadSideLength.ToString());
             }
-
-            if (settings.ArrowChangeHeadSideLength)
+        ,
+            (System.Xml.XmlNode node) =>
             {
-                _arrowHeadSideLength = settings.ArrowNewHeadSideLength;
+                base.SettingsSaveLoad.load(node);
+                if (bool.TryParse(LoadValueNode(node, "UseRecommendedArrowLength"), out bool useRecommendedArrowLength))
+                    _itemRecommendedArrowLength.Checked = useRecommendedArrowLength;
+                if (float.TryParse(LoadValueNode(node, "ArrowHeadSideLength"), out float arrowHeadSideLength))
+                    _arrowHeadSideLength = arrowHeadSideLength;
             }
-        }
+        );
 
         public override string GetName() => $"{name} for {PositionAngle.NameOfMultiple(positionAngleProvider())}";
 

@@ -33,10 +33,14 @@
             this.splitContainerMapLeft = new STROOP.BetterSplitContainer();
             this.tabControlMap = new System.Windows.Forms.TabControl();
             this.tabPageMapOptions = new System.Windows.Forms.TabPage();
+            this.comboBoxViewMode = new System.Windows.Forms.ComboBox();
             this.comboBoxMapOptionsBackground = new System.Windows.Forms.ComboBox();
+            this.comboBoxMapOptionsLevel = new System.Windows.Forms.ComboBox();
             this.textBoxMapOptionsGlobalIconSize = new STROOP.BetterTextbox();
             this.labelMapOptionsGlobalIconSize = new System.Windows.Forms.Label();
             this.labelMapOptionsBackground = new System.Windows.Forms.Label();
+            this.labelViewMode = new System.Windows.Forms.Label();
+            this.labelMapOptionsLevel = new System.Windows.Forms.Label();
             this.buttonMapOptionsClearAllTrackers = new System.Windows.Forms.Button();
             this.buttonMapOptionsAddNewTracker = new System.Windows.Forms.Button();
             this.checkBoxMapOptionsScaleIconSizes = new System.Windows.Forms.CheckBox();
@@ -104,10 +108,8 @@
             this.labelMapDataMapName = new System.Windows.Forms.Label();
             this.labelMapDataPuCoordinates = new System.Windows.Forms.Label();
             this.flowLayoutPanelMapTrackers = new STROOP.Tabs.MapTab.MapTrackerFlowLayoutPanel();
-            this.labelMapOptionsLevel = new System.Windows.Forms.Label();
-            this.comboBoxMapOptionsLevel = new System.Windows.Forms.ComboBox();
-            this.comboBoxViewMode = new System.Windows.Forms.ComboBox();
-            this.labelViewMode = new System.Windows.Forms.Label();
+            this.buttonMapOptionsLoadTrackerSettings = new System.Windows.Forms.Button();
+            this.buttonMapOptionsSaveTrackerSettings = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMap)).BeginInit();
             this.splitContainerMap.Panel1.SuspendLayout();
             this.splitContainerMap.SuspendLayout();
@@ -200,7 +202,9 @@
             this.tabPageMapOptions.Controls.Add(this.labelMapOptionsBackground);
             this.tabPageMapOptions.Controls.Add(this.labelViewMode);
             this.tabPageMapOptions.Controls.Add(this.labelMapOptionsLevel);
+            this.tabPageMapOptions.Controls.Add(this.buttonMapOptionsSaveTrackerSettings);
             this.tabPageMapOptions.Controls.Add(this.buttonMapOptionsClearAllTrackers);
+            this.tabPageMapOptions.Controls.Add(this.buttonMapOptionsLoadTrackerSettings);
             this.tabPageMapOptions.Controls.Add(this.buttonMapOptionsAddNewTracker);
             this.tabPageMapOptions.Controls.Add(this.checkBoxMapOptionsScaleIconSizes);
             this.tabPageMapOptions.Controls.Add(this.checkBoxMapOptionsReverseDragging);
@@ -221,6 +225,21 @@
             this.tabPageMapOptions.TabIndex = 3;
             this.tabPageMapOptions.Text = "Options";
             // 
+            // comboBoxViewMode
+            // 
+            this.comboBoxViewMode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBoxViewMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxViewMode.FormattingEnabled = true;
+            this.comboBoxViewMode.Items.AddRange(new object[] {
+            "TopDown",
+            "Ortho",
+            "3D"});
+            this.comboBoxViewMode.Location = new System.Drawing.Point(269, 171);
+            this.comboBoxViewMode.Name = "comboBoxViewMode";
+            this.comboBoxViewMode.Size = new System.Drawing.Size(66, 21);
+            this.comboBoxViewMode.TabIndex = 45;
+            this.comboBoxViewMode.SelectedIndexChanged += new System.EventHandler(this.comboBoxViewMode_SelectedIndexChanged);
+            // 
             // comboBoxMapOptionsBackground
             // 
             this.comboBoxMapOptionsBackground.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -229,6 +248,15 @@
             this.comboBoxMapOptionsBackground.Name = "comboBoxMapOptionsBackground";
             this.comboBoxMapOptionsBackground.Size = new System.Drawing.Size(183, 21);
             this.comboBoxMapOptionsBackground.TabIndex = 13;
+            // 
+            // comboBoxMapOptionsLevel
+            // 
+            this.comboBoxMapOptionsLevel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxMapOptionsLevel.Location = new System.Drawing.Point(69, 146);
+            this.comboBoxMapOptionsLevel.Margin = new System.Windows.Forms.Padding(2);
+            this.comboBoxMapOptionsLevel.Name = "comboBoxMapOptionsLevel";
+            this.comboBoxMapOptionsLevel.Size = new System.Drawing.Size(183, 21);
+            this.comboBoxMapOptionsLevel.TabIndex = 13;
             // 
             // textBoxMapOptionsGlobalIconSize
             // 
@@ -258,30 +286,49 @@
             this.labelMapOptionsBackground.TabIndex = 12;
             this.labelMapOptionsBackground.Text = "Background:";
             // 
+            // labelViewMode
+            // 
+            this.labelViewMode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.labelViewMode.AutoSize = true;
+            this.labelViewMode.Location = new System.Drawing.Point(269, 158);
+            this.labelViewMode.Name = "labelViewMode";
+            this.labelViewMode.Size = new System.Drawing.Size(63, 13);
+            this.labelViewMode.TabIndex = 12;
+            this.labelViewMode.Text = "View Mode:";
+            // 
+            // labelMapOptionsLevel
+            // 
+            this.labelMapOptionsLevel.AutoSize = true;
+            this.labelMapOptionsLevel.Location = new System.Drawing.Point(39, 149);
+            this.labelMapOptionsLevel.Name = "labelMapOptionsLevel";
+            this.labelMapOptionsLevel.Size = new System.Drawing.Size(31, 13);
+            this.labelMapOptionsLevel.TabIndex = 12;
+            this.labelMapOptionsLevel.Text = "Map:";
+            // 
             // buttonMapOptionsClearAllTrackers
             // 
-            this.buttonMapOptionsClearAllTrackers.Location = new System.Drawing.Point(177, 35);
+            this.buttonMapOptionsClearAllTrackers.Location = new System.Drawing.Point(155, 35);
             this.buttonMapOptionsClearAllTrackers.Margin = new System.Windows.Forms.Padding(0);
             this.buttonMapOptionsClearAllTrackers.Name = "buttonMapOptionsClearAllTrackers";
-            this.buttonMapOptionsClearAllTrackers.Size = new System.Drawing.Size(135, 25);
+            this.buttonMapOptionsClearAllTrackers.Size = new System.Drawing.Size(85, 25);
             this.buttonMapOptionsClearAllTrackers.TabIndex = 40;
             this.buttonMapOptionsClearAllTrackers.Text = "Clear All Trackers";
             this.buttonMapOptionsClearAllTrackers.UseVisualStyleBackColor = true;
             // 
             // buttonMapOptionsAddNewTracker
             // 
-            this.buttonMapOptionsAddNewTracker.Location = new System.Drawing.Point(177, 7);
+            this.buttonMapOptionsAddNewTracker.Location = new System.Drawing.Point(155, 7);
             this.buttonMapOptionsAddNewTracker.Margin = new System.Windows.Forms.Padding(0);
             this.buttonMapOptionsAddNewTracker.Name = "buttonMapOptionsAddNewTracker";
-            this.buttonMapOptionsAddNewTracker.Size = new System.Drawing.Size(135, 25);
+            this.buttonMapOptionsAddNewTracker.Size = new System.Drawing.Size(85, 25);
             this.buttonMapOptionsAddNewTracker.TabIndex = 41;
-            this.buttonMapOptionsAddNewTracker.Text = "Add New Tracker";
+            this.buttonMapOptionsAddNewTracker.Text = "Add Tracker";
             this.buttonMapOptionsAddNewTracker.UseVisualStyleBackColor = true;
             // 
             // checkBoxMapOptionsScaleIconSizes
             // 
             this.checkBoxMapOptionsScaleIconSizes.AutoSize = true;
-            this.checkBoxMapOptionsScaleIconSizes.Location = new System.Drawing.Point(177, 99);
+            this.checkBoxMapOptionsScaleIconSizes.Location = new System.Drawing.Point(155, 99);
             this.checkBoxMapOptionsScaleIconSizes.Name = "checkBoxMapOptionsScaleIconSizes";
             this.checkBoxMapOptionsScaleIconSizes.Size = new System.Drawing.Size(105, 17);
             this.checkBoxMapOptionsScaleIconSizes.TabIndex = 19;
@@ -291,7 +338,7 @@
             // checkBoxMapOptionsReverseDragging
             // 
             this.checkBoxMapOptionsReverseDragging.AutoSize = true;
-            this.checkBoxMapOptionsReverseDragging.Location = new System.Drawing.Point(177, 81);
+            this.checkBoxMapOptionsReverseDragging.Location = new System.Drawing.Point(155, 81);
             this.checkBoxMapOptionsReverseDragging.Name = "checkBoxMapOptionsReverseDragging";
             this.checkBoxMapOptionsReverseDragging.Size = new System.Drawing.Size(112, 17);
             this.checkBoxMapOptionsReverseDragging.TabIndex = 19;
@@ -301,7 +348,7 @@
             // checkBoxMapOptionsEnablePuView
             // 
             this.checkBoxMapOptionsEnablePuView.AutoSize = true;
-            this.checkBoxMapOptionsEnablePuView.Location = new System.Drawing.Point(177, 63);
+            this.checkBoxMapOptionsEnablePuView.Location = new System.Drawing.Point(155, 63);
             this.checkBoxMapOptionsEnablePuView.Name = "checkBoxMapOptionsEnablePuView";
             this.checkBoxMapOptionsEnablePuView.Size = new System.Drawing.Size(103, 17);
             this.checkBoxMapOptionsEnablePuView.TabIndex = 19;
@@ -975,48 +1022,27 @@
             this.flowLayoutPanelMapTrackers.TabIndex = 0;
             this.flowLayoutPanelMapTrackers.WrapContents = false;
             // 
-            // labelMapOptionsLevel
+            // buttonMapOptionsLoadTrackerSettings
             // 
-            this.labelMapOptionsLevel.AutoSize = true;
-            this.labelMapOptionsLevel.Location = new System.Drawing.Point(39, 149);
-            this.labelMapOptionsLevel.Name = "labelMapOptionsLevel";
-            this.labelMapOptionsLevel.Size = new System.Drawing.Size(31, 13);
-            this.labelMapOptionsLevel.TabIndex = 12;
-            this.labelMapOptionsLevel.Text = "Map:";
+            this.buttonMapOptionsLoadTrackerSettings.Location = new System.Drawing.Point(243, 7);
+            this.buttonMapOptionsLoadTrackerSettings.Margin = new System.Windows.Forms.Padding(0);
+            this.buttonMapOptionsLoadTrackerSettings.Name = "buttonMapOptionsLoadTrackerSettings";
+            this.buttonMapOptionsLoadTrackerSettings.Size = new System.Drawing.Size(85, 25);
+            this.buttonMapOptionsLoadTrackerSettings.TabIndex = 41;
+            this.buttonMapOptionsLoadTrackerSettings.Text = "Load Settings";
+            this.buttonMapOptionsLoadTrackerSettings.UseVisualStyleBackColor = true;
+            this.buttonMapOptionsLoadTrackerSettings.Click += new System.EventHandler(this.buttonMapOptionsLoadTrackerSettings_Click);
             // 
-            // comboBoxMapOptionsLevel
+            // buttonMapOptionsSaveTrackerSettings
             // 
-            this.comboBoxMapOptionsLevel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxMapOptionsLevel.Location = new System.Drawing.Point(69, 146);
-            this.comboBoxMapOptionsLevel.Margin = new System.Windows.Forms.Padding(2);
-            this.comboBoxMapOptionsLevel.Name = "comboBoxMapOptionsLevel";
-            this.comboBoxMapOptionsLevel.Size = new System.Drawing.Size(183, 21);
-            this.comboBoxMapOptionsLevel.TabIndex = 13;
-            // 
-            // comboBoxViewMode
-            // 
-            this.comboBoxViewMode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.comboBoxViewMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxViewMode.FormattingEnabled = true;
-            this.comboBoxViewMode.Items.AddRange(new object[] {
-            "TopDown",
-            "Ortho",
-            "3D"});
-            this.comboBoxViewMode.Location = new System.Drawing.Point(269, 171);
-            this.comboBoxViewMode.Name = "comboBoxViewMode";
-            this.comboBoxViewMode.Size = new System.Drawing.Size(66, 21);
-            this.comboBoxViewMode.TabIndex = 45;
-            this.comboBoxViewMode.SelectedIndexChanged += new System.EventHandler(this.comboBoxViewMode_SelectedIndexChanged);
-            // 
-            // labelViewMode
-            // 
-            this.labelViewMode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelViewMode.AutoSize = true;
-            this.labelViewMode.Location = new System.Drawing.Point(269, 158);
-            this.labelViewMode.Name = "labelViewMode";
-            this.labelViewMode.Size = new System.Drawing.Size(63, 13);
-            this.labelViewMode.TabIndex = 12;
-            this.labelViewMode.Text = "View Mode:";
+            this.buttonMapOptionsSaveTrackerSettings.Location = new System.Drawing.Point(243, 35);
+            this.buttonMapOptionsSaveTrackerSettings.Margin = new System.Windows.Forms.Padding(0);
+            this.buttonMapOptionsSaveTrackerSettings.Name = "buttonMapOptionsSaveTrackerSettings";
+            this.buttonMapOptionsSaveTrackerSettings.Size = new System.Drawing.Size(85, 25);
+            this.buttonMapOptionsSaveTrackerSettings.TabIndex = 40;
+            this.buttonMapOptionsSaveTrackerSettings.Text = "Save Settings";
+            this.buttonMapOptionsSaveTrackerSettings.UseVisualStyleBackColor = true;
+            this.buttonMapOptionsSaveTrackerSettings.Click += new System.EventHandler(this.buttonMapOptionsSaveTrackerSettings_Click);
             // 
             // MapTab
             // 
@@ -1129,5 +1155,7 @@
         internal System.Windows.Forms.ComboBox comboBoxMapOptionsLevel;
         internal System.Windows.Forms.Label labelViewMode;
         internal System.Windows.Forms.Label labelMapOptionsLevel;
+        internal System.Windows.Forms.Button buttonMapOptionsSaveTrackerSettings;
+        internal System.Windows.Forms.Button buttonMapOptionsLoadTrackerSettings;
     }
 }

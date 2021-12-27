@@ -56,7 +56,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             return vertices;
         }
 
-        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
+        protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Drawing;
-using OpenTK.Graphics.OpenGL;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
@@ -10,14 +8,14 @@ using OpenTK;
 using System.Windows.Forms;
 using STROOP.Models;
 
-
 namespace STROOP.Tabs.MapTab.MapObjects
 {
     public abstract class MapWallObject : MapTriangleObject
     {
-        private bool _showArrows;
+        private bool showArrows => _itemShowArrows.Checked;
         private float? _relativeHeight;
         private float? _absoluteHeight;
+        private float _hitboxVerticalOffset = -150;
 
         ToolStripMenuItem _itemShowArrows;
 
@@ -28,7 +26,6 @@ namespace STROOP.Tabs.MapTab.MapObjects
             Opacity = 0.5;
             Color = Color.Green;
 
-            _showArrows = false;
             _relativeHeight = null;
             _absoluteHeight = null;
         }
@@ -71,7 +68,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected override (Vector3[] faceVertices, Vector4 color)[] GetBaseFaceVertices(TriangleDataModel tri)
         {
-            var d = new Vector3(0, _relativeHeight.HasValue ? _relativeHeight.Value : -30, 0);
+            var d = new Vector3(0, _hitboxVerticalOffset, 0);
             return new[] { (new[] { tri.p1 + d, tri.p2 + d, tri.p3 + d }, new Vector4(1)) };
         }
 
@@ -110,7 +107,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                         projection1Plus,
                         false, color, outlineColor,
                         new Vector3(0, OutlineWidth, OutlineWidth),
-                        true);
+                        false);
 
                     graphics.triangleRenderer.Add(
                         new Vector3(x2, 0, z2),
@@ -118,7 +115,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                         projection1Plus,
                         false, color, outlineColor,
                         new Vector3(OutlineWidth, 0, OutlineWidth),
-                        true);
+                        false);
 
                     graphics.triangleRenderer.Add(
                         new Vector3(x2, 0, z2),
@@ -126,7 +123,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                         projection1Minus,
                         false, color, outlineColor,
                         new Vector3(OutlineWidth, 0, OutlineWidth),
-                        true);
+                        false);
 
                     graphics.triangleRenderer.Add(
                         new Vector3(x2, 0, z2),
@@ -134,7 +131,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                         projection2Minus,
                         false, color, outlineColor,
                         new Vector3(OutlineWidth, OutlineWidth, 0),
-                        true);
+                        false);
                 }
             });
         }
@@ -142,31 +139,19 @@ namespace STROOP.Tabs.MapTab.MapObjects
         protected List<ToolStripMenuItem> GetWallToolStripMenuItems(MapTracker targetTracker)
         {
             _itemShowArrows = new ToolStripMenuItem("Show Arrows");
-            _itemShowArrows.Click += (sender, e) =>
-            {
-                MapObjectSettings settings = new MapObjectSettings(
-                    wallChangeShowArrows: true, wallNewShowArrows: !_showArrows);
-                targetTracker.ApplySettings(settings);
-            };
+            _itemShowArrows.Click += (sender, e) => _itemShowArrows.Checked = !_itemShowArrows.Checked;
 
             ToolStripMenuItem itemSetRelativeHeight = new ToolStripMenuItem("Set Relative Height");
             itemSetRelativeHeight.Click += (sender, e) =>
             {
                 string text = DialogUtilities.GetStringFromDialog(labelText: "Enter relative height of wall hitbox compared to wall triangle.");
                 float? relativeHeightNullable = ParsingUtilities.ParseFloatNullable(text);
-                if (!relativeHeightNullable.HasValue) return;
-                MapObjectSettings settings = new MapObjectSettings(
-                    wallChangeRelativeHeight: true, wallNewRelativeHeight: relativeHeightNullable.Value);
-                targetTracker.ApplySettings(settings);
+                if (relativeHeightNullable.HasValue)
+                    _relativeHeight = relativeHeightNullable.Value;
             };
 
             ToolStripMenuItem itemClearRelativeHeight = new ToolStripMenuItem("Clear Relative Height");
-            itemClearRelativeHeight.Click += (sender, e) =>
-            {
-                MapObjectSettings settings = new MapObjectSettings(
-                    wallChangeRelativeHeight: true, wallNewRelativeHeight: null);
-                targetTracker.ApplySettings(settings);
-            };
+            itemClearRelativeHeight.Click += (sender, e) => _relativeHeight = null;
 
             ToolStripMenuItem itemSetAbsoluteHeight = new ToolStripMenuItem("Set Absolute Height");
             itemSetAbsoluteHeight.Click += (sender, e) =>
@@ -176,19 +161,12 @@ namespace STROOP.Tabs.MapTab.MapObjects
                     text == "" ?
                     Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset) :
                     ParsingUtilities.ParseFloatNullable(text);
-                if (!absoluteHeightNullable.HasValue) return;
-                MapObjectSettings settings = new MapObjectSettings(
-                    wallChangeAbsoluteHeight: true, wallNewAbsoluteHeight: absoluteHeightNullable.Value);
-                targetTracker.ApplySettings(settings);
+                if (absoluteHeightNullable.HasValue)
+                    _absoluteHeight = absoluteHeightNullable.Value;
             };
 
             ToolStripMenuItem itemClearAbsoluteHeight = new ToolStripMenuItem("Clear Absolute Height");
-            itemClearAbsoluteHeight.Click += (sender, e) =>
-            {
-                MapObjectSettings settings = new MapObjectSettings(
-                    wallChangeAbsoluteHeight: true, wallNewAbsoluteHeight: null);
-                targetTracker.ApplySettings(settings);
-            };
+            itemClearAbsoluteHeight.Click += (sender, e) => _absoluteHeight = null;
 
             return new List<ToolStripMenuItem>()
             {
@@ -200,25 +178,28 @@ namespace STROOP.Tabs.MapTab.MapObjects
             };
         }
 
-        public override void ApplySettings(MapObjectSettings settings)
-        {
-            base.ApplySettings(settings);
-
-            if (settings.WallChangeShowArrows)
+        public override (SaveSettings save, LoadSettings load) SettingsSaveLoad => (
+            (System.Xml.XmlNode node) =>
             {
-                _showArrows = settings.WallNewShowArrows;
-                _itemShowArrows.Checked = settings.WallNewShowArrows;
+                base.SettingsSaveLoad.save(node);
+                SaveValueNode(node, "ShowArrows", showArrows.ToString());
+                SaveValueNode(node, "RelativeHeight", _relativeHeight.ToString());
+                SaveValueNode(node, "AbsoluteHeight", _absoluteHeight.ToString());
+                SaveValueNode(node, "HitboxVerticalOffset", _hitboxVerticalOffset.ToString());
             }
-
-            if (settings.WallChangeRelativeHeight)
+        ,
+            (System.Xml.XmlNode node) =>
             {
-                _relativeHeight = settings.WallNewRelativeHeight;
+                base.SettingsSaveLoad.load(node);
+                if (bool.TryParse(LoadValueNode(node, "ShowArrows"), out var v))
+                    _itemShowArrows.Checked = v;
+                if (float.TryParse(LoadValueNode(node, "RelativeHeight"), out var relativeHeight))
+                    _relativeHeight = relativeHeight;
+                if (float.TryParse(LoadValueNode(node, "AbsoluteHeight"), out var absoluteHeight))
+                    _absoluteHeight = absoluteHeight;
+                if (float.TryParse(LoadValueNode(node, "HitboxVerticalOffset"), out var hitboxVerticalOffset))
+                    _hitboxVerticalOffset = hitboxVerticalOffset;
             }
-
-            if (settings.WallChangeAbsoluteHeight)
-            {
-                _absoluteHeight = settings.WallNewAbsoluteHeight;
-            }
-        }
+        );
     }
 }

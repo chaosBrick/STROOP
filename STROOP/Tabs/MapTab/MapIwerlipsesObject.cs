@@ -194,7 +194,7 @@
 
 //        public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.IwerlipsesImage;
 
-//        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
+//        protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
 //        {
 //            if (_contextMenuStrip == null)
 //            {

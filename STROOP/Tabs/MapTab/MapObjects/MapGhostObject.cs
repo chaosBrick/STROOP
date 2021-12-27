@@ -39,7 +39,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             base.InitSubTrackerContextMenuStrip(mapTab, targetStrip);
 
             targetStrip.Items.AddHandlerToItem("Add Tracker for Ghost Graphics Angle",
-                 () => MapTracker.CreateTracker(mapTab,
+                 tracker.MakeCreateTrackerHandler(mapTab, "GhostGraphicsAngle", () =>
                     new MapArrowObject(
                      positionAngleProvider,
                      _ => GhostPositionAngle.instance.Angle,

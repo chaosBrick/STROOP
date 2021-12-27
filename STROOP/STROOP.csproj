@@ -510,7 +510,6 @@
     <Compile Include="Tabs\MapTab\MapTrackerFlowLayoutPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Tabs\MapTab\MapObjectSettings.cs" />
     <Compile Include="Models\PanModel.cs" />
     <Compile Include="Script\ScriptEngine.cs" />
     <Compile Include="Script\TokenScript.cs" />

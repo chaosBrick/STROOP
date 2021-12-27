@@ -34,6 +34,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         {
             var radius = Size / graphics.MapViewScaleValue;
             var cursorPos = graphics.mapCursorPosition;
+            var closestDist = float.PositiveInfinity;
             if (!graphics.IsMouseDown(0))
             {
                 hoverData.currentPositionAngle = null;
@@ -49,10 +50,16 @@ namespace STROOP.Tabs.MapTab.MapObjects
                     else if (graphics.view.mode == MapView.ViewMode.ThreeDimensional)
                     {
                         var rad = Size * Get3DIconScale(graphics, (float)a.X, (float)a.Y, (float)a.Z);
-                        if ((ProjectOnLineSegment(a.position, graphics.view.position, graphics.mapCursorPosition) - a.position).Length < rad)
+                        var lineEnd = graphics.cursorOnMap ? graphics.mapCursorPosition
+                            : graphics.view.position + Vector3.Normalize(graphics.mapCursorPosition - graphics.view.position) * 10000;
+                        if ((ProjectOnLineSegment(a.position, graphics.view.position, lineEnd) - a.position).Length < rad)
                         {
-                            hoverData.currentPositionAngle = a;
-                            break;
+                            var newDist = (a.position - graphics.view.position).LengthSquared;
+                            if (closestDist > newDist)
+                            {
+                                hoverData.currentPositionAngle = a;
+                                closestDist = newDist;
+                            }
                         }
                     }
             }

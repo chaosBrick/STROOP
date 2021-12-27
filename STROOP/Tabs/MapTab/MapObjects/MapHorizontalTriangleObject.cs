@@ -75,19 +75,12 @@ namespace STROOP.Tabs.MapTab.MapObjects
                     text == "" ?
                     Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset) :
                     ParsingUtilities.ParseFloatNullable(text);
-                if (!minHeightNullable.HasValue) return;
-                MapObjectSettings settings = new MapObjectSettings(
-                    triangleChangeMinHeight: true, triangleNewMinHeight: minHeightNullable.Value);
-                targetTracker.ApplySettings(settings);
+                if (minHeightNullable.HasValue)
+                    _minHeight = minHeightNullable.Value;
             };
 
             ToolStripMenuItem itemClearMinHeight = new ToolStripMenuItem("Clear Min Height");
-            itemClearMinHeight.Click += (sender, e) =>
-            {
-                MapObjectSettings settings = new MapObjectSettings(
-                    triangleChangeMinHeight: true, triangleNewMinHeight: null);
-                targetTracker.ApplySettings(settings);
-            };
+            itemClearMinHeight.Click += (sender, e) => _minHeight = null;
 
             ToolStripMenuItem itemSetMaxHeight = new ToolStripMenuItem("Set Max Height");
             itemSetMaxHeight.Click += (sender, e) =>
@@ -97,19 +90,12 @@ namespace STROOP.Tabs.MapTab.MapObjects
                     text == "" ?
                     Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset) :
                     ParsingUtilities.ParseFloatNullable(text);
-                if (!maxHeightNullable.HasValue) return;
-                MapObjectSettings settings = new MapObjectSettings(
-                    triangleChangeMaxHeight: true, triangleNewMaxHeight: maxHeightNullable.Value);
-                targetTracker.ApplySettings(settings);
+                if (maxHeightNullable.HasValue)
+                    _maxHeight = maxHeightNullable.Value;
             };
 
             ToolStripMenuItem itemClearMaxHeight = new ToolStripMenuItem("Clear Max Height");
-            itemClearMaxHeight.Click += (sender, e) =>
-            {
-                MapObjectSettings settings = new MapObjectSettings(
-                    triangleChangeMaxHeight: true, triangleNewMaxHeight: null);
-                targetTracker.ApplySettings(settings);
-            };
+            itemClearMaxHeight.Click += (sender, e) => _maxHeight = null;
 
             return new List<ToolStripMenuItem>()
             {
@@ -120,20 +106,23 @@ namespace STROOP.Tabs.MapTab.MapObjects
             };
         }
 
-        public override void ApplySettings(MapObjectSettings settings)
-        {
-            base.ApplySettings(settings);
-
-            if (settings.TriangleChangeMinHeight)
+        public override (SaveSettings save, LoadSettings load) SettingsSaveLoad => (
+            (System.Xml.XmlNode node) =>
             {
-                _minHeight = settings.TriangleNewMinHeight;
+                base.SettingsSaveLoad.save(node);
+                SaveValueNode(node, "MinHeight", _minHeight.ToString());
+                SaveValueNode(node, "MaxHeight", _maxHeight.ToString());
             }
-
-            if (settings.TriangleChangeMaxHeight)
+        ,
+            (System.Xml.XmlNode node) =>
             {
-                _maxHeight = settings.TriangleNewMaxHeight;
+                base.SettingsSaveLoad.load(node);
+                if (float.TryParse(LoadValueNode(node, "MinHeight"), out float minHeight))
+                    _minHeight = minHeight;
+                if (float.TryParse(LoadValueNode(node, "MaxHeight"), out float maxHeight))
+                    _maxHeight = maxHeight;
             }
-        }
+        );
 
         private List<List<(float x, float y, float z)>> GetVertexListsWithSplicing(float? minHeight, float? maxHeight)
         {

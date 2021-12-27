@@ -49,28 +49,20 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.CustomGridlinesImage;
 
-        public override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
+        protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {
                 _itemUseRelativeAngles = new ToolStripMenuItem("Use Relative Angles");
-                _itemUseRelativeAngles.Click += (sender, e) =>
-                {
-                    MapObjectSettings settings = new MapObjectSettings(
-                        angleRangeChangeUseRelativeAngles: true,
-                        angleRangeNewUseRelativeAngles: !_useRelativeAngles);
-                    targetTracker.ApplySettings(settings);
-                };
+                _itemUseRelativeAngles.Click += (sender, e) => _itemUseRelativeAngles.Checked = !_itemUseRelativeAngles.Checked;
 
                 ToolStripMenuItem itemSetAngleDiff = new ToolStripMenuItem("Set Angle Diff");
                 itemSetAngleDiff.Click += (sender, e) =>
                 {
                     string text = DialogUtilities.GetStringFromDialog(labelText: "Enter angle diff.");
                     int? angleDiff = ParsingUtilities.ParseIntNullable(text);
-                    if (!angleDiff.HasValue || angleDiff.Value <= 0) return;
-                    MapObjectSettings settings = new MapObjectSettings(
-                        angleRangeChangeAngleDiff: true, angleRangeNewAngleDiff: angleDiff.Value);
-                    targetTracker.ApplySettings(settings);
+                    if (angleDiff.HasValue && angleDiff.Value > 0)
+                        _angleDiff = angleDiff.Value;
                 };
 
                 _contextMenuStrip = new ContextMenuStrip();
@@ -81,20 +73,22 @@ namespace STROOP.Tabs.MapTab.MapObjects
             return _contextMenuStrip;
         }
 
-        public override void ApplySettings(MapObjectSettings settings)
-        {
-            base.ApplySettings(settings);
-
-            if (settings.AngleRangeChangeUseRelativeAngles)
+        public override (SaveSettings, LoadSettings) SettingsSaveLoad => (
+            (System.Xml.XmlNode node) =>
             {
-                _useRelativeAngles = settings.AngleRangeNewUseRelativeAngles;
-                _itemUseRelativeAngles.Checked = settings.AngleRangeNewUseRelativeAngles;
+                base.SettingsSaveLoad.save(node);
+                SaveValueNode(node, "UseRelativeAngles", _itemUseRelativeAngles.ToString());
+                SaveValueNode(node, "AngleDiff", _angleDiff.ToString());
             }
-
-            if (settings.AngleRangeChangeAngleDiff)
+        ,
+            (System.Xml.XmlNode node) =>
             {
-                _angleDiff = settings.AngleRangeNewAngleDiff;
+                base.SettingsSaveLoad.load(node);
+                if (bool.TryParse(LoadValueNode(node, "UseRelativeAngles"), out bool useRelativeAngles))
+                    _itemUseRelativeAngles.Checked = useRelativeAngles;
+                if (int.TryParse(LoadValueNode(node, "AngleDiff"), out int angleDiff))
+                    _angleDiff = angleDiff;
             }
-        }
+        );
     }
 }

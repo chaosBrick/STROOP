@@ -35,7 +35,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             base.InitSubTrackerContextMenuStrip(mapTab, targetStrip);
 
             targetStrip.Items.AddHandlerToItem("Add Tracker for Angle",
-                () => MapTracker.CreateTracker(mapTab, new MapArrowObject(
+                tracker.MakeCreateTrackerHandler(mapTab, "CustomAngle", () => new MapArrowObject(
                     positionAngleProvider,
                     _ => _.Angle,
                     MapArrowObject.ArrowSource.Constant(1),
