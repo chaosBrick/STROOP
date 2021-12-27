@@ -13,7 +13,9 @@ namespace STROOP.Structs
     {
         public static BaseAddressTypeEnum GetBaseAddressType(string stringValue)
         {
-            return (BaseAddressTypeEnum)Enum.Parse(typeof(BaseAddressTypeEnum), stringValue);
+            if (Enum.TryParse<BaseAddressTypeEnum>(stringValue, out var parsed))
+                return parsed;
+            return BaseAddressTypeEnum.None;
         }
 
         public static WatchVariableSubclass GetSubclass(string stringValue)
@@ -48,7 +50,7 @@ namespace STROOP.Structs
 
         private static readonly List<uint> BaseAddressListZero = new List<uint> { 0 };
         private static readonly List<uint> BaseAddressListEmpty = new List<uint> { };
-        
+
         public static List<uint> GetBaseAddressListFromBaseAddressType(BaseAddressTypeEnum baseAddressType)
         {
             switch (baseAddressType)
