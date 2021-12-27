@@ -59,5 +59,5 @@ void main()
 		f = clamp(pixelsPerUnit.x * min(frac.x, frac.y) * unitDivisor, 0, 1);
 		f *= clamp(pixelsPerUnit.x, 0, 1);
 	}
-	gl_FragColor = mix(fs_outline_color, fs_color, f);
+	color = mix(fs_outline_color, fs_color, f);
 } 
