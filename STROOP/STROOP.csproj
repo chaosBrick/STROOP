@@ -473,7 +473,6 @@
     <Compile Include="Tabs\MapTab\MapObjects\MapCustomWallObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapMarioCeilingObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapObjectCylinderObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapHomeObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapCustomFloorObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapObjectFloorObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapNextPositionsObject.cs" />
