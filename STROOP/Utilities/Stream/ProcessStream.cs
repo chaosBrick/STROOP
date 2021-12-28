@@ -39,7 +39,8 @@ namespace STROOP.Utilities
         public byte[] Ram => _ram;
         public string ProcessName => _io?.Name ?? "(No Emulator)";
         public bool IsSuspended => _io?.IsSuspended ?? false;
-        public double FpsInPractice => _fpsTimes.Count == 0 ? 0 : 1000 / _fpsTimes.Average();
+        public double FpsInPractice => _fpsTimes.Count == 0 ? 0 : 1 / _fpsTimes.Average();
+        public double lastFrameTime => _fpsTimes.Count == 0 ? RefreshRateConfig.RefreshRateInterval : _fpsTimes.Last();
 
         public ProcessStream()
         {
@@ -590,14 +591,14 @@ namespace STROOP.Utilities
 
             while (!disposedValue)
             {
+                frameStopwatch.Restart();
                 Application.DoEvents();
                 //try
                 //{
-                int timeToWait;
+                double timeToWait;
                 lock (_mStreamProcess)
                 {
 
-                    frameStopwatch.Restart();
                     if ((!IsEnabled || !IsRunning) && !_lastUpdateBeforePausing)
                         goto FrameLimitStreamUpdate;
 
@@ -612,7 +613,8 @@ namespace STROOP.Utilities
 
                     // Calculate delay to match correct FPS
                     frameStopwatch.Stop();
-                    timeToWait = (int)RefreshRateConfig.RefreshRateInterval - (int)frameStopwatch.ElapsedMilliseconds;
+                    double timePassed = (frameStopwatch.ElapsedTicks / (double)Stopwatch.Frequency);
+                    timeToWait = RefreshRateConfig.RefreshRateInterval - timePassed;
                     timeToWait = Math.Max(timeToWait, 0);
 
                     // Calculate Fps
@@ -621,12 +623,12 @@ namespace STROOP.Utilities
                         double garbage;
                         _fpsTimes.TryDequeue(out garbage);
                     }
-                    _fpsTimes.Enqueue(frameStopwatch.ElapsedMilliseconds + timeToWait);
+                    _fpsTimes.Enqueue(timePassed + timeToWait);
                     FpsUpdated?.Invoke(this, new EventArgs());
                 }
 
                 if (timeToWait > 0)
-                    Thread.Sleep(timeToWait);
+                    Thread.Sleep(new TimeSpan((long)(timeToWait * 10000000)));
                 else
                     Thread.Yield();
                 //}

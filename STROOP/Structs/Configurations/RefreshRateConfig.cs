@@ -20,7 +20,7 @@ namespace STROOP.Structs.Configurations
             {
                 uint freq = LimitRefreshRate ? RefreshRateFreq : 0;
                 if (freq == 0) return 0;
-                else return 1000.0 / freq;
+                else return 1.0 / freq;
             }
         }
     }
