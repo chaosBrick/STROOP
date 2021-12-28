@@ -128,7 +128,9 @@ namespace STROOP.Controls
             // Created getter/setter functions
             if (IsSpecial)
             {
-                (_getterFunction, _setterFunction) = WatchVariableSpecialUtilities.CreateGetterSetterFunctions(SpecialType);
+                (_getterFunction, _setterFunction) = WatchVariableSpecialUtilities.CreateGetterSetterFunctions(SpecialType, out var valid);
+                if (!valid)
+                    BaseAddressType = BaseAddressTypeEnum.Invalid;
             }
             else
             {

@@ -15,7 +15,7 @@ namespace STROOP.Structs
         {
             if (Enum.TryParse<BaseAddressTypeEnum>(stringValue, out var parsed))
                 return parsed;
-            return BaseAddressTypeEnum.None;
+            return BaseAddressTypeEnum.Invalid;
         }
 
         public static WatchVariableSubclass GetSubclass(string stringValue)

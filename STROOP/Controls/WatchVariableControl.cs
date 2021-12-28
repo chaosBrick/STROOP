@@ -519,7 +519,9 @@ namespace STROOP.Controls
 
             if (!EditMode)
             {
-                if (_valueTextBox.Visible) _valueTextBox.Text = WatchVarWrapper.GetValue(true, true, FixedAddressListGetter()).ToString();
+                if (_valueTextBox.Visible) _valueTextBox.Text = WatchVarWrapper.WatchVar.BaseAddressType == BaseAddressTypeEnum.Invalid
+                        ? "Invalid variable"
+                        : WatchVarWrapper.GetValue(true, true, FixedAddressListGetter()).ToString();
                 if (_valueCheckBox.Visible) _valueCheckBox.CheckState = WatchVarWrapper.GetCheckStateValue(FixedAddressListGetter());
             }
 

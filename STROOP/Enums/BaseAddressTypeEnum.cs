@@ -12,6 +12,7 @@ namespace STROOP.Structs
     // TODO add new offset types
     public enum BaseAddressTypeEnum
     {
+        Invalid,
         None,
 
         Absolute,
