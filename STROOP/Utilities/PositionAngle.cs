@@ -53,7 +53,6 @@ namespace STROOP.Utilities
         private enum PositionAngleTypeEnum
         {
             Custom,
-            Custom2,
             Mario,
             Holp,
             Camera,
@@ -88,7 +87,6 @@ namespace STROOP.Utilities
             Ang,
             Functions,
             Self,
-            Point,
             None,
         }
 
@@ -228,8 +226,6 @@ namespace STROOP.Utilities
                 throw new ArgumentOutOfRangeException();
         }
 
-        public static PositionAngle Custom = new PositionAngle(PositionAngleTypeEnum.Custom);
-        public static PositionAngle Custom2 = new PositionAngle(PositionAngleTypeEnum.Custom2);
         public static PositionAngle Mario = new PositionAngle(PositionAngleTypeEnum.Mario);
         public static PositionAngle Holp = new PositionAngle(PositionAngleTypeEnum.Holp);
         public static PositionAngle Selected = new PositionAngle(PositionAngleTypeEnum.Selected);
@@ -242,7 +238,6 @@ namespace STROOP.Utilities
         public static PositionAngle MapFocus = new PositionAngle(PositionAngleTypeEnum.MapFocus);
         public static PositionAngle Scheduler = new PositionAngle(PositionAngleTypeEnum.Schedule);
         public static PositionAngle Self = new PositionAngle(PositionAngleTypeEnum.Self);
-        public static PositionAngle Point = new PositionAngle(PositionAngleTypeEnum.Point);
         public static PositionAngle None = new PositionAngle(PositionAngleTypeEnum.None);
         public static PositionAngle Custom(Vector3 position, ushort angle = 0) => new CustomPositionAngle(position, angle);
 
@@ -298,15 +293,7 @@ namespace STROOP.Utilities
             stringValue = stringValue.ToLower();
             List<string> parts = ParsingUtilities.ParseStringList(stringValue);
 
-            if (parts.Count == 1 && parts[0] == "custom")
-            {
-                return Custom;
-            }
-            if (parts.Count == 1 && parts[0] == "custom2")
-            {
-                return Custom2;
-            }
-            else if (parts.Count == 1 && parts[0] == "mario")
+            if (parts.Count == 1 && parts[0] == "mario")
             {
                 return Mario;
             }
@@ -464,10 +451,6 @@ namespace STROOP.Utilities
             {
                 return Self;
             }
-            else if (parts.Count == 1 && parts[0] == "point")
-            {
-                return Point;
-            }
             else if (parts.Count >= 1 && (parts[0] == "pos" || parts[0] == "position"))
             {
                 double x = parts.Count >= 2 ? ParsingUtilities.ParseDoubleNullable(parts[1]) ?? double.NaN : double.NaN;
@@ -496,7 +479,10 @@ namespace STROOP.Utilities
         public override string ToString()
         {
             List<object> parts = new List<object>();
-            parts.Add(PosAngleType);
+            if (IsObject())
+                parts.Add(GetMapNameForObject(Address.Value));
+            else
+                parts.Add(PosAngleType);
             if (Address.HasValue) parts.Add(HexUtilities.FormatValue(Address.Value, 8));
             if (Index.HasValue) parts.Add(Index.Value);
             if (Index2.HasValue) parts.Add(Index2.Value);
@@ -611,11 +597,7 @@ namespace STROOP.Utilities
             return IsObjectDependent() ? Address : null;
         }
 
-        public bool IsSelfOrPoint()
-        {
-            return PosAngleType == PositionAngleTypeEnum.Self ||
-                PosAngleType == PositionAngleTypeEnum.Point;
-        }
+        public bool IsSelf() => PosAngleType == PositionAngleTypeEnum.Self;
 
         public bool DependsOnSelf()
         {
@@ -648,10 +630,6 @@ namespace STROOP.Utilities
                 if (ShouldHaveAddress(PosAngleType) && Address == 0) return Double.NaN;
                 switch (PosAngleType)
                 {
-                    case PositionAngleTypeEnum.Custom:
-                        return SpecialConfig.CustomX;
-                    case PositionAngleTypeEnum.Custom2:
-                        return SpecialConfig.Custom2X;
                     case PositionAngleTypeEnum.Mario:
                         return Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.XOffset);
                     case PositionAngleTypeEnum.Holp:
@@ -734,8 +712,6 @@ namespace STROOP.Utilities
                         return (int)PosAngle1.X;
                     case PositionAngleTypeEnum.Self:
                         return SpecialConfig.SelfPA.X;
-                    case PositionAngleTypeEnum.Point:
-                        return SpecialConfig.PointPA.X;
                     case PositionAngleTypeEnum.None:
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -750,10 +726,6 @@ namespace STROOP.Utilities
                 if (ShouldHaveAddress(PosAngleType) && Address == 0) return Double.NaN;
                 switch (PosAngleType)
                 {
-                    case PositionAngleTypeEnum.Custom:
-                        return SpecialConfig.CustomY;
-                    case PositionAngleTypeEnum.Custom2:
-                        return SpecialConfig.Custom2Y;
                     case PositionAngleTypeEnum.Mario:
                         return Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
                     case PositionAngleTypeEnum.Holp:
@@ -836,8 +808,6 @@ namespace STROOP.Utilities
                         return (int)PosAngle1.Y;
                     case PositionAngleTypeEnum.Self:
                         return SpecialConfig.SelfPA.Y;
-                    case PositionAngleTypeEnum.Point:
-                        return SpecialConfig.PointPA.Y;
                     case PositionAngleTypeEnum.None:
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -852,10 +822,6 @@ namespace STROOP.Utilities
                 if (ShouldHaveAddress(PosAngleType) && Address == 0) return Double.NaN;
                 switch (PosAngleType)
                 {
-                    case PositionAngleTypeEnum.Custom:
-                        return SpecialConfig.CustomZ;
-                    case PositionAngleTypeEnum.Custom2:
-                        return SpecialConfig.Custom2Z;
                     case PositionAngleTypeEnum.Mario:
                         return Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.ZOffset);
                     case PositionAngleTypeEnum.Holp:
@@ -938,8 +904,6 @@ namespace STROOP.Utilities
                         return (int)PosAngle1.Z;
                     case PositionAngleTypeEnum.Self:
                         return SpecialConfig.SelfPA.Z;
-                    case PositionAngleTypeEnum.Point:
-                        return SpecialConfig.PointPA.Z;
                     case PositionAngleTypeEnum.None:
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -954,10 +918,6 @@ namespace STROOP.Utilities
                 if (ShouldHaveAddress(PosAngleType) && Address == 0) return Double.NaN;
                 switch (PosAngleType)
                 {
-                    case PositionAngleTypeEnum.Custom:
-                        return SpecialConfig.CustomAngle;
-                    case PositionAngleTypeEnum.Custom2:
-                        return SpecialConfig.Custom2Angle;
                     case PositionAngleTypeEnum.Mario:
                         return Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
                     case PositionAngleTypeEnum.Holp:
@@ -1034,8 +994,6 @@ namespace STROOP.Utilities
                         return MoreMath.NormalizeAngleTruncated(PosAngle1.Angle);
                     case PositionAngleTypeEnum.Self:
                         return SpecialConfig.SelfPA.Angle;
-                    case PositionAngleTypeEnum.Point:
-                        return SpecialConfig.PointPA.Angle;
                     case PositionAngleTypeEnum.None:
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -1245,12 +1203,6 @@ namespace STROOP.Utilities
             if (ShouldHaveAddress(PosAngleType) && Address == 0) return false;
             switch (PosAngleType)
             {
-                case PositionAngleTypeEnum.Custom:
-                    SpecialConfig.CustomX = value;
-                    return true;
-                case PositionAngleTypeEnum.Custom2:
-                    SpecialConfig.Custom2X = value;
-                    return true;
                 case PositionAngleTypeEnum.Mario:
                     return SetMarioComponent((float)value, Coordinate.X);
                 case PositionAngleTypeEnum.Holp:
@@ -1334,8 +1286,6 @@ namespace STROOP.Utilities
                     return PosAngle1.SetX(value);
                 case PositionAngleTypeEnum.Self:
                     return SpecialConfig.SelfPA.SetX(value);
-                case PositionAngleTypeEnum.Point:
-                    return SpecialConfig.PointPA.SetX(value);
                 case PositionAngleTypeEnum.None:
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -1347,12 +1297,6 @@ namespace STROOP.Utilities
             if (ShouldHaveAddress(PosAngleType) && Address == 0) return false;
             switch (PosAngleType)
             {
-                case PositionAngleTypeEnum.Custom:
-                    SpecialConfig.CustomY = value;
-                    return true;
-                case PositionAngleTypeEnum.Custom2:
-                    SpecialConfig.Custom2Y = value;
-                    return true;
                 case PositionAngleTypeEnum.Mario:
                     return SetMarioComponent((float)value, Coordinate.Y);
                 case PositionAngleTypeEnum.Holp:
@@ -1436,8 +1380,6 @@ namespace STROOP.Utilities
                     return PosAngle1.SetY(value);
                 case PositionAngleTypeEnum.Self:
                     return SpecialConfig.SelfPA.SetY(value);
-                case PositionAngleTypeEnum.Point:
-                    return SpecialConfig.PointPA.SetY(value);
                 case PositionAngleTypeEnum.None:
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -1449,12 +1391,6 @@ namespace STROOP.Utilities
             if (ShouldHaveAddress(PosAngleType) && Address == 0) return false;
             switch (PosAngleType)
             {
-                case PositionAngleTypeEnum.Custom:
-                    SpecialConfig.CustomZ = value;
-                    return true;
-                case PositionAngleTypeEnum.Custom2:
-                    SpecialConfig.Custom2Z = value;
-                    return true;
                 case PositionAngleTypeEnum.Mario:
                     return SetMarioComponent((float)value, Coordinate.Z);
                 case PositionAngleTypeEnum.Holp:
@@ -1538,8 +1474,6 @@ namespace STROOP.Utilities
                     return PosAngle1.SetZ(value);
                 case PositionAngleTypeEnum.Self:
                     return SpecialConfig.SelfPA.SetZ(value);
-                case PositionAngleTypeEnum.Point:
-                    return SpecialConfig.PointPA.SetZ(value);
                 case PositionAngleTypeEnum.None:
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -1552,12 +1486,6 @@ namespace STROOP.Utilities
             ushort valueUShort = MoreMath.NormalizeAngleUshort(value);
             switch (PosAngleType)
             {
-                case PositionAngleTypeEnum.Custom:
-                    SpecialConfig.CustomAngle = value;
-                    return true;
-                case PositionAngleTypeEnum.Custom2:
-                    SpecialConfig.Custom2Angle = value;
-                    return true;
                 case PositionAngleTypeEnum.Mario:
                     return Config.Stream.SetValue(valueUShort, MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
                 case PositionAngleTypeEnum.Holp:
@@ -1644,8 +1572,6 @@ namespace STROOP.Utilities
                     return PosAngle1.SetAngle(value);
                 case PositionAngleTypeEnum.Self:
                     return SpecialConfig.SelfPA.SetAngle(value);
-                case PositionAngleTypeEnum.Point:
-                    return SpecialConfig.PointPA.SetAngle(value);
                 case PositionAngleTypeEnum.None:
                 default:
                     throw new ArgumentOutOfRangeException();

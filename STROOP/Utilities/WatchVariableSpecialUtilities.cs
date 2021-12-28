@@ -29,10 +29,10 @@ namespace STROOP.Structs
         }
 
         public static (Func<uint, object>, Func<object, uint, bool> getterSetter)
-            CreateGetterSetterFunctions(string specialType)
+            CreateGetterSetterFunctions(string specialType, out bool valid)
         {
             (Func<uint, object>, Func<object, uint, bool> getterSetter) variable;
-            if (dictionary.TryGetValue(specialType, out variable))
+            if (valid = dictionary.TryGetValue(specialType, out variable))
                 return variable;
             return (DEFAULT_GETTER, DEFAULT_SETTER);
         }
@@ -626,7 +626,6 @@ namespace STROOP.Structs
             List<Func<uint, PositionAngle>> posAngleFuncs =
                 new List<Func<uint, PositionAngle>>()
                 {
-                    (uint address) => PositionAngle.Custom,
                     (uint address) => PositionAngle.Mario,
                     (uint address) => PositionAngle.Holp,
                     (uint address) => PositionAngle.Camera,
@@ -635,14 +634,12 @@ namespace STROOP.Structs
                     (uint address) => PositionAngle.Tri(address, 1),
                     (uint address) => PositionAngle.Tri(address, 2),
                     (uint address) => PositionAngle.Tri(address, 3),
-                    (uint address) => SpecialConfig.PointPA,
                     (uint address) => SpecialConfig.SelfPA,
                 };
 
             List<string> posAngleStrings =
                 new List<string>()
                 {
-                    "Custom",
                     "Mario",
                     "Holp",
                     "Camera",
@@ -651,7 +648,6 @@ namespace STROOP.Structs
                     "TriV1",
                     "TriV2",
                     "TriV3",
-                    "Point",
                     "Self",
                 };
 
@@ -2368,54 +2364,6 @@ namespace STROOP.Structs
             ,
                 DEFAULT_SETTER));
 
-            dictionary.Add("BobombTrajectoryFramesToPoint",
-                ((uint dummy) =>
-                {
-                    PositionAngle holpPos = PositionAngle.Holp;
-                    double yDist = SpecialConfig.PointY - holpPos.Y;
-                    double frames = GetObjectTrajectoryYDistToFrames(yDist);
-                    return frames;
-                }
-            ,
-                (double frames, uint dummy) =>
-                {
-                    PositionAngle holpPos = PositionAngle.Holp;
-                    double yDist = GetObjectTrajectoryFramesToYDist(frames);
-                    double hDist = Math.Abs(GetBobombTrajectoryFramesToHDist(frames));
-                    double newY = SpecialConfig.PointY - yDist;
-                    (double newX, double newZ) = MoreMath.AddVectorToPoint(
-                        hDist,
-                        MoreMath.ReverseAngle(SpecialConfig.PointAngle),
-                        SpecialConfig.PointX,
-                        SpecialConfig.PointZ);
-                    return PositionAngle.Holp.SetValues(x: newX, y: newY, z: newZ);
-                }
-            ));
-
-            dictionary.Add("CorkBoxTrajectoryFramesToPoint",
-                ((uint dummy) =>
-                {
-                    PositionAngle holpPos = PositionAngle.Holp;
-                    double yDist = SpecialConfig.PointY - holpPos.Y;
-                    double frames = GetObjectTrajectoryYDistToFrames(yDist);
-                    return frames;
-                }
-            ,
-                (double frames, uint dummy) =>
-                {
-                    PositionAngle holpPos = PositionAngle.Holp;
-                    double yDist = GetObjectTrajectoryFramesToYDist(frames);
-                    double hDist = Math.Abs(GetCorkBoxTrajectoryFramesToHDist(frames));
-                    double newY = SpecialConfig.PointY - yDist;
-                    (double newX, double newZ) = MoreMath.AddVectorToPoint(
-                        hDist,
-                        MoreMath.ReverseAngle(SpecialConfig.PointAngle),
-                        SpecialConfig.PointX,
-                        SpecialConfig.PointZ);
-                    return PositionAngle.Holp.SetValues(x: newX, y: newY, z: newZ);
-                }
-            ));
-
             dictionary.Add("TrajectoryRemainingHeight",
                 ((uint dummy) =>
                 {
@@ -2684,40 +2632,6 @@ namespace STROOP.Structs
                 }
             ));
 
-            dictionary.Add("FSDistPointToSelf",
-                ((uint dummy) =>
-                {
-                    double fDist = PositionAngle.GetFDistance(SpecialConfig.PointPA, SpecialConfig.SelfPA);
-                    double sDist = PositionAngle.GetSDistance(SpecialConfig.PointPA, SpecialConfig.SelfPA);
-                    return "(" + fDist + "," + sDist + ")";
-                }
-            ,
-                (string value, uint dummy) =>
-                {
-                    List<double?> values = ParsingUtilities.ParseDoubleList(value);
-                    if (values.Count < 2) return false;
-                    if (!values[0].HasValue || !values[1].HasValue) return false;
-                    double fDist = values[0].Value;
-                    double sDist = values[1].Value;
-                    (double relX, double relZ) =
-                        MoreMath.RotatePointAboutPointAnAngularDistance(
-                            sDist, -1 * fDist, 0, 0, SpecialConfig.PointAngle);
-                    SpecialConfig.SelfPA.SetX(SpecialConfig.PointX + relX);
-                    SpecialConfig.SelfPA.SetZ(SpecialConfig.PointZ + relZ);
-                    return true;
-                }
-            ));
-
-            dictionary.Add("PitchSelfToPoint",
-                ((uint dummy) =>
-                {
-                    return MoreMath.GetPitch(
-                        SpecialConfig.SelfX, SpecialConfig.SelfY, SpecialConfig.SelfZ,
-                        SpecialConfig.PointX, SpecialConfig.PointY, SpecialConfig.PointZ);
-                }
-            ,
-                DEFAULT_SETTER));
-
             dictionary.Add("WalkingDistance",
                 ((uint dummy) =>
                 {
@@ -2727,18 +2641,6 @@ namespace STROOP.Structs
                     float sum = (hSpeed + remainder) * numFrames / 2;
                     float distance = sum - hSpeed;
                     return distance;
-                }
-            ,
-                DEFAULT_SETTER));
-
-            dictionary.Add("WalkingDistanceDifferenceMarioToPoint",
-                ((uint dummy) =>
-                {
-                    PositionAngle marioPos = PositionAngle.Mario;
-                    PositionAngle pointPos = SpecialConfig.PointPA;
-                    float walkingDistance = (float)dictionary.Get("WalkingDistance").Item1(0);
-                    double diff = walkingDistance - PositionAngle.GetHDistance(marioPos, pointPos);
-                    return diff;
                 }
             ,
                 DEFAULT_SETTER));
@@ -5088,80 +4990,6 @@ namespace STROOP.Structs
                 (double doubleValue, uint dummy) =>
                 {
                     return SpecialConfig.SelfAnglePA.SetAngle(doubleValue);
-                }
-            ));
-
-            dictionary.Add("PointPosType",
-                ((uint dummy) =>
-                {
-                    return SpecialConfig.PointPosPA.ToString();
-                }
-            ,
-                (PositionAngle posAngle, uint dummy) =>
-                {
-                    SpecialConfig.PointPosPA = posAngle;
-                    return true;
-                }
-            ));
-
-            dictionary.Add("PointX",
-                ((uint dummy) =>
-                {
-                    return SpecialConfig.PointX;
-                }
-            ,
-                (double doubleValue, uint dummy) =>
-                {
-                    return SpecialConfig.PointPosPA.SetX(doubleValue);
-                }
-            ));
-
-            dictionary.Add("PointY",
-                ((uint dummy) =>
-                {
-                    return SpecialConfig.PointY;
-                }
-            ,
-                (double doubleValue, uint dummy) =>
-                {
-                    return SpecialConfig.PointPosPA.SetY(doubleValue);
-                }
-            ));
-
-            dictionary.Add("PointZ",
-                ((uint dummy) =>
-                {
-                    return SpecialConfig.PointZ;
-                }
-            ,
-                (double doubleValue, uint dummy) =>
-                {
-                    return SpecialConfig.PointPosPA.SetZ(doubleValue);
-                }
-            ));
-
-            dictionary.Add("PointAngleType",
-                ((uint dummy) =>
-                {
-                    return SpecialConfig.PointAnglePA.ToString();
-                }
-            ,
-                (PositionAngle posAngle, uint dummy) =>
-                {
-                    SpecialConfig.PointAnglePA = posAngle;
-                    return true;
-                }
-            ));
-
-            dictionary.Add("PointAngle",
-                ((uint dummy) =>
-                {
-                    return SpecialConfig.PointAngle;
-                }
-            ,
-                (double doubleValue, uint dummy) =>
-                {
-                    return SpecialConfig.PointAnglePA.SetAngle(doubleValue);
                 }
             ));
 

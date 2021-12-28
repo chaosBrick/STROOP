@@ -157,7 +157,7 @@ namespace STROOP.Structs
                 if (objectValue == null) return false;
                 PositionAngle posAngle = PositionAngle.FromString(objectValue.ToString());
                 if (posAngle == null) return false;
-                if (posAngle.IsSelfOrPoint()) return false;
+                if (posAngle.IsSelf()) return false;
                 return setter(posAngle, address);
             };
             _dictionary[key] = (getter, newSetter);

@@ -111,19 +111,23 @@ namespace STROOP.Tabs
         private void StoreInfo(
             bool x = false, bool y = false, bool z = false, bool angle = false)
         {
-            if (x) SpecialConfig.CustomX = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.XOffset);
-            if (y) SpecialConfig.CustomY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
-            if (z) SpecialConfig.CustomZ = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.ZOffset);
-            if (angle) SpecialConfig.CustomAngle = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
+            MessageBox.Show("Tell me why you want to do this, and maybe I'll implement it.");
+            //throw new NotImplementedException("TODO: Find a better way to do this.");
+            //if (x) SpecialConfig.CustomX = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.XOffset);
+            //if (y) SpecialConfig.CustomY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
+            //if (z) SpecialConfig.CustomZ = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.ZOffset);
+            //if (angle) SpecialConfig.CustomAngle = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
         }
 
         private void TakeInfo(
             bool x = false, bool y = false, bool z = false, bool angle = false)
         {
-            if (x) Config.Stream.SetValue((float)SpecialConfig.CustomX, MarioConfig.StructAddress + MarioConfig.XOffset);
-            if (y) Config.Stream.SetValue((float)SpecialConfig.CustomY, MarioConfig.StructAddress + MarioConfig.YOffset);
-            if (z) Config.Stream.SetValue((float)SpecialConfig.CustomZ, MarioConfig.StructAddress + MarioConfig.ZOffset);
-            if (angle) Config.Stream.SetValue((ushort)SpecialConfig.CustomAngle, MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
+            MessageBox.Show("Tell me why you want to do this, and maybe I'll implement it.");
+            //throw new NotImplementedException("TODO: Find a better way to do this.");
+            //if (x) Config.Stream.SetValue((float)SpecialConfig.CustomX, MarioConfig.StructAddress + MarioConfig.XOffset);
+            //if (y) Config.Stream.SetValue((float)SpecialConfig.CustomY, MarioConfig.StructAddress + MarioConfig.YOffset);
+            //if (z) Config.Stream.SetValue((float)SpecialConfig.CustomZ, MarioConfig.StructAddress + MarioConfig.ZOffset);
+            //if (angle) Config.Stream.SetValue((ushort)SpecialConfig.CustomAngle, MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
         }
 
         public void ShowTaserVariables()
@@ -175,45 +179,47 @@ namespace STROOP.Tabs
 
         private void SetScheduler(Dictionary<uint, (double, double, double, double, List<double>)> schedule)
         {
-            PositionAngle.Schedule = schedule;
-            SpecialConfig.PointPosPA = PositionAngle.Scheduler;
-            SpecialConfig.PointAnglePA = PositionAngle.Scheduler;
+            MessageBox.Show("Tell me why you want to do this, and maybe I'll implement it.");
+            //throw new NotImplementedException("TODO: Find a better way to do this.");
+            //PositionAngle.Schedule = schedule;
+            //SpecialConfig.PointPosPA = PositionAngle.Scheduler;
+            //SpecialConfig.PointAnglePA = PositionAngle.Scheduler;
 
-            watchVariablePanelTas.RemoveVariableGroup(VariableGroup.Scheduler);
-            List<List<double>> doubleListList = schedule.Values.ToList().ConvertAll(tuple => tuple.Item5);
-            int maxDoubleListCount = doubleListList.Count == 0 ? 0 : doubleListList.Max(doubleList => doubleList.Count);
-            for (int i = 0; i < maxDoubleListCount; i++)
-            {
-                string specialType = WatchVariableSpecialUtilities.AddSchedulerEntry(i);
-                WatchVariable watchVariable =
-                    new WatchVariable(
-                        memoryTypeName: null,
-                        specialType: specialType,
-                        baseAddressType: BaseAddressTypeEnum.None,
-                        offsetUS: null,
-                        offsetJP: null,
-                        offsetSH: null,
-                        offsetEU: null,
-                        offsetDefault: null,
-                        mask: null,
-                        shift: null,
-                        handleMapping: true);
-                WatchVariableControlPrecursor precursor =
-                    new WatchVariableControlPrecursor(
-                        name: "Var " + (i + 1),
-                        watchVar: watchVariable,
-                        subclass: WatchVariableSubclass.Number,
-                        backgroundColor: ColorUtilities.GetColorFromString("Purple"),
-                        displayType: null,
-                        roundingLimit: null,
-                        useHex: null,
-                        invertBool: null,
-                        isYaw: null,
-                        coordinate: null,
-                        groupList: new List<VariableGroup>() { VariableGroup.Scheduler });
-                WatchVariableControl control = precursor.CreateWatchVariableControl();
-                watchVariablePanelTas.AddVariable(control);
-            }
+            //watchVariablePanelTas.RemoveVariableGroup(VariableGroup.Scheduler);
+            //List<List<double>> doubleListList = schedule.Values.ToList().ConvertAll(tuple => tuple.Item5);
+            //int maxDoubleListCount = doubleListList.Count == 0 ? 0 : doubleListList.Max(doubleList => doubleList.Count);
+            //for (int i = 0; i < maxDoubleListCount; i++)
+            //{
+            //    string specialType = WatchVariableSpecialUtilities.AddSchedulerEntry(i);
+            //    WatchVariable watchVariable =
+            //        new WatchVariable(
+            //            memoryTypeName: null,
+            //            specialType: specialType,
+            //            baseAddressType: BaseAddressTypeEnum.None,
+            //            offsetUS: null,
+            //            offsetJP: null,
+            //            offsetSH: null,
+            //            offsetEU: null,
+            //            offsetDefault: null,
+            //            mask: null,
+            //            shift: null,
+            //            handleMapping: true);
+            //    WatchVariableControlPrecursor precursor =
+            //        new WatchVariableControlPrecursor(
+            //            name: "Var " + (i + 1),
+            //            watchVar: watchVariable,
+            //            subclass: WatchVariableSubclass.Number,
+            //            backgroundColor: ColorUtilities.GetColorFromString("Purple"),
+            //            displayType: null,
+            //            roundingLimit: null,
+            //            useHex: null,
+            //            invertBool: null,
+            //            isYaw: null,
+            //            coordinate: null,
+            //            groupList: new List<VariableGroup>() { VariableGroup.Scheduler });
+            //    WatchVariableControl control = precursor.CreateWatchVariableControl();
+            //    watchVariablePanelTas.AddVariable(control);
+            //}
         }
     }
 }

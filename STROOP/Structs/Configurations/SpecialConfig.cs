@@ -12,18 +12,6 @@ namespace STROOP.Structs.Configurations
     {
         // Point vars
 
-        // - Custom
-
-        public static double CustomX = 0;
-        public static double CustomY = 0;
-        public static double CustomZ = 0;
-        public static double CustomAngle = 0;
-
-        public static double Custom2X = 0;
-        public static double Custom2Y = 0;
-        public static double Custom2Z = 0;
-        public static double Custom2Angle = 0;
-
         // - Self pos
 
         public static PositionAngle SelfPosPA = PositionAngle.Mario;
@@ -53,44 +41,9 @@ namespace STROOP.Structs.Configurations
             get => SelfPA.Angle;
         }
 
-        // - Point pos
-
-        public static PositionAngle PointPosPA = PositionAngle.Custom;
-        public static PositionAngle PointAnglePA = PositionAngle.Custom;
-        public static PositionAngle PointPA
-        {
-            get => PositionAngle.Hybrid(PointPosPA, PointAnglePA);
-        }
-
-        public static double PointX
-        {
-            get => PointPA.X;
-        }
-
-        public static double PointY
-        {
-            get => PointPA.Y;
-        }
-
-        public static double PointZ
-        {
-            get => PointPA.Z;
-        }
-
-        public static double PointAngle
-        {
-            get => PointPA.Angle;
-        }
-
         // - Functions
 
-        public static bool IsSelectedPA
-        {
-            get => SelfPosPA.IsSelected ||
-                SelfAnglePA.IsSelected ||
-                PointPosPA.IsSelected ||
-                PointAnglePA.IsSelected;
-        }
+        public static bool IsSelectedPA => SelfPosPA.IsSelected ||  SelfAnglePA.IsSelected;
 
         // Cam Hack vars
 
