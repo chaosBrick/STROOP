@@ -20,7 +20,7 @@ namespace STROOP.Tabs.GfxTab
         * there are nodes setting up a camera, rotationg / scaling models, handling animation, all kinds of stuff
         * This manager makes it easy to browse all the nodes and edit them
         */
-        
+
         public GfxNode SelectedNode;
         List<WatchVariableControl> SpecificVariables;
 
@@ -37,10 +37,10 @@ namespace STROOP.Tabs.GfxTab
             buttonGfxDumpDisplayList.Click += DumpButton_Click;
             buttonGfxHitboxHack.Click += (sender, e) => InjectHitboxViewCode();
 
+            SuspendLayout();
             foreach (WatchVariableControlPrecursor precursor in GfxNode.GetCommonVariables())
-            {
                 watchVariablePanelGfx.AddVariable(precursor.CreateWatchVariableControl());
-            }
+            ResumeLayout();
 
             SpecificVariables = new List<WatchVariableControl>();
 
@@ -174,7 +174,7 @@ namespace STROOP.Tabs.GfxTab
             GfxNode root = GfxNode.ReadGfxNode(rootAddress);
             treeViewGfx.Nodes.Add(GfxToTreeNode(root));
         }
-        
+
         /*
          * Recursively converts a tree of GfxNodes to a tree of TreeNodes so that they can be displayed in the tree viewer
          */
