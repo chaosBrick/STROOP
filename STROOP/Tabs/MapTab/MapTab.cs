@@ -354,6 +354,40 @@ namespace STROOP.Tabs.MapTab
         {
             base.InitializeTab();
             Load2D();
+            AddViewModeContextMenu();
+        }
+
+        void AddViewModeContextMenu()
+        {
+            comboBoxViewMode.MouseDown += (_, e) =>
+            {
+                if (e.Button == MouseButtons.Right)
+                {
+                    if (graphics.view.mode == MapView.ViewMode.Orthogonal)
+                    {
+                        var ctx = new ContextMenuStrip();
+                        var itemSetRelativeNearPlane = new ToolStripMenuItem("Set Relative Near Plane");
+                        itemSetRelativeNearPlane.Click += (__, ___) =>
+                            graphics.view.orthoRelativeNearPlane = (float)DialogUtilities.GetDoubleFromDialog(0, labelText: "Enter relative near plane value.");
+                        ctx.Items.Add(itemSetRelativeNearPlane);
+
+                        var itemClearRelativeNearPlane = new ToolStripMenuItem("Clear Relative Near Plane");
+                        itemClearRelativeNearPlane.Click += (__, ___) => graphics.view.orthoRelativeNearPlane = float.NaN;
+                        ctx.Items.Add(itemClearRelativeNearPlane);
+
+                        var itemSetRelativeFarPlane = new ToolStripMenuItem("Set Relative Far Plane");
+                        itemSetRelativeFarPlane.Click += (__, ___) =>
+                            graphics.view.orthoRelativeFarPlane = (float)DialogUtilities.GetDoubleFromDialog(0, labelText: "Enter relative far plane value.");
+                        ctx.Items.Add(itemSetRelativeFarPlane);
+
+                        var itemClearRelativeFarPlane = new ToolStripMenuItem("Clear Relative Far Plane");
+                        itemClearRelativeFarPlane.Click += (__, ___) => graphics.view.orthoRelativeFarPlane = float.NaN;
+                        ctx.Items.Add(itemClearRelativeFarPlane);
+
+                        ctx.Show(Cursor.Position);
+                    }
+                }
+            };
         }
 
         public override void Update(bool active)

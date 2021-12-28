@@ -431,6 +431,7 @@
     </Compile>
     <Compile Include="Tabs\MapTab\GraphicsUtil.cs" />
     <Compile Include="Tabs\MapTab\IHoverData.cs" />
+    <Compile Include="Tabs\MapTab\MapObjects\HoverDatas.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapAllObjectCeilingObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapAllObjectFloorObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapAllObjectWallObject.cs" />

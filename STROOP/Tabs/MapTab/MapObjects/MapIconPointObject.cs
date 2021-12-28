@@ -47,6 +47,17 @@ namespace STROOP.Tabs.MapTab.MapObjects
                             break;
                         }
                     }
+                    else if (graphics.view.mode == MapView.ViewMode.Orthogonal)
+                    {
+                        var projectedPos = Vector3.TransformPosition(a.position, graphics.ViewMatrix);
+                        projectedPos.X = (1 + projectedPos.X) * graphics.glControl.Width / 2;
+                        projectedPos.Y = (1 - projectedPos.Y) * graphics.glControl.Height / 2;
+                        if ((projectedPos.Xy - graphics.mousePosition2D).LengthSquared < (Size * Size))
+                        {
+                            hoverData.currentPositionAngle = a;
+                            break;
+                        }
+                    }
                     else if (graphics.view.mode == MapView.ViewMode.ThreeDimensional)
                     {
                         var rad = Size * Get3DIconScale(graphics, (float)a.X, (float)a.Y, (float)a.Z);

@@ -166,9 +166,22 @@ namespace STROOP.Structs
             string buttonText = "OK")
         {
             ValueForm valueForm = new ValueForm(textBoxText, labelText, buttonText);
-            if (valueForm.ShowDialog() == DialogResult.OK)
+            if (valueForm.ShowDialog(AccessScope<StroopMainForm>.content) == DialogResult.OK)
                 return valueForm.StringValue;
             return null;
+        }
+
+        public static double GetDoubleFromDialog(
+            double defaultValue = 0,
+            string textBoxText = "",
+            string labelText = "Enter Value:",
+            string buttonText = "OK")
+        {
+            string text = GetStringFromDialog(textBoxText, labelText, buttonText);
+            float? relativeHeightNullable = Utilities.ParsingUtilities.ParseFloatNullable(text);
+            if (relativeHeightNullable.HasValue)
+                return relativeHeightNullable.Value;
+            return defaultValue;
         }
 
         public static (string text, bool rightButtonClicked)? GetStringAndSideFromDialog(

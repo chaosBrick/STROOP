@@ -97,10 +97,23 @@ namespace STROOP.Tabs.MapTab
                 MAX_COURSE_SIZE_X_MAX - MAX_COURSE_SIZE_X_MIN,
                 MAX_COURSE_SIZE_Z_MAX - MAX_COURSE_SIZE_Z_MIN);
 
+        public Vector2 mousePosition2D
+        {
+            get
+            {
+                var dsjakldjska = glControl.PointToClient(Cursor.Position);
+                return new Vector2(dsjakldjska.X, dsjakldjska.Y);
+            }
+        }
         public Vector3 mapCursorPosition;
         public bool cursorOnMap = false;
         Vector3 normalAtCursor;
         float cursorViewPlaneDist = 1000;
+
+        public (Vector3 normal, float d) worldspaceNearPlane { get; private set; }
+        public (Vector3 normal, float d) worldspaceFarPlane { get; private set; }
+        public (Vector3 normal, float d) orthographicZero { get; private set; }
+
         bool[] mouseDown = new bool[3];
         public bool IsMouseDown(int button) => mouseDown[button];
 
@@ -269,13 +282,15 @@ namespace STROOP.Tabs.MapTab
                 );
 
 
-            float zFar = 10000, zNear = -10000;
+            float zFar = float.IsNaN(view.orthoRelativeFarPlane) ? 10000 : view.orthoRelativeFarPlane;
+            float zNear = float.IsNaN(view.orthoRelativeNearPlane) ? -10000 : view.orthoRelativeNearPlane;
+            zFar = Math.Max(zNear + 0.0001f, zFar);
             float invFN = 1 / (zFar - zNear);
             Matrix4 othoDepth = new Matrix4(
                 1, 0, 0, 0,
                 0, 1, 0, 0,
                 0, 0, -2 * invFN, 0,
-                0, 0, 0, 1);
+                0, 0, -0.999f, 1);
 
             switch (view.mode)
             {
@@ -291,10 +306,14 @@ namespace STROOP.Tabs.MapTab
                 case MapView.ViewMode.Orthogonal:
                     float cool = (float)MoreMath.AngleUnitsToRadians(MapViewAngleValue);
                     BillboardMatrix = Matrix4.CreateRotationY(cool);
-
+                    float d = -Vector3.Dot(-BillboardMatrix.Row2.Xyz, view.focusPositionAngle.position);
+                    orthographicZero = (-BillboardMatrix.Row2.Xyz, d);
+                    worldspaceNearPlane = (-BillboardMatrix.Row2.Xyz, d + view.orthoRelativeNearPlane);
+                    worldspaceFarPlane = (BillboardMatrix.Row2.Xyz, d - view.orthoRelativeFarPlane);
                     ViewMatrix =
-                        Matrix4.CreateRotationY(-cool)
-                        * Matrix4.CreateTranslation(-view.position)
+                        Matrix4.CreateTranslation(-view.focusPositionAngle.position)
+                        * Matrix4.CreateRotationY(-cool)
+                        * Matrix4.CreateTranslation(-view.orthoOffset.X, -view.orthoOffset.Y, 0)
                         * Matrix4.CreateScale(scale / glControl.AspectRatio, scale, 1)
                         * othoDepth;
                     break;
@@ -302,6 +321,9 @@ namespace STROOP.Tabs.MapTab
                 case MapView.ViewMode.ThreeDimensional:
                     Vector3 target = view.focusPositionAngle.position;
                     Vector3 viewDirection = view.ComputeViewDirection();
+                    if (float.IsNaN(viewDirection.X))
+                        viewDirection = new Vector3(0, 0, 1);
+
                     switch (view.camera3DMode)
                     {
                         case MapView.Camera3DMode.InGame:
@@ -337,6 +359,7 @@ namespace STROOP.Tabs.MapTab
         bool FindClosestIntersection(Vector3 rayOrigin, Vector3 rayDirection, out Vector3 intersection, out Vector3 normal)
         {
             intersection = default(Vector3);
+            normal = default(Vector3);
             Vector3 viewDirection = Vector3.Normalize(rayDirection);
             float closestDistance = float.PositiveInfinity, newDistance;
             foreach (var t in levelTrianglesFor3DMap)
@@ -619,6 +642,7 @@ namespace STROOP.Tabs.MapTab
         private int _dragStartMouseX = 0;
         private int _dragStartMouseY = 0;
         private Vector3 _translateStartCenter = new Vector3(0);
+        private Vector2 _translateStartOrthoOffset = new Vector2(2);
         private Vector3 _rotatePivot = new Vector3(0);
         private Vector3 _rotateDiff = new Vector3(0);
 
@@ -635,10 +659,12 @@ namespace STROOP.Tabs.MapTab
                     _dragStartMouseX = e.X;
                     _dragStartMouseY = e.Y;
                     _translateStartCenter = view.position;
+                    _translateStartOrthoOffset = view.orthoOffset;
                     _dragStartYaw = view.yaw;
                     _dragStartPitch = view.pitch;
                     _rotatePivot = mapCursorPosition;
-                    _rotateDiff = Vector3.TransformPosition(view.position - mapCursorPosition, Matrix4.Invert(view.ComputeViewOrientation()));
+                    Matrix4 viewOrientation = view.ComputeViewOrientation();
+                    _rotateDiff = Vector3.TransformPosition(view.position - mapCursorPosition, Matrix4.Invert(viewOrientation));
 
                     view.movementSpeed = (mapCursorPosition - view.position).Length * 0.5f;
                     break;
@@ -746,10 +772,7 @@ namespace STROOP.Tabs.MapTab
                             }
                         case MapView.ViewMode.Orthogonal:
                             {
-                                var dnasklj = MoreMath.AngleUnitsToRadians(MapViewAngleValue);
-                                float newCenterX = _translateStartCenter.X - unitDiffX;
-                                float newCenterY = _translateStartCenter.Y + unitDiffY;
-                                SetCustomCenter($"{newCenterX}; {newCenterY}; {_translateStartCenter.Z}");
+                                view.orthoOffset = _translateStartOrthoOffset + new Vector2(-unitDiffX, unitDiffY);
                                 break;
                             }
                         case MapView.ViewMode.ThreeDimensional:
@@ -757,6 +780,8 @@ namespace STROOP.Tabs.MapTab
                                 float mul = 10.0f / (float)Math.Log((view.position - _rotatePivot).Length);
                                 float diffX = pixelDiffX / (float)glControl.Width * 2 * mul;
                                 float diffY = pixelDiffY / (float)glControl.Height * 2 * mul;
+                                if (float.IsNaN(diffX) || float.IsNaN(diffY))
+                                    throw null;
                                 view.yaw = _dragStartYaw + diffX;
                                 view.pitch = Math.Max(-(float)Math.PI * 0.499f, Math.Min((float)Math.PI * 0.499f, _dragStartPitch - diffY));
 

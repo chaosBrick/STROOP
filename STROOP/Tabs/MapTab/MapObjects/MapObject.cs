@@ -9,60 +9,8 @@ using OpenTK.Graphics;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {
-    public abstract class MapObject
+    public abstract partial class MapObject
     {
-        protected class MapObjectHoverData : IHoverData
-        {
-            readonly MapObject parent;
-            public PositionAngle currentPositionAngle;
-
-            public MapObjectHoverData(MapObject parent)
-            {
-                this.parent = parent;
-            }
-
-            public void DragTo(Vector3 newPosition)
-            {
-                if (parent.enableDragging.Checked)
-                {
-                    currentPositionAngle.SetX(newPosition.X);
-                    currentPositionAngle.SetY(newPosition.Y);
-                    currentPositionAngle.SetZ(newPosition.Z);
-                }
-            }
-
-            public void LeftClick(Vector3 position) { }
-
-            public void RightClick(Vector3 position) { }
-
-            public bool CanDrag() => parent.enableDragging.Checked;
-
-            public void AddContextMenuItems(MapTab tab, ContextMenuStrip menu)
-            {
-                var myItem = new ToolStripMenuItem(currentPositionAngle.ToString());
-                var copyPositionItem = new ToolStripMenuItem("Copy Position");
-                copyPositionItem.Click += (_, __) =>
-                {
-                    if (currentPositionAngle != null)
-                        CopyUtilities.CopyPosition(currentPositionAngle.position);
-                };
-                myItem.DropDownItems.Add(copyPositionItem);
-
-                var pastePositionItem = new ToolStripMenuItem("Paste Position");
-                pastePositionItem.Click += (_, __) =>
-                {
-                    if (currentPositionAngle != null && CopyUtilities.TryPastePosition(out Vector3 v))
-                    {
-                        currentPositionAngle.SetX(v.X);
-                        currentPositionAngle.SetY(v.Y);
-                        currentPositionAngle.SetZ(v.Z);
-                    }
-                };
-                myItem.DropDownItems.Add(pastePositionItem);
-                menu.Items.Add(myItem);
-            }
-        }
-
         ToolStripMenuItem enableDragging = new ToolStripMenuItem("Enable dragging");
 
         public virtual IHoverData GetHoverData(MapGraphics graphics) => null;

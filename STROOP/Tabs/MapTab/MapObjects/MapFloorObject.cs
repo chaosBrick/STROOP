@@ -26,6 +26,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
         }
 
         protected override Vector3[] GetVolumeDisplacements(TriangleDataModel tri) => new[] { new Vector3(0, -Size, 0) };
+        protected override (Vector3 low, Vector3 high)[] GetOrthogonalBoundaryProjection(MapGraphics graphics, TriangleDataModel tri) => 
+            new[] { (Vector3.Zero, new Vector3(0, -78, 0)) };
 
         protected List<ToolStripMenuItem> GetFloorToolStripMenuItems()
         {

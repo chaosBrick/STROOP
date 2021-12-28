@@ -60,6 +60,16 @@ namespace STROOP.Tabs.MapTab.MapObjects
             return null;
         }
 
+        protected override (Vector3 low, Vector3 high)[] GetOrthogonalBoundaryProjection(MapGraphics graphics, TriangleDataModel tri)
+        {
+            float angle = (float)Math.Atan2(tri.NormX, tri.NormZ);
+            var projectionDirection = graphics.BillboardMatrix.Row0.Xyz;
+            float projectionDist = Size / Vector3.Dot(new Vector3(tri.NormX, 0, tri.NormZ), projectionDirection);
+            Vector3 baseOffset = new Vector3(0, _hitboxVerticalOffset, 0);
+            return new[] { (baseOffset, baseOffset + graphics.BillboardMatrix.Row0.Xyz * projectionDist),
+                (baseOffset, baseOffset -graphics.BillboardMatrix.Row0.Xyz * projectionDist)};
+        }
+
         protected override Vector3[] GetVolumeDisplacements(TriangleDataModel tri)
         {
             float d = Size / (tri.XProjection ? tri.NormX : tri.NormZ);
@@ -141,6 +151,15 @@ namespace STROOP.Tabs.MapTab.MapObjects
             _itemShowArrows = new ToolStripMenuItem("Show Arrows");
             _itemShowArrows.Click += (sender, e) => _itemShowArrows.Checked = !_itemShowArrows.Checked;
 
+            ToolStripMenuItem itemSetHitboxDownOffset = new ToolStripMenuItem("Set Hitbox Vertical Offset");
+            itemSetHitboxDownOffset.Click += (sender, e) =>
+            {
+                string text = DialogUtilities.GetStringFromDialog(labelText: "Enter hitbox vertical offset.");
+                float? hitboxVerticalOffsetNullable = ParsingUtilities.ParseFloatNullable(text);
+                if (hitboxVerticalOffsetNullable.HasValue)
+                    _hitboxVerticalOffset = hitboxVerticalOffsetNullable.Value;
+            };
+
             ToolStripMenuItem itemSetRelativeHeight = new ToolStripMenuItem("Set Relative Height");
             itemSetRelativeHeight.Click += (sender, e) =>
             {
@@ -171,6 +190,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             return new List<ToolStripMenuItem>()
             {
                 _itemShowArrows,
+                itemSetHitboxDownOffset,
                 itemSetRelativeHeight,
                 itemClearRelativeHeight,
                 itemSetAbsoluteHeight,

@@ -10,6 +10,21 @@ namespace STROOP.Utilities
 {
     public class PositionAngle
     {
+        class CustomPositionAngle : PositionAngle
+        {
+            Vector3 customPos;
+            ushort customAngle;
+            public CustomPositionAngle(Vector3 pos, ushort angle = 0) { this.customPos = pos; this.customAngle = angle; }
+
+            public override double X => customPos.X;
+            public override double Y => customPos.Y;
+            public override double Z => customPos.Z;
+            public override bool SetX(double value) { customPos.X = (float)value; return true; }
+            public override bool SetY(double value) { customPos.X = (float)value; return true; }
+            public override bool SetZ(double value) { customPos.X = (float)value; return true; }
+            public override bool SetAngle(double value) { customAngle = (ushort)value; return true; }
+        }
+
         private readonly PositionAngleTypeEnum PosAngleType;
         private readonly uint? Address;
         private readonly int? Index;
@@ -229,6 +244,7 @@ namespace STROOP.Utilities
         public static PositionAngle Self = new PositionAngle(PositionAngleTypeEnum.Self);
         public static PositionAngle Point = new PositionAngle(PositionAngleTypeEnum.Point);
         public static PositionAngle None = new PositionAngle(PositionAngleTypeEnum.None);
+        public static PositionAngle Custom(Vector3 position, ushort angle = 0) => new CustomPositionAngle(position, angle);
 
         public static PositionAngle Obj(uint address) =>
             new PositionAngle(PositionAngleTypeEnum.Obj, address: address);

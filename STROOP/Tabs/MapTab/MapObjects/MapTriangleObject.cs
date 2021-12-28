@@ -120,28 +120,66 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 _bufferedTris = newList;
         }
 
+        bool projectOnPlane(Vector3 v1, Vector3 v2, Vector3 pNor, float pD, out Vector3 projection)
+        {
+            Vector3 diff = v2 - v1;
+            float vd = Vector3.Dot(v1, pNor) + pD;
+            float vOrthogonal = -Vector3.Dot(diff, pNor);
+            float f = vd / vOrthogonal;
+            projection = v1 + diff * f;
+
+            float newDot = Vector3.Dot(projection, pNor) + pD;
+            return f >= 0 && f < 1;
+        }
+
+        void DrawOrthogonalProjection(MapGraphics graphics, TriangleDataModel tri, (Vector3 pNor, float pD) plane, Vector4 color)
+        {
+            Vector3[] nearPlaneProjections = new Vector3[3];
+            int projIndex = 0;
+            Vector3 projection;
+            if (projectOnPlane(tri.p1, tri.p2, plane.pNor, plane.pD, out projection))
+                nearPlaneProjections[projIndex++] = projection;
+            if (projectOnPlane(tri.p2, tri.p3, plane.pNor, plane.pD, out projection))
+                nearPlaneProjections[projIndex++] = projection;
+            if (projectOnPlane(tri.p3, tri.p1, plane.pNor, plane.pD, out projection))
+                nearPlaneProjections[projIndex++] = projection;
+            if (projIndex >= 2) // we have a near plane projection
+                foreach ((Vector3 low, Vector3 high) offset in GetOrthogonalBoundaryProjection(graphics, tri))
+                {
+                    graphics.triangleRenderer.Add(
+                        nearPlaneProjections[0] + offset.low,
+                        nearPlaneProjections[1] + offset.low,
+                        nearPlaneProjections[0] + offset.high,
+                        false,
+                        color,
+                        new Vector4(0, 0, 0, 1),
+                        new Vector3(0, 1, 1) * OutlineWidth,
+                        false);
+                    graphics.triangleRenderer.Add(
+                        nearPlaneProjections[1] + offset.low,
+                        nearPlaneProjections[0] + offset.high,
+                        nearPlaneProjections[1] + offset.high,
+                        false,
+                        color,
+                        new Vector4(0, 0, 0, 1),
+                        new Vector3(1, 1, 0) * OutlineWidth,
+                        false);
+                }
+        }
+
         protected override void DrawOrthogonal(MapGraphics graphics)
         {
+            //Draw3D(graphics);
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
             {
                 var colorMultipliers = new float[] { 1.0f, 0.5f, 0.25f };
                 var baseColor = new Vector4(Color.R / 255f, Color.G / 255f, Color.B / 255f, OpacityByte / 255f);
                 foreach (var tri in GetTrianglesWithinDist())
-                {
-                    graphics.triangleRenderer.Add(
-                        new Vector3(tri.X1, tri.Y1, tri.Z1),
-                        new Vector3(tri.X2, tri.Y2, tri.Z2),
-                        new Vector3(tri.X3, tri.Y3, tri.Z3),
-                        false,
-                        new Vector4(baseColor.Xyz * 1.0f, baseColor.W),
-                        new Vector4(baseColor.Xyz * 0.5f, baseColor.W),
-                        new Vector4(baseColor.Xyz * 0.25f, baseColor.W),
-                        new Vector4(OutlineColor.R / 255f, OutlineColor.G / 255f, OutlineColor.B / 255f, OutlineColor.A / 255f),
-                        new Vector3(OutlineWidth),
-                        true);
-                }
+                    DrawOrthogonalProjection(graphics, tri, graphics.orthographicZero, baseColor);
             });
         }
+
+        protected abstract (Vector3 low, Vector3 high)[] GetOrthogonalBoundaryProjection(MapGraphics graphics, TriangleDataModel tri);
 
         protected override void Draw3D(MapGraphics graphics)
         {

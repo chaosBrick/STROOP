@@ -1,6 +1,7 @@
 ﻿
 using System.Drawing;
 using OpenTK;
+using STROOP.Models;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {
@@ -15,5 +16,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         }
 
         protected override Vector3[] GetVolumeDisplacements(Models.TriangleDataModel tri) => new[] { new Vector3(0, -Size, 0) };
+        protected override (Vector3 low, Vector3 high)[] GetOrthogonalBoundaryProjection(MapGraphics graphics, TriangleDataModel tri)
+            => new[] { (Vector3.Zero, new Vector3(0, -160, 0)) };
     }
 }
