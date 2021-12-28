@@ -362,16 +362,21 @@ namespace STROOP.Tabs.MapTab
 
             using (new AccessScope<MapTab>(this))
             {
-                if (!graphics.IsMouseDown(0) && !IsContextMenuOpen())
+                if (!IsContextMenuOpen())
                 {
-                    hoverData.Clear();
-                    foreach (var tracker in flowLayoutPanelMapTrackers.EnumerateTrackers())
-                        if (tracker.IsVisible)
-                        {
-                            var newHover = tracker.mapObject.GetHoverData(graphics);
-                            if (newHover != null)
-                                hoverData.Add(newHover);
-                        }
+                    if (Form.ActiveForm != null && glControlMap2D.ClientRectangle.Contains(glControlMap2D.PointToClient(Cursor.Position)))
+                        graphics.UpdateFlyingControls(Config.Stream.lastFrameTime);
+                    if (!graphics.IsMouseDown(0))
+                    {
+                        hoverData.Clear();
+                        foreach (var tracker in flowLayoutPanelMapTrackers.EnumerateTrackers())
+                            if (tracker.IsVisible)
+                            {
+                                var newHover = tracker.mapObject.GetHoverData(graphics);
+                                if (newHover != null)
+                                    hoverData.Add(newHover);
+                            }
+                    }
                 }
 
                 flowLayoutPanelMapTrackers.UpdateControl();

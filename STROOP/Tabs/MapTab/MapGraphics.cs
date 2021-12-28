@@ -98,6 +98,9 @@ namespace STROOP.Tabs.MapTab
                 MAX_COURSE_SIZE_Z_MAX - MAX_COURSE_SIZE_Z_MIN);
 
         public Vector3 mapCursorPosition;
+        public bool cursorOnMap = false;
+        Vector3 normalAtCursor;
+        float cursorViewPlaneDist = 1000;
         bool[] mouseDown = new bool[3];
         public bool IsMouseDown(int button) => mouseDown[button];
 
@@ -297,7 +300,7 @@ namespace STROOP.Tabs.MapTab
                     break;
 
                 case MapView.ViewMode.ThreeDimensional:
-                    Vector3 target = new Vector3(Models.DataModels.Mario.X, Models.DataModels.Mario.Y, Models.DataModels.Mario.Z);
+                    Vector3 target = view.focusPositionAngle.position;
                     Vector3 viewDirection = view.ComputeViewDirection();
                     switch (view.camera3DMode)
                     {
@@ -331,17 +334,18 @@ namespace STROOP.Tabs.MapTab
             hasUnitPrecision = pixelsPerUnit.X >= 2 && pixelsPerUnit.Y >= 2;
         }
 
-        bool FindClosestIntersection(Vector3 rayOrigin, Vector3 rayDirection, out Vector3 intersection)
+        bool FindClosestIntersection(Vector3 rayOrigin, Vector3 rayDirection, out Vector3 intersection, out Vector3 normal)
         {
             intersection = default(Vector3);
             Vector3 viewDirection = Vector3.Normalize(rayDirection);
             float closestDistance = float.PositiveInfinity, newDistance;
             foreach (var t in levelTrianglesFor3DMap)
-                if (t.Intersect(rayOrigin, viewDirection, out Vector3 newIntersection)
+                if (t.Intersect(rayOrigin, viewDirection, out Vector3 newIntersection, out Vector3 newNormal)
                     && (newDistance = (newIntersection - view.position).LengthSquared) < closestDistance)
                 {
                     closestDistance = newDistance;
                     intersection = newIntersection;
+                    normal = newNormal;
                 }
 
             return (closestDistance < float.PositiveInfinity);
@@ -356,10 +360,15 @@ namespace STROOP.Tabs.MapTab
                 var dx = tan * (glControlCursorPos.X - glControl.Width / 2.0f) / glControl.Height;
                 var dy = -tan * (glControlCursorPos.Y - glControl.Height / 2.0f) / glControl.Height;
                 var dirrrr = BillboardMatrix.Row0.Xyz * dx + BillboardMatrix.Row1.Xyz * dy - BillboardMatrix.Row2.Xyz;
+                if (float.IsNaN(dirrrr.X)) dirrrr = new Vector3(0, 0, 1);
 
-                if (FindClosestIntersection(view.position, dirrrr, out Vector3 closestIntersection))
+                if (cursorOnMap = FindClosestIntersection(view.position + dirrrr, dirrrr, out Vector3 closestIntersection, out normalAtCursor))
+                {
                     mapCursorPosition = closestIntersection;
-
+                    cursorViewPlaneDist = Vector3.Dot(mapCursorPosition - view.position, -BillboardMatrix.Row2.Xyz);
+                }
+                else
+                    mapCursorPosition = view.position + dirrrr * cursorViewPlaneDist;
             }
         }
 
@@ -636,6 +645,13 @@ namespace STROOP.Tabs.MapTab
                 case MouseButtons.Right:
                     mouseDown[1] = true;
                     break;
+                case MouseButtons.Middle:
+                    mouseDown[2] = true;
+                    _dragStartMouseX = e.X;
+                    _dragStartMouseY = e.Y;
+                    _dragStartYaw = view.yaw;
+                    _dragStartPitch = view.pitch;
+                    break;
             }
 
             using (new AccessScope<MapTab>(mapTab))
@@ -658,6 +674,9 @@ namespace STROOP.Tabs.MapTab
                 case MouseButtons.Right:
                     mouseDown[1] = false;
                     break;
+                case MouseButtons.Middle:
+                    mouseDown[2] = false;
+                    break;
             }
         }
 
@@ -666,7 +685,7 @@ namespace STROOP.Tabs.MapTab
             for (int i = 0; i < mouseDown.Length; i++)
                 mouseDown[i] &= MouseUtility.IsMouseDown(i);
 
-            if (view.camera3DMode != MapView.Camera3DMode.Free)
+            if (view.mode != MapView.ViewMode.ThreeDimensional)
                 mapCursorPosition = Vector3.TransformPosition(new Vector3(2.0f * e.X / glControl.Width - 1, 1 - 2.0f * e.Y / glControl.Height, 0), Matrix4.Invert(ViewMatrix));
 
             using (new AccessScope<MapTab>(mapTab))
@@ -677,6 +696,30 @@ namespace STROOP.Tabs.MapTab
                         hover.DragTo(mapCursorPosition);
                         return;
                     }
+            }
+
+            if (mouseDown[2])
+            {
+                if (view.mode == MapView.ViewMode.ThreeDimensional)
+                {
+                    int pixelDiffX = e.X - _dragStartMouseX;
+                    int pixelDiffY = e.Y - _dragStartMouseY;
+                    float mul = 10.0f / (float)Math.Log((view.position - _rotatePivot).Length);
+                    float diffX = pixelDiffX / (float)glControl.Width * 2 * mul;
+                    float diffY = pixelDiffY / (float)glControl.Height * 2 * mul;
+                    if (float.IsNaN(diffX) || float.IsNaN(diffY))
+                        throw null;
+                    if (view.camera3DMode == MapView.Camera3DMode.Free)
+                    {
+                        view.yaw = _dragStartYaw - diffX;
+                        view.pitch = Math.Max(-(float)Math.PI * 0.499f, Math.Min((float)Math.PI * 0.499f, _dragStartPitch + diffY));
+                    }
+                    else if (view.camera3DMode == MapView.Camera3DMode.FocusOnPositionAngle)
+                    {
+                        view.yaw = _dragStartYaw + diffX;
+                        view.pitch = Math.Max(-(float)Math.PI * 0.499f, Math.Min((float)Math.PI * 0.499f, _dragStartPitch - diffY));
+                    }
+                }
             }
 
             if (mouseDown[0])
@@ -742,6 +785,13 @@ namespace STROOP.Tabs.MapTab
                         case MapView.ViewMode.Orthogonal:
                             {
                                 float newAngle = _rotateStartAngle - (e.X - _dragStartMouseX) * 128;
+                                newAngle %= 0x10000;
+                                if (newAngle < 0) newAngle += 0x10000;
+                                int increment = 0x4000;
+                                int snapMargin = Math.Min(0x800, increment / 2);
+                                for (var snapValue = 0; snapValue <= 0x10000; snapValue += increment)
+                                    if (Math.Abs(newAngle - snapValue) < snapMargin)
+                                        newAngle = snapValue;
                                 SetCustomAngle(newAngle);
                                 break;
                             }
@@ -766,10 +816,42 @@ namespace STROOP.Tabs.MapTab
                 if (view.camera3DMode == MapView.Camera3DMode.FocusOnPositionAngle)
                     view.camera3DDistanceController = Math.Max(0.0f, Math.Min(100, view.camera3DDistanceController - delta));
                 else if (view.camera3DMode == MapView.Camera3DMode.Free)
-                    view.position -= BillboardMatrix.Row2.Xyz * delta * view.movementSpeed / 5;
+                {
+                    var diff = mapCursorPosition - view.position;
+                    if (Vector3.Dot(diff, normalAtCursor) < 0)
+                        view.movementSpeed = diff.Length * 0.5f;
+                    view.position += Vector3.Normalize(mapCursorPosition - view.position) * delta * view.movementSpeed / 5;
+                }
+                Update3DCursor();
             }
             else
                 ChangeScale2(delta, SpecialConfig.Map2DScrollSpeed);
+        }
+
+        public void UpdateFlyingControls(double frameTime)
+        {
+            Vector3 forwards = -BillboardMatrix.Row2.Xyz;
+            Vector3 up = BillboardMatrix.Row1.Xyz;
+            Vector3 right = BillboardMatrix.Row0.Xyz;
+            Vector3 relativeMovement = Vector3.Zero;
+            if (System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.W))
+                relativeMovement.Z += 1;
+            if (System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.S))
+                relativeMovement.Z -= 1;
+            if (System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.D))
+                relativeMovement.X += 1;
+            if (System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.A))
+                relativeMovement.X -= 1;
+            if (System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.E))
+                relativeMovement.Y += 1;
+            if (System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.Q))
+                relativeMovement.Y -= 1;
+            if (relativeMovement != Vector3.Zero)
+            {
+                relativeMovement.Normalize();
+                float movement = (float)frameTime * (System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.LeftShift) ? 100 : 2000);
+                view.position += (right * relativeMovement.X + up * relativeMovement.Y + forwards * relativeMovement.Z) * movement;
+            }
         }
 
         private void OnDoubleClick(object sender, EventArgs e)

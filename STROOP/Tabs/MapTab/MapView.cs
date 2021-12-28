@@ -25,6 +25,7 @@ namespace STROOP.Tabs.MapTab
         public MapGraphics MapGraphics;
         public ViewMode mode = ViewMode.TopDown;
         public Camera3DMode camera3DMode = Camera3DMode.FocusOnPositionAngle;
+        public PositionAngle focusPositionAngle = PositionAngle.Mario;
 
         public Vector3 position;
         public float yaw, pitch, camera3DDistanceController = 50;

@@ -210,12 +210,16 @@ namespace STROOP.Models
             XProjection = NormX < -0.707 || NormX > 0.707;
         }
 
-        public bool Intersect(Vector3 rayOrigin, Vector3 rayDirection, out Vector3 intersection)
+        public bool Intersect(Vector3 rayOrigin, Vector3 rayDirection, out Vector3 intersection, out Vector3 normal)
         {
             intersection = default(Vector3);
+            normal = default(Vector3);
             bool result = IntersectTriangle(rayOrigin, rayDirection, p1, p2, p3, out float t, out float u, out float v, out Vector3 n);
             if (result)
+            {
                 intersection = rayOrigin + t * rayDirection;
+                normal = Vector3.Normalize(n);
+            }
             return result;
         }
 
