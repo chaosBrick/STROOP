@@ -4,17 +4,21 @@ using System.Windows.Forms;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
+using System.Xml.Linq;
 
 namespace STROOP
 {
     static class Program
     {
+        public const string CONFIG_FILE_NAME = "Config/Config.xml";
+        public static XDocument config { get; private set; }
+
         public static bool IsVisualStudioHostProcess()
         {
             return (System.Diagnostics.Process.GetCurrentProcess().ProcessName.ToUpper() == "DEVENV");
         }
 
-        static Structs.ScriptParser _scriptParser;
+        static ScriptParser _scriptParser;
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -46,7 +50,7 @@ namespace STROOP
                 ("Loading Main Configuration",
                 () =>
                 {
-                    XmlConfigParser.OpenConfig(@"Config/Config.xml");
+                    config = XmlConfigParser.OpenConfig(@"Config/Config.xml");
                     XmlConfigParser.OpenSavedSettings(@"Config/SavedSettings.xml");
                 }
             ),

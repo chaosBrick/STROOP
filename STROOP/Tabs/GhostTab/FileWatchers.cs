@@ -30,6 +30,8 @@ namespace STROOP.Tabs.GhostTab
 
         static void SaveConfig()
         {
+            if (configNode == null)
+                Program.config.Root.Add(configNode = new XElement(XName.Get("GhostFileWatchers")));
             configNode.RemoveAll();
             foreach (var path in fileWatcherPaths)
             {
@@ -37,7 +39,7 @@ namespace STROOP.Tabs.GhostTab
                 n.SetAttributeValue(XName.Get("path"), path);
                 configNode.Add(n);
             }
-            configNode.Document.Save("Config/Config.xml");
+            configNode.Document.Save(Program.CONFIG_FILE_NAME);
         }
 
         Dictionary<string, FileSystemWatcher> activeFileWatchers = new Dictionary<string, FileSystemWatcher>();

@@ -47,7 +47,7 @@ namespace STROOP.Utilities
             configParsers[elementName] = parser;
         }
 
-        public static void OpenConfig(string path)
+        public static XDocument OpenConfig(string path)
         {
             var assembly = Assembly.GetExecutingAssembly();
             foreach (var t in assembly.GetTypes())
@@ -72,15 +72,13 @@ namespace STROOP.Utilities
                     case "Emulators":
                         foreach (var subElement in element.Elements())
                         {
-                            string special = subElement.Attribute(XName.Get("special")) != null ?
-                                subElement.Attribute(XName.Get("special")).Value : null;
+                            string special = subElement.Attribute(XName.Get("special"))?.Value ?? null;
                             Config.Emulators.Add(new Emulator()
                             {
                                 Name = subElement.Attribute(XName.Get("name")).Value,
                                 ProcessName = subElement.Attribute(XName.Get("processName")).Value,
                                 RamStart = ParsingUtilities.ParseHex(subElement.Attribute(XName.Get("ramStart")).Value),
-                                Dll = subElement.Attribute(XName.Get("offsetDll")) != null
-                                    ? subElement.Attribute(XName.Get("offsetDll")).Value : null,
+                                Dll = subElement.Attribute(XName.Get("offsetDll"))?.Value ?? null,
                                 Endianness = subElement.Attribute(XName.Get("endianness")).Value == "big"
                                     ? EndiannessType.Big : EndiannessType.Little,
                                 IOType = special == "dolphin" ? typeof(DolphinProcessIO) : typeof(WindowsProcessRamIO),
@@ -99,6 +97,8 @@ namespace STROOP.Utilities
                         break;
                 }
             }
+
+            return doc;
         }
 
         public static void OpenSavedSettings(string path)

@@ -9,12 +9,36 @@ using OpenTK;
 using OpenTK.Graphics;
 using STROOP.Structs.Configurations;
 using STROOP.Tabs.MapTab.MapObjects;
+using System.Xml.Linq;
 
 
 namespace STROOP.Tabs.MapTab
 {
     public partial class MapTab : STROOPTab, IDisposable
     {
+        const string DEFAULT_TRACKER_FILE = "MapTrackers.default.xml";
+        const string CONFIG_NODE_NAME = "LastMapTrackerFileName";
+
+        static XElement configNode;
+        static string lastTrackerFileName = null;
+        [InitializeConfigParser]
+        static void InitConfigParser()
+        {
+            XmlConfigParser.AddConfigParser(CONFIG_NODE_NAME, _ =>
+            {
+                configNode = _;
+                lastTrackerFileName = _.Attribute(XName.Get("path")).Value;
+            });
+        }
+
+        static void SaveConfig()
+        {
+            if (configNode == null)
+                Program.config.Root.Add(configNode = new XElement(XName.Get(CONFIG_NODE_NAME)));
+            configNode.SetAttributeValue(XName.Get("path"), lastTrackerFileName);
+            configNode.Document.Save(Program.CONFIG_FILE_NAME);
+        }
+
         public GLControl glControlMap2D { get; private set; }
         public MapGraphics graphics { get; private set; }
 
@@ -29,6 +53,7 @@ namespace STROOP.Tabs.MapTab
         Dictionary<object, MapTracker> semaphoreTrackers = new Dictionary<object, MapTracker>();
         List<(CheckBox checkBox, MapTracker tracker)> quickSemaphores = new List<(CheckBox checkBox, MapTracker tracker)>();
         Dictionary<string, Func<MapTracker>> newTrackerByName = new Dictionary<string, Func<MapTracker>>();
+
 
         public MapTab()
         {
@@ -363,9 +388,21 @@ namespace STROOP.Tabs.MapTab
             {
                 if (e.Button == MouseButtons.Right)
                 {
+                    var ctx = new ContextMenuStrip();
+
+                    var itemRefreshLevelGeometry = new ToolStripMenuItem("Refresh Level Geometry");
+                    itemRefreshLevelGeometry.Click += (__, ___) => RequireGeometryUpdate();
+                    ctx.Items.Add(itemRefreshLevelGeometry);
+
                     if (graphics.view.mode == MapView.ViewMode.Orthogonal)
                     {
-                        var ctx = new ContextMenuStrip();
+                        ctx.Items.Add(new ToolStripSeparator());
+
+                        var itemDisplayLevelGeometry = new ToolStripMenuItem("Display Triangle Geometry");
+                        itemDisplayLevelGeometry.Checked = graphics.view.displayOrthoLevelGeometry;
+                        itemDisplayLevelGeometry.Click += (__, ___) => itemDisplayLevelGeometry.Checked = graphics.view.displayOrthoLevelGeometry = !graphics.view.displayOrthoLevelGeometry;
+                        ctx.Items.Add(itemDisplayLevelGeometry);
+
                         var itemSetRelativeNearPlane = new ToolStripMenuItem("Set Relative Near Plane");
                         itemSetRelativeNearPlane.Click += (__, ___) =>
                             graphics.view.orthoRelativeNearPlane = (float)DialogUtilities.GetDoubleFromDialog(0, labelText: "Enter relative near plane value.");
@@ -384,8 +421,8 @@ namespace STROOP.Tabs.MapTab
                         itemClearRelativeFarPlane.Click += (__, ___) => graphics.view.orthoRelativeFarPlane = float.NaN;
                         ctx.Items.Add(itemClearRelativeFarPlane);
 
-                        ctx.Show(Cursor.Position);
                     }
+                    ctx.Show(Cursor.Position);
                 }
             };
         }
@@ -557,35 +594,72 @@ namespace STROOP.Tabs.MapTab
 
         private void buttonMapOptionsLoadTrackerSettings_Click(object sender, EventArgs e)
         {
-            var lastFileName = "TrackerConfig.xml";
-
             var ctx = new ContextMenuStrip();
             var itemLoadLast = new ToolStripMenuItem("Load last");
-            itemLoadLast.Click += (_, __) =>
-            {
-                if (LoadTrackerConfig(lastFileName, out var loadedTrackers))
-                {
-                    flowLayoutPanelMapTrackers.Controls.Clear();
-                    foreach (var tracker in loadedTrackers)
-                        flowLayoutPanelMapTrackers.Controls.Add(tracker);
-                }
-                else
-                    MessageBox.Show("Failed to load tracker configuration!");
-            };
-
+            itemLoadLast.Enabled = lastTrackerFileName != null;
+            itemLoadLast.Click += (_, __) => LoadTrackerConfigAndDisplay(lastTrackerFileName);
             ctx.Items.Add(itemLoadLast);
+
+            var itemLoadDefaults = new ToolStripMenuItem("Load Defaults");
+            itemLoadDefaults.Enabled = System.IO.File.Exists(DEFAULT_TRACKER_FILE);
+            itemLoadDefaults.Click += (_, __) => LoadTrackerConfigAndDisplay(DEFAULT_TRACKER_FILE);
+            ctx.Items.Add(itemLoadDefaults);
+
+            var itemLoadFile = new ToolStripMenuItem("Load...");
+            itemLoadFile.Click += (_, __) =>
+            {
+                var dlg = new OpenFileDialog();
+                dlg.Filter = "Xml Config files (*.xml)|*.xml";
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    LoadTrackerConfigAndDisplay(dlg.FileName);
+                    lastTrackerFileName = dlg.FileName;
+                    SaveConfig();
+                }
+            };
+            ctx.Items.Add(itemLoadFile);
+
             ctx.Show(Cursor.Position);
+        }
+
+        void LoadTrackerConfigAndDisplay(string trackerFile)
+        {
+            if (LoadTrackerConfig(trackerFile, out var loadedTrackers))
+            {
+                flowLayoutPanelMapTrackers.Controls.Clear();
+                foreach (var tracker in loadedTrackers)
+                    flowLayoutPanelMapTrackers.Controls.Add(tracker);
+            }
+            else
+                MessageBox.Show("Failed to load tracker configuration!");
         }
 
         private void buttonMapOptionsSaveTrackerSettings_Click(object sender, EventArgs e)
         {
-            var lastFileName = "TrackerConfig.xml";
-
             var ctx = new ContextMenuStrip();
             var itemOverrideLast = new ToolStripMenuItem("Save last");
-            itemOverrideLast.Click += (_, __) => SaveTrackerConfig(lastFileName);
-
+            itemOverrideLast.Enabled = lastTrackerFileName != null;
+            itemOverrideLast.Click += (_, __) => SaveTrackerConfig(lastTrackerFileName);
             ctx.Items.Add(itemOverrideLast);
+
+            var itemSaveDefault = new ToolStripMenuItem("Save default");
+            itemSaveDefault.Click += (_, __) => SaveTrackerConfig(DEFAULT_TRACKER_FILE);
+            ctx.Items.Add(itemSaveDefault);
+
+            var itemSaveFile = new ToolStripMenuItem("Save as...");
+            itemSaveFile.Click += (_, __) =>
+            {
+                var dlg = new SaveFileDialog();
+                dlg.Filter = "Xml Config files (*.xml)|*.xml";
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    SaveTrackerConfig(dlg.FileName);
+                    lastTrackerFileName = dlg.FileName;
+                    SaveConfig();
+                }
+            };
+            ctx.Items.Add(itemSaveFile);
+
             ctx.Show(Cursor.Position);
         }
 
