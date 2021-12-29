@@ -79,6 +79,7 @@ namespace STROOP.Tabs.MapTab.Renderers
 
         TransparentTriangleRenderer transparentRenderer;
         public TransparencyRenderer.Transparent transparent => transparentRenderer;
+        public MapGraphics.DrawLayers drawlayer = MapGraphics.DrawLayers.Geometry;
 
         protected TriangleRenderer() { }
 
@@ -121,7 +122,7 @@ namespace STROOP.Tabs.MapTab.Renderers
         {
             triangles.Clear();
             transparentRenderer.triangles.Clear();
-            graphics.drawLayers[(int)MapGraphics.DrawLayers.Geometry].Add(() =>
+            graphics.drawLayers[(int)drawlayer].Add(() =>
             {
                 if (triangles.Count == 0)
                     return;

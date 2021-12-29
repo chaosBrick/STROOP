@@ -19,8 +19,9 @@ namespace STROOP.Tabs.MapTab
             FillBuffersRedirect,
             Background,
             Geometry,
-            Objects,
             Transparency,
+            GeometryOverlay,
+            Objects,
             Overlay,
         }
 
@@ -29,7 +30,7 @@ namespace STROOP.Tabs.MapTab
         bool needsRecreateObjectMipmaps = false;
         List<Renderers.Renderer> renderers = new List<Renderers.Renderer>();
         public Renderers.SpriteRenderer objectRenderer;
-        public Renderers.TriangleRenderer triangleRenderer;
+        public Renderers.TriangleRenderer triangleRenderer, triangleOverlayRenderer;
         public Renderers.LineRenderer lineRenderer;
         public Renderers.CircleRenderer circleRenderer;
         public Renderers.CylinderRenderer cylinderRenderer;
@@ -174,6 +175,7 @@ namespace STROOP.Tabs.MapTab
 
             CreateObjectsRenderer();
             renderers.Add(triangleRenderer = new Renderers.TriangleRenderer(0x10000));
+            renderers.Add(triangleOverlayRenderer = new Renderers.TriangleRenderer(0x10000) { drawlayer = DrawLayers.GeometryOverlay });
             renderers.Add(lineRenderer = new Renderers.LineRenderer());
             renderers.Add(circleRenderer = new Renderers.CircleRenderer());
             renderers.Add(cylinderRenderer = new Renderers.CylinderRenderer());
@@ -285,12 +287,7 @@ namespace STROOP.Tabs.MapTab
             float zFar = float.IsNaN(view.orthoRelativeFarPlane) ? 10000 : view.orthoRelativeFarPlane;
             float zNear = float.IsNaN(view.orthoRelativeNearPlane) ? -10000 : view.orthoRelativeNearPlane;
             zFar = Math.Max(zNear + 0.0001f, zFar);
-            float invFN = 1 / (zFar - zNear);
-            Matrix4 othoDepth = new Matrix4(
-                1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, -2 * invFN, 0,
-                0, 0, -0.999f, 1);
+            Matrix4 othoDepth = Matrix4.CreateOrthographic(2, 2, zNear, zFar);
 
             switch (view.mode)
             {

@@ -134,33 +134,33 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         void DrawOrthogonalProjection(MapGraphics graphics, TriangleDataModel tri, (Vector3 pNor, float pD) plane, Vector4 color)
         {
-            Vector3[] nearPlaneProjections = new Vector3[3];
+            Vector3[] projections = new Vector3[3];
             int projIndex = 0;
             Vector3 projection;
             if (projectOnPlane(tri.p1, tri.p2, plane.pNor, plane.pD, out projection))
-                nearPlaneProjections[projIndex++] = projection;
+                projections[projIndex++] = projection;
             if (projectOnPlane(tri.p2, tri.p3, plane.pNor, plane.pD, out projection))
-                nearPlaneProjections[projIndex++] = projection;
+                projections[projIndex++] = projection;
             if (projectOnPlane(tri.p3, tri.p1, plane.pNor, plane.pD, out projection))
-                nearPlaneProjections[projIndex++] = projection;
+                projections[projIndex++] = projection;
             if (projIndex >= 2) // we have a near plane projection
-                foreach ((Vector3 low, Vector3 high) offset in GetOrthogonalBoundaryProjection(graphics, tri))
+                foreach ((Vector3 low, Vector3 high) offset in GetOrthogonalBoundaryProjection(graphics, tri, projections[0], projections[1]))
                 {
-                    graphics.triangleRenderer.Add(
-                        nearPlaneProjections[0] + offset.low,
-                        nearPlaneProjections[1] + offset.low,
-                        nearPlaneProjections[0] + offset.high,
+                    graphics.triangleOverlayRenderer.Add(
+                        projections[0] + offset.low,
+                        projections[1] + offset.low,
+                        projections[0] + offset.high,
                         false,
-                        color,
+                        new Vector4(color.Xyz, 1),
                         new Vector4(0, 0, 0, 1),
                         new Vector3(0, 1, 1) * OutlineWidth,
                         false);
-                    graphics.triangleRenderer.Add(
-                        nearPlaneProjections[1] + offset.low,
-                        nearPlaneProjections[0] + offset.high,
-                        nearPlaneProjections[1] + offset.high,
+                    graphics.triangleOverlayRenderer.Add(
+                        projections[1] + offset.low,
+                        projections[0] + offset.high,
+                        projections[1] + offset.high,
                         false,
-                        color,
+                        new Vector4(color.Xyz, 1),
                         new Vector4(0, 0, 0, 1),
                         new Vector3(1, 1, 0) * OutlineWidth,
                         false);
@@ -175,11 +175,23 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 var colorMultipliers = new float[] { 1.0f, 0.5f, 0.25f };
                 var baseColor = new Vector4(Color.R / 255f, Color.G / 255f, Color.B / 255f, OpacityByte / 255f);
                 foreach (var tri in GetTrianglesWithinDist())
+                {
+                    if (graphics.view.displayOrthoLevelGeometry)
+                    graphics.triangleRenderer.Add(
+                        tri.p1,
+                        tri.p2,
+                        tri.p3,
+                        false,
+                        baseColor,
+                        new Vector4(OutlineColor.R / 255f, OutlineColor.G / 255f, OutlineColor.B / 255f, OutlineColor.A / 255f),
+                        new Vector3(OutlineWidth),
+                        true);
                     DrawOrthogonalProjection(graphics, tri, graphics.orthographicZero, baseColor);
+                }
             });
         }
 
-        protected abstract (Vector3 low, Vector3 high)[] GetOrthogonalBoundaryProjection(MapGraphics graphics, TriangleDataModel tri);
+        protected abstract (Vector3 low, Vector3 high)[] GetOrthogonalBoundaryProjection(MapGraphics graphics, TriangleDataModel tri, Vector3 projectionA, Vector3 projectionB);
 
         protected override void Draw3D(MapGraphics graphics)
         {
@@ -290,5 +302,23 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 itemClearWithinCenter,
             };
         }
+
+        public override (SaveSettings save, LoadSettings load) SettingsSaveLoad => (
+            (System.Xml.XmlNode node) =>
+            {
+                base.SettingsSaveLoad.save(node);
+                SaveValueNode(node, "WithinDist", _withinDist.ToString());
+                SaveValueNode(node, "WithinCenter", _withinCenter.ToString());
+            }
+        ,
+            (System.Xml.XmlNode node) =>
+            {
+                base.SettingsSaveLoad.load(node);
+                if (float.TryParse(LoadValueNode(node, "WithinDist"), out var withinDist))
+                    _withinDist = withinDist;
+                if (float.TryParse(LoadValueNode(node, "WithinCenter"), out var withinCenter))
+                    _withinCenter = withinCenter;
+            }
+        );
     }
 }

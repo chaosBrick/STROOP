@@ -60,14 +60,30 @@ namespace STROOP.Tabs.MapTab.MapObjects
             return null;
         }
 
-        protected override (Vector3 low, Vector3 high)[] GetOrthogonalBoundaryProjection(MapGraphics graphics, TriangleDataModel tri)
+        protected override (Vector3 low, Vector3 high)[] GetOrthogonalBoundaryProjection(MapGraphics graphics, TriangleDataModel tri, Vector3 projectionA, Vector3 projectionB)
         {
+            var minX = Math.Min(tri.X1, Math.Min(tri.X2, tri.X3));
+            var maxX = Math.Max(tri.X1, Math.Max(tri.X2, tri.X3));
+            var minZ = Math.Min(tri.Z1, Math.Min(tri.Z2, tri.Z3));
+            var maxZ = Math.Max(tri.Z1, Math.Max(tri.Z2, tri.Z3));
+
+            var min = tri.XProjection ? minZ : minX;
+            var max = tri.XProjection ? maxZ : maxX;
+
             float angle = (float)Math.Atan2(tri.NormX, tri.NormZ);
             var projectionDirection = graphics.BillboardMatrix.Row0.Xyz;
-            float projectionDist = Size / Vector3.Dot(new Vector3(tri.NormX, 0, tri.NormZ), projectionDirection);
+            float projectionDist = Math.Abs(Size / Vector3.Dot(new Vector3(tri.NormX, 0, tri.NormZ), projectionDirection));
+
+            if (projectionDist > 100)
+                ;
+            var right = graphics.BillboardMatrix.Row0.Xyz;
+            var rightAbs = Math.Abs(tri.XProjection ? right.Z : right.X);
+            var leftProjection = Math.Min(projectionDist, (max - (tri.XProjection ? projectionA.Z : projectionA.X)) / rightAbs);
+            var rightProjection = Math.Min(projectionDist, ((tri.XProjection ? projectionA.Z : projectionA.X) - min) / rightAbs);
+
             Vector3 baseOffset = new Vector3(0, _hitboxVerticalOffset, 0);
-            return new[] { (baseOffset, baseOffset + graphics.BillboardMatrix.Row0.Xyz * projectionDist),
-                (baseOffset, baseOffset -graphics.BillboardMatrix.Row0.Xyz * projectionDist)};
+            return new[] { (baseOffset, baseOffset + right * rightProjection),
+                (baseOffset, baseOffset - right* leftProjection)};
         }
 
         protected override Vector3[] GetVolumeDisplacements(TriangleDataModel tri)
