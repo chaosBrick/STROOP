@@ -179,7 +179,9 @@ namespace STROOP.Structs
             var assoc = FindObjectAssociation(behaviorCriteria);
             if (assoc == null)
                 return DefaultImage;
-
+            if (assoc.MapImage == null)
+                return DefaultImage;
+            
             return assoc.MapImage;
         }
 
