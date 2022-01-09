@@ -77,6 +77,7 @@ namespace STROOP.Tabs.MapTab
             InitializeControls();
 
             comboBoxViewMode.SelectedIndex = 0;
+            RequireGeometryUpdate();
         }
 
         public MapLayout GetMapLayout(object mapLayoutChoice = null) =>
@@ -394,11 +395,54 @@ namespace STROOP.Tabs.MapTab
                     itemRefreshLevelGeometry.Click += (__, ___) => RequireGeometryUpdate();
                     ctx.Items.Add(itemRefreshLevelGeometry);
 
+                    if (graphics.view.mode == MapView.ViewMode.ThreeDimensional)
+                    {
+                        ctx.Items.Add(new ToolStripSeparator());
+
+                        var itemDisplayLevelGeometry = new ToolStripMenuItem("Display Level Geometry");
+                        itemDisplayLevelGeometry.Checked = graphics.view.display3DLevelGeometry;
+                        itemDisplayLevelGeometry.Click += (__, ___) => itemDisplayLevelGeometry.Checked = graphics.view.display3DLevelGeometry = !graphics.view.display3DLevelGeometry;
+                        ctx.Items.Add(itemDisplayLevelGeometry);
+
+                        var itemDisplayCylinderOutlines = new ToolStripMenuItem("Draw Cylinder Outlines");
+                        itemDisplayCylinderOutlines.Checked = graphics.view.drawCylinderOutlines;
+                        itemDisplayCylinderOutlines.Click += (__, ___) => itemDisplayCylinderOutlines.Checked = graphics.view.drawCylinderOutlines = !graphics.view.drawCylinderOutlines;
+                        ctx.Items.Add(itemDisplayCylinderOutlines);
+
+                        ctx.Items.Add(new ToolStripSeparator());
+
+                        var itemCameraModeInGame = new ToolStripMenuItem("In-Game View");
+                        var itemCameraModePivot = new ToolStripMenuItem("Pivot");
+                        var itemCameraModeFree = new ToolStripMenuItem("Free");
+                        itemCameraModeInGame.Checked = graphics.view.camera3DMode == MapView.Camera3DMode.InGame;
+                        itemCameraModePivot.Checked = graphics.view.camera3DMode == MapView.Camera3DMode.FocusOnPositionAngle;
+                        itemCameraModeFree.Checked = graphics.view.camera3DMode == MapView.Camera3DMode.Free;
+
+                        itemCameraModeInGame.Click += (__, ___) =>
+                        {
+                            graphics.view.camera3DMode = MapView.Camera3DMode.InGame;
+                            itemCameraModePivot.Checked = itemCameraModeFree.Checked = !(itemCameraModeInGame.Checked = true);
+                        };
+                        itemCameraModePivot.Click += (__, ___) =>
+                        {
+                            graphics.view.camera3DMode = MapView.Camera3DMode.FocusOnPositionAngle;
+                            itemCameraModeInGame.Checked = itemCameraModeFree.Checked = !(itemCameraModePivot.Checked = true);
+                        };
+                        itemCameraModeFree.Click += (__, ___) =>
+                        {
+                            graphics.view.camera3DMode = MapView.Camera3DMode.Free;
+                            itemCameraModeInGame.Checked = itemCameraModePivot.Checked = !(itemCameraModeInGame.Checked = true);
+                        };
+                        ctx.Items.Add(itemCameraModeInGame);
+                        ctx.Items.Add(itemCameraModePivot);
+                        ctx.Items.Add(itemCameraModeFree);
+                    }
+
                     if (graphics.view.mode == MapView.ViewMode.Orthogonal)
                     {
                         ctx.Items.Add(new ToolStripSeparator());
 
-                        var itemDisplayLevelGeometry = new ToolStripMenuItem("Display Triangle Geometry");
+                        var itemDisplayLevelGeometry = new ToolStripMenuItem("Display Triangle Tracker Geometry");
                         itemDisplayLevelGeometry.Checked = graphics.view.displayOrthoLevelGeometry;
                         itemDisplayLevelGeometry.Click += (__, ___) => itemDisplayLevelGeometry.Checked = graphics.view.displayOrthoLevelGeometry = !graphics.view.displayOrthoLevelGeometry;
                         ctx.Items.Add(itemDisplayLevelGeometry);

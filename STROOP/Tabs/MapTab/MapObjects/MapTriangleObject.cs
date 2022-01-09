@@ -84,6 +84,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         private float? _withinCenter;
         protected bool _excludeDeathBarriers;
         protected TriangleHoverData hoverData;
+        float _projectionAlphaMultiplier = 0.5f;
 
         public MapTriangleObject()
             : base()
@@ -151,7 +152,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                         projections[1] + offset.low,
                         projections[0] + offset.high,
                         false,
-                        new Vector4(color.Xyz, 1),
+                        new Vector4(color.Xyz, color.W),
                         new Vector4(0, 0, 0, 1),
                         new Vector3(0, 1, 1) * OutlineWidth,
                         false);
@@ -160,7 +161,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                         projections[0] + offset.high,
                         projections[1] + offset.high,
                         false,
-                        new Vector4(color.Xyz, 1),
+                        new Vector4(color.Xyz, color.W),
                         new Vector4(0, 0, 0, 1),
                         new Vector3(1, 1, 0) * OutlineWidth,
                         false);
@@ -177,15 +178,15 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 foreach (var tri in GetTrianglesWithinDist())
                 {
                     if (graphics.view.displayOrthoLevelGeometry)
-                    graphics.triangleRenderer.Add(
-                        tri.p1,
-                        tri.p2,
-                        tri.p3,
-                        false,
-                        baseColor,
-                        new Vector4(OutlineColor.R / 255f, OutlineColor.G / 255f, OutlineColor.B / 255f, OutlineColor.A / 255f),
-                        new Vector3(OutlineWidth),
-                        true);
+                        graphics.triangleRenderer.Add(
+                            tri.p1,
+                            tri.p2,
+                            tri.p3,
+                            false,
+                            baseColor,
+                            new Vector4(OutlineColor.R / 255f, OutlineColor.G / 255f, OutlineColor.B / 255f, OutlineColor.A / 255f),
+                            new Vector3(OutlineWidth),
+                            true);
                     DrawOrthogonalProjection(graphics, tri, graphics.orthographicZero, baseColor);
                 }
             });
@@ -199,18 +200,19 @@ namespace STROOP.Tabs.MapTab.MapObjects
             {
                 var colorMultipliers = new float[] { 1.0f, 0.5f, 0.25f };
                 var baseColor = new Vector4(Color.R / 255f, Color.G / 255f, Color.B / 255f, OpacityByte / 255f);
-                var projectionColor = new Vector4(baseColor.Xyz, 0.5f * baseColor.W);
+                var projectionColor = new Vector4(baseColor.Xyz, _projectionAlphaMultiplier * baseColor.W);
                 foreach (var tri in GetTrianglesWithinDist())
                 {
-                    //graphics.triangleRenderer.Add(
-                    //    tri.p1,
-                    //    tri.p2,
-                    //    tri.p3,
-                    //    false,
-                    //    baseColor,
-                    //    new Vector4(OutlineColor.R / 255f, OutlineColor.G / 255f, OutlineColor.B / 255f, OutlineColor.A / 255f),
-                    //    new Vector3(OutlineWidth),
-                    //    true);
+                    if (!graphics.view.display3DLevelGeometry)
+                        graphics.triangleRenderer.Add(
+                            tri.p1,
+                            tri.p2,
+                            tri.p3,
+                            false,
+                            baseColor,
+                            new Vector4(OutlineColor.R / 255f, OutlineColor.G / 255f, OutlineColor.B / 255f, OutlineColor.A / 255f),
+                            new Vector3(OutlineWidth),
+                            true);
 
                     Vector4 outlineColor = new Vector4(OutlineColor.R / 255f, OutlineColor.G / 255f, OutlineColor.B / 255f, OutlineColor.A / 255f);
                     foreach (var baseDisplacement in GetBaseFaceVertices(tri))
@@ -231,7 +233,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                                         outlineColor,
                                         new Vector3(OutlineWidth),
                                         true);
-
+                                
                                 Vector3 a = baseVectors[i], b = baseVectors[(i + 1) % baseVectors.Length];
 
                                 graphics.triangleRenderer.Add(
@@ -294,12 +296,22 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 _withinCenter = null;
             };
 
+            ToolStripMenuItem itemSetProjectionColorMultiplier = new ToolStripMenuItem("Set Projection Alpha Multiplier");
+            itemSetProjectionColorMultiplier.Click += (sender, e) =>
+            {
+                string text = DialogUtilities.GetStringFromDialog(labelText: "Enter the value by which the alpha of projection side faces are multiplied (Default is 0.5).");
+                float? projectionColorMultiplierNullable = ParsingUtilities.ParseFloatNullable(text);
+                if (!projectionColorMultiplierNullable.HasValue) return;
+                _projectionAlphaMultiplier = projectionColorMultiplierNullable.Value;
+            };
+
             return new List<ToolStripMenuItem>()
             {
                 itemSetWithinDist,
                 itemClearWithinDist,
                 itemSetWithinCenter,
                 itemClearWithinCenter,
+                itemSetProjectionColorMultiplier,
             };
         }
 
@@ -309,6 +321,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 base.SettingsSaveLoad.save(node);
                 SaveValueNode(node, "WithinDist", _withinDist.ToString());
                 SaveValueNode(node, "WithinCenter", _withinCenter.ToString());
+                SaveValueNode(node, "ProjectionAlphaMultiplier", _projectionAlphaMultiplier.ToString());
             }
         ,
             (System.Xml.XmlNode node) =>
@@ -318,6 +331,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
                     _withinDist = withinDist;
                 if (float.TryParse(LoadValueNode(node, "WithinCenter"), out var withinCenter))
                     _withinCenter = withinCenter;
+                if (float.TryParse(LoadValueNode(node, "ProjectionAlphaMultiplier"), out var projectionAlphaMultiplier))
+                    _projectionAlphaMultiplier = projectionAlphaMultiplier;
             }
         );
     }

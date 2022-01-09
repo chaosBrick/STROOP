@@ -121,25 +121,26 @@ namespace STROOP.Tabs.MapTab.Renderers
         public override void SetDrawCalls(MapGraphics graphics)
         {
             instances.Clear();
-            graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffersRedirect].Add(() =>
-            {
-                foreach (var instance in instances)
+            if (graphics.view.drawCylinderOutlines)
+                graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffersRedirect].Add(() =>
                 {
-                    var oldPointLow = Vector3.TransformPosition(vertices[FIRST_LOWER_VERTEX].Xyz, instance.transform);
-                    var oldPointHigh = Vector3.TransformPosition(vertices[FIRST_UPPER_VERTEX].Xyz, instance.transform);
-                    for (int i = 1; i <= NUM_CIRCLE_VERTICES; i++)
+                    foreach (var instance in instances)
                     {
-                        var newPointLow = Vector3.TransformPosition(vertices[FIRST_LOWER_VERTEX + i].Xyz, instance.transform);
-                        var newPointHigh = Vector3.TransformPosition(vertices[FIRST_UPPER_VERTEX + i].Xyz, instance.transform);
+                        var oldPointLow = Vector3.TransformPosition(vertices[FIRST_LOWER_VERTEX].Xyz, instance.transform);
+                        var oldPointHigh = Vector3.TransformPosition(vertices[FIRST_UPPER_VERTEX].Xyz, instance.transform);
+                        for (int i = 1; i <= NUM_CIRCLE_VERTICES; i++)
+                        {
+                            var newPointLow = Vector3.TransformPosition(vertices[FIRST_LOWER_VERTEX + i].Xyz, instance.transform);
+                            var newPointHigh = Vector3.TransformPosition(vertices[FIRST_UPPER_VERTEX + i].Xyz, instance.transform);
 
-                        graphics.lineRenderer.Add(oldPointLow, newPointLow, new Vector4(0, 0, 0, 1), 2);
-                        graphics.lineRenderer.Add(oldPointHigh, newPointHigh, new Vector4(0, 0, 0, 1), 2);
+                            graphics.lineRenderer.Add(oldPointLow, newPointLow, new Vector4(0, 0, 0, 1), 2);
+                            graphics.lineRenderer.Add(oldPointHigh, newPointHigh, new Vector4(0, 0, 0, 1), 2);
 
-                        oldPointLow = newPointLow;
-                        oldPointHigh = newPointHigh;
+                            oldPointLow = newPointLow;
+                            oldPointHigh = newPointHigh;
+                        }
                     }
-                }
-            });
+                });
         }
     }
 }

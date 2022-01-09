@@ -29,6 +29,8 @@ namespace STROOP.Tabs.MapTab
         public Vector2 orthoOffset = Vector2.Zero;
         public float orthoRelativeNearPlane = 0, orthoRelativeFarPlane = float.NaN;
         public bool displayOrthoLevelGeometry = true;
+        public bool display3DLevelGeometry = true;
+        public bool drawCylinderOutlines = false;
 
         public Vector3 position;
         public float yaw, pitch, camera3DDistanceController = 50;

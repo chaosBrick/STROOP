@@ -250,15 +250,16 @@ namespace STROOP.Tabs.MapTab
                     GL.ClearDepth(1);
                     GL.Clear(ClearBufferMask.DepthBufferBit);
 
-                    drawLayers[(int)DrawLayers.FillBuffers].Insert(0, () =>
-                    {
-                        foreach (var t in levelTrianglesFor3DMap)
+                    if (view.display3DLevelGeometry)
+                        drawLayers[(int)DrawLayers.FillBuffers].Insert(0, () =>
                         {
-                            var color = t.Classification == TriangleClassification.Wall ? new Vector3(0.4f, 0.66f, 0.4f) :
-                                (t.Classification == TriangleClassification.Floor ? new Vector3(0.4f, 0.4f, 0.8f) : new Vector3(0.8f, 0.4f, 0.4f));
-                            triangleRenderer.Add(t.p1, t.p2, t.p3, false, new Vector4(color, 1), new Vector4(color * 0.5f, 1), new Vector4(color * 0.25f, 1), new Vector4(0.2f, 0.2f, 0.2f, 1), new Vector3(1.5f), false);
-                        }
-                    });
+                            foreach (var t in levelTrianglesFor3DMap)
+                            {
+                                var color = t.Classification == TriangleClassification.Wall ? new Vector3(0.4f, 0.66f, 0.4f) :
+                                    (t.Classification == TriangleClassification.Floor ? new Vector3(0.4f, 0.4f, 0.8f) : new Vector3(0.8f, 0.4f, 0.4f));
+                                triangleRenderer.Add(t.p1, t.p2, t.p3, false, new Vector4(color, 1), new Vector4(color * 0.5f, 1), new Vector4(color * 0.25f, 1), new Vector4(0.2f, 0.2f, 0.2f, 1), new Vector3(1.5f), false);
+                            }
+                        });
                 }
 
                 foreach (var layer in drawLayers)
@@ -284,8 +285,8 @@ namespace STROOP.Tabs.MapTab
                 );
 
 
-            float zFar = float.IsNaN(view.orthoRelativeFarPlane) ? 10000 : view.orthoRelativeFarPlane;
-            float zNear = float.IsNaN(view.orthoRelativeNearPlane) ? -10000 : view.orthoRelativeNearPlane;
+            float zFar = view.mode == MapView.ViewMode.TopDown || float.IsNaN(view.orthoRelativeFarPlane) ? 10000 : view.orthoRelativeFarPlane;
+            float zNear = view.mode == MapView.ViewMode.TopDown || float.IsNaN(view.orthoRelativeNearPlane) ? -10000 : view.orthoRelativeNearPlane;
             zFar = Math.Max(zNear + 0.0001f, zFar);
             Matrix4 othoDepth = Matrix4.CreateOrthographic(2, 2, zNear, zFar);
 
@@ -325,8 +326,8 @@ namespace STROOP.Tabs.MapTab
                     {
                         case MapView.Camera3DMode.InGame:
                             view.position = new Vector3(Models.DataModels.Camera.X, Models.DataModels.Camera.Y, Models.DataModels.Camera.Z);
-                            view.yaw = Models.DataModels.Camera.FacingYaw;
-                            view.pitch = Models.DataModels.Camera.FacingPitch;
+                            view.yaw = (float)MoreMath.AngleUnitsToRadians(Models.DataModels.Camera.FacingYaw);
+                            view.pitch = (float)MoreMath.AngleUnitsToRadians(-Models.DataModels.Camera.FacingPitch);
                             target = view.position + viewDirection;
                             break;
                         case MapView.Camera3DMode.FocusOnPositionAngle:
@@ -773,6 +774,7 @@ namespace STROOP.Tabs.MapTab
                                 break;
                             }
                         case MapView.ViewMode.ThreeDimensional:
+                            if (view.camera3DMode != MapView.Camera3DMode.InGame)
                             {
                                 float mul = 10.0f / (float)Math.Log((view.position - _rotatePivot).Length);
                                 float diffX = pixelDiffX / (float)glControl.Width * 2 * mul;
@@ -787,8 +789,8 @@ namespace STROOP.Tabs.MapTab
                                     var dir = Vector3.TransformPosition(_rotateDiff, view.ComputeViewOrientation());
                                     view.position = _rotatePivot + dir;
                                 }
-                                break;
                             }
+                            break;
                     }
                 }
                 else
@@ -809,7 +811,7 @@ namespace STROOP.Tabs.MapTab
                                 float newAngle = _rotateStartAngle - (e.X - _dragStartMouseX) * 128;
                                 newAngle %= 0x10000;
                                 if (newAngle < 0) newAngle += 0x10000;
-                                int increment = 0x4000;
+                                int increment = 0x2000;
                                 int snapMargin = Math.Min(0x800, increment / 2);
                                 for (var snapValue = 0; snapValue <= 0x10000; snapValue += increment)
                                     if (Math.Abs(newAngle - snapValue) < snapMargin)
