@@ -877,9 +877,9 @@ namespace STROOP
             this.gfxTab.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.gfxTab.Location = new System.Drawing.Point(0, 0);
+            this.gfxTab.Location = new System.Drawing.Point(3, 3);
             this.gfxTab.Name = "gfxTab";
-            this.gfxTab.Size = new System.Drawing.Size(0, 0);
+            this.gfxTab.Size = new System.Drawing.Size(906, 460);
             this.gfxTab.TabIndex = 0;
             // 
             // tabPageDebug
