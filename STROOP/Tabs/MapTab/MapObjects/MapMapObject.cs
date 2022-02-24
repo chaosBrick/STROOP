@@ -15,7 +15,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
     public abstract class MapMapObject : MapIconRectangleObject
     {
         Renderers.SpriteRenderer renderer;
-        public MapMapObject() : base()
+        public MapMapObject() : base(null)
         {
             InternalRotates = true;
             renderer = new Renderers.SpriteRenderer(MapGraphics.DrawLayers.Background);
@@ -35,7 +35,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 var dimooof = GetDimensions(graphics);
                 foreach (var dim in dimooof)
                     renderer.AddInstance(
-                        graphics.BillboardMatrix 
+                        graphics.BillboardMatrix
                         * Matrix4.CreateScale(dim.size.Width, 1, dim.size.Height)
                         * Matrix4.CreateTranslation(dim.loc.X, 0, dim.loc.Y),
                         graphics.GetObjectTextureLayer(GetInternalImage().Value),

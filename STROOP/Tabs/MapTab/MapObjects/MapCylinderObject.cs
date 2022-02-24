@@ -5,10 +5,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 {
     public abstract class MapCylinderObject : MapCircleObject
     {
-        public MapCylinderObject()
-            : base()
-        {
-        }
+        protected MapCylinderObject(ObjectCreateParams creationParamters) : base(creationParamters) { }
 
         protected override List<(float centerX, float centerZ, float radius)> Get2DDimensions()
         {
@@ -30,7 +27,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
             {
                 var color = new Vector4(Color.R / 255.0f, Color.G / 255.0f, Color.B / 255.0f, (float)Opacity);
-                foreach (var dim in Get3DDimensions()) {
+                foreach (var dim in Get3DDimensions())
+                {
                     var transform = Matrix4.CreateScale(dim.radius, dim.maxY - dim.minY, dim.radius) * Matrix4.CreateTranslation(dim.centerX, dim.minY, dim.centerZ);
                     graphics.cylinderRenderer.Add(transform, color);
                 }

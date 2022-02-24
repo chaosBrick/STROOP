@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using OpenTK;
 
 namespace STROOP.Utilities
 {
@@ -134,7 +135,37 @@ namespace STROOP.Utilities
             return Color.FromArgb(alpha, color.R, color.G, color.B);
         }
 
-        public static OpenTK.Vector4 ColorToVec4(Color color, int alpha = -1) =>
-            new OpenTK.Vector4(color.R / 255f, color.G / 255f, color.B / 255f, (alpha == -1 ? color.A : alpha) / 255f);
+        public static Vector4 ColorToVec4(Color color, int alpha = -1) =>
+            new Vector4(color.R / 255f, color.G / 255f, color.B / 255f, (alpha == -1 ? color.A : alpha) / 255f);
+
+        public static Vector4 ColorFromHSV(float hue, float saturation, float value, float alpha = 1)
+        {
+            int hi = Convert.ToInt32(Math.Floor(hue / 60)) % 6;
+            float f = hue / 60 - (float)Math.Floor(hue / 60);
+
+            float v = value;
+            float p = value * (1 - saturation);
+            float q = value * (1 - f * saturation);
+            float t = value * (1 - (1 - f) * saturation);
+
+            if (hi == 0)
+                return new Vector4(v, t, p, alpha);
+            else if (hi == 1)
+                return new Vector4(q, v, p, alpha);
+            else if (hi == 2)
+                return new Vector4(p, v, t, alpha);
+            else if (hi == 3)
+                return new Vector4(p, q, v, alpha);
+            else if (hi == 4)
+                return new Vector4(t, p, v, alpha);
+            else
+                return new Vector4(v, p, q, alpha);
+        }
+
+        public static Vector4 GetRandomColor(int seed)
+        {
+            Random rnd = new Random(seed);
+            return ColorFromHSV((float)rnd.NextDouble() * 360, 0.5f, 0.8f);
+        }
     }
 }

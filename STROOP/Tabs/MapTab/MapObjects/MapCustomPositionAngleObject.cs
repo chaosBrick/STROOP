@@ -13,19 +13,19 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         private readonly PositionAngle _posAngle;
 
-        public MapCustomPositionAngleObject(PositionAngle posAngle)
-            : base()
+        public MapCustomPositionAngleObject(ObjectCreateParams createParams, PositionAngle posAngle)
+            : base(createParams)
         {
             _posAngle = posAngle;
             positionAngleProvider = () => new[] { _posAngle };
             InternalRotates = true;
         }
 
-        public static MapCustomPositionAngleObject Create()
+        public static MapCustomPositionAngleObject Create(ObjectCreateParams creationParameters)
         {
-            string text = DialogUtilities.GetStringFromDialog(labelText: "Enter a PositionAngle.");
+            string text = ObjectCreateParams.GetString(ref creationParameters, "Name", "Enter a PositionAngle.");
             PositionAngle posAngle = PositionAngle.FromString(text);
-            return posAngle != null ? new MapCustomPositionAngleObject(posAngle) : null;
+            return posAngle != null ? new MapCustomPositionAngleObject(creationParameters, posAngle) : null;
         }
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.GreenMarioMapImage;
@@ -35,9 +35,9 @@ namespace STROOP.Tabs.MapTab.MapObjects
             base.InitSubTrackerContextMenuStrip(mapTab, targetStrip);
 
             targetStrip.Items.AddHandlerToItem("Add Tracker for Angle",
-                tracker.MakeCreateTrackerHandler(mapTab, "CustomAngle", () => new MapArrowObject(
+                tracker.MakeCreateTrackerHandler(mapTab, "CustomAngle", _ => new MapArrowObject(
                     positionAngleProvider,
-                    _ => _.Angle,
+                    o => o.Angle,
                     MapArrowObject.ArrowSource.Constant(1),
                     $"Angle")));
         }

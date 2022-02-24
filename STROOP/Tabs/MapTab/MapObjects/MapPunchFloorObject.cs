@@ -23,15 +23,9 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 .ConvertAll(tri => tri.Address);
         }
 
-        public MapPunchFloorObject()
-            : base(GetPunchTriangleList())
-        {
-        }
+        public MapPunchFloorObject() : base(GetPunchTriangleList()) { }
 
-        public override string GetName()
-        {
-            return "Punch Floor Tris";
-        }
+        public override string GetName() => "Punch Floor Tris";
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.TriangleFloorImage;
     }

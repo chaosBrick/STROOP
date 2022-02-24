@@ -15,7 +15,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         public string name;
 
         public MapObjectCylinderObject(PositionAngleProvider positionAngleProvider, GetDimensions getDimensions, string name)
-            : base()
+            : base(null)
         {
             this.positionAngleProvider = positionAngleProvider;
             this.getDimensions = getDimensions;
@@ -62,7 +62,9 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 float marioHitboxRadius = Config.Stream.GetSingle(marioObjRef + ObjectConfig.HitboxRadiusOffset);
                 float effectiveRadius = hitboxRadius + marioHitboxRadius;
 
-                return ((float)posAngle.X, (float)posAngle.Z, effectiveRadius, hitboxMinY, hitboxMaxY);
+                float marioHitboxHeight = Config.Stream.GetSingle(marioObjRef + ObjectConfig.HitboxHeightOffset);
+
+                return ((float)posAngle.X, (float)posAngle.Z, effectiveRadius, hitboxMinY - marioHitboxHeight, hitboxMaxY);
             };
 
             public static GetDimensions HurtBox = posAngle =>
@@ -91,7 +93,9 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 float marioHurtboxRadius = Config.Stream.GetSingle(marioObjRef + ObjectConfig.HurtboxRadiusOffset);
                 float effectiveRadius = hurtboxRadius + marioHurtboxRadius;
 
-                return ((float)posAngle.X, (float)posAngle.Z, effectiveRadius, hurtboxMinY, hurtboxMaxY);
+                float marioHurtboxHeight = Config.Stream.GetSingle(marioObjRef + ObjectConfig.HurtboxHeightOffset);
+
+                return ((float)posAngle.X, (float)posAngle.Z, effectiveRadius, hurtboxMinY - marioHurtboxHeight, hurtboxMaxY);
             };
 
             public static GetDimensions CustomSize(Func<(float, float, float)> customSizeProvider) => posAngle =>

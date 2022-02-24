@@ -9,8 +9,96 @@ using OpenTK.Graphics;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {
+    public class ObjectCreateParams
+    {
+        List<(string key, string value)> xmlEntries = new List<(string, string)>();
+
+        public ObjectCreateParams() { }
+
+        public ObjectCreateParams(System.Xml.XmlNode node)
+        {
+            foreach (System.Xml.XmlNode n in node.SelectNodes("*"))
+                xmlEntries.Add((n.Name, n.InnerText));
+        }
+
+        public System.Xml.XmlNode CreateDocumentNode(string name, System.Xml.XmlDocument doc)
+        {
+            var node = doc.CreateElement(name);
+            foreach (var f in xmlEntries)
+            {
+                var innerNode = doc.CreateElement(f.key);
+                innerNode.InnerText = f.value;
+                node.AppendChild(innerNode);
+            }
+            return node;
+        }
+
+        public void AddValue(string key, string value) => xmlEntries.Add((key, value));
+
+        public string GetValue(string key, string defaultValue = "")
+        {
+            foreach (var a in xmlEntries)
+                if (a.key == key)
+                    return a.value;
+            return defaultValue;
+        }
+
+        public IEnumerable<string> GetValues(string key)
+        {
+            foreach (var a in xmlEntries)
+                if (a.key == key)
+                    yield return a.value;
+        }
+
+        public static List<(float x, float y, float z)> GetCustomPoints(ref ObjectCreateParams creationParameters, string nodeName)
+        {
+            List<(float x, float y, float z)> points = null;
+            if (creationParameters != null)
+                points = ParsingUtilities.ParseTupleList(creationParameters.GetValue(nodeName), vals =>
+                {
+                    if (vals.Length == 2)
+                        return (float.Parse(vals[0]), 0, float.Parse(vals[1]));
+                    else if (vals.Length == 3)
+                        return (float.Parse(vals[0]), float.Parse(vals[1]), float.Parse(vals[2]));
+                    return (0, 0, 0);
+                });
+
+            if (points == null)
+            {
+                (string, bool)? result = DialogUtilities.GetStringAndSideFromDialog(
+                     labelText: "Enter points as pairs or triplets of floats.",
+                     button1Text: "Pairs",
+                     button2Text: "Triplets");
+                if (!result.HasValue) return null;
+                (string text, bool useTriplets) = result.Value;
+                points = MapUtilities.ParsePoints(text, useTriplets);
+                if (creationParameters == null)
+                    creationParameters = new ObjectCreateParams();
+                creationParameters.AddValue(nodeName, StringUtilities.Concat(points, p => $"({p.x}, {p.y}, {p.z})"));
+            }
+            return points;
+        }
+
+        public static string GetString(ref ObjectCreateParams creationParameters, string nodeName, string dialogPrompt)
+        {
+            string result = null;
+            if (creationParameters != null)
+                result = creationParameters.GetValue(nodeName, null);
+            if (result == null)
+            {
+                if (creationParameters == null)
+                    creationParameters = new ObjectCreateParams();
+                result = DialogUtilities.GetStringFromDialog(labelText: dialogPrompt);
+                creationParameters.AddValue(nodeName, result);
+            }
+            return result;
+        }
+    }
+
     public abstract partial class MapObject
     {
+        public readonly ObjectCreateParams creationParameters;
+
         ToolStripMenuItem enableDragging = new ToolStripMenuItem("Enable dragging");
 
         public virtual IHoverData GetHoverData(MapGraphics graphics) => null;
@@ -23,7 +111,6 @@ namespace STROOP.Tabs.MapTab.MapObjects
         public static PositionAngleProvider NoPositionAngles = () => new PositionAngle[0];
 
         public PositionAngleProvider positionAngleProvider { get; protected set; } = NoPositionAngles;
-
 
         public float Size = 25;
         public double Opacity = 1;
@@ -54,6 +141,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
         protected ContextMenuStrip _contextMenuStrip = null;
 
         public MapObject() { }
+
+        protected MapObject(ObjectCreateParams creationParameters) { this.creationParameters = creationParameters; }
 
         public static float Get3DIconScale(MapGraphics graphics, float x, float y, float z) => (0.5f * (float)Math.Tan(1) * (new Vector3(x, y, z) - graphics.view.position).Length) / graphics.glControl.Height;
 
@@ -131,7 +220,6 @@ namespace STROOP.Tabs.MapTab.MapObjects
         }
 
         public bool ShouldDisplay(MapTrackerVisibilityType visiblityType) => true;
-        public virtual PositionAngleProvider GetPositionAngleProvider() => null;
 
         public override string ToString() => GetName();
 
@@ -158,7 +246,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         public virtual void InitSubTrackerContextMenuStrip(MapTab mapTab, ContextMenuStrip targetStrip)
         {
             targetStrip.Items.AddHandlerToItem("Add Tracker for aggregated Path",
-                tracker.MakeCreateTrackerHandler(mapTab, "AggregatedPath", () => new MapPathObject(positionAngleProvider)));
+                tracker.MakeCreateTrackerHandler(mapTab, "AggregatedPath", _ => new MapPathObject(positionAngleProvider)));
         }
 
         public virtual void Update() { }

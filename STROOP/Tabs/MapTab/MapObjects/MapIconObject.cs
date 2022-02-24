@@ -9,8 +9,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
         protected Image Image;
 
         protected MapObjectHoverData hoverData;
-        public MapIconObject()
-            : base()
+        protected MapIconObject(ObjectCreateParams creationParameters)
+        : base(creationParameters)
         {
             Image = null;
             hoverData = new MapObjectHoverData(this);

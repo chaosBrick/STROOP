@@ -19,7 +19,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             _triAddressList = triAddressList;
         }
 
-        public static MapCustomCeilingObject Create()
+        public static MapCustomCeilingObject Create(ObjectCreateParams creationParameters)
         {
             var lst = GetTrianglesFromDialog(Config.Stream.GetUInt32(MarioConfig.StructAddress + MarioConfig.WallTriangleOffset));
             return lst != null ? new MapCustomCeilingObject(lst) : null;

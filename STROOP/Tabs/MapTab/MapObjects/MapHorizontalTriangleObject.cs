@@ -17,8 +17,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
         private float? _maxHeight;
         protected bool _enableQuarterFrameLandings;
 
-        public MapHorizontalTriangleObject()
-            : base()
+        protected MapHorizontalTriangleObject(ObjectCreateParams creationParameters)
+            : base(creationParameters)
         {
             _minHeight = null;
             _maxHeight = null;
@@ -35,7 +35,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                         return hoverData;
                     }
                 }
-            return null;
+            return base.GetHoverData(graphics);
         }
 
         protected override void DrawTopDown(MapGraphics graphics)

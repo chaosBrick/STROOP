@@ -20,7 +20,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         ToolStripMenuItem _itemShowArrows;
 
         public MapWallObject()
-            : base()
+            : base(null)
         {
             Size = 50;
             Opacity = 0.5;
@@ -57,7 +57,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                         }
                     }
                 }
-            return null;
+            return base.GetHoverData(graphics);
         }
 
         protected override (Vector3 low, Vector3 high)[] GetOrthogonalBoundaryProjection(MapGraphics graphics, TriangleDataModel tri, Vector3 projectionA, Vector3 projectionB)
@@ -74,8 +74,6 @@ namespace STROOP.Tabs.MapTab.MapObjects
             var projectionDirection = graphics.BillboardMatrix.Row0.Xyz;
             float projectionDist = Math.Abs(Size / Vector3.Dot(new Vector3(tri.NormX, 0, tri.NormZ), projectionDirection));
 
-            if (projectionDist > 100)
-                ;
             var right = graphics.BillboardMatrix.Row0.Xyz;
             var rightAbs = Math.Abs(tri.XProjection ? right.Z : right.X);
             var leftProjection = Math.Min(projectionDist, (max - (tri.XProjection ? projectionA.Z : projectionA.X)) / rightAbs);

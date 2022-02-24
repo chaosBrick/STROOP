@@ -9,6 +9,19 @@ namespace STROOP.Utilities
     public static class ParsingUtilities
     {
 
+        public static List<T> ParseTupleList<T>(string input, Func<string[], T> elementConverter)
+        {
+            List<T> ts = new List<T>();
+            var tupleSplits = input.Split(';');
+            foreach (var split in tupleSplits)
+            {
+                var startIndex = split.IndexOf('(') + 1;
+                var trim = split.Substring(startIndex, split.IndexOf(')') - startIndex);
+                ts.Add(elementConverter(Array.ConvertAll(trim.Split(','), o => o.Trim())));
+            }
+            return ts;
+        }
+
         public static uint ParseHex(object obj)
         {
             string str = obj.ToString();

@@ -1,11 +1,5 @@
-﻿using STROOP.Forms;
-using STROOP.Structs;
-using STROOP.Structs.Configurations;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace STROOP.Utilities
 {
@@ -46,5 +40,13 @@ namespace STROOP.Utilities
             if (string.IsNullOrEmpty(s)) return s;
             return s.Substring(0, 1).ToUpper() + s.Substring(1);
         }
+
+        public static string Concat<T>(IEnumerable<T> ts, Func<T, string> toString)
+        {
+            List<string> strings = new List<string>();
+            foreach (var t in ts)
+                strings.Add(toString(t));
+            return string.Concat(strings);
+        }
     }
-} 
+}

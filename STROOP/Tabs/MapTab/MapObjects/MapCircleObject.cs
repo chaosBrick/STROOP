@@ -7,8 +7,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
 {
     public abstract class MapCircleObject : MapObject
     {
-        public MapCircleObject()
-            : base()
+        protected MapCircleObject(ObjectCreateParams creationParameters)
+            : base(creationParameters)
         {
             Opacity = 0.5;
             Color = Color.Red;

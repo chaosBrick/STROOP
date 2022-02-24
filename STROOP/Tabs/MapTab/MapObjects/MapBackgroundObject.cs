@@ -6,7 +6,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
     {
         Renderers.SpriteRenderer renderer;
         public MapBackgroundObject()
-            : base()
+            : base(null)
         {
             InternalRotates = false;
             renderer = new Renderers.SpriteRenderer(MapGraphics.DrawLayers.Background, 1);

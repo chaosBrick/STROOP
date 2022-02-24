@@ -16,27 +16,19 @@ namespace STROOP.Tabs.MapTab.MapObjects
         private float _relativeMinY = 0;
         private float _relativeMaxY = 100;
 
-        public MapCustomCylinderPointsObject(List<(float x, float y, float z)> points)
-            : base()
+        protected MapCustomCylinderPointsObject(List<(float x, float y, float z)> points, ObjectCreateParams creationParameters)
+            : base(creationParameters)
         {
             _points = points;
 
             Size = 100;
         }
 
-        public static MapCustomCylinderPointsObject Create()
+        public static MapCustomCylinderPointsObject Create(ObjectCreateParams creationParameters)
         {
-            (string, bool)? result = DialogUtilities.GetStringAndSideFromDialog(
-                labelText: "Enter points as pairs or triplets of floats.",
-                button1Text: "Pairs",
-                button2Text: "Triplets");
-            if (!result.HasValue) return null;
-            (string text, bool useTriplets) = result.Value;
-            List<(double x, double y, double z)> points = MapUtilities.ParsePoints(text, useTriplets);
+            var points = ObjectCreateParams.GetCustomPoints(ref creationParameters, "Points");
             if (points == null) return null;
-            List<(float x, float y, float z)> floatPoints = points.ConvertAll(
-                point => ((float)point.x, (float)point.y, (float)point.z));
-            return new MapCustomCylinderPointsObject(floatPoints);
+            return new MapCustomCylinderPointsObject(points, creationParameters);
         }
 
         protected override List<(float centerX, float centerZ, float radius, float minY, float maxY)> Get3DDimensions()

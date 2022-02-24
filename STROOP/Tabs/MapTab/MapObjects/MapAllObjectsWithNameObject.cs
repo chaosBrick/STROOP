@@ -18,7 +18,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
         private readonly Lazy<Image> _objMapImage;
         Func<ObjectDataModel, bool> predicate;
 
-        private MapMultipleObjects(string name, Lazy<Image> image, Lazy<Image> mapImage) : base()
+        private MapMultipleObjects(ObjectCreateParams creationParameters, string name, Lazy<Image> image, Lazy<Image> mapImage)
+            : base(creationParameters)
         {
             _objName = name;
             _objImage = image;
@@ -26,20 +27,23 @@ namespace STROOP.Tabs.MapTab.MapObjects
             positionAngleProvider = () => Config.StroopMainForm.ObjectSlotsManager.GetLoadedObjectsWithPredicate(predicate).ConvertAll(_ => PositionAngle.Obj(_.Address)).ToArray();
         }
 
-        public static MapMultipleObjects CreateByName()
+        public static MapMultipleObjects CreateByName(ObjectCreateParams creationParameters)
         {
-            string objName = DialogUtilities.GetStringFromDialog(labelText: "Enter the name of the object.");
+            string objName = ObjectCreateParams.GetString(
+                ref creationParameters,
+                "ObjectName",
+                "Enter the name of the object.");
             if (objName == null) return null;
             ObjectBehaviorAssociation assoc = Config.ObjectAssociations.GetObjectAssociation(objName);
             if (assoc == null) return null;
-            var objByName = new MapMultipleObjects("All " + assoc.Name, assoc.Image, assoc.MapImage);
+            var objByName = new MapMultipleObjects(creationParameters, "All " + assoc.Name, assoc.Image, assoc.MapImage);
             objByName.predicate = _ => _.BehaviorAssociation.Name == objName;
             return objByName;
         }
 
-        public static MapMultipleObjects CreateAllObjects()
+        public static MapMultipleObjects CreateAllObjects(ObjectCreateParams creationParameters)
         {
-            var objByName = new MapMultipleObjects("All Objects", Config.ObjectAssociations.DefaultImage, Config.ObjectAssociations.DefaultImage);
+            var objByName = new MapMultipleObjects(null, "All Objects", Config.ObjectAssociations.DefaultImage, Config.ObjectAssociations.DefaultImage);
             objByName.predicate = _ => true;
             return objByName;
         }
@@ -77,9 +81,9 @@ namespace STROOP.Tabs.MapTab.MapObjects
         public virtual List<(float x, float y, float z, float angle, Lazy<Image> tex, float alpha)> GetData()
         {
             List<ObjectDataModel> objs = Config.StroopMainForm.ObjectSlotsManager.GetLoadedObjectsWithPredicate(predicate);
-            return objs.ConvertAll(obj => 
-                    (obj.X, obj.Y, obj.Z, 
-                    (float)obj.FacingYaw, 
+            return objs.ConvertAll(obj =>
+                    (obj.X, obj.Y, obj.Z,
+                    (float)obj.FacingYaw,
                     Config.ObjectAssociations.GetObjectMapImage(obj.BehaviorCriteria),
                     hoverData.currentPositionAngle != null && obj.Address == hoverData.currentPositionAngle.GetObjAddress() ? ObjectUtilities.HoverAlpha() : 1
                     ));

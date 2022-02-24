@@ -28,7 +28,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         }
 
         public MapGhostObject()
-            : base()
+            : base(null)
         {
             positionAngleProvider = () => new List<PositionAngle>(new[] { GhostPositionAngle.instance });
             InternalRotates = true;
@@ -39,10 +39,10 @@ namespace STROOP.Tabs.MapTab.MapObjects
             base.InitSubTrackerContextMenuStrip(mapTab, targetStrip);
 
             targetStrip.Items.AddHandlerToItem("Add Tracker for Ghost Graphics Angle",
-                 tracker.MakeCreateTrackerHandler(mapTab, "GhostGraphicsAngle", () =>
+                 tracker.MakeCreateTrackerHandler(mapTab, "GhostGraphicsAngle", _ =>
                     new MapArrowObject(
                      positionAngleProvider,
-                     _ => GhostPositionAngle.instance.Angle,
+                     __ => GhostPositionAngle.instance.Angle,
                      MapArrowObject.ArrowSource.Constant(100),
                      $"Ghost Graphics Angle")));
         }

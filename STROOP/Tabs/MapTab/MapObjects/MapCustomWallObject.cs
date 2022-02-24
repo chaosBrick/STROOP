@@ -19,9 +19,9 @@ namespace STROOP.Tabs.MapTab.MapObjects
             _triAddressList = triAddressList;
         }
 
-        public static MapCustomWallObject Create()
+        public static MapCustomWallObject Create(ObjectCreateParams creationParameters)
         {
-            var lst = GetTrianglesFromDialog(Config.Stream.GetUInt32(MarioConfig.StructAddress + MarioConfig.WallTriangleOffset));
+            var lst = GetCreationAddressList(ref creationParameters, Config.Stream.GetUInt32(MarioConfig.StructAddress + MarioConfig.WallTriangleOffset));
             return lst != null ? new MapCustomWallObject(lst) : null;
         }
 

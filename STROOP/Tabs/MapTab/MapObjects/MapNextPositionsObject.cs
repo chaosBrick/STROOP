@@ -18,7 +18,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         private double _numFrames = 4;
 
         public MapNextPositionsObject()
-            : base()
+            : base(null)
         {
             InternalRotates = true;
         }

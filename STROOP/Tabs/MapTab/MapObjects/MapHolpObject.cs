@@ -8,7 +8,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
     public class MapHolpObject : MapIconPointObject
     {
         public MapHolpObject()
-            : base()
+            : base(null)
         {
             positionAngleProvider = () => new[] { PositionAngle.Holp };
         }

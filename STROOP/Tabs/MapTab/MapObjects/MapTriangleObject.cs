@@ -59,6 +59,19 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 };
                 myItem.DropDownItems.Add(itemCopyPosition);
 
+                var itemAssignColor = new ToolStripMenuItem("Assign Custom Color");
+                itemAssignColor.Click += (_, __) =>
+                {
+                    var dlg = new ColorDialog();
+                    if (dlg.ShowDialog() == DialogResult.OK)
+                        parent.individualTriangleColors[triangle.Address] = ColorUtilities.ColorToVec4(dlg.Color);
+                };
+                myItem.DropDownItems.Add(itemAssignColor);
+
+                var itemRemoveColor = new ToolStripMenuItem("Remove Custom Color");
+                itemRemoveColor.Click += (_, __) => parent.individualTriangleColors.Remove(triangle.Address);
+                myItem.DropDownItems.Add(itemRemoveColor);
+
                 menu.Items.Add(myItem);
             }
         }
@@ -79,15 +92,28 @@ namespace STROOP.Tabs.MapTab.MapObjects
             return nullableUIntList.ConvertAll(nullableUInt => nullableUInt.Value);
         }
 
+        protected static List<uint> GetCreationAddressList(ref ObjectCreateParams creationParameters, uint defaultTriangle)
+        {
+            List<uint> lst = null;
+            if (creationParameters != null)
+                lst = ParsingUtilities.ParseHexList(creationParameters.GetValue("Addresses"));
+            if (lst == null)
+                lst = GetTrianglesFromDialog(Config.Stream.GetUInt32(MarioConfig.StructAddress + MarioConfig.FloorTriangleOffset));
+            return lst;
+        }
+
         protected List<TriangleDataModel> _bufferedTris { get; private set; } = new List<TriangleDataModel>();
         private float? _withinDist;
         private float? _withinCenter;
         protected bool _excludeDeathBarriers;
         protected TriangleHoverData hoverData;
         float _projectionAlphaMultiplier = 0.5f;
+        Dictionary<uint, Vector4> individualTriangleColors = new Dictionary<uint, Vector4>();
+        bool useRandomColors => itemUseRandomColors.Checked;
+        ToolStripMenuItem itemUseRandomColors;
 
-        public MapTriangleObject()
-            : base()
+        protected MapTriangleObject(ObjectCreateParams creationParameters)
+            : base(creationParameters)
         {
             hoverData = new TriangleHoverData(this);
             _withinDist = null;
@@ -119,6 +145,19 @@ namespace STROOP.Tabs.MapTab.MapObjects
             var newList = GetTrianglesOfAnyDist();
             if (newList != null)
                 _bufferedTris = newList;
+        }
+
+        public override IHoverData GetHoverData(MapGraphics graphics)
+        {
+            if (graphics.view.mode == MapView.ViewMode.ThreeDimensional)
+            {
+                if (graphics.hoverTriangle != null && _bufferedTris.Any(_ => _.Address == graphics.hoverTriangle.Address))
+                {
+                    hoverData.triangle = graphics.hoverTriangle;
+                    return hoverData;
+                }
+            }
+            return null;
         }
 
         bool projectOnPlane(Vector3 v1, Vector3 v2, Vector3 pNor, float pD, out Vector3 projection)
@@ -170,7 +209,6 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected override void DrawOrthogonal(MapGraphics graphics)
         {
-            //Draw3D(graphics);
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
             {
                 var colorMultipliers = new float[] { 1.0f, 0.5f, 0.25f };
@@ -199,10 +237,18 @@ namespace STROOP.Tabs.MapTab.MapObjects
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
             {
                 var colorMultipliers = new float[] { 1.0f, 0.5f, 0.25f };
-                var baseColor = new Vector4(Color.R / 255f, Color.G / 255f, Color.B / 255f, OpacityByte / 255f);
-                var projectionColor = new Vector4(baseColor.Xyz, _projectionAlphaMultiplier * baseColor.W);
+                var regularBaseColor = new Vector4(Color.R / 255f, Color.G / 255f, Color.B / 255f, OpacityByte / 255f);
                 foreach (var tri in GetTrianglesWithinDist())
                 {
+                    Vector4 baseColor;
+                    if (!individualTriangleColors.TryGetValue(tri.Address, out baseColor))
+                        if (useRandomColors)
+                            baseColor = ColorUtilities.GetRandomColor((int)tri.Address);
+                        else
+                            baseColor = regularBaseColor;
+                    baseColor.W = OpacityByte / 255f;
+                    var projectionColor = new Vector4(baseColor.Xyz, _projectionAlphaMultiplier * baseColor.W);
+
                     if (!graphics.view.display3DLevelGeometry)
                         graphics.triangleRenderer.Add(
                             tri.p1,
@@ -233,7 +279,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                                         outlineColor,
                                         new Vector3(OutlineWidth),
                                         true);
-                                
+
                                 Vector3 a = baseVectors[i], b = baseVectors[(i + 1) % baseVectors.Length];
 
                                 graphics.triangleRenderer.Add(
@@ -261,7 +307,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         protected abstract Vector3[] GetVolumeDisplacements(TriangleDataModel tri);
         protected virtual (Vector3[] faceVertices, Vector4 color)[] GetBaseFaceVertices(TriangleDataModel tri) => new[] { (new[] { tri.p1, tri.p2, tri.p3 }, new Vector4(1)) };
 
-        protected List<ToolStripMenuItem> GetTriangleToolStripMenuItems()
+        protected List<ToolStripItem> GetTriangleToolStripMenuItems()
         {
             ToolStripMenuItem itemSetWithinDist = new ToolStripMenuItem("Set Within Dist");
             itemSetWithinDist.Click += (sender, e) =>
@@ -305,13 +351,22 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 _projectionAlphaMultiplier = projectionColorMultiplierNullable.Value;
             };
 
-            return new List<ToolStripMenuItem>()
+            itemUseRandomColors = new ToolStripMenuItem("Use random colors");
+            itemUseRandomColors.Click += (sender, e) => itemUseRandomColors.Checked = !itemUseRandomColors.Checked;
+
+            var itemClearCustomColors = new ToolStripMenuItem("Clear Custom Colors");
+            itemClearCustomColors.Click += (sender, e) => individualTriangleColors.Clear();
+
+            return new List<ToolStripItem>()
             {
                 itemSetWithinDist,
                 itemClearWithinDist,
                 itemSetWithinCenter,
                 itemClearWithinCenter,
+                new ToolStripSeparator(),
                 itemSetProjectionColorMultiplier,
+                itemUseRandomColors,
+                itemClearCustomColors,
             };
         }
 
@@ -322,6 +377,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 SaveValueNode(node, "WithinDist", _withinDist.ToString());
                 SaveValueNode(node, "WithinCenter", _withinCenter.ToString());
                 SaveValueNode(node, "ProjectionAlphaMultiplier", _projectionAlphaMultiplier.ToString());
+                SaveValueNode(node, "UseRandomColors", useRandomColors.ToString());
             }
         ,
             (System.Xml.XmlNode node) =>
@@ -333,6 +389,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
                     _withinCenter = withinCenter;
                 if (float.TryParse(LoadValueNode(node, "ProjectionAlphaMultiplier"), out var projectionAlphaMultiplier))
                     _projectionAlphaMultiplier = projectionAlphaMultiplier;
+                if (bool.TryParse(LoadValueNode(node, "UseRandomColors"), out var randomColors))
+                    itemUseRandomColors.Checked = randomColors;
             }
         );
     }

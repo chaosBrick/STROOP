@@ -38,6 +38,7 @@ namespace STROOP.Tabs.MapTab
         public Vector2 pixelsPerUnit { get; private set; }
 
         public bool hasUnitPrecision { get; private set; }
+        public Models.TriangleDataModel hoverTriangle;
 
         const int OBJECTS_TEXTURE_SIZE = 256;
         const int OBJECTS_TEXTURE_LAYERS = 256;
@@ -102,8 +103,8 @@ namespace STROOP.Tabs.MapTab
         {
             get
             {
-                var dsjakldjska = glControl.PointToClient(Cursor.Position);
-                return new Vector2(dsjakldjska.X, dsjakldjska.Y);
+                var a = glControl.PointToClient(Cursor.Position);
+                return new Vector2(a.X, a.Y);
             }
         }
         public Vector3 mapCursorPosition;
@@ -153,7 +154,6 @@ namespace STROOP.Tabs.MapTab
             glControl.MouseUp += OnMouseUp;
             glControl.MouseMove += OnMouseMove;
             glControl.MouseWheel += OnScroll;
-            glControl.DoubleClick += OnDoubleClick;
             glControl.MouseEnter += (_, __) =>
             {
                 var form = glControl.FindForm();
@@ -285,8 +285,8 @@ namespace STROOP.Tabs.MapTab
                 );
 
 
-            float zFar = view.mode == MapView.ViewMode.TopDown || float.IsNaN(view.orthoRelativeFarPlane) ? 10000 : view.orthoRelativeFarPlane;
-            float zNear = view.mode == MapView.ViewMode.TopDown || float.IsNaN(view.orthoRelativeNearPlane) ? -10000 : view.orthoRelativeNearPlane;
+            float zFar = view.mode == MapView.ViewMode.TopDown || float.IsNaN(view.orthoRelativeFarPlane) ? 100000 : view.orthoRelativeFarPlane;
+            float zNear = view.mode == MapView.ViewMode.TopDown || float.IsNaN(view.orthoRelativeNearPlane) ? -100000 : view.orthoRelativeNearPlane;
             zFar = Math.Max(zNear + 0.0001f, zFar);
             Matrix4 othoDepth = Matrix4.CreateOrthographic(2, 2, zNear, zFar);
 
@@ -339,7 +339,7 @@ namespace STROOP.Tabs.MapTab
                     }
 
                     float nearClip = Math.Max(1, Math.Min(50, (target - view.position).Length / 100));
-                    //nearClip = 2;
+
                     ViewMatrix = Matrix4.LookAt(view.position, target, new Vector3(0, 1, 0));
                     var mat = Matrix4.Invert(ViewMatrix);
                     mat.Row3 = new Vector4(0, 0, 0, 1);
@@ -354,10 +354,10 @@ namespace STROOP.Tabs.MapTab
             hasUnitPrecision = pixelsPerUnit.X >= 2 && pixelsPerUnit.Y >= 2;
         }
 
-        bool FindClosestIntersection(Vector3 rayOrigin, Vector3 rayDirection, out Vector3 intersection, out Vector3 normal)
+        bool FindClosestIntersection(Vector3 rayOrigin, Vector3 rayDirection, out Vector3 intersection, out Models.TriangleDataModel triangle)
         {
             intersection = default(Vector3);
-            normal = default(Vector3);
+            triangle = default(Models.TriangleDataModel);
             Vector3 viewDirection = Vector3.Normalize(rayDirection);
             float closestDistance = float.PositiveInfinity, newDistance;
             foreach (var t in levelTrianglesFor3DMap)
@@ -366,7 +366,7 @@ namespace STROOP.Tabs.MapTab
                 {
                     closestDistance = newDistance;
                     intersection = newIntersection;
-                    normal = newNormal;
+                    triangle = t;
                 }
 
             return (closestDistance < float.PositiveInfinity);
@@ -383,8 +383,9 @@ namespace STROOP.Tabs.MapTab
                 var dirrrr = BillboardMatrix.Row0.Xyz * dx + BillboardMatrix.Row1.Xyz * dy - BillboardMatrix.Row2.Xyz;
                 if (float.IsNaN(dirrrr.X)) dirrrr = new Vector3(0, 0, 1);
 
-                if (cursorOnMap = FindClosestIntersection(view.position + dirrrr, dirrrr, out Vector3 closestIntersection, out normalAtCursor))
+                if (cursorOnMap = FindClosestIntersection(view.position + dirrrr, dirrrr, out Vector3 closestIntersection, out hoverTriangle))
                 {
+                    normalAtCursor = new Vector3(hoverTriangle.NormX, hoverTriangle.NormY, hoverTriangle.NormZ);
                     mapCursorPosition = closestIntersection;
                     cursorViewPlaneDist = Vector3.Dot(mapCursorPosition - view.position, -BillboardMatrix.Row2.Xyz);
                 }
@@ -876,16 +877,6 @@ namespace STROOP.Tabs.MapTab
                 float movement = (float)frameTime * (System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.LeftShift) ? 100 : 2000);
                 view.position += (right * relativeMovement.X + up * relativeMovement.Y + forwards * relativeMovement.Z) * movement;
             }
-        }
-
-        private void OnDoubleClick(object sender, EventArgs e)
-        {
-            if (mapTab.HasMouseListeners)
-                return;
-
-            //mapTab.radioButtonMapControllersScaleCourseDefault.Checked = true;
-            //mapTab.radioButtonMapControllersCenterBestFit.Checked = true;
-            //mapTab.radioButtonMapControllersAngle32768.Checked = true;
         }
     }
 }

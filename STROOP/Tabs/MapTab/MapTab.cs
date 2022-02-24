@@ -52,7 +52,7 @@ namespace STROOP.Tabs.MapTab
         public bool HasMouseListeners => hoverData.Count > 0;
         Dictionary<object, MapTracker> semaphoreTrackers = new Dictionary<object, MapTracker>();
         List<(CheckBox checkBox, MapTracker tracker)> quickSemaphores = new List<(CheckBox checkBox, MapTracker tracker)>();
-        Dictionary<string, Func<MapTracker>> newTrackerByName = new Dictionary<string, Func<MapTracker>>();
+        Dictionary<string, MapTracker.CreateTracker> newTrackerByName = new Dictionary<string, MapTracker.CreateTracker>();
 
 
         public MapTab()
@@ -134,7 +134,7 @@ namespace STROOP.Tabs.MapTab
             foreach (var it in quickSemaphores)
             {
                 var capture = it;
-                newTrackerByName[capture.tracker.creationIdentifier] = () =>
+                newTrackerByName[capture.tracker.creationIdentifier] = _ =>
                 {
                     capture.checkBox.Checked = true;
                     return capture.tracker;
@@ -177,16 +177,16 @@ namespace STROOP.Tabs.MapTab
                     var capturedType = type;
                     var toolStripItem = new ToolStripMenuItem($"Add Tracker for {attr.DisplayName}");
                     var creationIdentifier = attr.DisplayName.Replace(' ', '_');
-                    Func<MapTracker> newObjectFunc;
+                    MapTracker.CreateTracker newObjectFunc;
                     if (attr.Initializer == null)
                         newTrackerByName[creationIdentifier] = newObjectFunc =
-                            () => new MapTracker(this, creationIdentifier, (MapObject)Activator.CreateInstance(capturedType));
+                            _ => new MapTracker(this, creationIdentifier, (MapObject)Activator.CreateInstance(capturedType));
                     else
-                        newTrackerByName[creationIdentifier] = newObjectFunc = () =>
+                        newTrackerByName[creationIdentifier] = newObjectFunc = creationParameters =>
                         {
                             var newObj = (MapObject)
                                     (capturedType.GetMethod(attr.Initializer, BindingFlags.Public | BindingFlags.Static)
-                                    ?.Invoke(null, new object[0])
+                                    ?.Invoke(null, new object[] { creationParameters })
                                     ?? null);
                             return newObj != null ? new MapTracker(this, creationIdentifier, newObj) : null;
                         };
@@ -195,7 +195,7 @@ namespace STROOP.Tabs.MapTab
                     {
                         using (new AccessScope<MapTab>(this))
                         {
-                            var tracker = newObjectFunc();
+                            var tracker = newObjectFunc(null);
                             if (tracker != null)
                                 flowLayoutPanelMapTrackers.Controls.Add(tracker);
                         }
@@ -349,6 +349,18 @@ namespace STROOP.Tabs.MapTab
             copyPositionItem.Click += (e, args) => CopyUtilities.CopyPosition(onClickPosition);
             contextMenu.Items.Add(copyPositionItem);
             contextMenu.Items.Add(new ToolStripSeparator());
+
+            if (graphics.view.mode == MapView.ViewMode.ThreeDimensional)
+            {
+                var pivotPositionItem = new ToolStripMenuItem("Pivot This Position");
+                pivotPositionItem.Click += (e, args) =>
+                {
+                    graphics.view.camera3DMode = MapView.Camera3DMode.FocusOnPositionAngle;
+                    graphics.view.focusPositionAngle = PositionAngle.Custom(onClickPosition);
+                };
+                contextMenu.Items.Add(pivotPositionItem);
+                contextMenu.Items.Add(new ToolStripSeparator());
+            }
 
             foreach (var a in hoverData)
                 a.AddContextMenuItems(this, contextMenu);
@@ -719,7 +731,8 @@ namespace STROOP.Tabs.MapTab
                     if (n.NodeType == System.Xml.XmlNodeType.Element
                         && newTrackerByName.TryGetValue(n.Name, out var newObjFunc))
                     {
-                        var newObj = newObjFunc();
+                        var createParamsNode = n.SelectSingleNode("CreationParameters");
+                        var newObj = newObjFunc(createParamsNode != null ? new ObjectCreateParams(createParamsNode) : null);
                         if (newObj != null)
                         {
                             loadedTrackers.Add(newObj);
@@ -727,8 +740,9 @@ namespace STROOP.Tabs.MapTab
                         }
                     }
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine(ex.ToString());
                 foreach (var a in loadedTrackers)
                     a.mapObject.CleanUp();
                 loadedTrackers = new List<MapTracker>();
@@ -745,6 +759,8 @@ namespace STROOP.Tabs.MapTab
                 if (control is MapTracker tracker && tracker.parentTracker == null && tracker.creationIdentifier != null)
                 {
                     var trackerNode = doc.CreateElement(tracker.creationIdentifier);
+                    if (tracker.mapObject.creationParameters != null)
+                        trackerNode.AppendChild(tracker.mapObject.creationParameters.CreateDocumentNode("CreationParameters", doc));
                     tracker.mapObject.SettingsSaveLoad.save(trackerNode);
                     tracker.SaveChildTrackers(trackerNode);
                     root.AppendChild(trackerNode);

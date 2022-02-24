@@ -16,7 +16,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         public string name;
 
         public MapObjectSphereObject(PositionAngleProvider posAngle, GetDimensions getDimensions, string name)
-            : base()
+            : base(null)
         {
             this.posAngle = posAngle;
             this.getDimensions = getDimensions;

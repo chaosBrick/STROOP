@@ -1,21 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using OpenTK.Graphics.OpenGL;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
-using STROOP.Structs;
-using OpenTK;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {
     public class MapCameraObject : MapIconPointObject
     {
         public MapCameraObject()
-            : base()
+            : base(null)
         {
             positionAngleProvider = () => new[] { PositionAngle.Camera };
             InternalRotates = true;

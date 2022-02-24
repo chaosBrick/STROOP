@@ -13,16 +13,18 @@ namespace STROOP.Tabs.MapTab.MapObjects
     {
         private readonly List<uint> _triAddressList;
 
-        public MapCustomFloorObject(List<uint> triAddressList)
-            : base()
+        protected MapCustomFloorObject(List<uint> triAddressList) : this(triAddressList, null) { }
+
+        protected MapCustomFloorObject(List<uint> triAddressList, ObjectCreateParams creationParameters)
+            : base(creationParameters)
         {
             _triAddressList = triAddressList;
         }
 
-        public static MapCustomFloorObject Create()
+        public static MapCustomFloorObject Create(ObjectCreateParams creationParameters)
         {
-            var lst = GetTrianglesFromDialog(Config.Stream.GetUInt32(MarioConfig.StructAddress + MarioConfig.FloorTriangleOffset));
-            return lst != null ? new MapCustomFloorObject(lst) : null;
+            List<uint> lst = GetCreationAddressList(ref creationParameters, Config.Stream.GetUInt32(MarioConfig.StructAddress + MarioConfig.FloorTriangleOffset));
+            return lst != null ? new MapCustomFloorObject(lst, creationParameters) : null;
         }
 
         protected override List<TriangleDataModel> GetTrianglesOfAnyDist()

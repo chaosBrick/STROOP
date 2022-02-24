@@ -19,7 +19,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         ToolStripMenuItem itemAutoUpdate;
 
         public MapLevelFloorObject()
-            : base()
+            : base(null)
         {
             _removeCurrentTri = false;
             _triangleListForm = null;

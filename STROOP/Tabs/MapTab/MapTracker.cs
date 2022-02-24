@@ -10,6 +10,8 @@ namespace STROOP.Tabs.MapTab
 {
     public partial class MapTracker : UserControl
     {
+        public delegate MapTracker CreateTracker(ObjectCreateParams creationParameters);
+
         private static readonly Image ImageEyeOpen = Properties.Resources.image_eye_open2;
         private static readonly Image ImageEyeClosed = Properties.Resources.image_eye_closed2;
 
@@ -27,7 +29,7 @@ namespace STROOP.Tabs.MapTab
         public readonly string creationIdentifier;
         public readonly MapTracker parentTracker;
         List<MapTracker> childTrackers = new List<MapTracker>();
-        Dictionary<string, Func<MapTracker>> createChildTrackers = new Dictionary<string, Func<MapTracker>>();
+        Dictionary<string, CreateTracker> createChildTrackers = new Dictionary<string, CreateTracker>();
 
         public delegate void RemovedFromMapEventHandler();
         public event RemovedFromMapEventHandler RemovedFromMap;
@@ -50,7 +52,6 @@ namespace STROOP.Tabs.MapTab
         {
             CleanUp();
             mapTab.flowLayoutPanelMapTrackers.Controls.Remove(this);
-            parentTracker?.childTrackers.Remove(this);
             RemovedFromMap?.Invoke();
         }
 
@@ -151,11 +152,11 @@ namespace STROOP.Tabs.MapTab
             }
         }
 
-        public Action MakeCreateTrackerHandler(MapTab target, string identifier, Func<MapObject> newObjFunc)
+        public Action MakeCreateTrackerHandler(MapTab target, string identifier, Func<ObjectCreateParams, MapObject> newObjFunc)
         {
-            Func<MapTracker> createTracker = () => new MapTracker(this, identifier, newObjFunc());
+            CreateTracker createTracker = creationParameters => new MapTracker(this, identifier, newObjFunc(creationParameters));
             createChildTrackers[identifier] = createTracker;
-            return () => target.flowLayoutPanelMapTrackers.Controls.Add(createTracker());
+            return () => target.flowLayoutPanelMapTrackers.Controls.Add(createTracker(null));
         }
 
         public void SaveChildTrackers(System.Xml.XmlNode node)
@@ -184,7 +185,7 @@ namespace STROOP.Tabs.MapTab
                 if (n.NodeType == System.Xml.XmlNodeType.Element
                     && createChildTrackers.TryGetValue(n.Name, out var newTrackerFunc))
                 {
-                    var t = newTrackerFunc();
+                    var t = newTrackerFunc(null);
                     childTrackers.Add(t);
                     childTrackers.AddRange(t.LoadChildTrackers(n));
                 }
@@ -343,7 +344,11 @@ namespace STROOP.Tabs.MapTab
             textBoxName.SubmitTextLoosely(_customName ?? string.Join(", ", mapObject.GetName()));
         }
 
-        public void CleanUp() { mapObject.CleanUp(); }
+        public void CleanUp()
+        {
+            mapObject.CleanUp();
+            parentTracker?.childTrackers.Remove(this);
+        }
 
         public override string ToString()
         {

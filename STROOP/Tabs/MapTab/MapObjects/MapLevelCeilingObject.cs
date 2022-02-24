@@ -34,7 +34,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         {
             if (_contextMenuStrip == null)
             {
-                ToolStripMenuItem itemAutoUpdate = new ToolStripMenuItem("Auto Update");
+                itemAutoUpdate = new ToolStripMenuItem("Auto Update");
                 itemAutoUpdate.Click += (sender, e) => itemAutoUpdate.Checked = !itemAutoUpdate.Checked;
                 itemAutoUpdate.Checked = true;
 

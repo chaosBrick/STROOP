@@ -8,8 +8,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
 {
     public abstract class MapSphereObject : MapCircleObject
     {
-        public MapSphereObject()
-            : base()
+        protected MapSphereObject(ObjectCreateParams creationParameters)
+            : base(creationParameters)
         {
         }
 

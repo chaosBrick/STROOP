@@ -25,35 +25,35 @@ namespace STROOP.Tabs.MapTab.MapObjects
             var anglesItem = targetStrip.Items.GetSubItem("Angles");
 
             anglesItem.DropDownItems.AddHandlerToItem("Add Tracker for Mario Facing Angle",
-                tracker.MakeCreateTrackerHandler(mapTab, "MarioFacingAngle", () => new MapArrowObject(
+                tracker.MakeCreateTrackerHandler(mapTab, "MarioFacingAngle", _ => new MapArrowObject(
                     positionAngleProvider,
                     MapArrowObject.ArrowSource.MarioFacingYaw,
                     MapArrowObject.ArrowSource.MarioHSpeed,
                     $"Mario Facing Angle")));
 
             anglesItem.DropDownItems.AddHandlerToItem("Add Tracker for Mario Intended Angle",
-                tracker.MakeCreateTrackerHandler(mapTab, "MarioIntendedAngle", () => new MapArrowObject(
+                tracker.MakeCreateTrackerHandler(mapTab, "MarioIntendedAngle", _ => new MapArrowObject(
                     positionAngleProvider,
                     MapArrowObject.ArrowSource.MarioIndendedYaw,
                     MapArrowObject.ArrowSource.MarioHSpeed,
                     $"Mario Intended Angle")));
 
             anglesItem.DropDownItems.AddHandlerToItem("Add Tracker for Mario Moving Angle",
-                tracker.MakeCreateTrackerHandler(mapTab, "MarioMovingAngle", () => new MapArrowObject(
+                tracker.MakeCreateTrackerHandler(mapTab, "MarioMovingAngle", _ => new MapArrowObject(
                     positionAngleProvider,
                     MapArrowObject.ArrowSource.MarioMovingYaw,
                     MapArrowObject.ArrowSource.MarioHSpeed,
                     $"Mario Moving Angle")));
 
             anglesItem.DropDownItems.AddHandlerToItem("Add Tracker for Mario Sliding Angle",
-                tracker.MakeCreateTrackerHandler(mapTab, "MarioSlidingAngle", () => new MapArrowObject(
+                tracker.MakeCreateTrackerHandler(mapTab, "MarioSlidingAngle", _ => new MapArrowObject(
                     positionAngleProvider,
                     MapArrowObject.ArrowSource.MarioSlidingYaw,
                     MapArrowObject.ArrowSource.MarioSlidingSpeed,
                     $"Mario Sliding Angle")));
 
             anglesItem.DropDownItems.AddHandlerToItem("Add Tracker for Mario Twirling Angle",
-                tracker.MakeCreateTrackerHandler(mapTab, "MarioTwirlingAngle", () => new MapArrowObject(
+                tracker.MakeCreateTrackerHandler(mapTab, "MarioTwirlingAngle", _ => new MapArrowObject(
                     positionAngleProvider,
                     MapArrowObject.ArrowSource.MarioTwirlingYaw,
                     MapArrowObject.ArrowSource.MarioHSpeed,

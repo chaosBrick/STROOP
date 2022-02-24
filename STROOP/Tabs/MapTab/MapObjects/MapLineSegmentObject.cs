@@ -30,7 +30,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             OutlineColor = Color.Red;
         }
 
-        public static MapObject Create()
+        public static MapObject Create(ObjectCreateParams creationParameters)
         {
             string text1 = DialogUtilities.GetStringFromDialog(labelText: "Enter the first PositionAngle.");
             if (text1 == null) return null;
