@@ -12,6 +12,7 @@ namespace STROOP.Utilities
     {
         string Name { get; }
         Process Process { get; }
+        string GetLastMessages();
         bool Suspend();
         bool Resume();
 

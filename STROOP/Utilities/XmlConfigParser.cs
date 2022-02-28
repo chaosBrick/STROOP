@@ -73,11 +73,15 @@ namespace STROOP.Utilities
                         foreach (var subElement in element.Elements())
                         {
                             string special = subElement.Attribute(XName.Get("special"))?.Value ?? null;
+                            var allowAutoDetect = true;
+                            if (bool.TryParse(subElement.Attribute(XName.Get("autoDetectRAMStart"))?.Value ?? null, out var t))
+                                allowAutoDetect = t;
                             Config.Emulators.Add(new Emulator()
                             {
                                 Name = subElement.Attribute(XName.Get("name")).Value,
                                 ProcessName = subElement.Attribute(XName.Get("processName")).Value,
                                 RamStart = ParsingUtilities.ParseHex(subElement.Attribute(XName.Get("ramStart")).Value),
+                                AllowAutoDetect = allowAutoDetect,
                                 Dll = subElement.Attribute(XName.Get("offsetDll"))?.Value ?? null,
                                 Endianness = subElement.Attribute(XName.Get("endianness")).Value == "big"
                                     ? EndiannessType.Big : EndiannessType.Little,

@@ -3,8 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static STROOP.Utilities.Kernal32NativeMethods;
 
 namespace STROOP.Utilities
@@ -34,7 +32,7 @@ namespace STROOP.Utilities
 
             _process.EnableRaisingEvents = true;
 
-            ProcessAccess accessFlags = ProcessAccess.PROCESS_QUERY_LIMITED_INFORMATION | ProcessAccess.SUSPEND_RESUME 
+            ProcessAccess accessFlags = ProcessAccess.PROCESS_QUERY_LIMITED_INFORMATION | ProcessAccess.SUSPEND_RESUME
                 | ProcessAccess.VM_OPERATION | ProcessAccess.VM_READ | ProcessAccess.VM_WRITE;
             _processHandle = ProcessGetHandleFromId(accessFlags, false, _process.Id);
             try
@@ -84,6 +82,15 @@ namespace STROOP.Utilities
             return output.ToArray();
         }
 
+        bool CompareBytes(byte[] a, byte[] b)
+        {
+            if (a.Length != b.Length) return false;
+            for (int i = 0; i < a.Length; i++)
+                if (a[i] != b[i])
+                    return false;
+            return true;
+        }
+
         protected virtual void CalculateOffset()
         {
             // Find DLL offset if needed
@@ -101,8 +108,29 @@ namespace STROOP.Utilities
             }
 
             _baseOffset = (UIntPtr)(_emulator.RamStart + (UInt64)dllOffset.ToInt64());
-        }
 
+            if (!_emulator.AllowAutoDetect)
+                return;
+
+            const int COMPARISON_READ_OFFSET = 0x2462b4; // Address of create_thread
+
+            var autoDetectPattern = System.IO.File.ReadAllBytes("AutoDetectFile.bin");
+            var comparisonBuffer = new byte[autoDetectPattern.Length];
+
+            var processScanner = new SigScanSharp(Process.Handle);
+            if (processScanner.SelectModule(Process.MainModule))
+            {
+                var foundPatternAddress = processScanner.FindPattern(autoDetectPattern, out var t);
+                if (foundPatternAddress == 0)
+                    messageLogBuilder.AppendLine("Unable to verify or correct RAM start.");
+                else
+                {
+                    var newBaseOffset = (UIntPtr)(foundPatternAddress - COMPARISON_READ_OFFSET);
+                    if (newBaseOffset != _baseOffset)
+                        _baseOffset = newBaseOffset;
+                }
+            }
+        }
         public override bool Suspend()
         {
             SuspendProcess(_process);
@@ -138,12 +166,12 @@ namespace STROOP.Utilities
                 disposedValue = true;
             }
         }
-        
+
         ~WindowsProcessRamIO()
         {
             Dispose(false);
         }
-        
+
         public void Dispose()
         {
             Dispose(true);

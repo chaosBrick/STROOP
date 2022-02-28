@@ -909,6 +909,7 @@
     <Compile Include="Utilities\CogUtilities.cs" />
     <Compile Include="Utilities\Stream\DolphinProcessIO.cs" />
     <Compile Include="Utilities\Stream\BaseProcessIO.cs" />
+    <Compile Include="Utilities\Stream\SigScanSharp.cs" />
     <Compile Include="Utilities\Stream\StFileIO.cs" />
     <Compile Include="Utilities\Stream\WindowsProcessIO.cs" />
     <Compile Include="Utilities\HexUtilities.cs" />

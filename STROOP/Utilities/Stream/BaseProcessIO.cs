@@ -1,18 +1,16 @@
 ﻿using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using static STROOP.Utilities.Kernal32NativeMethods;
 
 namespace STROOP.Utilities
 {
     public abstract class BaseProcessIO : IEmuRamIO
     {
         public abstract event EventHandler OnClose;
+
+        protected StringBuilder messageLogBuilder = new StringBuilder();
 
         protected abstract bool WriteFunc(UIntPtr address, byte[] buffer);
         protected abstract bool ReadFunc(UIntPtr address, byte[] buffer);
@@ -30,6 +28,13 @@ namespace STROOP.Utilities
 
         public BaseProcessIO()
         {
+        }
+
+        public string GetLastMessages()
+        {
+            var result = messageLogBuilder.ToString();
+            messageLogBuilder.Clear();
+            return result;
         }
 
         public bool ReadRelative(uint address, byte[] buffer, EndiannessType endianness)
@@ -57,7 +62,7 @@ namespace STROOP.Utilities
 
                 readBytes = EndiannessUtilities.SwapByteEndianness(readBytes);
                 Buffer.BlockCopy(readBytes, 0, buffer, 0, buffer.Length);
-                
+
                 return true;
             }
         }
@@ -73,7 +78,7 @@ namespace STROOP.Utilities
             if (address.ToUInt64() < BaseOffset.ToUInt64()
                 || address.ToUInt64() + (uint)buffer.Length >= BaseOffset.ToUInt64() + Config.RamSize)
                 return false;
-            
+
             if (Endianness == endianness)
             {
                 return WriteFunc(address, buffer);
@@ -90,10 +95,10 @@ namespace STROOP.Utilities
                     success &= WriteFunc(address, toWrite);
                 }
                 else if (buffer.Length % 4 == 0) // Full alignment writes
-                { 
+                {
                     success &= WriteFunc(address, toWrite);
                 }
-                else 
+                else
                 {
                     throw new Exception("Misaligned data");
                 }
