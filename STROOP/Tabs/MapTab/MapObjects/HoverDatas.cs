@@ -82,8 +82,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             {
                 if (currentPositionAngle == null)
                     return;
-                tab.graphics.view.camera3DMode = MapView.Camera3DMode.FocusOnPositionAngle;
-                tab.graphics.view.focusPositionAngle = currentPositionAngle;
+                tab.graphics.view.Pivot(currentPositionAngle);
             }
 
             public override string ToString() => currentPositionAngle.ToString();

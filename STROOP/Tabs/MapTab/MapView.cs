@@ -39,6 +39,16 @@ namespace STROOP.Tabs.MapTab
         public Matrix4 ComputeViewOrientation() => Matrix4.CreateRotationX(pitch) * Matrix4.CreateRotationY(yaw);
         public Vector3 ComputeViewDirection() => Vector3.TransformPosition(new Vector3(0, 0, 1), ComputeViewOrientation());
 
+        public void Pivot(PositionAngle pivotPoint)
+        {
+            camera3DMode = Camera3DMode.FocusOnPositionAngle;
+            focusPositionAngle = pivotPoint;
+            var d = focusPositionAngle.position - position;
+            yaw = (float)(System.Math.PI / 2 - System.Math.Atan2(d.Z, d.X));
+            pitch = (float)-System.Math.Atan2(d.Y, System.Math.Sqrt(d.X * d.X + d.Z * d.Z));
+            camera3DDistanceController = 10 * (float)(System.Math.Log(d.Length));
+        }
+
         public bool TranslateMapCameraPosition(float xOffset, float yOffset, float zOffset, bool useRelative)
         {
             MapUtilities.MaybeChangeMapCameraMode();
