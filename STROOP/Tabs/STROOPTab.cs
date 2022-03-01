@@ -5,7 +5,7 @@ using System.Drawing;
 
 namespace STROOP.Tabs
 {
-    public abstract partial class STROOPTab : UserControl
+    public partial class STROOPTab : UserControl
     {
         public static void UpdateTab(TabPage page, bool active)
         {
@@ -39,7 +39,14 @@ namespace STROOP.Tabs
             InitializeComponent();
         }
 
-        public abstract string GetDisplayName();
+        public virtual string GetDisplayName()
+        {
+            var baseName = GetType().Name;
+            if (baseName.EndsWith("Tab"))
+                return baseName.Remove(baseName.Length - 3);
+            else
+                return baseName;
+        }
 
         public static void PerformRecursiveAction(Control c, Action<WatchVariableFlowLayoutPanel> action)
         {
