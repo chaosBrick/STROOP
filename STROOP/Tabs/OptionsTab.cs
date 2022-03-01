@@ -74,7 +74,7 @@ namespace STROOP.Tabs
                 (bool value) => SavedSettingsConfig.NeutralizeTrianglesWith0x15 = value,
                 (bool value) => SavedSettingsConfig.CloningUpdatesHolpType = value,
                 (bool value) => SavedSettingsConfig.UseInGameTrigForAngleLogic = value,
-                (bool value) => {SavedSettingsConfig.UseExtendedLevelBoundaries = value; AccessScope<StroopMainForm>.content?.mapTab.RequireGeometryUpdate(); },
+                (bool value) => {SavedSettingsConfig.UseExtendedLevelBoundaries = value; AccessScope<StroopMainForm>.content?.GetTab<MapTab.MapTab>().RequireGeometryUpdate(); },
                 (bool value) => SavedSettingsConfig.UseExpandedRamSize = value,
             };
 
@@ -187,6 +187,8 @@ namespace STROOP.Tabs
                     () => setAllObjectSlotOverlays(false),
                 });
         }
+
+        public override string GetDisplayName() => "Options";
 
         public void AddCogContextMenu(Control cogControl)
         {

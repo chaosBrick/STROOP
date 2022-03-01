@@ -38,6 +38,8 @@ namespace STROOP.Tabs
             watchVariablePanelSnow.SetGroups(ALL_VAR_GROUPS, VISIBLE_VAR_GROUPS);
         }
 
+        public override string GetDisplayName() => "Snow";
+
         public override void InitializeTab()
         {
             base.InitializeTab();

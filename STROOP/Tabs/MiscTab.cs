@@ -31,6 +31,8 @@ namespace STROOP.Tabs
             if (Program.IsVisualStudioHostProcess()) return;
         }
 
+        public override string GetDisplayName() => "Misc";
+
         public override void InitializeTab()
         {
             base.InitializeTab();

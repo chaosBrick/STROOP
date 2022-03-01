@@ -80,6 +80,8 @@ namespace STROOP.Tabs
             _objectSpecificPrecursors = new List<WatchVariableControlPrecursor>();
         }
 
+        public override string GetDisplayName() => "Memory";
+
         public override void InitializeTab()
         {
             base.InitializeTab();

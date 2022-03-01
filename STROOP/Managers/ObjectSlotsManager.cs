@@ -181,8 +181,8 @@ namespace STROOP.Managers
         private TabPage GetTabDestination(bool isMarking)
         {
             if (isMarking) return null;
-            if (ActiveTab == TabType.Other) return mainForm.objectTab.Tab;
-            if (ActiveTab == TabType.TAS && !SpecialConfig.IsSelectedPA) return mainForm.objectTab.Tab;
+            if (ActiveTab == TabType.Other) return mainForm.GetTab<Tabs.ObjectTab>().Tab;
+            if (ActiveTab == TabType.TAS && !SpecialConfig.IsSelectedPA) return mainForm.GetTab<Tabs.ObjectTab>().Tab;
             return null;
         }
 
@@ -199,11 +199,12 @@ namespace STROOP.Managers
 
             if (click == ClickType.ModelClick)
             {
-                uint currentModelObjectAddress = mainForm.modelTab.ModelObjectAddress;
+                var tab = mainForm.GetTab<Tabs.ModelTab>();
+                uint currentModelObjectAddress = tab.ModelObjectAddress;
                 uint newModelObjectAddress = currentModelObjectAddress == selectedSlot.CurrentObject.Address ? 0
                     : selectedSlot.CurrentObject.Address;
-                mainForm.modelTab.ModelObjectAddress = newModelObjectAddress;
-                mainForm.modelTab.ManualMode = false;
+                tab.ModelObjectAddress = newModelObjectAddress;
+                tab.ManualMode = false;
             }
             else if (click == ClickType.CamHackClick)
             {
@@ -307,8 +308,9 @@ namespace STROOP.Managers
 
             if (click == ClickType.MemoryClick)
             {
-                mainForm.memoryTab.SetObjectAddress(selectedSlot.CurrentObject?.Address);
-                mainForm.memoryTab.UpdateHexDisplay();
+                var memoryTab = mainForm.GetTab<Tabs.MemoryTab>();
+                memoryTab.SetObjectAddress(selectedSlot.CurrentObject?.Address);
+                memoryTab.UpdateHexDisplay();
             }
         }
 

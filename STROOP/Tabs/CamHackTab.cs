@@ -22,6 +22,8 @@ namespace STROOP.Tabs
             InitializeComponent();
         }
 
+        public override string GetDisplayName() => "Cam Hack";
+
         public override void InitializeTab()
         {
             base.InitializeTab();

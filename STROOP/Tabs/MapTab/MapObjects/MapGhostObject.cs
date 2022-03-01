@@ -15,11 +15,11 @@ namespace STROOP.Tabs.MapTab.MapObjects
         {
             public static GhostPositionAngle instance = new GhostPositionAngle();
             private GhostPositionAngle() : base() { }
-            Vector3 Position => AccessScope<StroopMainForm>.content?.ghostTab?.GhostPosition ?? new Vector3();
+            Vector3 Position => AccessScope<StroopMainForm>.content?.GetTab<GhostTab.GhostTab>()?.GhostPosition ?? new Vector3();
             public override double X => Position.X;
             public override double Y => Position.Y;
             public override double Z => Position.Z;
-            public override double Angle => AccessScope<StroopMainForm>.content?.ghostTab?.GhostAngle ?? 0;
+            public override double Angle => AccessScope<StroopMainForm>.content?.GetTab<GhostTab.GhostTab>()?.GhostAngle ?? 0;
 
             public override bool SetX(double value) => false;
             public override bool SetY(double value) => false;

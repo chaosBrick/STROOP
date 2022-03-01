@@ -21,6 +21,8 @@ namespace STROOP.Tabs
             InitializeComponent();
         }
 
+        public override string GetDisplayName() => "Disassembly";
+
         public override void InitializeTab()
         {
             base.InitializeTab();

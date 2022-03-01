@@ -150,6 +150,8 @@ namespace STROOP.Tabs
             watchVariablePanelObject.SetGroups(ALL_VAR_GROUPS, VISIBLE_VAR_GROUPS);
         }
 
+        public override string GetDisplayName() => "Object";
+
         public override void InitializeTab()
         {
             base.InitializeTab();

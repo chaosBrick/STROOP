@@ -54,7 +54,7 @@ namespace STROOP.Structs.Configurations
             set
             {
                 _numPans = Math.Max(0, value);
-                AccessScope<StroopMainForm>.content.camHackTab.NotifyNumPanChange((int)_numPans);
+                AccessScope<StroopMainForm>.content.GetTab<Tabs.CamHackTab>().NotifyNumPanChange((int)_numPans);
             }
         }
         public static double CurrentPan

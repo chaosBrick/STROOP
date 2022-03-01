@@ -22,6 +22,8 @@ namespace STROOP.Tabs
             _m64File = new M64File(this);
         }
 
+        public override string GetDisplayName() => "M64";
+
         public override void InitializeTab()
         {
             base.InitializeTab();

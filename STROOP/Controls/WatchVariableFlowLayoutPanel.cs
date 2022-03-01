@@ -430,7 +430,7 @@ namespace STROOP.Controls
         private void AddAllVariablesToCustomTab()
         {
             GetCurrentVariableControls().ForEach(varControl =>
-                varControl.AddToTab(AccessScope<StroopMainForm>.content.customTab.watchVariablePanelCustom));
+                varControl.AddToTab(AccessScope<StroopMainForm>.content.GetTab<Tabs.CustomTab>().watchVariablePanelCustom));
         }
 
         private List<XElement> GetCurrentVarXmlElements(bool useCurrentState = true)

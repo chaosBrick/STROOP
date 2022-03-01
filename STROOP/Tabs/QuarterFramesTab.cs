@@ -27,5 +27,7 @@ namespace STROOP.Tabs
             InitializeComponent();
             watchVariablePanelQuarterFrame.SetGroups(ALL_VAR_GROUPS, VISIBLE_VAR_GROUPS);
         }
+
+        public override string GetDisplayName() => "QFrames";
     }
 }

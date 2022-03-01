@@ -204,16 +204,11 @@ namespace STROOP.Structs.Configurations
             }
         }
 
-        public static List<TabPage> _recommendedTabOrder;
-
-        public static void StoreRecommendedTabOrder()
-        {
-            _recommendedTabOrder = ControlUtilities.GetTabPages(Config.TabControlMain);
-        }
+        public static List<TabPage> _allTabs = new List<TabPage>();
 
         public static void InvokeRecommendedTabOrder()
         {
-            InvokeTabOrderCleanly(_recommendedTabOrder);
+            InvokeTabOrderCleanly(_allTabs);
             Save();
         }
 
@@ -277,9 +272,7 @@ namespace STROOP.Structs.Configurations
 
         public static void InvokeInitiallySavedRemovedTabs()
         {
-            List<TabPage> removedTabs =
-                ControlUtilities.GetTabPages(Config.TabControlMain)
-                .FindAll(tab => InitiallySavedRemovedTabs.Contains(tab.Text));
+            List<TabPage> removedTabs = _allTabs.FindAll(tab => InitiallySavedRemovedTabs.Contains(tab.Text));
             removedTabs.ForEach(tab => RemoveTab(tab, shouldSave: false));
         }
 

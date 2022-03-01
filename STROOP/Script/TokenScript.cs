@@ -46,7 +46,8 @@ namespace STROOP.Script
 
         public void Run()
         {
-            List<(string, object)> inputData = AccessScope<StroopMainForm>.content.scriptTab.watchVariablePanelScript.GetCurrentVariableNamesAndValues();
+            var scriptTab = AccessScope<StroopMainForm>.content.GetTab<Tabs.ScriptTab>();
+            List<(string, object)> inputData = scriptTab.watchVariablePanelScript.GetCurrentVariableNamesAndValues();
             List<string> inputItems = new List<string>();
             foreach ((string name, object value) in inputData)
             {
@@ -61,7 +62,7 @@ namespace STROOP.Script
             {
                 string name = outputItems[i];
                 string value = outputItems[i + 1];
-                AccessScope<StroopMainForm>.content.scriptTab.watchVariablePanelScript.SetVariableValueByName(name, value);
+                scriptTab.watchVariablePanelScript.SetVariableValueByName(name, value);
             }
         }
 

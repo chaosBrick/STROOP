@@ -48,6 +48,8 @@ namespace STROOP.Tabs
             _undoDictionary = new Dictionary<uint, object>();
         }
 
+        public override string GetDisplayName() => "Search";
+
         public override void InitializeTab()
         {
             base.InitializeTab();

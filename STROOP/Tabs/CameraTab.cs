@@ -13,6 +13,8 @@ namespace STROOP.Tabs
             InitializeComponent();
         }
 
+        public override string GetDisplayName() => "Camera";
+
         public override void InitializeTab()
         {
             base.InitializeTab();

@@ -24,6 +24,8 @@ namespace STROOP.Tabs
             InitializeComponent();
         }
 
+        public override string GetDisplayName() => "Custom";
+
         public override void InitializeTab()
         {
             base.InitializeTab();

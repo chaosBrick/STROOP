@@ -55,6 +55,8 @@ namespace STROOP.Tabs.GhostTab
             UpdateFileWatchers();
         }
 
+        public override string GetDisplayName() => "Ghost";
+
         void AddGhost(string name, Ghost newGhost)
         {
             newGhost.name = name;

@@ -29,6 +29,8 @@ namespace STROOP.Tabs
             watchVariablePanelTriangles.SetGroups(ALL_VAR_GROUPS, VISIBLE_VAR_GROUPS);
         }
 
+        public override string GetDisplayName() => "Triangles";
+
         public override void InitializeTab()
         {
             base.InitializeTab();

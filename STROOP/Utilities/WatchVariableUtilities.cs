@@ -98,9 +98,10 @@ namespace STROOP.Structs
 
                 case BaseAddressTypeEnum.Triangle:
                     {
-                        List<uint> triangleAddresses = AccessScope<StroopMainForm>.content.trianglesTab.TriangleAddresses;
+                        var trianglesTab = AccessScope<StroopMainForm>.content.GetTab<Tabs.TrianglesTab>();
+                        List<uint> triangleAddresses = trianglesTab.TriangleAddresses;
                         if (triangleAddresses.Count == 1 && triangleAddresses[0] == 0) return BaseAddressListEmpty;
-                        return AccessScope<StroopMainForm>.content.trianglesTab.TriangleAddresses;
+                        return trianglesTab.TriangleAddresses;
                     }
 
                 case BaseAddressTypeEnum.TriangleExertionForceTable:
@@ -113,7 +114,7 @@ namespace STROOP.Structs
 
                 case BaseAddressTypeEnum.CellsTriangle:
                     {
-                        uint triangleAddress = AccessScope<StroopMainForm>.content.cellsTab.TriangleAddress;
+                        uint triangleAddress = AccessScope<StroopMainForm>.content.GetTab<Tabs.CellsTab>().TriangleAddress;
                         return triangleAddress != 0 ? new List<uint>() { triangleAddress } : BaseAddressListEmpty;
                     }
 
@@ -178,13 +179,13 @@ namespace STROOP.Structs
 
                 case BaseAddressTypeEnum.Painting:
                     {
-                        uint? paintingAddress = AccessScope<StroopMainForm>.content.paintingTab.GetPaintingAddress();
+                        uint? paintingAddress = AccessScope<StroopMainForm>.content.GetTab<Tabs.PaintingTab>().GetPaintingAddress();
                         return paintingAddress != null ? new List<uint>() { paintingAddress.Value } : BaseAddressListEmpty;
                     }
 
                 case BaseAddressTypeEnum.Music:
                     {
-                        uint? musicAddress = AccessScope<StroopMainForm>.content.musicTab.GetMusicAddress();
+                        uint? musicAddress = AccessScope<StroopMainForm>.content.GetTab<Tabs.MusicTab>().GetMusicAddress();
                         return musicAddress != null ? new List<uint>() { musicAddress.Value } : BaseAddressListEmpty;
                     }
 
@@ -207,7 +208,7 @@ namespace STROOP.Structs
 
                 case BaseAddressTypeEnum.GfxNode:
                     {
-                        Tabs.GfxTab.GfxNode node = AccessScope<StroopMainForm>.content.gfxTab.SelectedNode;
+                        Tabs.GfxTab.GfxNode node = AccessScope<StroopMainForm>.content.GetTab<Tabs.GfxTab.GfxTab>().SelectedNode;
                         return node != null ? new List<uint>() { node.Address } : BaseAddressListEmpty;
                     }
                 case BaseAddressTypeEnum.GhostHack:

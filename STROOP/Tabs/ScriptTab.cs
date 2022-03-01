@@ -16,6 +16,8 @@ namespace STROOP.Tabs
             _script = new TokenScript();
         }
 
+        public override string GetDisplayName() => "Script";
+
         public override void InitializeTab()
         {
             base.InitializeTab();

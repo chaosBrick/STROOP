@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
+using System.IO;
 using STROOP.Utilities;
 using STROOP.Structs;
 using STROOP.Managers;
@@ -15,7 +16,6 @@ using STROOP.Structs.Configurations;
 using STROOP.Controls;
 using STROOP.Forms;
 using STROOP.Models;
-using System.IO;
 
 namespace STROOP
 {
@@ -25,6 +25,7 @@ namespace STROOP
 
         DataTable _tableOtherData = new DataTable();
         Dictionary<int, DataRow> _otherDataRowAssoc = new Dictionary<int, DataRow>();
+        Dictionary<Type, Tabs.STROOPTab> tabsByType = new Dictionary<Type, Tabs.STROOPTab>();
         public ObjectSlotsManager ObjectSlotsManager;
 
         bool _objSlotResizing = false;
@@ -35,8 +36,9 @@ namespace STROOP
         {
             this.isMainForm = isMainForm;
             InitializeComponent();
+            InitTabs();
             ObjectSlotsManager = new ObjectSlotsManager(this, tabControlMain);
-            optionsTab.AddCogContextMenu(pictureBoxCog);
+            GetTab<Tabs.OptionsTab>().AddCogContextMenu(pictureBoxCog);
         }
 
         private bool AttachToProcess(Process process)
@@ -50,6 +52,30 @@ namespace STROOP
             }
 
             return Config.Stream.SwitchProcess(process, emulators[0]);
+        }
+
+        private void InitTabs()
+        {
+            SavedSettingsConfig._allTabs.Clear();
+            tabControlMain.TabPages.Clear();
+            foreach (var t in typeof(Tabs.STROOPTab).Assembly.GetTypes())
+            {
+                if (t.IsSubclassOf(typeof(Tabs.STROOPTab)) && !t.IsAbstract && !t.IsGenericType)
+                {
+                    var ctor = t.GetConstructor(new Type[0]);
+                    if (ctor != null)
+                    {
+                        var tabControl = (Tabs.STROOPTab)ctor.Invoke(new object[0]);
+                        var newTab = new TabPage(tabControl.GetDisplayName());
+                        newTab.Controls.Add(tabControl);
+                        tabControl.Bounds = newTab.ClientRectangle;
+                        tabControl.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top | AnchorStyles.Bottom;
+                        tabsByType[t] = tabControl;
+                        tabControlMain.TabPages.Add(newTab);
+                        SavedSettingsConfig._allTabs.Add(newTab);
+                    }
+                }
+            }
         }
 
         private void StroopMainForm_Load(object sender, EventArgs e)
@@ -66,7 +92,6 @@ namespace STROOP
             Config.TabControlMain = tabControlMain;
             Config.DebugText = labelDebugText;
 
-            SavedSettingsConfig.StoreRecommendedTabOrder();
             SavedSettingsConfig.InvokeInitiallySavedTabOrder();
             Config.TabControlMain.SelectedIndex = 0;
             InitializeTabRemoval();
@@ -140,10 +165,10 @@ namespace STROOP
                 {
                     () => MappingConfig.OpenMapping(),
                     () => MappingConfig.ClearMapping(),
-                    () => gfxTab.InjectHitboxViewCode(),
+                    () => GetTab<Tabs.GfxTab.GfxTab>().InjectHitboxViewCode(),
                     () => Config.Stream.SetValue(MarioConfig.FreeMovementAction, MarioConfig.StructAddress + MarioConfig.ActionOffset),
-                    () => fileTab.DoEverything(),
-                    () => trianglesTab.GoToClosestVertex(),
+                    () => GetTab<Tabs.FileTab>().DoEverything(),
+                    () => GetTab<Tabs.TrianglesTab>().GoToClosestVertex(),
                     () => saveAsSavestate(),
                     () =>
                     {
@@ -161,8 +186,9 @@ namespace STROOP
                     () => HelpfulHintUtilities.ShowAllHelpfulHints(),
                     () =>
                     {
+                        var tasTab = GetTab<Tabs.TasTab>();
                         tasTab.EnableTASerSettings();
-                        tabControlMain.SelectedTab = tabPageTas;
+                        tabControlMain.SelectedTab = tasTab.Tab;
                     },
                     () =>
                     {
@@ -535,6 +561,8 @@ namespace STROOP
             bool containsTab = tabPages.Any(tabPage => tabPage.Name == name);
             if (containsTab) tabControlMain.SelectTab(name);
         }
+
+        public T GetTab<T>() where T : Tabs.STROOPTab => (T)tabsByType[typeof(T)];
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {

@@ -116,14 +116,14 @@ namespace STROOP
             itemSelectInObjectTab.Click += (sender, e) =>
             {
                 Config.ObjectSlotsManager.DoSlotClickUsingSpecifications(
-                    this, ClickType.ObjectClick, false, false, AccessScope<StroopMainForm>.content.objectTab.Tab, null);
+                    this, ClickType.ObjectClick, false, false, AccessScope<StroopMainForm>.content.GetTab<Tabs.ObjectTab>().Tab, null);
             };
 
             ToolStripMenuItem itemSelectInMemoryTab = new ToolStripMenuItem("Select in Memory Tab");
             itemSelectInMemoryTab.Click += (sender, e) =>
             {
                 Config.ObjectSlotsManager.DoSlotClickUsingSpecifications(
-                    this, ClickType.MemoryClick, false, false, AccessScope<StroopMainForm>.content.memoryTab.Tab, null);
+                    this, ClickType.MemoryClick, false, false, AccessScope<StroopMainForm>.content.GetTab<Tabs.MemoryTab>().Tab, null);
             };
 
             ToolStripMenuItem itemSelectInCurrentTab = new ToolStripMenuItem("Select in Current Tab");
@@ -608,7 +608,7 @@ namespace STROOP
                 _drawClosestOverlay = OverlayConfig.ShowOverlayClosestObject && address == DataModels.Mario.ClosestObject;
                 _drawCameraOverlay = OverlayConfig.ShowOverlayCameraObject && address == DataModels.Camera.SecondaryObject;
                 _drawCameraHackOverlay = OverlayConfig.ShowOverlayCameraHackObject && address == DataModels.Camera.HackObject;
-                _drawModelOverlay = address == AccessScope<StroopMainForm>.content.modelTab.ModelObjectAddress;
+                _drawModelOverlay = address == AccessScope<StroopMainForm>.content.GetTab<Tabs.ModelTab>().ModelObjectAddress;
                 _drawWallOverlay = OverlayConfig.ShowOverlayWallObject && address == DataModels.Mario.WallTriangle?.AssociatedObject;
                 _drawFloorOverlay = OverlayConfig.ShowOverlayFloorObject && address == DataModels.Mario.FloorTriangle?.AssociatedObject;
                 _drawCeilingOverlay = OverlayConfig.ShowOverlayCeilingObject && address == DataModels.Mario.CeilingTriangle?.AssociatedObject;
@@ -709,7 +709,7 @@ namespace STROOP
                     break;
 
                 case TabType.Model:
-                    selectionType = CurrentObject?.Address == AccessScope<StroopMainForm>.content.modelTab.ModelObjectAddress
+                    selectionType = CurrentObject?.Address == AccessScope<StroopMainForm>.content.GetTab<Tabs.ModelTab>().ModelObjectAddress
                         ? SelectionType.MODEL_SELECTION : SelectionType.NOT_SELECTED;
                     break;
 

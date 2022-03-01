@@ -3241,7 +3241,7 @@ namespace STROOP.Structs
                     uint structSize = TriangleConfig.TriangleStructSize;
                     uint newTriAddress = (uint)(triangleListStartAddress + index * structSize);
 
-                    AccessScope<StroopMainForm>.content.trianglesTab.SetCustomTriangleAddresses(newTriAddress);
+                    AccessScope<StroopMainForm>.content.GetTab<Tabs.TrianglesTab>().SetCustomTriangleAddresses(newTriAddress);
                     return true;
                 }
             ));
@@ -3273,7 +3273,7 @@ namespace STROOP.Structs
             ,
                 (uint address, uint triAddress) =>
                 {
-                    AccessScope<StroopMainForm>.content.trianglesTab.SetCustomTriangleAddresses(address);
+                    AccessScope<StroopMainForm>.content.GetTab<Tabs.TrianglesTab>().SetCustomTriangleAddresses(address);
                     return true;
                 }
             ));
@@ -3281,12 +3281,12 @@ namespace STROOP.Structs
             dictionary.Add("CurrentCellsTriangleAddress",
                 ((uint dummy) =>
                 {
-                    return AccessScope<StroopMainForm>.content.cellsTab.TriangleAddress;
+                    return AccessScope<StroopMainForm>.content.GetTab<Tabs.CellsTab>().TriangleAddress;
                 }
             ,
                 (uint address, uint dummy) =>
                 {
-                    AccessScope<StroopMainForm>.content.cellsTab.TriangleAddress = address;
+                    AccessScope<StroopMainForm>.content.GetTab<Tabs.CellsTab>().TriangleAddress = address;
                     return true;
                 }
             ));
@@ -3877,7 +3877,7 @@ namespace STROOP.Structs
             dictionary.Add("StarsInFile",
                 ((uint fileAddress) =>
                 {
-                    return AccessScope<StroopMainForm>.content.fileTab.CalculateNumStars(fileAddress);
+                    return AccessScope<StroopMainForm>.content.GetTab<Tabs.FileTab>().CalculateNumStars(fileAddress);
                 }
             ,
                 DEFAULT_SETTER));
@@ -3885,7 +3885,7 @@ namespace STROOP.Structs
             dictionary.Add("FileChecksumCalculated",
                 ((uint fileAddress) =>
                 {
-                    return AccessScope<StroopMainForm>.content.fileTab.GetChecksum(fileAddress);
+                    return AccessScope<StroopMainForm>.content.GetTab<Tabs.FileTab>().GetChecksum(fileAddress);
                 }
             ,
                 DEFAULT_SETTER));
@@ -3895,7 +3895,7 @@ namespace STROOP.Structs
             dictionary.Add("MainSaveChecksumCalculated",
                 ((uint mainSaveAddress) =>
                 {
-                    return AccessScope<StroopMainForm>.content.mainSaveTab.GetChecksum(mainSaveAddress);
+                    return AccessScope<StroopMainForm>.content.GetTab<Tabs.MainSaveTab>().GetChecksum(mainSaveAddress);
                 }
             ,
                 DEFAULT_SETTER));

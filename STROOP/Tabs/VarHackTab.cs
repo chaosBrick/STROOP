@@ -16,6 +16,8 @@ namespace STROOP.Tabs
             InitializeComponent();
         }
 
+        public override string GetDisplayName() => "Var Hack";
+
         public override void InitializeTab()
         {
             base.InitializeTab();
@@ -170,7 +172,7 @@ namespace STROOP.Tabs
 
             if (watchVar.BaseAddressType == BaseAddressTypeEnum.Triangle)
             {
-                var trianglePointerAddress = AccessScope<StroopMainForm>.content.trianglesTab.TrianglePointerAddress;
+                var trianglePointerAddress = AccessScope<StroopMainForm>.content.GetTab<TrianglesTab>().TrianglePointerAddress;
                 if (trianglePointerAddress.HasValue)
                 {
                     AddVariable(

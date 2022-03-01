@@ -32,6 +32,8 @@ namespace STROOP.Tabs
             watchVariablePanelWarp.SetGroups(ALL_VAR_GROUPS, VISIBLE_VAR_GROUPS);
         }
 
+        public override string GetDisplayName() => "Warp";
+
         public override void InitializeTab()
         {
             base.InitializeTab();

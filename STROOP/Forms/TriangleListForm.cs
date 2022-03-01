@@ -72,7 +72,7 @@ namespace STROOP.Forms
 
         private void Inject()
         {
-            AccessScope<StroopMainForm>.content.gfxTab.InjectHitboxViewCode();
+            AccessScope<StroopMainForm>.content.GetTab<Tabs.GfxTab.GfxTab>().InjectHitboxViewCode();
         }
 
         private void Remove()

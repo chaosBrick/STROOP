@@ -15,6 +15,8 @@ namespace STROOP.Tabs
             InitializeComponent();
         }
 
+        public override string GetDisplayName() => "Coin";
+
         public override void InitializeTab()
         {
             base.InitializeTab();

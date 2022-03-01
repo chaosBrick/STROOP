@@ -8,7 +8,7 @@ namespace STROOP.Structs.Configurations
 {
     public static class MainSaveConfig
     {
-        public static uint CurrentMainSaveAddress => AccessScope<StroopMainForm>.content.mainSaveTab.CurrentMainSaveAddress;
+        public static uint CurrentMainSaveAddress => AccessScope<StroopMainForm>.content.GetTab<Tabs.MainSaveTab>().CurrentMainSaveAddress;
 
         public static uint MainSaveStructAddress { get => RomVersionConfig.SwitchMap(MainSaveStructAddressUS, MainSaveStructAddressJP); }
         public static readonly uint MainSaveStructAddressUS = 0x802078C0;

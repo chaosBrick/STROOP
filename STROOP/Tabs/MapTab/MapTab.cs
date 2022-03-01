@@ -61,6 +61,8 @@ namespace STROOP.Tabs.MapTab
             if (Program.IsVisualStudioHostProcess()) return;
         }
 
+        public override string GetDisplayName() => "Map";
+
         public void Load2D()
         {
             // Create new graphics control

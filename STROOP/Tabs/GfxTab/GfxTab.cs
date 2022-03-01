@@ -10,7 +10,7 @@ using STROOP.Utilities;
 
 namespace STROOP.Tabs.GfxTab
 {
-    public partial class GfxTab : UserControl
+    public partial class GfxTab : STROOPTab
     {
         /**
         * The Gfx tree is responsible for drawing everything in SM64 except HUD text
@@ -43,8 +43,9 @@ namespace STROOP.Tabs.GfxTab
             ResumeLayout();
 
             SpecificVariables = new List<WatchVariableControl>();
-
         }
+
+        public override string GetDisplayName() => "Gfx";
 
         // Inject code that shows hitboxes in-game
         // Note: a bit ugly at the moment. Hack folder is hardcoded instead of taken from Config file,

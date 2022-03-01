@@ -12,6 +12,8 @@ namespace STROOP.Tabs
             InitializeComponent();
         }
 
+        public override string GetDisplayName() => "Sound";
+
         public override void InitializeTab()
         {
             base.InitializeTab();

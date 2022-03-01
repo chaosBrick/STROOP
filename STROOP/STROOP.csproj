@@ -744,12 +744,6 @@
     <Compile Include="Tabs\TasTab.Designer.cs">
       <DependentUpon>TasTab.cs</DependentUpon>
     </Compile>
-    <Compile Include="Tabs\TestingTab.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Tabs\TestingTab.Designer.cs">
-      <DependentUpon>TestingTab.cs</DependentUpon>
-    </Compile>
     <Compile Include="Tabs\TrianglesTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -1089,9 +1083,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Tabs\TasTab.resx">
       <DependentUpon>TasTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\TestingTab.resx">
-      <DependentUpon>TestingTab.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Tabs\TrianglesTab.resx">
       <DependentUpon>TrianglesTab.cs</DependentUpon>
