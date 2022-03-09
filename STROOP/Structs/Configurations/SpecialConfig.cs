@@ -2,16 +2,12 @@
 using STROOP.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace STROOP.Structs.Configurations
 {
     public static class SpecialConfig
     {
-        // Point vars
-
+        public static float ExtBoundariesScale => SavedSettingsConfig.UseExtendedLevelBoundaries ? 4 : 1;
         // - Self pos
 
         public static PositionAngle SelfPosPA = PositionAngle.Mario;
@@ -43,7 +39,7 @@ namespace STROOP.Structs.Configurations
 
         // - Functions
 
-        public static bool IsSelectedPA => SelfPosPA.IsSelected ||  SelfAnglePA.IsSelected;
+        public static bool IsSelectedPA => SelfPosPA.IsSelected || SelfAnglePA.IsSelected;
 
         // Cam Hack vars
 
@@ -123,7 +119,7 @@ namespace STROOP.Structs.Configurations
             set => GoalRngValue = RngIndexer.GetRngValue(value);
         }
         public static ushort GoalRngValue = 0;
-        
+
         // PU vars
 
         public static int PuParam1 = 0;
@@ -145,90 +141,9 @@ namespace STROOP.Structs.Configurations
         public static uint VirtualToSegmentedSegment = 0;
         public static uint VirtualToSegmentedAddress = 0;
         public static uint VirtualToSegmentedOutput => SegmentationUtilities.VirtualToSegmented(VirtualToSegmentedSegment, VirtualToSegmentedAddress);
-
-        // Map3D
-
-        public static Map3DCameraMode Map3DMode = Map3DCameraMode.InGame;
-        public static float Map3DCameraX = 0;
-        public static float Map3DCameraY = 0;
-        public static float Map3DCameraZ = 0;
-        public static float Map3DCameraYaw = 0;
-        public static float Map3DCameraPitch = 0;
-        public static float Map3DCameraRoll = 0;
-        public static float Map3DFocusX = 0;
-        public static float Map3DFocusY = 0;
-        public static float Map3DFocusZ = 0;
-        public static PositionAngle Map3DCameraPosPA = PositionAngle.None;
-        public static PositionAngle Map3DCameraAnglePA = PositionAngle.None;
-        public static PositionAngle Map3DFocusPosPA = PositionAngle.None;
-        public static PositionAngle Map3DFocusAnglePA = PositionAngle.None;
-        public static float Map3DFollowingRadius = 1000;
-        public static float Map3DFollowingYOffset = 1000;
-        public static float Map3DFollowingYaw = 0;
-        public static float Map3DFOV = 0;
+        
 
         public static double Map2DScrollSpeed = 1.1;
-        public static double Map3DScrollSpeed = 100;
-        public static double Map3DTranslateSpeed = 20;
-        public static double Map3DRotateSpeed = 50;
-
-        public static CompassPosition CompassPosition;
-        public static float CompassLineHeight = 50;
-        public static float CompassLineWidth = 10;
-        public static float CompassArrowHeight = 50;
-        public static float CompassArrowWidth = 60;
-        public static float CompassHorizontalMargin = 10;
-        public static float CompassVerticalMargin = 10;
-        public static float CompassDirectionTextSize = 80;
-        public static float CompassAngleTextSize = 80;
-        public static float CompassDirectionTextPosition = 0;
-        public static float CompassAngleTextPosition = 50;
-        public static float CompassShowDirectionText = 1;
-        public static float CompassShowAngleText = 0;
-        public static float CompassAngleTextSigned = 0;
-
-        public static float CompassCenterX
-        {
-            get
-            {
-                throw null;
-                //float relCenterX = CompassHorizontalMargin + CompassArrowHeight + CompassLineHeight + CompassLineWidth / 2;
-                //switch (CompassPosition)
-                //{
-                //    case CompassPosition.TopLeft:
-                //    case CompassPosition.BottomLeft:
-                //        return relCenterX;
-                //    case CompassPosition.TopRight:
-                //    case CompassPosition.BottomRight:
-                //        return glControl.Width - relCenterX;
-                //    case CompassPosition.Center:
-                //        return glControl.Width / 2;
-                //    default:
-                //        throw new ArgumentOutOfRangeException();
-                //}
-            }
-        }
-        public static float CompassCenterZ
-        {
-            get
-            {
-                throw null;
-                //float relCenterZ = CompassVer>ticalMargin + CompassArrowHeight + CompassLineHeight + CompassLineWidth / 2;
-                //switch (CompassPosition)
-                //{
-                //    case CompassPosition.TopLeft:
-                //    case CompassPosition.TopRight:
-                //        return relCenterZ;
-                //    case CompassPosition.BottomLeft:
-                //    case CompassPosition.BottomRight:
-                //        return glControl.Height - relCenterZ;
-                //    case CompassPosition.Center:
-                //        return glControl.Height / 2;
-                //    default:
-                //        throw new ArgumentOutOfRangeException();
-                //}
-            }
-        }
 
         // Dummy Vars
 

@@ -196,42 +196,6 @@ namespace STROOP.Forms
             selectionForm.Show();
         }
 
-        public static void ShowMap3DModeSelectionForm()
-        {
-            SelectionForm selectionForm = new SelectionForm();
-            selectionForm.Initialize(
-                "Select a Mode",
-                "Set Mode",
-                EnumUtilities.GetEnumStrings<Map3DCameraMode>(typeof(Map3DCameraMode)),
-                modeString =>
-                {
-                    try
-                    {
-                        SpecialConfig.Map3DMode = (Map3DCameraMode)Enum.Parse(typeof(Map3DCameraMode), modeString, true);
-                    }
-                    catch (Exception) { }
-                });
-            selectionForm.Show();
-        }
-
-        public static void ShowCompassPositionSelectionForm()
-        {
-            SelectionForm selectionForm = new SelectionForm();
-            selectionForm.Initialize(
-                "Select a Compass Position",
-                "Set Compass Position",
-                EnumUtilities.GetEnumStrings<CompassPosition>(typeof(CompassPosition)),
-                stringValue =>
-                {
-                    try
-                    {
-                        SpecialConfig.CompassPosition = (CompassPosition)Enum.Parse(typeof(CompassPosition), stringValue, true);
-                    }
-                    catch (Exception) { }
-                });
-            selectionForm.Show();
-        }
-
         public static void ShowDataManagerSelectionForm(List<WatchVariableControl> controls, AddToTabTypeEnum addToTabType)
         {
             SelectionForm selectionForm = new SelectionForm();

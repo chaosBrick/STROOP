@@ -146,7 +146,7 @@ namespace STROOP.Tabs.MapTab.Renderers
             var mat = graphics.ViewMatrix;
             GL.UniformMatrix4(GL.GetUniformLocation(program, "viewProjection"), false, ref mat);
             GL.Uniform2(uniform_pixelsPerUnit, ref pixelsPerUnit);
-            float unitDivisor = Structs.Configurations.SavedSettingsConfig.UseExtendedLevelBoundaries ? 4 : 1;
+            float unitDivisor = Structs.Configurations.SpecialConfig.ExtBoundariesScale;
             GL.Uniform1(uniform_unitDivisor, unitDivisor);
 
             GL.Uniform2(GL.GetUniformLocation(program, "gridOffset"), new Vector2(0)); // new Vector2(-3, -3));

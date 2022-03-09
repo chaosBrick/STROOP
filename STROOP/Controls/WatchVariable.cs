@@ -93,12 +93,7 @@ namespace STROOP.Controls
                 {
                     throw new ArgumentOutOfRangeException("Special var cannot have base address type " + baseAddressType);
                 }
-
-                if (offsetDefault.HasValue || offsetUS.HasValue || offsetJP.HasValue || offsetSH.HasValue || offsetEU.HasValue)
-                {
-                    throw new ArgumentOutOfRangeException("Special var cannot have any type of offset");
-                }
-
+                
                 if (mask != null)
                 {
                     throw new ArgumentOutOfRangeException("Special var cannot have mask");

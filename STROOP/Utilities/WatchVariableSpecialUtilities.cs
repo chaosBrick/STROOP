@@ -1,5 +1,4 @@
 ﻿using STROOP.Controls;
-using STROOP.Managers;
 using STROOP.Models;
 using STROOP.Structs.Configurations;
 using STROOP.Ttc;
@@ -24,7 +23,6 @@ namespace STROOP.Structs
             AddLiteralEntriesToDictionary();
             AddGeneratedEntriesToDictionary();
             AddPanEntriesToDictionary();
-            AddMap3DEntriesToDictionary();
             InitializeSpecialAttribute.ExecuteInitializers();
         }
 
@@ -491,136 +489,7 @@ namespace STROOP.Structs
                 ));
             }
         }
-
-        public static void AddMap3DEntriesToDictionary()
-        {
-            List<(string, Func<float>, Action<float>)> floatEntries =
-                new List<(string, Func<float>, Action<float>)>()
-                {
-                    ("Map3DCameraX", () => SpecialConfig.Map3DCameraX, (float value) => SpecialConfig.Map3DCameraX = value),
-                    ("Map3DCameraY", () => SpecialConfig.Map3DCameraY, (float value) => SpecialConfig.Map3DCameraY = value),
-                    ("Map3DCameraZ", () => SpecialConfig.Map3DCameraZ, (float value) => SpecialConfig.Map3DCameraZ = value),
-                    ("Map3DCameraYaw", () => SpecialConfig.Map3DCameraYaw, (float value) => SpecialConfig.Map3DCameraYaw = value),
-                    ("Map3DCameraPitch", () => SpecialConfig.Map3DCameraPitch, (float value) => SpecialConfig.Map3DCameraPitch = value),
-                    ("Map3DCameraRoll", () => SpecialConfig.Map3DCameraRoll, (float value) => SpecialConfig.Map3DCameraRoll = value),
-                    ("Map3DFocusX", () => SpecialConfig.Map3DFocusX, (float value) => SpecialConfig.Map3DFocusX = value),
-                    ("Map3DFocusY", () => SpecialConfig.Map3DFocusY, (float value) => SpecialConfig.Map3DFocusY = value),
-                    ("Map3DFocusZ", () => SpecialConfig.Map3DFocusZ, (float value) => SpecialConfig.Map3DFocusZ = value),
-                    ("Map3DFollowingRadius", () => SpecialConfig.Map3DFollowingRadius, (float value) => SpecialConfig.Map3DFollowingRadius = value),
-                    ("Map3DFollowingYOffset", () => SpecialConfig.Map3DFollowingYOffset, (float value) => SpecialConfig.Map3DFollowingYOffset = value),
-                    ("Map3DFollowingYaw", () => SpecialConfig.Map3DFollowingYaw, (float value) => SpecialConfig.Map3DFollowingYaw = value),
-                    ("Map3DFOV", () => SpecialConfig.Map3DFOV, (float value) => SpecialConfig.Map3DFOV = value),
-
-                    ("CompassLineHeight", () => SpecialConfig.CompassLineHeight, (float value) => SpecialConfig.CompassLineHeight = value),
-                    ("CompassLineWidth", () => SpecialConfig.CompassLineWidth, (float value) => SpecialConfig.CompassLineWidth = value),
-                    ("CompassArrowHeight", () => SpecialConfig.CompassArrowHeight, (float value) => SpecialConfig.CompassArrowHeight = value),
-                    ("CompassArrowWidth", () => SpecialConfig.CompassArrowWidth, (float value) => SpecialConfig.CompassArrowWidth = value),
-                    ("CompassHorizontalMargin", () => SpecialConfig.CompassHorizontalMargin, (float value) => SpecialConfig.CompassHorizontalMargin = value),
-                    ("CompassVerticalMargin", () => SpecialConfig.CompassVerticalMargin, (float value) => SpecialConfig.CompassVerticalMargin = value),
-                    ("CompassDirectionTextSize", () => SpecialConfig.CompassDirectionTextSize, (float value) => SpecialConfig.CompassDirectionTextSize = value),
-                    ("CompassAngleTextSize", () => SpecialConfig.CompassAngleTextSize, (float value) => SpecialConfig.CompassAngleTextSize = value),
-                    ("CompassDirectionTextPosition", () => SpecialConfig.CompassDirectionTextPosition, (float value) => SpecialConfig.CompassDirectionTextPosition = value),
-                    ("CompassAngleTextPosition", () => SpecialConfig.CompassAngleTextPosition, (float value) => SpecialConfig.CompassAngleTextPosition = value),
-                    ("CompassShowDirectionText", () => SpecialConfig.CompassShowDirectionText, (float value) => SpecialConfig.CompassShowDirectionText = value),
-                    ("CompassShowAngleText", () => SpecialConfig.CompassShowAngleText, (float value) => SpecialConfig.CompassShowAngleText = value),
-                    ("CompassAngleTextSigned", () => SpecialConfig.CompassAngleTextSigned, (float value) => SpecialConfig.CompassAngleTextSigned = value),
-                };
-
-            foreach ((string key, Func<float> getter, Action<float> setter) in floatEntries)
-            {
-                dictionary.Add(key,
-                    ((uint dummy) =>
-                    {
-                        return getter();
-                    }
-                ,
-                    (float floatValue, uint dummy) =>
-                    {
-                        setter(floatValue);
-                        return true;
-                    }
-                ));
-            }
-
-            List<(string, Func<double>, Action<double>)> doubleEntries =
-                new List<(string, Func<double>, Action<double>)>()
-                {
-                    ("Map2DScrollSpeed", () => SpecialConfig.Map2DScrollSpeed, (double value) => SpecialConfig.Map2DScrollSpeed = value),
-                    ("Map3DScrollSpeed", () => SpecialConfig.Map3DScrollSpeed, (double value) => SpecialConfig.Map3DScrollSpeed = value),
-                    ("Map3DTranslateSpeed", () => SpecialConfig.Map3DTranslateSpeed, (double value) => SpecialConfig.Map3DTranslateSpeed = value),
-                    ("Map3DRotateSpeed", () => SpecialConfig.Map3DRotateSpeed, (double value) => SpecialConfig.Map3DRotateSpeed = value),
-                };
-
-            foreach ((string key, Func<double> getter, Action<double> setter) in doubleEntries)
-            {
-                dictionary.Add(key,
-                    ((uint dummy) =>
-                    {
-                        return getter();
-                    }
-                ,
-                    (double doubleValue, uint dummy) =>
-                    {
-                        setter(doubleValue);
-                        return true;
-                    }
-                ));
-            }
-
-            List<(string, Func<string>, Action<PositionAngle>)> posAngleEntries =
-                new List<(string, Func<string>, Action<PositionAngle>)>()
-                {
-                    ("Map3DCameraPosPA", () => SpecialConfig.Map3DCameraPosPA.ToString(), (PositionAngle value) => SpecialConfig.Map3DCameraPosPA = value),
-                    ("Map3DCameraAnglePA", () => SpecialConfig.Map3DCameraAnglePA.ToString(), (PositionAngle value) => SpecialConfig.Map3DCameraAnglePA = value),
-                    ("Map3DFocusPosPA", () => SpecialConfig.Map3DFocusPosPA.ToString(), (PositionAngle value) => SpecialConfig.Map3DFocusPosPA = value),
-                    ("Map3DFocusAnglePA", () => SpecialConfig.Map3DFocusAnglePA.ToString(), (PositionAngle value) => SpecialConfig.Map3DFocusAnglePA = value),
-                };
-
-            foreach ((string key, Func<string> getter, Action<PositionAngle> setter) in posAngleEntries)
-            {
-                dictionary.Add(key,
-                    ((uint dummy) =>
-                    {
-                        return getter();
-                    }
-                ,
-                    (PositionAngle posAngle, uint dummy) =>
-                    {
-                        setter(posAngle);
-                        return true;
-                    }
-                ));
-            }
-
-            List<(string, Func<string>, Action<string>)> stringEntries =
-                new List<(string, Func<string>, Action<string>)>()
-                {
-                    ("Map3DMode", () => SpecialConfig.Map3DMode.ToString(), (string value) => SpecialConfig.Map3DMode = (Map3DCameraMode)Enum.Parse(typeof(Map3DCameraMode), value, true)),
-                    ("CompassPosition", () => SpecialConfig.CompassPosition.ToString(), (string value) => SpecialConfig.CompassPosition = (CompassPosition)Enum.Parse(typeof(CompassPosition), value, true)),
-                };
-
-            foreach ((string key, Func<string> getter, Action<string> setter) in stringEntries)
-            {
-                dictionary.Add(key,
-                    ((uint dummy) =>
-                    {
-                        return getter();
-                    }
-                ,
-                    (string value, uint dummy) =>
-                    {
-                        try
-                        {
-                            setter(value);
-                            return true;
-                        }
-                        catch (Exception) { }
-                        return false;
-                    }
-                ));
-            }
-        }
-
+        
         public static void AddGeneratedEntriesToDictionary()
         {
             List<Func<uint, PositionAngle>> posAngleFuncs =
@@ -746,6 +615,11 @@ namespace STROOP.Structs
 
         public static void AddLiteralEntriesToDictionary()
         {
+            dictionary.Add("ExtBoundariesFloat",
+                ((uint address) => Config.Stream.GetSingle(address) * SpecialConfig.ExtBoundariesScale,
+                (float value, uint address) => Config.Stream.SetValue(value / SpecialConfig.ExtBoundariesScale, address))
+                );
+
             // Buffer
 
             dictionary.Add("Buffer",

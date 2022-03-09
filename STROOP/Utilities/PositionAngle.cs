@@ -59,8 +59,6 @@ namespace STROOP.Utilities
             CameraFocus,
             CamHackCamera,
             CamHackFocus,
-            MapCamera,
-            MapFocus,
             Obj,
             ObjHome,
             ObjGfx,
@@ -234,8 +232,6 @@ namespace STROOP.Utilities
         public static PositionAngle CameraFocus = new PositionAngle(PositionAngleTypeEnum.CameraFocus);
         public static PositionAngle CamHackCamera = new PositionAngle(PositionAngleTypeEnum.CamHackCamera);
         public static PositionAngle CamHackFocus = new PositionAngle(PositionAngleTypeEnum.CamHackFocus);
-        public static PositionAngle MapCamera = new PositionAngle(PositionAngleTypeEnum.MapCamera);
-        public static PositionAngle MapFocus = new PositionAngle(PositionAngleTypeEnum.MapFocus);
         public static PositionAngle Scheduler = new PositionAngle(PositionAngleTypeEnum.Schedule);
         public static PositionAngle Self = new PositionAngle(PositionAngleTypeEnum.Self);
         public static PositionAngle None = new PositionAngle(PositionAngleTypeEnum.None);
@@ -316,14 +312,6 @@ namespace STROOP.Utilities
             else if (parts.Count == 1 && parts[0] == "camhackfocus")
             {
                 return CamHackFocus;
-            }
-            else if (parts.Count == 1 && (parts[0] == "mapcam" || parts[0] == "mapcamera"))
-            {
-                return MapCamera;
-            }
-            else if (parts.Count == 1 && parts[0] == "mapfocus")
-            {
-                return MapFocus;
             }
             else if (parts.Count == 2 && (parts[0] == "obj" || parts[0] == "object"))
             {
@@ -642,10 +630,6 @@ namespace STROOP.Utilities
                         return Config.Stream.GetSingle(CamHackConfig.StructAddress + CamHackConfig.CameraXOffset);
                     case PositionAngleTypeEnum.CamHackFocus:
                         return Config.Stream.GetSingle(CamHackConfig.StructAddress + CamHackConfig.FocusXOffset);
-                    case PositionAngleTypeEnum.MapCamera:
-                        return SpecialConfig.Map3DCameraX;
-                    case PositionAngleTypeEnum.MapFocus:
-                        return SpecialConfig.Map3DFocusX;
                     case PositionAngleTypeEnum.Obj:
                         return Config.Stream.GetSingle(Address.Value + ObjectConfig.XOffset);
                     case PositionAngleTypeEnum.ObjHome:
@@ -738,10 +722,6 @@ namespace STROOP.Utilities
                         return Config.Stream.GetSingle(CamHackConfig.StructAddress + CamHackConfig.CameraYOffset);
                     case PositionAngleTypeEnum.CamHackFocus:
                         return Config.Stream.GetSingle(CamHackConfig.StructAddress + CamHackConfig.FocusYOffset);
-                    case PositionAngleTypeEnum.MapCamera:
-                        return SpecialConfig.Map3DCameraY;
-                    case PositionAngleTypeEnum.MapFocus:
-                        return SpecialConfig.Map3DFocusY;
                     case PositionAngleTypeEnum.Obj:
                         return Config.Stream.GetSingle(Address.Value + ObjectConfig.YOffset);
                     case PositionAngleTypeEnum.ObjHome:
@@ -834,10 +814,6 @@ namespace STROOP.Utilities
                         return Config.Stream.GetSingle(CamHackConfig.StructAddress + CamHackConfig.CameraZOffset);
                     case PositionAngleTypeEnum.CamHackFocus:
                         return Config.Stream.GetSingle(CamHackConfig.StructAddress + CamHackConfig.FocusZOffset);
-                    case PositionAngleTypeEnum.MapCamera:
-                        return SpecialConfig.Map3DCameraZ;
-                    case PositionAngleTypeEnum.MapFocus:
-                        return SpecialConfig.Map3DFocusZ;
                     case PositionAngleTypeEnum.Obj:
                         return Config.Stream.GetSingle(Address.Value + ObjectConfig.ZOffset);
                     case PositionAngleTypeEnum.ObjHome:
@@ -930,10 +906,6 @@ namespace STROOP.Utilities
                         return CamHackUtilities.GetCamHackYawFacing();
                     case PositionAngleTypeEnum.CamHackFocus:
                         return CamHackUtilities.GetCamHackYawFacing();
-                    case PositionAngleTypeEnum.MapCamera:
-                        return SpecialConfig.Map3DCameraYaw;
-                    case PositionAngleTypeEnum.MapFocus:
-                        return SpecialConfig.Map3DCameraYaw;
                     case PositionAngleTypeEnum.Obj:
                         return Config.Stream.GetUInt16(Address.Value + ObjectConfig.YawFacingOffset);
                     case PositionAngleTypeEnum.ObjHome:
@@ -1215,12 +1187,6 @@ namespace STROOP.Utilities
                     return Config.Stream.SetValue((float)value, CamHackConfig.StructAddress + CamHackConfig.CameraXOffset);
                 case PositionAngleTypeEnum.CamHackFocus:
                     return Config.Stream.SetValue((float)value, CamHackConfig.StructAddress + CamHackConfig.FocusXOffset);
-                case PositionAngleTypeEnum.MapCamera:
-                    SpecialConfig.Map3DCameraX = (float)value;
-                    return true;
-                case PositionAngleTypeEnum.MapFocus:
-                    SpecialConfig.Map3DFocusX = (float)value;
-                    return true;
                 case PositionAngleTypeEnum.Obj:
                     return Config.Stream.SetValue((float)value, Address.Value + ObjectConfig.XOffset);
                 case PositionAngleTypeEnum.ObjHome:
@@ -1309,12 +1275,6 @@ namespace STROOP.Utilities
                     return Config.Stream.SetValue((float)value, CamHackConfig.StructAddress + CamHackConfig.CameraYOffset);
                 case PositionAngleTypeEnum.CamHackFocus:
                     return Config.Stream.SetValue((float)value, CamHackConfig.StructAddress + CamHackConfig.FocusYOffset);
-                case PositionAngleTypeEnum.MapCamera:
-                    SpecialConfig.Map3DCameraY = (float)value;
-                    return true;
-                case PositionAngleTypeEnum.MapFocus:
-                    SpecialConfig.Map3DFocusY = (float)value;
-                    return true;
                 case PositionAngleTypeEnum.Obj:
                     return Config.Stream.SetValue((float)value, Address.Value + ObjectConfig.YOffset);
                 case PositionAngleTypeEnum.ObjHome:
@@ -1403,12 +1363,6 @@ namespace STROOP.Utilities
                     return Config.Stream.SetValue((float)value, CamHackConfig.StructAddress + CamHackConfig.CameraZOffset);
                 case PositionAngleTypeEnum.CamHackFocus:
                     return Config.Stream.SetValue((float)value, CamHackConfig.StructAddress + CamHackConfig.FocusZOffset);
-                case PositionAngleTypeEnum.MapCamera:
-                    SpecialConfig.Map3DCameraZ = (float)value;
-                    return true;
-                case PositionAngleTypeEnum.MapFocus:
-                    SpecialConfig.Map3DFocusZ = (float)value;
-                    return true;
                 case PositionAngleTypeEnum.Obj:
                     return Config.Stream.SetValue((float)value, Address.Value + ObjectConfig.ZOffset);
                 case PositionAngleTypeEnum.ObjHome:
@@ -1498,12 +1452,6 @@ namespace STROOP.Utilities
                     return false;
                 case PositionAngleTypeEnum.CamHackFocus:
                     return false;
-                case PositionAngleTypeEnum.MapCamera:
-                    SpecialConfig.Map3DCameraYaw = (float)value;
-                    return true;
-                case PositionAngleTypeEnum.MapFocus:
-                    SpecialConfig.Map3DCameraYaw = (float)value;
-                    return true;
                 case PositionAngleTypeEnum.Obj:
                     {
                         bool success = true;

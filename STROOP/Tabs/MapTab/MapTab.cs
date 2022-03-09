@@ -378,7 +378,6 @@ namespace STROOP.Tabs.MapTab
             radioButtonMapControllersScaleCourseDefault.Checked = true;
             radioButtonMapControllersCenterBestFit.Checked = true;
             radioButtonMapControllersAngle32768.Checked = true;
-            SpecialConfig.Map3DMode = Map3DCameraMode.InGame;
         }
 
         private void SetGlobalIconSize(float size)
@@ -640,15 +639,6 @@ namespace STROOP.Tabs.MapTab
         {
             "Focus Pos PA", "Following Radius", "Following Y Offset", "Following Yaw", "FOV",
         };
-        private static readonly Dictionary<Map3DCameraMode, List<string>> coloredVarsMap =
-            new Dictionary<Map3DCameraMode, List<string>>()
-            {
-                [Map3DCameraMode.InGame] = inGameColoredVars,
-                [Map3DCameraMode.CameraPosAndFocus] = cameraPosAndFocusColoredVars,
-                [Map3DCameraMode.CameraPosAndAngle] = cameraPosAndAngleColoredVars,
-                [Map3DCameraMode.FollowFocusRelativeAngle] = followFocusRelativeAngleColoredVars,
-                [Map3DCameraMode.FollowFocusAbsoluteAngle] = followFocusAbsoluteAngleColoredVars,
-            };
 
         private void buttonMapOptionsLoadTrackerSettings_Click(object sender, EventArgs e)
         {

@@ -154,14 +154,6 @@ namespace STROOP.Tabs.MapTab
             return (px, pz);
         }
 
-        public static void MaybeChangeMapCameraMode()
-        {
-            if (SpecialConfig.Map3DMode == Map3DCameraMode.InGame)
-            {
-                SpecialConfig.Map3DMode = Map3DCameraMode.CameraPosAndFocus;
-            }
-        }
-
         public static void CreateTrackBarContextMenuStrip(TrackBar trackBar)
         {
             List<int> maxValues = Enumerable.Range(1, 9).ToList().ConvertAll(p => (int)Math.Pow(10, p));
