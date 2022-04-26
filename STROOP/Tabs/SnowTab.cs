@@ -96,17 +96,12 @@ namespace STROOP.Tabs
             List<WatchVariableControl> controls = new List<WatchVariableControl>();
             for (int i = 0; i < 3; i++)
             {
-                WatchVariable watchVar = new WatchVariable(
-                    memoryTypeName: "int",
-                    baseAddressType: BaseAddressTypeEnum.Snow,
-                    offsetUS: null,
-                    offsetJP: null,
-                    offsetSH: null,
-                    offsetEU: null,
-                    offsetDefault: offsets[i],
-                    mask: null,
-                    shift: null,
-                    handleMapping: true);
+                WatchVariable watchVar = new WatchVariable(names[i],
+                    new WatchVariable.CustomViewData<WatchVariableNumberWrapper>(
+                        _ => Config.Stream.GetInt32(Config.Stream.GetUInt32(SnowConfig.SnowArrayPointerAddress) + offsets[i]),
+                        (val, _) => Config.Stream.SetValue((int)val, Config.Stream.GetUInt32(SnowConfig.SnowArrayPointerAddress) + offsets[i])
+                        )
+                    );
                 controls.Add(watchVar.CreateWatchVariableControl());
             }
             return controls;

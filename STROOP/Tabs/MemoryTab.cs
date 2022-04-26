@@ -233,8 +233,8 @@ namespace STROOP.Tabs
                         precursorLists.ForEach(precursors =>
                         {
                             List<WatchVariable> overlapped = valueText.GetOverlapped(precursors);
-                        overlapped.ForEach(precursor => watchVariablePanelMemory.AddVariable(
-                            precursor.CreateWatchVariableControl())); // newVariableGroupList: new List<VariableGroup>() { VariableGroup.Custom })));
+                            overlapped.ForEach(precursor => watchVariablePanelMemory.AddVariable(
+                                precursor.CreateWatchVariableControl())); // newVariableGroupList: new List<VariableGroup>() { VariableGroup.Custom })));
                         });
                     }
                 });
@@ -339,17 +339,14 @@ namespace STROOP.Tabs
                 uint offset = useObjAddress ? (uint)ByteIndex : MemoryAddress;
                 uint nameOffset = useRelativeName ? (uint)ByteIndex : MemoryAddress;
 
-                return new WatchVariable(
-                    memoryTypeName: typeString,
-                    baseAddressType: baseAddressType,
-                    offsetUS: null,
-                    offsetJP: null,
-                    offsetSH: null,
-                    offsetEU: null,
-                    offsetDefault: offset,
-                    mask: null,
-                    shift: null,
-                    handleMapping: true);
+
+
+                var result = new WatchVariable($"{baseAddressType}: {offset}", new WatchVariable.CustomViewData<WatchVariableNumberWrapper>(null, null));
+                ((WatchVariable.CustomView)result.view)._getterFunction = (uint address) =>
+                   Config.Stream.GetValue(result.MemoryType, address, result.UseAbsoluteAddressing, result.Mask, result.Shift);
+                ((WatchVariable.CustomView)result.view)._setterFunction = (object value, uint address) =>
+                    Config.Stream.SetValueRoundingWrapping(result.MemoryType, value, address, result.UseAbsoluteAddressing, result.Mask, result.Shift);
+                return result;
             }
         }
 

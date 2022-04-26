@@ -86,59 +86,21 @@ namespace STROOP.Tabs
                 string.Format("Warp {0} Object", index),
                 string.Format("Warp {0} Next", index),
             };
-            List<uint> offsets = new List<uint>()
+            
+            WatchVariable.CustomViewData[] varData = new WatchVariable.CustomViewData[]
             {
-                address + 0x0,
-                address + 0x1,
-                address + 0x2,
-                address + 0x3,
-                address + 0x4,
-                address + 0x8,
-            };
-            List<string> types = new List<string>()
-            {
-                "byte",
-                "byte",
-                "byte",
-                "byte",
-                "uint",
-                "uint",
-            };
-            List<WatchVariableSubclass> subclasses = new List<WatchVariableSubclass>()
-            {
-                WatchVariableSubclass.Number,
-                WatchVariableSubclass.Number,
-                WatchVariableSubclass.Number,
-                WatchVariableSubclass.Number,
-                WatchVariableSubclass.Object,
-                WatchVariableSubclass.Address,
-            };
-            List<bool?> useHexes = new List<bool?>()
-            {
-                true,
-                null,
-                null,
-                true,
-                null,
-                null,
+                new WatchVariable.CustomViewData<WatchVariableNumberWrapper>(_ => Config.Stream.GetByte(address), (val, _) => Config.Stream.SetValue((byte)val, address)),
+                new WatchVariable.CustomViewData<WatchVariableNumberWrapper>(_ => Config.Stream.GetByte(address + 0x1), (val, _) => Config.Stream.SetValue((byte)val, address + 0x1)),
+                new WatchVariable.CustomViewData<WatchVariableNumberWrapper>(_ => Config.Stream.GetByte(address + 0x2), (val, _) => Config.Stream.SetValue((byte)val, address + 0x2)),
+                new WatchVariable.CustomViewData<WatchVariableNumberWrapper>(_ => Config.Stream.GetByte(address + 0x3), (val, _) => Config.Stream.SetValue((byte)val, address + 0x3)),
+                new WatchVariable.CustomViewData<WatchVariableObjectWrapper>(_ => Config.Stream.GetUInt32(address + 0x4), (val, _) => Config.Stream.SetValue((uint)val, address + 0x4)),
+                new WatchVariable.CustomViewData<WatchVariableAddressWrapper>(_ => Config.Stream.GetUInt32(address + 0x8), (val, _) => Config.Stream.SetValue((uint)val, address + 0x8)),
             };
 
             List<WatchVariableControl> controls = new List<WatchVariableControl>();
             for (int i = 0; i < 6; i++)
-            {
-                WatchVariable watchVar = new WatchVariable(
-                    memoryTypeName: types[i],
-                    baseAddressType: BaseAddressTypeEnum.Relative,
-                    offsetUS: null,
-                    offsetJP: null,
-                    offsetSH: null,
-                    offsetEU: null,
-                    offsetDefault: offsets[i],
-                    mask: null,
-                    shift: null,
-                    handleMapping: true);
-                controls.Add(watchVar.CreateWatchVariableControl());
-            }
+                controls.Add(new WatchVariable(names[i], varData[i]).CreateWatchVariableControl());
+
             return controls;
         }
 

@@ -54,29 +54,30 @@ namespace STROOP.Forms
 
         private WatchVariableControl CreateWatchVariableControl()
         {
-            string name = textBoxNameValue.Text;
-            string memoryType = comboBoxTypeValue.SelectedItem.ToString();
-            BaseAddressTypeEnum baseAddressType = (BaseAddressTypeEnum)comboBoxBaseValue.SelectedItem;
-            uint offset = ParsingUtilities.ParseHexNullable(textBoxOffsetValue.Text) ?? 0;
+            throw new NotImplementedException();
 
-            bool useOffsetDefault =
-                baseAddressType != BaseAddressTypeEnum.Absolute &&
-                baseAddressType != BaseAddressTypeEnum.Relative &&
-                baseAddressType != BaseAddressTypeEnum.None;
+            //string name = textBoxNameValue.Text;
+            //string memoryType = comboBoxTypeValue.SelectedItem.ToString();
+            //BaseAddressTypeEnum baseAddressType = (BaseAddressTypeEnum)comboBoxBaseValue.SelectedItem;
+            //uint offset = ParsingUtilities.ParseHexNullable(textBoxOffsetValue.Text) ?? 0;
 
-            WatchVariable watchVar = new WatchVariable(
-                memoryTypeName: memoryType,
-                baseAddressType: baseAddressType,
-                offsetUS: useOffsetDefault ? (uint?)null : offset,
-                offsetJP: useOffsetDefault ? (uint?)null : offset,
-                offsetSH: useOffsetDefault ? (uint?)null : offset,
-                offsetEU: useOffsetDefault ? (uint?)null : offset,
-                offsetDefault: useOffsetDefault ? offset : (uint?)null,
-                mask: null,
-                shift: null,
-                handleMapping: !_disableMapping);
+            //bool useOffsetDefault =
+            //    baseAddressType != BaseAddressTypeEnum.Absolute &&
+            //    baseAddressType != BaseAddressTypeEnum.Relative &&
+            //    baseAddressType != BaseAddressTypeEnum.None;
 
-            return watchVar.CreateWatchVariableControl();
+            //WatchVariable watchVar = new WatchVariable(
+            //    memoryTypeName: memoryType,
+            //    baseAddressType: baseAddressType,
+            //    offsetUS: useOffsetDefault ? (uint?)null : offset,
+            //    offsetJP: useOffsetDefault ? (uint?)null : offset,
+            //    offsetSH: useOffsetDefault ? (uint?)null : offset,
+            //    offsetEU: useOffsetDefault ? (uint?)null : offset,
+            //    offsetDefault: useOffsetDefault ? offset : (uint?)null,
+            //    mask: null,
+            //    shift: null,
+            //    handleMapping: !_disableMapping);
+            //return watchVar.CreateWatchVariableControl();
         }
     }
 }

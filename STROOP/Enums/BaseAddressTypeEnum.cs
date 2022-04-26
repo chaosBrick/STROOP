@@ -40,7 +40,6 @@ namespace STROOP.Structs
         Animation,
         Waypoint,
         Water,
-        Snow,
         Area,
         Painting,
         Music,
@@ -49,7 +48,6 @@ namespace STROOP.Structs
 
         HackedArea,
         CamHack,
-        GfxNode,
         GhostHack,
     };
 }

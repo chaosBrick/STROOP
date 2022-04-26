@@ -28,7 +28,7 @@ namespace STROOP.Structs
         {
             return (Coordinate)Enum.Parse(typeof(Coordinate), stringValue);
         }
-        
+
         public static List<string> ParseVariableGroupList(string stringValue) =>
             new List<string>(Array.ConvertAll(stringValue.Split('|', ','), _ => _.Trim()));
 
@@ -155,9 +155,6 @@ namespace STROOP.Structs
                         return waterAddress != 0 ? new List<uint>() { waterAddress } : BaseAddressListEmpty;
                     }
 
-                case BaseAddressTypeEnum.Snow:
-                    return new List<uint> { Config.Stream.GetUInt32(SnowConfig.SnowArrayPointerAddress) };
-
                 case BaseAddressTypeEnum.Area:
                     return new List<uint> { AreaConfig.SelectedAreaAddress };
 
@@ -189,17 +186,13 @@ namespace STROOP.Structs
 
                 case BaseAddressTypeEnum.CamHack:
                     return new List<uint> { CamHackConfig.StructAddress };
-
-                case BaseAddressTypeEnum.GfxNode:
-                    {
-                        Tabs.GfxTab.GfxNode node = AccessScope<StroopMainForm>.content.GetTab<Tabs.GfxTab.GfxTab>().SelectedNode;
-                        return node != null ? new List<uint>() { node.Address } : BaseAddressListEmpty;
-                    }
                 case BaseAddressTypeEnum.GhostHack:
                     return new List<uint>
                     {
                         GhostHackConfig.CurrentGhostStruct
                     };
+                case BaseAddressTypeEnum.Invalid:
+                    return new List<uint>();
 
                 default:
                     throw new ArgumentOutOfRangeException();

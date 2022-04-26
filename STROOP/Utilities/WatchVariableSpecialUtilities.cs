@@ -12,8 +12,8 @@ namespace STROOP.Structs
 {
     public static class WatchVariableSpecialUtilities
     {
-        private readonly static WatchVariable.GetterFunction DEFAULT_GETTER = (uint address) => Double.NaN;
-        private readonly static WatchVariable.SetterFunction DEFAULT_SETTER = (object value, uint address) => false;
+        public readonly static WatchVariable.GetterFunction DEFAULT_GETTER = (uint address) => Double.NaN;
+        public readonly static WatchVariable.SetterFunction DEFAULT_SETTER = (object value, uint address) => false;
 
         public static WatchVariableSpecialDictionary dictionary { get; private set; }
 
@@ -193,191 +193,63 @@ namespace STROOP.Structs
             return specialType;
         }
 
-        private static int _numAggregateMathOperationEntries = 0;
-
-        public static string AddAggregateMathOperationEntry(List<WatchVariableControl> controls, AggregateMathOperation operation)
+        public static WatchVariable.GetterFunction AddAggregateMathOperationEntry(List<WatchVariableControl> controls, AggregateMathOperation operation)
         {
-            string specialType = "AggregateMathOperation" + _numAggregateMathOperationEntries;
             switch (operation)
             {
                 case AggregateMathOperation.Mean:
-                    dictionary.Add(specialType,
-                        ((uint dummy) =>
-                        {
-                            return controls
-                                .ConvertAll(control => control.GetValue(handleFormatting: false))
-                                .ConvertAll(value => ParsingUtilities.ParseDouble(value))
-                                .Average();
-                        }
-                    ,
-                        DEFAULT_SETTER));
-                    break;
+                    return (uint dummy) =>
+                    {
+                        return controls
+                            .ConvertAll(control => control.GetValue(handleFormatting: false))
+                            .ConvertAll(value => ParsingUtilities.ParseDouble(value))
+                            .Average();
+                    };
                 case AggregateMathOperation.Median:
-                    dictionary.Add(specialType,
-                        ((uint dummy) =>
+                    return (uint dummy) =>
+                    {
+                        List<double> doubleValues = controls
+                            .ConvertAll(control => control.GetValue(handleFormatting: false))
+                            .ConvertAll(value => ParsingUtilities.ParseDouble(value));
+                        doubleValues.Sort();
+                        if (doubleValues.Count % 2 == 1)
                         {
-                            List<double> doubleValues = controls
-                                .ConvertAll(control => control.GetValue(handleFormatting: false))
-                                .ConvertAll(value => ParsingUtilities.ParseDouble(value));
-                            doubleValues.Sort();
-                            if (doubleValues.Count % 2 == 1)
-                            {
-                                return doubleValues[doubleValues.Count / 2];
-                            }
-                            else
-                            {
-                                return (doubleValues[doubleValues.Count / 2 - 1] + doubleValues[doubleValues.Count / 2]) / 2;
-                            }
+                            return doubleValues[doubleValues.Count / 2];
                         }
-                    ,
-                        DEFAULT_SETTER));
-                    break;
+                        else
+                        {
+                            return (doubleValues[doubleValues.Count / 2 - 1] + doubleValues[doubleValues.Count / 2]) / 2;
+                        }
+                    };
                 case AggregateMathOperation.Min:
-                    dictionary.Add(specialType,
-                        ((uint dummy) =>
-                        {
-                            return controls
-                                .ConvertAll(control => control.GetValue(handleFormatting: false))
-                                .ConvertAll(value => ParsingUtilities.ParseDouble(value))
-                                .Min();
-                        }
-                    ,
-                        DEFAULT_SETTER));
-                    break;
+                    return (uint dummy) =>
+                    {
+                        return controls
+                            .ConvertAll(control => control.GetValue(handleFormatting: false))
+                            .ConvertAll(value => ParsingUtilities.ParseDouble(value))
+                            .Min();
+                    };
                 case AggregateMathOperation.Max:
-                    dictionary.Add(specialType,
-                        ((uint dummy) =>
-                        {
-                            return controls
-                                .ConvertAll(control => control.GetValue(handleFormatting: false))
-                                .ConvertAll(value => ParsingUtilities.ParseDouble(value))
-                                .Max();
-                        }
-                    ,
-                        DEFAULT_SETTER));
-                    break;
+                    return (uint dummy) =>
+                    {
+                        return controls
+                            .ConvertAll(control => control.GetValue(handleFormatting: false))
+                            .ConvertAll(value => ParsingUtilities.ParseDouble(value))
+                            .Max();
+                    };
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            _numAggregateMathOperationEntries++;
-            return specialType;
         }
 
-        private static int _numDistanceMathOperationEntries = 0;
-
-        public static string AddDistanceMathOperationEntry(List<WatchVariableControl> controls, bool use3D)
-        {
-            string specialType = "DistanceMathOperation" + _numDistanceMathOperationEntries;
-            if (use3D)
-            {
-                PositionAngle p1 = PositionAngle.Functions(
-                    new List<Func<double>>()
-                    {
-                        () => ParsingUtilities.ParseDouble(controls[0].GetValue(handleFormatting: false)),
-                        () => ParsingUtilities.ParseDouble(controls[1].GetValue(handleFormatting: false)),
-                        () => ParsingUtilities.ParseDouble(controls[2].GetValue(handleFormatting: false)),
-                    },
-                    new List<Func<double, bool>>()
-                    {
-                        (double value) => controls[0].SetValue(value),
-                        (double value) => controls[1].SetValue(value),
-                        (double value) => controls[2].SetValue(value),
-                    });
-                PositionAngle p2 = PositionAngle.Functions(
-                    new List<Func<double>>()
-                    {
-                        () => ParsingUtilities.ParseDouble(controls[3].GetValue(handleFormatting: false)),
-                        () => ParsingUtilities.ParseDouble(controls[4].GetValue(handleFormatting: false)),
-                        () => ParsingUtilities.ParseDouble(controls[5].GetValue(handleFormatting: false)),
-                    },
-                    new List<Func<double, bool>>()
-                    {
-                        (double value) => controls[3].SetValue(value),
-                        (double value) => controls[4].SetValue(value),
-                        (double value) => controls[5].SetValue(value),
-                    });
-                dictionary.Add(specialType,
-                    ((uint dummy) =>
-                    {
-                        return PositionAngle.GetDistance(p1, p2);
-                    }
-                ,
-                    (double dist, uint dummy) =>
-                    {
-                        return PositionAngle.SetDistance(p1, p2, dist);
-                    }
-                ));
-            }
-            else
-            {
-                PositionAngle p1 = PositionAngle.Functions(
-                    new List<Func<double>>()
-                    {
-                        () => ParsingUtilities.ParseDouble(controls[0].GetValue(handleFormatting: false)),
-                        () => 0,
-                        () => ParsingUtilities.ParseDouble(controls[1].GetValue(handleFormatting: false)),
-                    },
-                    new List<Func<double, bool>>()
-                    {
-                        (double value) => controls[0].SetValue(value),
-                        (double value) => true,
-                        (double value) => controls[1].SetValue(value),
-                    });
-                PositionAngle p2 = PositionAngle.Functions(
-                    new List<Func<double>>()
-                    {
-                        () => ParsingUtilities.ParseDouble(controls[2].GetValue(handleFormatting: false)),
-                        () => 0,
-                        () => ParsingUtilities.ParseDouble(controls[3].GetValue(handleFormatting: false)),
-                    },
-                    new List<Func<double, bool>>()
-                    {
-                        (double value) => controls[2].SetValue(value),
-                        (double value) => true,
-                        (double value) => controls[3].SetValue(value),
-                    });
-                dictionary.Add(specialType,
-                    ((uint dummy) =>
-                    {
-                        return PositionAngle.GetHDistance(p1, p2);
-                    }
-                ,
-                    (double dist, uint dummy) =>
-                    {
-                        return PositionAngle.SetHDistance(p1, p2, dist);
-                    }
-                ));
-            }
-            _numDistanceMathOperationEntries++;
-            return specialType;
-        }
-
-        private static int _numRealTimeEntries = 0;
-
-        public static string AddRealTimeEntry(WatchVariableControl control)
-        {
-            string specialType = "RealTime" + _numRealTimeEntries;
-            dictionary.Add(specialType,
-                ((uint dummy) =>
-                {
-                    uint totalFrames = ParsingUtilities.ParseUIntRoundingWrapping(
-                        control.GetValue(useRounding: false, handleFormatting: false)) ?? 0;
-                    return GetRealTime(totalFrames);
-                }
-            ,
-                DEFAULT_SETTER));
-            _numRealTimeEntries++;
-            return specialType;
-        }
-
-        public static (WatchVariable.GetterFunction, WatchVariable.SetterFunction) MakeDummy(string typeString)
+        public static WatchVariable.CustomViewData MakeDummy(string typeString)
         {
             int index = SpecialConfig.DummyValues.Count;
             Type type = TypeUtilities.StringToType[typeString];
             SpecialConfig.DummyValues.Add(ParsingUtilities.ParseValueRoundingWrapping(0, type));
             string specialType = "Dummy" + index + StringUtilities.Capitalize(typeString);
 
-            return ((uint dummy) => SpecialConfig.DummyValues[index],
+            return new WatchVariable.CustomViewData<WatchVariableNumberWrapper>((uint dummy) => SpecialConfig.DummyValues[index],
                  (object value, uint dummy) =>
                  {
                      object o = ParsingUtilities.ParseValueRoundingWrapping(value, type);
@@ -2123,20 +1995,20 @@ namespace STROOP.Structs
             dictionary.Add("SpeedMultiplier",
                 ((uint dummy) =>
                 {
-            /*
-            intended dyaw = intended yaw - slide yaw (idk what this is called in stroop)
-            if cos(intended dyaw) < 0 and fspeed >= 0:
-              K = 0.5 + 0.5 * fspeed / 100
-            else:
-              K = 1
+                    /*
+                    intended dyaw = intended yaw - slide yaw (idk what this is called in stroop)
+                    if cos(intended dyaw) < 0 and fspeed >= 0:
+                      K = 0.5 + 0.5 * fspeed / 100
+                    else:
+                      K = 1
 
-            multiplier = (intended mag / 32) * cos(intended dyaw) * K * 0.02 + A
+                    multiplier = (intended mag / 32) * cos(intended dyaw) * K * 0.02 + A
 
-            slide: A = 0.98
-            slippery: A = 0.96
-            default: A = 0.92
-            not slippery: A = 0.92
-            */
+                    slide: A = 0.98
+                    slippery: A = 0.96
+                    default: A = 0.92
+                    not slippery: A = 0.92
+                    */
 
                     ushort intendedYaw = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.IntendedYawOffset);
                     ushort movingYaw = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.MovingYawOffset);

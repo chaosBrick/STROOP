@@ -44,6 +44,8 @@ namespace STROOP.Utilities
 
         public static string FormatMemory(object number, int? numDigits = null, bool usePrefix = true)
         {
+            if (number is bool boolValue)
+                number = boolValue ? 1 : 0;
             if (!TypeUtilities.IsNumber(number)) throw new ArgumentOutOfRangeException();
 
             byte[] bytes = TypeUtilities.GetBytes(number);

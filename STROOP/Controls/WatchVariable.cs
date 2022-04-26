@@ -27,11 +27,15 @@ namespace STROOP.Controls
             public string Name { get; set; }
             public GetterFunction _getterFunction { get; set; }
             public SetterFunction _setterFunction { get; set; }
-            public string GetValueByKey(string key) => null;
-            public Type GetWrapperType()
+            public Dictionary<string, string> keyedValues = new Dictionary<string, string>();
+            public virtual string GetValueByKey(string key)
             {
-                throw new InvalidOperationException("Nope");
+                if (keyedValues.TryGetValue(key, out var result))
+                    return result;
+                return null;
             }
+            public Type wrapperType;
+            public Type GetWrapperType() => wrapperType;
         }
 
         public class XmlView : IVariableView
@@ -70,6 +74,26 @@ namespace STROOP.Controls
             }
             public Type GetWrapperType() => WatchVariableWrapper.GetWrapperType(wrapper);
             public string GetValueByKey(string key) => xElement.Attribute(key)?.Value ?? null;
+        }
+
+        public abstract class CustomViewData
+        {
+            public readonly GetterFunction getter;
+            public readonly SetterFunction setter;
+            public readonly Type wrapperType;
+            protected CustomViewData(GetterFunction getterFunction, SetterFunction setterFunction, Type wrapperType)
+            {
+                getter = getterFunction;
+                setter = setterFunction;
+                this.wrapperType = wrapperType;
+            }
+        };
+
+        public class CustomViewData<T> : CustomViewData where T : WatchVariableWrapper
+        {
+            public CustomViewData(GetterFunction getterFunction, SetterFunction setterFunction)
+                : base(getterFunction, setterFunction, typeof(T))
+            { }
         }
 
         public readonly string MemoryTypeName;
@@ -156,12 +180,13 @@ namespace STROOP.Controls
             return result;
         }
 
-        public WatchVariable(string name, (GetterFunction getterFunction, SetterFunction setterFunction) getSet)
+        public WatchVariable(string name, CustomViewData viewData)
         {
-            view = new CustomView() { Name = name, _getterFunction = getSet.getterFunction, _setterFunction = getSet.setterFunction };
+            BaseAddressType = BaseAddressTypeEnum.None;
+            view = new CustomView() { Name = name, _getterFunction = viewData.getter, _setterFunction = viewData.setter, wrapperType = viewData.wrapperType };
         }
 
-        public WatchVariable(string memoryTypeName, BaseAddressTypeEnum baseAddressType,
+        private WatchVariable(string memoryTypeName, BaseAddressTypeEnum baseAddressType,
             uint? offsetUS, uint? offsetJP, uint? offsetSH, uint? offsetEU, uint? offsetDefault, uint? mask, int? shift, bool handleMapping)
         {
             if (offsetDefault.HasValue && (offsetUS.HasValue || offsetJP.HasValue || offsetSH.HasValue || offsetEU.HasValue))
