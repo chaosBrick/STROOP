@@ -11,8 +11,8 @@ namespace STROOP.Tabs
 {
     public partial class TasTab : STROOPTab
     {
-        private static readonly List<VariableGroup> ALL_VAR_GROUPS =
-            new List<VariableGroup>()
+        private static readonly List<string> ALL_VAR_GROUPS =
+            new List<string>()
             {
                 VariableGroup.Basic,
                 VariableGroup.Advanced,
@@ -21,8 +21,8 @@ namespace STROOP.Tabs
                 VariableGroup.Scheduler,
             };
 
-        private static readonly List<VariableGroup> VISIBLE_VAR_GROUPS =
-            new List<VariableGroup>()
+        private static readonly List<string> VISIBLE_VAR_GROUPS =
+            new List<string>()
             {
                 VariableGroup.Basic,
                 VariableGroup.Advanced,
@@ -135,7 +135,7 @@ namespace STROOP.Tabs
         public void ShowTaserVariables()
         {
             watchVariablePanelTas.ShowOnlyVariableGroups(
-                new List<VariableGroup>() { VariableGroup.TAS, VariableGroup.Custom });
+                new List<string>() { VariableGroup.TAS, VariableGroup.Custom });
         }
 
         public void SetScheduler(string text, bool useFloats)

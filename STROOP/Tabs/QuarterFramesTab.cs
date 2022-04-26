@@ -10,15 +10,15 @@ namespace STROOP.Tabs
 {
     public partial class QuarterFramesTab : STROOPTab
     {
-        private static readonly List<VariableGroup> ALL_VAR_GROUPS =
-            new List<VariableGroup>()
+        private static readonly List<string> ALL_VAR_GROUPS =
+            new List<string>()
             {
                 VariableGroup.QuarterFrameHack,
                 VariableGroup.GhostHack,
             };
 
-        private static readonly List<VariableGroup> VISIBLE_VAR_GROUPS =
-            new List<VariableGroup>()
+        private static readonly List<string> VISIBLE_VAR_GROUPS =
+            new List<string>()
             {
                 VariableGroup.QuarterFrameHack,
             };

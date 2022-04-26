@@ -120,7 +120,6 @@ namespace STROOP.Structs.Configurations
 
                 WatchVariable watchVar = new WatchVariable(
                     memoryTypeName: typeString,
-                    specialType: null,
                     baseAddressType: BaseAddressTypeEnum.Relative,
                     offsetUS: address,
                     offsetJP: address,
@@ -130,19 +129,7 @@ namespace STROOP.Structs.Configurations
                     mask: null,
                     shift: null,
                     handleMapping: false);
-                WatchVariableControlPrecursor precursor = new WatchVariableControlPrecursor(
-                    name: name,
-                    watchVar: watchVar,
-                    subclass: WatchVariableSubclass.Number,
-                    backgroundColor: null,
-                    displayType: null,
-                    roundingLimit: null,
-                    useHex: null,
-                    invertBool: null,
-                    isYaw: null,
-                    coordinate: null,
-                    groupList: new List<VariableGroup>() { VariableGroup.Custom });
-                WatchVariableControl control = precursor.CreateWatchVariableControl();
+                WatchVariableControl control = watchVar.CreateWatchVariableControl();
                 controls.Add(control);
             }
             return controls;

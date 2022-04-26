@@ -11,8 +11,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using STROOP.Structs;
 
-namespace STROOP.Structs
+namespace STROOP.Utilities
 {
     public static class DialogUtilities
     {

@@ -197,14 +197,13 @@ namespace STROOP.Utilities
 
         public static List<WatchVariableControl> OpenWatchVariableControls(string path)
         {
-            return OpenWatchVariableControlPrecursors(path)
-                .ConvertAll(precursor => precursor.CreateWatchVariableControl());
+            return OpenWatchVariableControlPrecursors(path).ConvertAll(precursor => precursor.CreateWatchVariableControl());
         }
 
-        public static List<WatchVariableControlPrecursor> OpenWatchVariableControlPrecursors(string path)
+        public static List<WatchVariable> OpenWatchVariableControlPrecursors(string path)
         {
             string schemaFile = "MiscDataSchema.xsd";
-            var objectData = new List<WatchVariableControlPrecursor>();
+            var objectData = new List<WatchVariable>();
             var assembly = Assembly.GetExecutingAssembly();
 
             // Create schema set
@@ -222,8 +221,7 @@ namespace STROOP.Utilities
                 if (element.Name.ToString() != "Data")
                     continue;
 
-                WatchVariableControlPrecursor watchVarControl = new WatchVariableControlPrecursor(element);
-                objectData.Add(watchVarControl);
+                objectData.Add(WatchVariable.ParseXml(element));
             }
 
             return objectData;
@@ -508,11 +506,11 @@ namespace STROOP.Utilities
                                 rotates = bool.Parse(element.Element(XName.Get("MapImage")).Attribute(XName.Get("rotates")).Value);
                             }
 
-                            List<WatchVariableControlPrecursor> precursors = new List<WatchVariableControlPrecursor>();
+                            List<WatchVariable> precursors = new List<WatchVariable>();
                             foreach (var subElement in element.Elements().Where(x => x.Name == "Data"))
                             {
-                                WatchVariableControlPrecursor precursor = new WatchVariableControlPrecursor(subElement);
-                                precursors.Add(precursor);
+                                var variableView = WatchVariable.ParseXml(subElement);
+                                precursors.Add(variableView);
                             }
 
                             var newBehavior = new ObjectBehaviorAssociation()

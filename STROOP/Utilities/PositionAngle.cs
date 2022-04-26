@@ -10,7 +10,7 @@ namespace STROOP.Utilities
 {
     public class PositionAngle
     {
-        class CustomPositionAngle : PositionAngle
+        public class CustomPositionAngle : PositionAngle
         {
             Vector3 customPos;
             ushort customAngle;
@@ -20,8 +20,8 @@ namespace STROOP.Utilities
             public override double Y => customPos.Y;
             public override double Z => customPos.Z;
             public override bool SetX(double value) { customPos.X = (float)value; return true; }
-            public override bool SetY(double value) { customPos.X = (float)value; return true; }
-            public override bool SetZ(double value) { customPos.X = (float)value; return true; }
+            public override bool SetY(double value) { customPos.Y = (float)value; return true; }
+            public override bool SetZ(double value) { customPos.Z = (float)value; return true; }
             public override bool SetAngle(double value) { customAngle = (ushort)value; return true; }
         }
 

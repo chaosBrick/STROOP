@@ -52,21 +52,17 @@ namespace STROOP.Controls
             _contextMenuStrip.AddToBeginningList(itemSelectObject);
         }
 
-        protected override string GetClass()
+        protected override string GetClass() => "Object";
+
+        protected override object ConvertValue(object value, bool handleRounding = true, bool handleFormatting = true)
         {
-            return "Object";
+            if (_displayAsObject)
+                return HandleObjectDisplaying(value);
+            return base.ConvertValue(value, handleRounding, handleFormatting);
         }
 
-        protected override object HandleHexDisplaying(object value)
+        protected object HandleObjectDisplaying(object value)
         {
-            // prevent hex display if we're displaying as object
-            return _displayAsObject ? value : base.HandleHexDisplaying(value);
-        }
-
-        protected override object HandleObjectDisplaying(object value)
-        {
-            if (!_displayAsObject) return value;
-
             uint? uintValueNullable = ParsingUtilities.ParseUIntNullable(value);
             if (!uintValueNullable.HasValue) return value;
             uint uintValue = uintValueNullable.Value;
@@ -74,7 +70,7 @@ namespace STROOP.Controls
             return Config.ObjectSlotsManager.GetDescriptiveSlotLabelFromAddress(uintValue, false);
         }
 
-        protected override object HandleObjectUndisplaying(object value)
+        protected object HandleObjectUndisplaying(object value)
         {
             string slotName = value.ToString().ToLower();
 
@@ -88,9 +84,6 @@ namespace STROOP.Controls
             return obj != null ? obj.Address : value;
         }
 
-        protected override bool GetUseHexExactly()
-        {
-            return _displayAsHex && !_displayAsObject;
-        }
+        public override bool DisplayAsHex() => _displayAsHex && !_displayAsObject;
     }
 }

@@ -11,8 +11,8 @@ namespace STROOP.Tabs
 {
     public partial class SnowTab : STROOPTab
     {
-        private static readonly List<VariableGroup> ALL_VAR_GROUPS =
-            new List<VariableGroup>()
+        private static readonly List<string> ALL_VAR_GROUPS =
+            new List<string>()
             {
                 VariableGroup.Basic,
                 VariableGroup.Intermediate,
@@ -20,8 +20,8 @@ namespace STROOP.Tabs
                 VariableGroup.Snow,
             };
 
-        private static readonly List<VariableGroup> VISIBLE_VAR_GROUPS =
-            new List<VariableGroup>()
+        private static readonly List<string> VISIBLE_VAR_GROUPS =
+            new List<string>()
             {
                 VariableGroup.Basic,
                 VariableGroup.Intermediate,
@@ -98,7 +98,6 @@ namespace STROOP.Tabs
             {
                 WatchVariable watchVar = new WatchVariable(
                     memoryTypeName: "int",
-                    specialType: null,
                     baseAddressType: BaseAddressTypeEnum.Snow,
                     offsetUS: null,
                     offsetJP: null,
@@ -108,19 +107,7 @@ namespace STROOP.Tabs
                     mask: null,
                     shift: null,
                     handleMapping: true);
-                WatchVariableControlPrecursor precursor = new WatchVariableControlPrecursor(
-                    name: names[i],
-                    watchVar: watchVar,
-                    subclass: WatchVariableSubclass.Number,
-                    backgroundColor: null,
-                    displayType: null,
-                    roundingLimit: null,
-                    useHex: null,
-                    invertBool: null,
-                    isYaw: null,
-                    coordinate: i == 0 ? Coordinate.X : i == 1 ? Coordinate.Y : Coordinate.Z,
-                    groupList: new List<VariableGroup>() { VariableGroup.Snow });
-                controls.Add(precursor.CreateWatchVariableControl());
+                controls.Add(watchVar.CreateWatchVariableControl());
             }
             return controls;
         }

@@ -16,9 +16,9 @@ namespace STROOP.Tabs
     public partial class MemoryTab : STROOPTab
     {
         private readonly List<ValueText> _currentValueTexts;
-        private readonly List<WatchVariableControlPrecursor> _objectPrecursors;
-        private readonly List<WatchVariableControlPrecursor> _objectSpecificPrecursors;
-        private List<WatchVariableControlPrecursor> _memTabPrecursors => watchVariablePanelMemory.GetCurrentVariablePrecursors();
+        private readonly List<WatchVariable> _objectPrecursors;
+        private readonly List<WatchVariable> _objectSpecificPrecursors;
+        private List<WatchVariable> _memTabPrecursors => watchVariablePanelMemory.GetCurrentVariablePrecursors();
 
         private uint? _address;
         public uint? Address
@@ -53,9 +53,9 @@ namespace STROOP.Tabs
                 _objectSpecificPrecursors.Clear();
                 if (_behavior.HasValue)
                 {
-                    List<WatchVariableControlPrecursor> precursors =
+                    List<WatchVariable> precursors =
                         Config.ObjectAssociations.GetWatchVarControls(_behavior.Value)
-                            .ConvertAll(control => control.WatchVarPrecursor);
+                            .ConvertAll(control => control.WatchVar);
                     _objectSpecificPrecursors.AddRange(precursors);
                 }
             }
@@ -77,7 +77,7 @@ namespace STROOP.Tabs
 
             _currentValueTexts = new List<ValueText>();
             _objectPrecursors = XmlConfigParser.OpenWatchVariableControlPrecursors(watchVariablePanelMemory.DataPath);
-            _objectSpecificPrecursors = new List<WatchVariableControlPrecursor>();
+            _objectSpecificPrecursors = new List<WatchVariable>();
         }
 
         public override string GetDisplayName() => "Memory";
@@ -85,7 +85,7 @@ namespace STROOP.Tabs
         public override void InitializeTab()
         {
             base.InitializeTab();
-            
+
             // Set up controls
             comboBoxMemoryTypes.DataSource = TypeUtilities.InGameTypeList;
 
@@ -225,19 +225,16 @@ namespace STROOP.Tabs
             bool useRelativeName = checkBoxMemoryRelativeAddresses.Checked;
             if (isAltKeyHeld)
             {
-                List<List<WatchVariableControlPrecursor>> precursorLists =
-                    new List<List<WatchVariableControlPrecursor>>()
-                        { _objectPrecursors, _objectSpecificPrecursors };
+                List<List<WatchVariable>> precursorLists = new List<List<WatchVariable>>() { _objectPrecursors, _objectSpecificPrecursors };
                 _currentValueTexts.ForEach(valueText =>
                 {
                     if (index >= valueText.StringIndex && index <= valueText.StringIndex + valueText.StringSize)
                     {
                         precursorLists.ForEach(precursors =>
                         {
-                            List<WatchVariableControlPrecursor> overlapped = valueText.GetOverlapped(precursors);
-                            overlapped.ForEach(precursor => watchVariablePanelMemory.AddVariable(
-                                precursor.CreateWatchVariableControl(
-                                    newVariableGroupList: new List<VariableGroup>() { VariableGroup.Custom })));
+                            List<WatchVariable> overlapped = valueText.GetOverlapped(precursors);
+                        overlapped.ForEach(precursor => watchVariablePanelMemory.AddVariable(
+                            precursor.CreateWatchVariableControl())); // newVariableGroupList: new List<VariableGroup>() { VariableGroup.Custom })));
                         });
                     }
                 });
@@ -248,7 +245,7 @@ namespace STROOP.Tabs
                 {
                     if (index >= valueText.StringIndex && index <= valueText.StringIndex + valueText.StringSize)
                     {
-                        WatchVariableControlPrecursor precursor = valueText.CreatePrecursor(useObjAddress, useHex, useObj, useRelativeName);
+                        WatchVariable precursor = valueText.CreatePrecursor(useObjAddress, useHex, useObj, useRelativeName);
                         watchVariablePanelMemory.AddVariable(precursor.CreateWatchVariableControl());
                     }
                 });
@@ -281,22 +278,20 @@ namespace STROOP.Tabs
                 MemoryType = memoryType;
             }
 
-            public bool OverlapsData(List<WatchVariableControlPrecursor> precursors)
+            public bool OverlapsData(List<WatchVariable> precursors)
             {
                 return GetOverlapped(precursors).Count > 0;
             }
 
-            public List<WatchVariableControlPrecursor> GetOverlapped(
-                List<WatchVariableControlPrecursor> precursors)
+            public List<WatchVariable> GetOverlapped(List<WatchVariable> precursors)
             {
                 uint minOffset = MemoryAddress;
                 uint maxOffset = MemoryAddress + (uint)ByteSize - 1;
                 uint? minObjOffset = ObjectUtilities.GetObjectRelativeAddress(minOffset);
                 uint? maxObjOffset = ObjectUtilities.GetObjectRelativeAddress(maxOffset);
 
-                return precursors.FindAll(precursor =>
+                return precursors.FindAll(watchVar =>
                 {
-                    WatchVariable watchVar = precursor.WatchVar;
                     if (watchVar.IsSpecial) return false;
                     if (watchVar.Mask != null) return false;
 
@@ -316,7 +311,7 @@ namespace STROOP.Tabs
                 });
             }
 
-            public WatchVariableControlPrecursor CreatePrecursor(bool useObjAddress, bool useHex, bool useObj, bool useRelativeName)
+            public WatchVariable CreatePrecursor(bool useObjAddress, bool useHex, bool useObj, bool useRelativeName)
             {
                 WatchVariableSubclass subclass = useObj
                     ? WatchVariableSubclass.Object
@@ -344,9 +339,8 @@ namespace STROOP.Tabs
                 uint offset = useObjAddress ? (uint)ByteIndex : MemoryAddress;
                 uint nameOffset = useRelativeName ? (uint)ByteIndex : MemoryAddress;
 
-                WatchVariable watchVar = new WatchVariable(
+                return new WatchVariable(
                     memoryTypeName: typeString,
-                    specialType: null,
                     baseAddressType: baseAddressType,
                     offsetUS: null,
                     offsetJP: null,
@@ -356,18 +350,6 @@ namespace STROOP.Tabs
                     mask: null,
                     shift: null,
                     handleMapping: true);
-                return new WatchVariableControlPrecursor(
-                    name: typeString + " " + HexUtilities.FormatValue(nameOffset),
-                    watchVar: watchVar,
-                    subclass: subclass,
-                    backgroundColor: null,
-                    displayType: null,
-                    roundingLimit: null,
-                    useHex: hexValue,
-                    invertBool: null,
-                    isYaw: null,
-                    coordinate: null,
-                    groupList: new List<VariableGroup>() { VariableGroup.Custom });
             }
         }
 

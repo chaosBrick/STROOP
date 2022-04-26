@@ -12,15 +12,15 @@ namespace STROOP.Tabs
     {
         private List<uint> _warpNodeAddresses;
 
-        private static readonly List<VariableGroup> ALL_VAR_GROUPS =
-            new List<VariableGroup>()
+        private static readonly List<string> ALL_VAR_GROUPS =
+            new List<string>()
             {
                 VariableGroup.Basic,
                 VariableGroup.WarpNode,
             };
 
-        private static readonly List<VariableGroup> VISIBLE_VAR_GROUPS =
-            new List<VariableGroup>()
+        private static readonly List<string> VISIBLE_VAR_GROUPS =
+            new List<string>()
             {
                 VariableGroup.Basic,
                 VariableGroup.WarpNode,
@@ -128,7 +128,6 @@ namespace STROOP.Tabs
             {
                 WatchVariable watchVar = new WatchVariable(
                     memoryTypeName: types[i],
-                    specialType: null,
                     baseAddressType: BaseAddressTypeEnum.Relative,
                     offsetUS: null,
                     offsetJP: null,
@@ -138,19 +137,7 @@ namespace STROOP.Tabs
                     mask: null,
                     shift: null,
                     handleMapping: true);
-                WatchVariableControlPrecursor precursor = new WatchVariableControlPrecursor(
-                    name: names[i],
-                    watchVar: watchVar,
-                    subclass: subclasses[i],
-                    backgroundColor: null,
-                    displayType: null,
-                    roundingLimit: null,
-                    useHex: useHexes[i],
-                    invertBool: null,
-                    isYaw: null,
-                    coordinate: null,
-                    groupList: new List<VariableGroup>() { VariableGroup.WarpNode });
-                controls.Add(precursor.CreateWatchVariableControl());
+                controls.Add(watchVar.CreateWatchVariableControl());
             }
             return controls;
         }

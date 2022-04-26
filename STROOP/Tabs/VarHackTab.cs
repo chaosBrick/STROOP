@@ -179,7 +179,7 @@ namespace STROOP.Tabs
                         control.VarName + " " + VarHackConfig.EscapeChar,
                         trianglePointerAddress.Value,
                         watchVar.MemoryType,
-                        watchVarWrapper.GetUseHex(),
+                        watchVarWrapper.DisplayAsHex(),
                         watchVar.Offset);
                 }
             }
@@ -193,7 +193,7 @@ namespace STROOP.Tabs
                         control.VarName + indexSuffix + " " + VarHackConfig.EscapeChar,
                         addressList[i],
                         watchVar.MemoryType,
-                        watchVarWrapper.GetUseHex(),
+                        watchVarWrapper.DisplayAsHex(),
                         null);
                 }
             }

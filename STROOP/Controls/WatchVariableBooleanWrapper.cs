@@ -8,14 +8,14 @@ namespace STROOP.Controls
         private bool _displayAsCheckbox;
         private bool _displayAsInverted;
 
-        public WatchVariableBooleanWrapper(
-            WatchVariable watchVar,
-            WatchVariableControl watchVarControl,
-            bool? displayAsInverted)
-            : base(watchVar, watchVarControl, DEFAULT_DISPLAY_TYPE, DEFAULT_ROUNDING_LIMIT, DEFAULT_DISPLAY_AS_HEX, true)
+        public WatchVariableBooleanWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl)
+            : base(watchVar, watchVarControl)
         {
             _displayAsCheckbox = true;
-            _displayAsInverted = displayAsInverted ?? false;
+            if (bool.TryParse(watchVar.view.GetValueByKey("invertBool"), out var invertBool))
+                _displayAsInverted = invertBool;
+            else
+                _displayAsInverted = false;
 
             AddBooleanContextMenuStripItems();
         }
@@ -27,7 +27,6 @@ namespace STROOP.Controls
             {
                 _displayAsCheckbox = !_displayAsCheckbox;
                 itemDisplayAsCheckbox.Checked = _displayAsCheckbox;
-                _watchVarControl.SetUseCheckbox(_displayAsCheckbox);
             };
             itemDisplayAsCheckbox.Checked = _displayAsCheckbox;
 
@@ -44,7 +43,7 @@ namespace STROOP.Controls
             _contextMenuStrip.AddToBeginningList(itemDisplayAsInverted);
         }
 
-        protected override CheckState ConvertValueToCheckState(object value)
+        protected CheckState ConvertValueToCheckState(object value)
         {
             double? doubleValueNullable = ParsingUtilities.ParseDoubleNullable(value);
             if (!doubleValueNullable.HasValue) return CheckState.Unchecked;
@@ -52,7 +51,7 @@ namespace STROOP.Controls
             return HandleInverting(doubleValue == 0) ? CheckState.Unchecked : CheckState.Checked;
         }
 
-        protected override object ConvertCheckStateToValue(CheckState checkState)
+        protected object ConvertCheckStateToValue(CheckState checkState)
         {
             if (checkState == CheckState.Indeterminate) return "";
 
@@ -62,14 +61,8 @@ namespace STROOP.Controls
             return HandleInverting(checkState == CheckState.Unchecked) ? offValue : onValue;
         }
 
-        private bool HandleInverting(bool boolValue)
-        {
-            return boolValue != _displayAsInverted;
-        }
+        private bool HandleInverting(bool boolValue) => boolValue != _displayAsInverted;
 
-        protected override string GetClass()
-        {
-            return "Boolean";
-        }
+        protected override string GetClass() => "Boolean";
     }
 }

@@ -28,25 +28,9 @@ namespace STROOP.Structs
         {
             return (Coordinate)Enum.Parse(typeof(Coordinate), stringValue);
         }
-
-        public static VariableGroup GetVariableGroup(string stringValue)
-        {
-            return (VariableGroup)Enum.Parse(typeof(VariableGroup), stringValue);
-        }
-
-        public static List<VariableGroup> ParseVariableGroupList(string stringValue)
-        {
-            List<VariableGroup> variableGroupList = new List<VariableGroup>();
-            if (stringValue != null)
-            {
-                string[] groupNames = stringValue.Split(',');
-                foreach (string groupName in groupNames)
-                {
-                    variableGroupList.Add(GetVariableGroup(groupName));
-                }
-            }
-            return variableGroupList;
-        }
+        
+        public static List<string> ParseVariableGroupList(string stringValue) =>
+            new List<string>(Array.ConvertAll(stringValue.Split('|', ','), _ => _.Trim()));
 
         private static readonly List<uint> BaseAddressListZero = new List<uint> { 0 };
         private static readonly List<uint> BaseAddressListEmpty = new List<uint> { };

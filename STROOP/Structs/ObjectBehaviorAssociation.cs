@@ -21,7 +21,7 @@ namespace STROOP.Structs
         public Lazy<Image> TransparentImage;
         public Lazy<Image> MapImage;
         public PushHitbox PushHitbox;
-        public List<WatchVariableControlPrecursor> Precursors = new List<WatchVariableControlPrecursor>();
+        public List<WatchVariable> Precursors = new List<WatchVariable>();
 
         private List<WatchVariableControl> _watchVariableControls = null;
         public List<WatchVariableControl> WatchVariableControls
@@ -29,11 +29,7 @@ namespace STROOP.Structs
             get
             {
                 if (_watchVariableControls == null)
-                {
-                    _watchVariableControls =
-                        Precursors.ConvertAll(
-                            precursor => precursor.CreateWatchVariableControl());
-                }
+                    _watchVariableControls = Precursors.ConvertAll(precursor => precursor.CreateWatchVariableControl());
                 return _watchVariableControls;
             }
         }

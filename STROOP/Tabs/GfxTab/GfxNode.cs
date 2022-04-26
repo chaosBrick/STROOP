@@ -82,9 +82,9 @@ namespace STROOP.Tabs.GfxTab
             return res;
         }
 
-        public static List<WatchVariableControlPrecursor> GetCommonVariables()
+        public static List<WatchVariable> GetCommonVariables()
         {
-            List<WatchVariableControlPrecursor> precursors = new List<WatchVariableControlPrecursor>();
+            List<WatchVariable> precursors = new List<WatchVariable>();
             precursors.Add(gfxProperty("Type", "ushort", 0x00));
             precursors.Add(gfxProperty("Active", "ushort", 0x02, Structs.WatchVariableSubclass.Boolean, 0x01));
             precursors.Add(gfxProperty("Bit 1", "ushort", 0x02, Structs.WatchVariableSubclass.Boolean, 0x02));
@@ -102,7 +102,7 @@ namespace STROOP.Tabs.GfxTab
         }
 
         // Wrapper to make defining variables easier
-        protected static WatchVariableControlPrecursor gfxProperty(string name, string type, uint offset,
+        protected static WatchVariable gfxProperty(string name, string type, uint offset,
             Structs.WatchVariableSubclass subclass = Structs.WatchVariableSubclass.Number, uint? mask = null)
         {
             Color color = (offset <= 0x13)
@@ -110,7 +110,6 @@ namespace STROOP.Tabs.GfxTab
                 : ColorUtilities.GetColorFromString("LightBlue");
             WatchVariable watchVar = new WatchVariable(
                 memoryTypeName: type,
-                specialType: null,
                 baseAddressType: BaseAddressTypeEnum.GfxNode,
                 offsetUS: null,
                 offsetJP: null,
@@ -120,25 +119,13 @@ namespace STROOP.Tabs.GfxTab
                 mask: mask,
                 shift: null,
                 handleMapping: true);
-            WatchVariableControlPrecursor precursor = new WatchVariableControlPrecursor(
-                name: name,
-                watchVar: watchVar,
-                subclass: subclass,
-                backgroundColor: color,
-                displayType: null,
-                roundingLimit: null,
-                useHex: (type == "uint" || type == "ushort") ? true : (bool?)null,
-                invertBool: null,
-                coordinate: null,
-                isYaw: null,
-                groupList: new List<VariableGroup>());
-            return precursor;
+            return watchVar;
         }
 
         // If there are type specific variables, this should be overridden 
-        public virtual List<WatchVariableControlPrecursor> GetTypeSpecificVariables()
+        public virtual List<WatchVariable> GetTypeSpecificVariables()
         {
-            return new List<WatchVariableControlPrecursor>();
+            return new List<WatchVariable>();
         }
     }
 
@@ -175,9 +162,9 @@ namespace STROOP.Tabs.GfxTab
             }
         }
 
-        public override List<WatchVariableControlPrecursor> GetTypeSpecificVariables()
+        public override List<WatchVariable> GetTypeSpecificVariables()
         {
-            List<WatchVariableControlPrecursor> precursors = new List<WatchVariableControlPrecursor>();
+            List<WatchVariable> precursors = new List<WatchVariable>();
             precursors.Add(gfxProperty("Selection function", "uint", 0x14));
             precursors.Add(gfxProperty("Selected child", "ushort", 0x1E));
             return precursors;
@@ -187,9 +174,9 @@ namespace STROOP.Tabs.GfxTab
     internal class GfxBackgroundImage : GfxNode
     {
         public override string Name { get { return "Background image"; } }
-        public override List<WatchVariableControlPrecursor> GetTypeSpecificVariables()
+        public override List<WatchVariable> GetTypeSpecificVariables()
         {
-            var precursors = new List<WatchVariableControlPrecursor>();
+            var precursors = new List<WatchVariable>();
             precursors.Add(gfxProperty("Draw function", "uint", 0x14));
             return precursors;
         }
@@ -202,9 +189,9 @@ namespace STROOP.Tabs.GfxTab
         //int marioOffset  0x18        memory offset from marioData to check
         //void* heldObj      0x1c        another struct
         //short[3] position     0x20,2,4
-        public override List<WatchVariableControlPrecursor> GetTypeSpecificVariables()
+        public override List<WatchVariable> GetTypeSpecificVariables()
         {
-            List<WatchVariableControlPrecursor> precursors = new List<WatchVariableControlPrecursor>();
+            List<WatchVariable> precursors = new List<WatchVariable>();
             precursors.Add(gfxProperty("Function pointer", "uint", 0x14));
             precursors.Add(gfxProperty("Mario offset", "int", 0x18));
             precursors.Add(gfxProperty("Held object", "uint", 0x1C));
@@ -256,9 +243,9 @@ namespace STROOP.Tabs.GfxTab
             }
         }
 
-        public override List<WatchVariableControlPrecursor> GetTypeSpecificVariables()
+        public override List<WatchVariable> GetTypeSpecificVariables()
         {
-            var precursors = new List<WatchVariableControlPrecursor>();
+            var precursors = new List<WatchVariable>();
             precursors.Add(gfxProperty("Function pointer", "uint", 0x14));
             precursors.Add(gfxProperty("Parameter 1", "ushort", 0x18));
             precursors.Add(gfxProperty("Parameter 2", "ushort", 0x1A));
@@ -269,9 +256,9 @@ namespace STROOP.Tabs.GfxTab
     internal class GfxCamera : GfxNode
     {
         public override string Name { get { return "Camera"; } }
-        public override List<WatchVariableControlPrecursor> GetTypeSpecificVariables()
+        public override List<WatchVariable> GetTypeSpecificVariables()
         {
-            List<WatchVariableControlPrecursor> precursors = new List<WatchVariableControlPrecursor>();
+            List<WatchVariable> precursors = new List<WatchVariable>();
             precursors.Add(gfxProperty("Update function", "uint", 0x14));
             precursors.Add(gfxProperty("X from", "float", 0x1C));
             precursors.Add(gfxProperty("Y from", "float", 0x20));
@@ -286,9 +273,9 @@ namespace STROOP.Tabs.GfxTab
     internal class GfxProjection3D : GfxNode
     {
         public override string Name { get { return "Projection 3D"; } }
-        public override List<WatchVariableControlPrecursor> GetTypeSpecificVariables()
+        public override List<WatchVariable> GetTypeSpecificVariables()
         {
-            List<WatchVariableControlPrecursor> precursors = new List<WatchVariableControlPrecursor>();
+            List<WatchVariable> precursors = new List<WatchVariable>();
             precursors.Add(gfxProperty("Update function", "uint", 0x14));
             precursors.Add(gfxProperty("Fov", "float", 0x1C));
             precursors.Add(gfxProperty("Z clip near", "short", 0x20));
@@ -300,9 +287,9 @@ namespace STROOP.Tabs.GfxTab
     internal class GfxObjectParent : GfxNode
     {
         public override string Name { get { return "Object parent"; } }
-        public override List<WatchVariableControlPrecursor> GetTypeSpecificVariables()
+        public override List<WatchVariable> GetTypeSpecificVariables()
         {
-            List<WatchVariableControlPrecursor> precursors = new List<WatchVariableControlPrecursor>();
+            List<WatchVariable> precursors = new List<WatchVariable>();
             precursors.Add(gfxProperty("Temp child", "uint", 0x14));
             return precursors;
         }
@@ -311,9 +298,9 @@ namespace STROOP.Tabs.GfxTab
     internal class GfxShadowNode : GfxNode
     {
         public override string Name { get { return "Shadow"; } }
-        public override List<WatchVariableControlPrecursor> GetTypeSpecificVariables()
+        public override List<WatchVariable> GetTypeSpecificVariables()
         {
-            List<WatchVariableControlPrecursor> precursors = new List<WatchVariableControlPrecursor>();
+            List<WatchVariable> precursors = new List<WatchVariable>();
             precursors.Add(gfxProperty("Radius", "short", 0x14));
             precursors.Add(gfxProperty("Opacity", "byte", 0x16));
             precursors.Add(gfxProperty("Type", "byte", 0x17));
@@ -324,9 +311,9 @@ namespace STROOP.Tabs.GfxTab
     internal class GfxScalingNode : GfxNode
     {
         public override string Name { get { return "Scaling node"; } }
-        public override List<WatchVariableControlPrecursor> GetTypeSpecificVariables()
+        public override List<WatchVariable> GetTypeSpecificVariables()
         {
-            List<WatchVariableControlPrecursor> precursors = new List<WatchVariableControlPrecursor>();
+            List<WatchVariable> precursors = new List<WatchVariable>();
             precursors.Add(gfxProperty("Scale", "float", 0x18));
             return precursors;
         }
@@ -341,9 +328,9 @@ namespace STROOP.Tabs.GfxTab
     internal class GfxAnimationNode : GfxNode
     {
         public override string Name { get { return "Animated node"; } }
-        public override List<WatchVariableControlPrecursor> GetTypeSpecificVariables()
+        public override List<WatchVariable> GetTypeSpecificVariables()
         {
-            List<WatchVariableControlPrecursor> precursors = new List<WatchVariableControlPrecursor>();
+            List<WatchVariable> precursors = new List<WatchVariable>();
             precursors.Add(gfxProperty("Display list", "uint", 0x14));
             precursors.Add(gfxProperty("X offset", "short", 0x18));
             precursors.Add(gfxProperty("Y offset", "short", 0x1A));
@@ -355,9 +342,9 @@ namespace STROOP.Tabs.GfxTab
     internal class GfxGameObject : GfxNode
     {
         public override string Name { get { return "Game object"; } }
-        public override List<WatchVariableControlPrecursor> GetTypeSpecificVariables()
+        public override List<WatchVariable> GetTypeSpecificVariables()
         {
-            List<WatchVariableControlPrecursor> precursors = new List<WatchVariableControlPrecursor>();
+            List<WatchVariable> precursors = new List<WatchVariable>();
             precursors.Add(gfxProperty("Shared child", "uint", 0x14));
             return precursors;
         }
@@ -367,9 +354,9 @@ namespace STROOP.Tabs.GfxTab
     {
         public override string Name { get { return "Rotation"; } }
 
-        public override List<WatchVariableControlPrecursor> GetTypeSpecificVariables()
+        public override List<WatchVariable> GetTypeSpecificVariables()
         {
-            List<WatchVariableControlPrecursor> precursors = new List<WatchVariableControlPrecursor>();
+            List<WatchVariable> precursors = new List<WatchVariable>();
             precursors.Add(gfxProperty("Segmented address", "uint", 0x14));
             precursors.Add(gfxProperty("Angle x", "short", 0x18)); //Todo: make these angle types
             precursors.Add(gfxProperty("Angle y", "short", 0x1A));
@@ -382,9 +369,9 @@ namespace STROOP.Tabs.GfxTab
     internal class GfxTranslatedModel : GfxNode
     {
         public override string Name { get { return "Menu model"; } }
-        public override List<WatchVariableControlPrecursor> GetTypeSpecificVariables()
+        public override List<WatchVariable> GetTypeSpecificVariables()
         {
-            List<WatchVariableControlPrecursor> precursors = new List<WatchVariableControlPrecursor>();
+            List<WatchVariable> precursors = new List<WatchVariable>();
             precursors.Add(gfxProperty("Segmented address", "uint", 0x14));
             precursors.Add(gfxProperty("X offset", "short", 0x18));
             precursors.Add(gfxProperty("Y offset", "short", 0x1A));
@@ -397,9 +384,9 @@ namespace STROOP.Tabs.GfxTab
     {
         public override string Name { get { return "Debug transformation"; } }
 
-        public override List<WatchVariableControlPrecursor> GetTypeSpecificVariables()
+        public override List<WatchVariable> GetTypeSpecificVariables()
         {
-            var precursors = new List<WatchVariableControlPrecursor>();
+            var precursors = new List<WatchVariable>();
             precursors.Add(gfxProperty("X translation", "short", 0x18));
             precursors.Add(gfxProperty("Y translation", "short", 0x1A));
             precursors.Add(gfxProperty("Z translation", "short", 0x1C));
@@ -413,9 +400,9 @@ namespace STROOP.Tabs.GfxTab
     internal class GfxLevelOfDetail : GfxNode
     {
         public override string Name { get { return "Level of detail"; } }
-        public override List<WatchVariableControlPrecursor> GetTypeSpecificVariables()
+        public override List<WatchVariable> GetTypeSpecificVariables()
         {
-            var precursors = new List<WatchVariableControlPrecursor>();
+            var precursors = new List<WatchVariable>();
             precursors.Add(gfxProperty("Min cam distance", "short", 0x14));
             precursors.Add(gfxProperty("Max cam distance", "short", 0x16));
             precursors.Add(gfxProperty("Pointer 1", "uint", 0x18));
@@ -427,9 +414,9 @@ namespace STROOP.Tabs.GfxTab
     internal class GfxMasterList : GfxNode
     {
         public override string Name { get { return "Master list"; } }
-        public override List<WatchVariableControlPrecursor> GetTypeSpecificVariables()
+        public override List<WatchVariable> GetTypeSpecificVariables()
         {
-            var precursors = new List<WatchVariableControlPrecursor>();
+            var precursors = new List<WatchVariable>();
             precursors.Add(gfxProperty("Pointer 0", "uint", 0x14));
             precursors.Add(gfxProperty("Pointer 1", "uint", 0x18));
             precursors.Add(gfxProperty("Pointer 2", "uint", 0x1C));
@@ -459,9 +446,9 @@ namespace STROOP.Tabs.GfxTab
     internal class GfxScreenSpace : GfxNode
     {
         public override string Name { get { return "Screenspace"; } }
-        public override List<WatchVariableControlPrecursor> GetTypeSpecificVariables()
+        public override List<WatchVariable> GetTypeSpecificVariables()
         {
-            var precursors = new List<WatchVariableControlPrecursor>();
+            var precursors = new List<WatchVariable>();
             precursors.Add(gfxProperty("??? 0x14", "float", 0x14));
             precursors.Add(gfxProperty("??? 0x18", "uint", 0x18));
             return precursors;
@@ -471,9 +458,9 @@ namespace STROOP.Tabs.GfxTab
     internal class GfxRootnode : GfxNode
     {
         public override string Name { get { return "Root"; } }
-        public override List<WatchVariableControlPrecursor> GetTypeSpecificVariables()
+        public override List<WatchVariable> GetTypeSpecificVariables()
         {
-            List<WatchVariableControlPrecursor> precursors = new List<WatchVariableControlPrecursor>();
+            List<WatchVariable> precursors = new List<WatchVariable>();
             precursors.Add(gfxProperty("Some short", "short", 0x14));
             precursors.Add(gfxProperty("Screen xoffset", "short", 0x16));
             precursors.Add(gfxProperty("Screen yoffset", "short", 0x18));
@@ -486,9 +473,9 @@ namespace STROOP.Tabs.GfxTab
     internal class GfxDisplayList : GfxNode
     {
         public override string Name { get { return "Display List"; } }
-        public override List<WatchVariableControlPrecursor> GetTypeSpecificVariables()
+        public override List<WatchVariable> GetTypeSpecificVariables()
         {
-            List<WatchVariableControlPrecursor> precursors = new List<WatchVariableControlPrecursor>();
+            List<WatchVariable> precursors = new List<WatchVariable>();
             precursors.Add(gfxProperty("Segmented address", "uint", 0x14));
             return precursors;
         }

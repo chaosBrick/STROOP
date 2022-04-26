@@ -12,8 +12,8 @@ namespace STROOP.Structs
 {
     public static class WatchVariableSpecialUtilities
     {
-        private readonly static Func<uint, object> DEFAULT_GETTER = (uint address) => Double.NaN;
-        private readonly static Func<object, uint, bool> DEFAULT_SETTER = (object value, uint address) => false;
+        private readonly static WatchVariable.GetterFunction DEFAULT_GETTER = (uint address) => Double.NaN;
+        private readonly static WatchVariable.SetterFunction DEFAULT_SETTER = (object value, uint address) => false;
 
         public static WatchVariableSpecialDictionary dictionary { get; private set; }
 
@@ -26,10 +26,10 @@ namespace STROOP.Structs
             InitializeSpecialAttribute.ExecuteInitializers();
         }
 
-        public static (Func<uint, object>, Func<object, uint, bool> getterSetter)
+        public static (WatchVariable.GetterFunction, WatchVariable.SetterFunction)
             CreateGetterSetterFunctions(string specialType, out bool valid)
         {
-            (Func<uint, object>, Func<object, uint, bool> getterSetter) variable;
+            (WatchVariable.GetterFunction, WatchVariable.SetterFunction) variable;
             if (valid = dictionary.TryGetValue(specialType, out variable))
                 return variable;
             return (DEFAULT_GETTER, DEFAULT_SETTER);
@@ -370,29 +370,22 @@ namespace STROOP.Structs
             return specialType;
         }
 
-        public static string AddDummyEntry(string typeString)
+        public static (WatchVariable.GetterFunction, WatchVariable.SetterFunction) MakeDummy(string typeString)
         {
             int index = SpecialConfig.DummyValues.Count;
             Type type = TypeUtilities.StringToType[typeString];
             SpecialConfig.DummyValues.Add(ParsingUtilities.ParseValueRoundingWrapping(0, type));
             string specialType = "Dummy" + index + StringUtilities.Capitalize(typeString);
 
-            dictionary.Add(specialType,
-                ((uint dummy) =>
-                {
-                    return SpecialConfig.DummyValues[index];
-                }
-            ,
-                (double value, uint dummy) =>
-                {
-                    object o = ParsingUtilities.ParseValueRoundingWrapping(value, type);
-                    if (o == null) return false;
-                    SpecialConfig.DummyValues[index] = o;
-                    return true;
-                }
-            ));
-
-            return specialType;
+            return ((uint dummy) => SpecialConfig.DummyValues[index],
+                 (object value, uint dummy) =>
+                 {
+                     object o = ParsingUtilities.ParseValueRoundingWrapping(value, type);
+                     if (o == null) return false;
+                     SpecialConfig.DummyValues[index] = o;
+                     return true;
+                 }
+            );
         }
 
         public static string AddSchedulerEntry(int index)
@@ -489,7 +482,7 @@ namespace STROOP.Structs
                 ));
             }
         }
-        
+
         public static void AddGeneratedEntriesToDictionary()
         {
             List<Func<uint, PositionAngle>> posAngleFuncs =
@@ -2130,20 +2123,20 @@ namespace STROOP.Structs
             dictionary.Add("SpeedMultiplier",
                 ((uint dummy) =>
                 {
-                    /*
-                    intended dyaw = intended yaw - slide yaw (idk what this is called in stroop)
-                    if cos(intended dyaw) < 0 and fspeed >= 0:
-                      K = 0.5 + 0.5 * fspeed / 100
-                    else:
-                      K = 1
+            /*
+            intended dyaw = intended yaw - slide yaw (idk what this is called in stroop)
+            if cos(intended dyaw) < 0 and fspeed >= 0:
+              K = 0.5 + 0.5 * fspeed / 100
+            else:
+              K = 1
 
-                    multiplier = (intended mag / 32) * cos(intended dyaw) * K * 0.02 + A
+            multiplier = (intended mag / 32) * cos(intended dyaw) * K * 0.02 + A
 
-                    slide: A = 0.98
-                    slippery: A = 0.96
-                    default: A = 0.92
-                    not slippery: A = 0.92
-                    */
+            slide: A = 0.98
+            slippery: A = 0.96
+            default: A = 0.92
+            not slippery: A = 0.92
+            */
 
                     ushort intendedYaw = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.IntendedYawOffset);
                     ushort movingYaw = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.MovingYawOffset);

@@ -1,28 +1,82 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Drawing;
 using STROOP.Utilities;
 using STROOP.Structs;
-using STROOP.Extensions;
-using System.Reflection;
-using STROOP.Managers;
 using STROOP.Structs.Configurations;
+using System.Xml.Linq;
 
 namespace STROOP.Controls
 {
     public class WatchVariable
     {
+        public delegate object GetterFunction(uint address);
+        public delegate bool SetterFunction(object value, uint address);
+
+        public interface IVariableView
+        {
+            string Name { get; }
+            GetterFunction _getterFunction { get; }
+            SetterFunction _setterFunction { get; }
+            string GetValueByKey(string key);
+            Type GetWrapperType();
+        }
+
+        public class CustomView : IVariableView
+        {
+            public string Name { get; set; }
+            public GetterFunction _getterFunction { get; set; }
+            public SetterFunction _setterFunction { get; set; }
+            public string GetValueByKey(string key) => null;
+            public Type GetWrapperType()
+            {
+                throw new InvalidOperationException("Nope");
+            }
+        }
+
+        public class XmlView : IVariableView
+        {
+            readonly WatchVariable watchVariable;
+            readonly string wrapper;
+            readonly XElement xElement;
+            public string Name { get; private set; }
+
+            public GetterFunction _getterFunction { get; private set; }
+            public SetterFunction _setterFunction { get; private set; }
+
+            public XmlView(WatchVariable watchVariable, XElement element)
+            {
+                this.watchVariable = watchVariable;
+                this.xElement = element;
+                Name = element.Value;
+                wrapper = element.Attribute(XName.Get("subclass"))?.Value ?? "Number";
+
+                if (!watchVariable.IsSpecial)
+                {
+                    _getterFunction = (uint address) =>
+                        Config.Stream.GetValue(watchVariable.MemoryType, address, watchVariable.UseAbsoluteAddressing, watchVariable.Mask, watchVariable.Shift);
+                    _setterFunction = (object value, uint address) =>
+                        Config.Stream.SetValueRoundingWrapping(watchVariable.MemoryType, value, address, watchVariable.UseAbsoluteAddressing, watchVariable.Mask, watchVariable.Shift);
+                }
+                else
+                {
+                    (_getterFunction, _setterFunction) = WatchVariableSpecialUtilities.CreateGetterSetterFunctions(element.Attribute(XName.Get("specialType"))?.Value, out var valid);
+                    if (!valid)
+                    {
+                        _getterFunction = _ => null;
+                        _setterFunction = (_, __) => false;
+                    }
+                }
+            }
+            public Type GetWrapperType() => WatchVariableWrapper.GetWrapperType(wrapper);
+            public string GetValueByKey(string key) => xElement.Attribute(key)?.Value ?? null;
+        }
+
         public readonly string MemoryTypeName;
         public readonly Type MemoryType;
         public readonly int? ByteCount;
         public readonly int? NibbleCount;
         public readonly bool? SignedType;
-
-        public readonly string SpecialType;
 
         public readonly BaseAddressTypeEnum BaseAddressType;
 
@@ -36,11 +90,10 @@ namespace STROOP.Controls
         public readonly int? Shift;
         public readonly bool HandleMapping;
 
-        private readonly Func<uint, object> _getterFunction;
-        private readonly Func<object, uint, bool> _setterFunction;
-
-        public bool IsSpecial { get => SpecialType != null; }
+        public bool IsSpecial { get => MemoryType == null; }
         public bool UseAbsoluteAddressing { get => BaseAddressType == BaseAddressTypeEnum.Absolute; }
+
+        public IVariableView view;
 
         public uint Offset
         {
@@ -66,6 +119,8 @@ namespace STROOP.Controls
             }
         }
 
+        public WatchVariableControl CreateWatchVariableControl() => new WatchVariableControl(this);
+
         public List<uint> GetBaseAddressList()
         {
             return WatchVariableUtilities.GetBaseAddressListFromBaseAddressType(BaseAddressType);
@@ -78,26 +133,40 @@ namespace STROOP.Controls
             return baseAddresses.ConvertAll(baseAddress => baseAddress + offset);
         }
 
-        public WatchVariable(string memoryTypeName, string specialType, BaseAddressTypeEnum baseAddressType,
+        public static WatchVariable ParseXml(XElement element)
+        {
+            /// Watchvariable params
+            string typeName = (element.Attribute(XName.Get("type"))?.Value);
+            string specialType = element.Attribute(XName.Get("specialType"))?.Value;
+            BaseAddressTypeEnum baseAddressType = WatchVariableUtilities.GetBaseAddressType(element.Attribute(XName.Get("base")).Value);
+            uint? offsetUS = ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("offsetUS"))?.Value);
+            uint? offsetJP = ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("offsetJP"))?.Value);
+            uint? offsetSH = ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("offsetSH"))?.Value);
+            uint? offsetEU = ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("offsetEU"))?.Value);
+            uint? offsetDefault = ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("offset"))?.Value);
+            uint? mask = element.Attribute(XName.Get("mask")) != null ?
+                (uint?)ParsingUtilities.ParseHex(element.Attribute(XName.Get("mask")).Value) : null;
+            int? shift = element.Attribute(XName.Get("shift")) != null ?
+                int.Parse(element.Attribute(XName.Get("shift")).Value) : (int?)null;
+            bool handleMapping = (element.Attribute(XName.Get("handleMapping")) != null) ?
+                bool.Parse(element.Attribute(XName.Get("handleMapping")).Value) : true;
+
+            var result = new WatchVariable(typeName, baseAddressType, offsetUS, offsetJP, offsetSH, offsetEU, offsetDefault, mask, shift, handleMapping);
+            result.view = new XmlView(result, element);
+            return result;
+        }
+
+        public WatchVariable(string name, (GetterFunction getterFunction, SetterFunction setterFunction) getSet)
+        {
+            view = new CustomView() { Name = name, _getterFunction = getSet.getterFunction, _setterFunction = getSet.setterFunction };
+        }
+
+        public WatchVariable(string memoryTypeName, BaseAddressTypeEnum baseAddressType,
             uint? offsetUS, uint? offsetJP, uint? offsetSH, uint? offsetEU, uint? offsetDefault, uint? mask, int? shift, bool handleMapping)
         {
             if (offsetDefault.HasValue && (offsetUS.HasValue || offsetJP.HasValue || offsetSH.HasValue || offsetEU.HasValue))
             {
                 throw new ArgumentOutOfRangeException("Can't have both a default offset value and a rom-specific offset value");
-            }
-
-            if (specialType != null)
-            {
-                if (baseAddressType == BaseAddressTypeEnum.Relative ||
-                    baseAddressType == BaseAddressTypeEnum.Absolute)
-                {
-                    throw new ArgumentOutOfRangeException("Special var cannot have base address type " + baseAddressType);
-                }
-                
-                if (mask != null)
-                {
-                    throw new ArgumentOutOfRangeException("Special var cannot have mask");
-                }
             }
 
             BaseAddressType = baseAddressType;
@@ -108,8 +177,6 @@ namespace STROOP.Controls
             OffsetEU = offsetEU;
             OffsetDefault = offsetDefault;
 
-            SpecialType = specialType;
-
             MemoryTypeName = memoryTypeName;
             MemoryType = memoryTypeName == null ? null : TypeUtilities.StringToType[MemoryTypeName];
             ByteCount = memoryTypeName == null ? (int?)null : TypeUtilities.TypeSize[MemoryType];
@@ -119,45 +186,10 @@ namespace STROOP.Controls
             Mask = mask;
             Shift = shift;
             HandleMapping = handleMapping;
-
-            // Created getter/setter functions
-            if (IsSpecial)
-            {
-                (_getterFunction, _setterFunction) = WatchVariableSpecialUtilities.CreateGetterSetterFunctions(SpecialType, out var valid);
-                if (!valid)
-                    BaseAddressType = BaseAddressTypeEnum.Invalid;
-            }
-            else
-            {
-                _getterFunction = (uint address) =>
-                {
-                    return Config.Stream.GetValue(
-                        MemoryType, address, UseAbsoluteAddressing, Mask, Shift);
-                };
-                _setterFunction = (object value, uint address) =>
-                {
-                    return Config.Stream.SetValueRoundingWrapping(
-                        MemoryType, value, address, UseAbsoluteAddressing, Mask, Shift);
-                };
-
-            }
         }
 
-        public List<object> GetValues(List<uint> addresses = null)
-        {
-            List<uint> addressList = GetAddressList(addresses);
-            List<object> realValues = addressList.ConvertAll(
-                address => _getterFunction(address));
-            List<object> lockValues = WatchVariableLockManager.GetExistingLockValues(this, addresses);
-            if (lockValues == null) return realValues; // short circuit if locking is disabled
-            if (lockValues.Count != realValues.Count) throw new ArgumentOutOfRangeException();
-            List<object> returnValues = new List<object>();
-            for (int i = 0; i < lockValues.Count; i++)
-            {
-                returnValues.Add(lockValues[i] ?? realValues[i]);
-            }
-            return returnValues;
-        }
+        public List<object> GetValues(List<uint> addresses = null) =>
+            GetAddressList(addresses).ConvertAll(address => view._getterFunction(address));
 
         public bool SetValue(object value, List<uint> addresses = null)
         {
@@ -166,8 +198,7 @@ namespace STROOP.Controls
 
             bool streamAlreadySuspended = Config.Stream.IsSuspended;
             if (!streamAlreadySuspended) Config.Stream.Suspend();
-            bool success = addressList.ConvertAll(
-                address => _setterFunction(value, address))
+            bool success = addressList.ConvertAll(address => view._setterFunction(value, address))
                     .Aggregate(true, (b1, b2) => b1 && b2);
             if (!streamAlreadySuspended) Config.Stream.Resume();
 
@@ -191,7 +222,7 @@ namespace STROOP.Controls
             for (int i = 0; i < minCount; i++)
             {
                 if (values[i] == null) continue;
-                success &= _setterFunction(values[i], addressList[i]);
+                success &= view._setterFunction(values[i], addressList[i]);
             }
             if (!streamAlreadySuspended) Config.Stream.Resume();
 
@@ -205,42 +236,44 @@ namespace STROOP.Controls
 
         public List<WatchVariableLock> GetLocks(List<uint> addresses = null)
         {
-            List<uint> baseAddressList = addresses ?? GetBaseAddressList();
-            List<uint> addressList = GetAddressList(addresses);
-            List<object> values = GetValues(addresses);
-            if (values.Count != addressList.Count || values.Count != baseAddressList.Count)
-                return new List<WatchVariableLock>();
+            throw new NotImplementedException("What");
+            //List<uint> baseAddressList = addresses ?? GetBaseAddressList();
+            //List<uint> addressList = GetAddressList(addresses);
+            //List<object> values = GetValues(addresses);
+            //if (values.Count != addressList.Count || values.Count != baseAddressList.Count)
+            //    return new List<WatchVariableLock>();
 
-            List<WatchVariableLock> locks = new List<WatchVariableLock>();
-            for (int i = 0; i < values.Count; i++)
-            {
-                locks.Add(new WatchVariableLock(
-                    IsSpecial, MemoryType, ByteCount, Mask, Shift, addressList[i], baseAddressList[i], SpecialType, _setterFunction, values[i]));
-            }
-            return locks;
+            //List<WatchVariableLock> locks = new List<WatchVariableLock>();
+            //for (int i = 0; i < values.Count; i++)
+            //{
+            //    locks.Add(new WatchVariableLock(
+            //        IsSpecial, MemoryType, ByteCount, Mask, Shift, addressList[i], baseAddressList[i], SpecialType, view._setterFunction, values[i]));
+            //}
+            //return locks;
         }
 
         public List<WatchVariableLock> GetLocksWithoutValues(List<uint> addresses = null)
         {
-            List<uint> baseAddressList = addresses ?? GetBaseAddressList();
-            List<uint> addressList = GetAddressList(addresses);
-            if (baseAddressList.Count != addressList.Count)
-                return new List<WatchVariableLock>();
+            return new List<WatchVariableLock>();
+            throw new NotImplementedException("What");
+            //List<uint> baseAddressList = addresses ?? GetBaseAddressList();
+            //List<uint> addressList = GetAddressList(addresses);
+            //if (baseAddressList.Count != addressList.Count)
+            //    return new List<WatchVariableLock>();
 
-            List<WatchVariableLock> locks = new List<WatchVariableLock>();
-            for (int i = 0; i < addressList.Count; i++)
-            {
-                locks.Add(new WatchVariableLock(
-                    IsSpecial, MemoryType, ByteCount, Mask, Shift, addressList[i], baseAddressList[i], SpecialType, _setterFunction, null));
-            }
-            return locks;
+            //List<WatchVariableLock> locks = new List<WatchVariableLock>();
+            //for (int i = 0; i < addressList.Count; i++)
+            //{
+            //    locks.Add(new WatchVariableLock(
+            //        IsSpecial, MemoryType, ByteCount, Mask, Shift, addressList[i], baseAddressList[i], SpecialType, view._setterFunction, null));
+            //}
+            //return locks;
         }
 
         public List<Func<object, bool>> GetSetters(List<uint> addresses = null)
         {
             List<uint> addressList = GetAddressList(addresses);
-            return addressList.ConvertAll(
-                address => (Func<object, bool>)((object value) => _setterFunction(value, address)));
+            return addressList.ConvertAll(address => (Func<object, bool>)((object value) => view._setterFunction(value, address)));
         }
 
         public string GetTypeDescription()
@@ -273,7 +306,7 @@ namespace STROOP.Controls
 
         public string GetBaseTypeOffsetDescription()
         {
-            string offsetString = IsSpecial ? SpecialType : HexUtilities.FormatValue(Offset);
+            string offsetString = IsSpecial ? "Special" : HexUtilities.FormatValue(Offset);
             return BaseAddressType + " + " + offsetString;
         }
 

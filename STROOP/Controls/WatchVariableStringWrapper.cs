@@ -9,12 +9,39 @@ namespace STROOP.Controls
     {
         public static Dictionary<string, EventHandler> specialTypeContextMenuHandlers = new Dictionary<string, EventHandler>();
 
+        protected CarretlessTextBox textBox = new CarretlessTextBox();
+
+        protected WatchVariableStringWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl, int ignore)
+            : base(watchVar, watchVarControl)
+        {
+            textBox.Multiline = false;
+            textBox.KeyDown += (_, e) =>
+            {
+                if (e.KeyCode == Keys.Enter)
+                    SetValue(UnconvertValue(textBox.Text));
+                else if (e.KeyCode == Keys.Escape)
+                    textBox.Parent.Focus();
+            };
+            textBox.LostFocus += (_, e) => SetValue(UnconvertValue(textBox.Text));
+            watchVarControl.valueControlContainer.Controls.Add(textBox);
+        }
+
         public WatchVariableStringWrapper(
             WatchVariable watchVar,
             WatchVariableControl watchVarControl)
-            : base(watchVar, watchVarControl, DEFAULT_USE_CHECKBOX)
+            : this(watchVar, watchVarControl, 0)
         {
-            AddStringContextMenuStripItems(watchVar.SpecialType);
+            AddStringContextMenuStripItems(watchVar.view.GetValueByKey("specialType"));
+        }
+
+        protected override void UpdateControls()
+        {
+            _watchVarControl.EditMode = textBox.Focused;
+            if (_watchVarControl.EditMode)
+                return;
+            var values = WatchVar.GetValues();
+            if (values.Count > 0)
+                textBox.Text = ConvertValue(values[0])?.ToString() ?? "<null>";
         }
 
         private void AddStringContextMenuStripItems(string specialType)

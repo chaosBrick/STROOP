@@ -1,26 +1,33 @@
-﻿using STROOP.Extensions;
-using STROOP.Forms;
-using STROOP.Managers;
+﻿using STROOP.Forms;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
 using System.Windows.Forms;
 
 namespace STROOP.Controls
 {
     public abstract class WatchVariableWrapper
     {
+        static Dictionary<string, Type> wrapperTypes = new Dictionary<string, Type>();
+        static WatchVariableWrapper()
+        {
+            foreach (var t in typeof(WatchVariableWrapper).Assembly.GetTypes())
+                if (t.IsSubclassOf(typeof(WatchVariableWrapper)) && !t.IsGenericType && !t.IsAbstract)
+                    if (t.Name.StartsWith("WatchVariable") && t.Name.EndsWith("Wrapper"))
+                        wrapperTypes[t.Name.Substring("WatchVariable".Length, t.Name.Length - ("WatchVariable".Length + "Wrapper".Length))] = t;
+        }
+
+        public static Type GetWrapperType(string name)
+        {
+            if (wrapperTypes.TryGetValue(name, out var result))
+                return result;
+            return typeof(WatchVariableNumberWrapper);
+        }
+
         // Defaults
         protected const Type DEFAULT_DISPLAY_TYPE = null;
-        protected const int DEFAULT_ROUNDING_LIMIT = 3;
-        protected const bool DEFAULT_DISPLAY_AS_HEX = false;
-        protected const bool DEFAULT_USE_CHECKBOX = false;
-        protected const bool DEFAULT_IS_YAW = false;
 
         // Main objects
         public readonly WatchVariable WatchVar;
@@ -39,72 +46,17 @@ namespace STROOP.Controls
         private ToolStripMenuItem _itemRename;
         private ToolStripMenuItem _itemRemove;
 
-        // Fields
-        private readonly bool _startsAsCheckbox;
-
-        public static WatchVariableWrapper CreateWatchVariableWrapper(
-            WatchVariable watchVar,
-            WatchVariableControl watchVarControl,
-            WatchVariableSubclass subclass,
-            Type displayType,
-            int? roundingLimit,
-            bool? useHex,
-            bool? invertBool,
-            bool? isYaw,
-            Coordinate? coordinate)
-        {
-            switch (subclass)
-            {
-                case WatchVariableSubclass.String:
-                    return new WatchVariableStringWrapper(watchVar, watchVarControl);
-
-                case WatchVariableSubclass.Number:
-                    return new WatchVariableNumberWrapper(
-                        watchVar,
-                        watchVarControl,
-                        displayType,
-                        roundingLimit,
-                        useHex,
-                        DEFAULT_USE_CHECKBOX,
-                        coordinate);
-
-                case WatchVariableSubclass.Angle:
-                    return new WatchVariableAngleWrapper(watchVar, watchVarControl, displayType, isYaw);
-
-                case WatchVariableSubclass.Object:
-                    return new WatchVariableObjectWrapper(watchVar, watchVarControl);
-
-                case WatchVariableSubclass.Triangle:
-                    return new WatchVariableTriangleWrapper(watchVar, watchVarControl);
-
-                case WatchVariableSubclass.Address:
-                    return new WatchVariableAddressWrapper(watchVar, watchVarControl);
-
-                case WatchVariableSubclass.Boolean:
-                    return new WatchVariableBooleanWrapper(watchVar, watchVarControl, invertBool);
-
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        protected WatchVariableWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl, bool useCheckbox = false)
+        protected WatchVariableWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl)
         {
             WatchVar = watchVar;
             _watchVarControl = watchVarControl;
 
-            _startsAsCheckbox = useCheckbox;
             _contextMenuStrip = new BetterContextMenuStrip();
 
             _contextMenuStrip.SuspendLayout();
             AddContextMenuStripItems();
             AddExternalContextMenuStripItems();
             AddCustomContextMenuStripItems();
-        }
-
-        public bool StartsAsCheckbox()
-        {
-            return _startsAsCheckbox;
         }
 
         public ContextMenuStrip GetContextMenuStrip()
@@ -152,8 +104,8 @@ namespace STROOP.Controls
             itemOpenBitController.Click += (sender, e) => ShowBitForm();
 
             ToolStripMenuItem itemAddToCustomTab = new ToolStripMenuItem("Add to Custom Tab");
-            itemAddToCustomTab.Click += (sender, e) =>
-                _watchVarControl.AddToTab(AccessScope<StroopMainForm>.content.GetTab<Tabs.CustomTab>().watchVariablePanelCustom);
+            itemAddToCustomTab.Click += (sender, e) => new NotImplementedException("What");
+            //_watchVarControl.AddToTab(AccessScope<StroopMainForm>.content.GetTab<Tabs.CustomTab>().watchVariablePanelCustom);
 
             _contextMenuStrip.AddToEndingList(new ToolStripSeparator());
             _contextMenuStrip.AddToEndingList(itemOpenController);
@@ -285,7 +237,10 @@ namespace STROOP.Controls
             _itemDisableAllLocks.Visible = WatchVariableLockManager.ContainsAnyLocks() || LockConfig.LockingDisabled;
             _itemDisableAllLocks.Checked = LockConfig.LockingDisabled;
             _itemFixAddress.Checked = _watchVarControl.FixedAddressListGetter() != null;
+            UpdateControls();
         }
+
+        protected abstract void UpdateControls();
 
         public void ToggleLocked(bool? newLockedValueNullable, List<uint> addresses = null)
         {
@@ -302,8 +257,6 @@ namespace STROOP.Controls
                 WatchVariableLockManager.RemoveLocks(WatchVar, addresses);
             }
         }
-
-
 
         public Type GetMemoryType()
         {
@@ -345,20 +298,11 @@ namespace STROOP.Controls
             return value;
         }
 
-        private object ConvertValue(
+        protected virtual object ConvertValue(
             object value,
             bool handleRounding = true,
             bool handleFormatting = true)
         {
-            if (handleFormatting && GetUseHexExactly() && SavedSettingsConfig.DisplayAsHexUsesMemory)
-            {
-                return HandleHexDisplaying(value);
-            }
-            value = HandleAngleConverting(value);
-            value = HandleRounding(value, handleRounding);
-            value = HandleAngleRoundingOut(value);
-            if (handleFormatting) value = HandleHexDisplaying(value);
-            if (handleFormatting) value = HandleObjectDisplaying(value);
             return value;
         }
 
@@ -374,61 +318,12 @@ namespace STROOP.Controls
             return WatchVar.SetValue(value, addresses);
         }
 
-        public object UnconvertValue(object value)
-        {
-            value = HandleObjectUndisplaying(value);
-            value = HandleHexUndisplaying(value);
-            value = HandleAngleUnconverting(value);
-            value = HandleNumberConversion(value);
-            return value;
-        }
-
-        public CheckState GetCheckStateValue(List<uint> addresses = null)
-        {
-            List<object> values = GetVerifiedValues(addresses);
-            List<CheckState> checkStates = values.ConvertAll(value => ConvertValueToCheckState(value));
-            CheckState checkState = CombineCheckStates(checkStates);
-            return checkState;
-        }
-
-        public bool SetCheckStateValue(CheckState checkState, List<uint> addresses = null)
-        {
-            object value = ConvertCheckStateToValue(checkState);
-            return WatchVar.SetValue(value, addresses);
-        }
-
-        public bool AddValue(object objectValue, bool add, List<uint> addresses = null)
-        {
-            double? changeValueNullable = ParsingUtilities.ParseDoubleNullable(objectValue);
-            if (!changeValueNullable.HasValue) return false;
-            double changeValue = changeValueNullable.Value;
-
-            List<object> currentValues = GetVerifiedValues(addresses);
-            List<object> convertedValues = currentValues.ConvertAll(
-                currentValue => ConvertValue(currentValue, false, false));
-            List<double?> convertedValuesDoubleNullable =
-                convertedValues.ConvertAll(
-                    convertedValue => ParsingUtilities.ParseDoubleNullable(convertedValue));
-            List<object> newValues = convertedValuesDoubleNullable.ConvertAll(convertedValueDoubleNullable =>
-            {
-                if (!convertedValueDoubleNullable.HasValue) return null;
-                double convertedValueDouble = convertedValueDoubleNullable.Value;
-                double modifiedValue = convertedValueDouble + changeValue * (add ? +1 : -1);
-                object unconvertedValue = UnconvertValue(modifiedValue);
-                return unconvertedValue;
-            });
-
-            return WatchVar.SetValues(newValues, addresses);
-        }
+        public virtual object UnconvertValue(object value) => value;
 
         public List<uint> GetCurrentAddressesToFix()
         {
             return new List<uint>(WatchVar.GetBaseAddressList());
         }
-
-
-
-
 
         protected (bool meaningfulValue, object value) CombineValues(List<object> values)
         {
@@ -441,19 +336,6 @@ namespace STROOP.Controls
             return (true, firstValue);
         }
 
-        protected CheckState CombineCheckStates(List<CheckState> checkStates)
-        {
-            if (checkStates.Count == 0) return CheckState.Unchecked;
-            CheckState firstCheckState = checkStates[0];
-            for (int i = 1; i < checkStates.Count; i++)
-            {
-                if (checkStates[i] != firstCheckState) return CheckState.Indeterminate;
-            }
-            return firstCheckState;
-        }
-
-
-
         // Generic methods
 
         protected virtual void HandleVerification(object value)
@@ -464,82 +346,10 @@ namespace STROOP.Controls
 
         protected abstract string GetClass();
 
-        // Number methods
-
-        protected virtual object HandleRounding(object value, bool handleRounding)
-        {
-            return value;
-        }
-
-        protected virtual object HandleHexDisplaying(object value)
-        {
-            return value;
-        }
-
-        protected virtual object HandleHexUndisplaying(object value)
-        {
-            return value;
-        }
-
-        protected virtual object HandleNumberConversion(object value)
-        {
-            return value;
-        }
-
-        // Angle methods
-
-        protected virtual object HandleAngleConverting(object value)
-        {
-            return value;
-        }
-
-        protected virtual object HandleAngleUnconverting(object value)
-        {
-            return value;
-        }
-
-        protected virtual object HandleAngleRoundingOut(object value)
-        {
-            return value;
-        }
-
-        // Object methods
-
-        protected virtual object HandleObjectDisplaying(object value)
-        {
-            return value;
-        }
-
-        protected virtual object HandleObjectUndisplaying(object value)
-        {
-            return value;
-        }
-
-        // Boolean methods
-
-        protected virtual CheckState ConvertValueToCheckState(object value)
-        {
-            return CheckState.Unchecked;
-        }
-
-        protected virtual object ConvertCheckStateToValue(CheckState checkState)
-        {
-            return "";
-        }
-
-
 
         // Virtual methods
 
-        public virtual bool GetUseHex()
-        {
-            return false;
-        }
-
-        protected virtual bool GetUseHexExactly()
-        {
-            return false;
-        }
+        public virtual bool DisplayAsHex() => false;
 
         public virtual void ApplySettings(WatchVariableControlSettings settings)
         {

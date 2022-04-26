@@ -37,16 +37,16 @@ namespace STROOP.Tabs
 
         byte[] _copiedFile;
 
-        private static readonly List<VariableGroup> ALL_VAR_GROUPS =
-            new List<VariableGroup>()
+        private static readonly List<string> ALL_VAR_GROUPS =
+            new List<string>()
             {
                 VariableGroup.Basic,
                 VariableGroup.Intermediate,
                 VariableGroup.Advanced,
             };
 
-        private static readonly List<VariableGroup> VISIBLE_VAR_GROUPS =
-            new List<VariableGroup>()
+        private static readonly List<string> VISIBLE_VAR_GROUPS =
+            new List<string>()
             {
                 VariableGroup.Basic,
                 VariableGroup.Intermediate,

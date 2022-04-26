@@ -526,5 +526,24 @@ namespace STROOP.Utilities
                 && float.TryParse(split[1].Trim(), out value.Y)
                 && float.TryParse(split[2].Trim(), out value.Z));
         }
+
+        public static bool ParseByteString(string byteString, out byte[] result)
+        {
+            result = null;
+            byteString = byteString.Replace(" ", "");
+            if (byteString.Length % 2 != 0)
+                return false;
+
+            var bytes = new byte[byteString.Length / 2];
+            for (int i = 0; i < bytes.Length; i++)
+                if (!byte.TryParse(
+                    byteString.Substring(i * 2, 2),
+                    System.Globalization.NumberStyles.HexNumber,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    out bytes[i]))
+                    return false;
+            result = bytes;
+            return true;
+        }
     }
 }

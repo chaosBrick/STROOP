@@ -266,7 +266,6 @@ namespace STROOP.Structs
                     WatchVariable watchVariable =
                         new WatchVariable(
                             memoryTypeName: null,
-                            specialType: specialType,
                             baseAddressType: BaseAddressTypeEnum.None,
                             offsetUS: null,
                             offsetJP: null,
@@ -276,20 +275,7 @@ namespace STROOP.Structs
                             mask: null,
                             shift: null,
                             handleMapping: true);
-                    WatchVariableControlPrecursor precursor =
-                        new WatchVariableControlPrecursor(
-                            name: string.Format("{0} {1} {2}", control1.VarName, MathOperationUtilities.GetSymbol(operation), control2.VarName),
-                            watchVar: watchVariable,
-                            subclass: WatchVariableSubclass.Number,
-                            backgroundColor: null,
-                            displayType: null,
-                            roundingLimit: null,
-                            useHex: null,
-                            invertBool: null,
-                            isYaw: null,
-                            coordinate: null,
-                            groupList: new List<VariableGroup>() { VariableGroup.Custom });
-                    WatchVariableControl control = precursor.CreateWatchVariableControl();
+                    WatchVariableControl control = watchVariable.CreateWatchVariableControl();
                     panel.AddVariable(control);
                 }
             }
@@ -301,7 +287,6 @@ namespace STROOP.Structs
                 WatchVariable watchVariable =
                     new WatchVariable(
                         memoryTypeName: null,
-                        specialType: specialType,
                         baseAddressType: BaseAddressTypeEnum.None,
                         offsetUS: null,
                         offsetJP: null,
@@ -311,20 +296,7 @@ namespace STROOP.Structs
                         mask: null,
                         shift: null,
                         handleMapping: true);
-                WatchVariableControlPrecursor precursor =
-                    new WatchVariableControlPrecursor(
-                        name: operation.ToString(),
-                        watchVar: watchVariable,
-                        subclass: WatchVariableSubclass.Number,
-                        backgroundColor: null,
-                        displayType: null,
-                        roundingLimit: null,
-                        useHex: null,
-                        invertBool: null,
-                        isYaw: null,
-                        coordinate: null,
-                        groupList: new List<VariableGroup>() { VariableGroup.Custom });
-                WatchVariableControl control = precursor.CreateWatchVariableControl();
+                WatchVariableControl control = watchVariable.CreateWatchVariableControl();
                 panel.AddVariable(control);
             }
             void createDistanceMathOperationVariable(bool use3D)
@@ -352,7 +324,6 @@ namespace STROOP.Structs
                 WatchVariable watchVariable =
                     new WatchVariable(
                         memoryTypeName: null,
-                        specialType: specialType,
                         baseAddressType: BaseAddressTypeEnum.None,
                         offsetUS: null,
                         offsetJP: null,
@@ -362,22 +333,10 @@ namespace STROOP.Structs
                         mask: null,
                         shift: null,
                         handleMapping: true);
-                WatchVariableControlPrecursor precursor =
-                    new WatchVariableControlPrecursor(
-                        name: name,
-                        watchVar: watchVariable,
-                        subclass: WatchVariableSubclass.Number,
-                        backgroundColor: null,
-                        displayType: null,
-                        roundingLimit: null,
-                        useHex: null,
-                        invertBool: null,
-                        isYaw: null,
-                        coordinate: null,
-                        groupList: new List<VariableGroup>() { VariableGroup.Custom });
-                WatchVariableControl control = precursor.CreateWatchVariableControl();
+                WatchVariableControl control = watchVariable.CreateWatchVariableControl();
                 panel.AddVariable(control);
             }
+
             void createRealTimeVariable()
             {
                 List<WatchVariableControl> controls = getVars();
@@ -389,7 +348,6 @@ namespace STROOP.Structs
                     WatchVariable watchVariable =
                         new WatchVariable(
                             memoryTypeName: null,
-                            specialType: specialType,
                             baseAddressType: BaseAddressTypeEnum.None,
                             offsetUS: null,
                             offsetJP: null,
@@ -399,20 +357,7 @@ namespace STROOP.Structs
                             mask: null,
                             shift: null,
                             handleMapping: true);
-                    WatchVariableControlPrecursor precursor =
-                        new WatchVariableControlPrecursor(
-                            name: string.Format("{0} Real Time", control.VarName),
-                            watchVar: watchVariable,
-                            subclass: WatchVariableSubclass.String,
-                            backgroundColor: null,
-                            displayType: null,
-                            roundingLimit: null,
-                            useHex: null,
-                            invertBool: null,
-                            isYaw: null,
-                            coordinate: null,
-                            groupList: new List<VariableGroup>() { VariableGroup.Custom });
-                    WatchVariableControl control2 = precursor.CreateWatchVariableControl();
+                    WatchVariableControl control2 = watchVariable.CreateWatchVariableControl();
                     panel.AddVariable(control2);
                 }
             }
@@ -568,31 +513,7 @@ namespace STROOP.Structs
                 form.Initialize(getVars().ConvertAll(control => control.CreateCopy()));
                 form.ShowForm();
             };
-
-            ToolStripMenuItem itemAddToTab = new ToolStripMenuItem("Add to Tab...");
-            ControlUtilities.AddDropDownItems(
-                itemAddToTab,
-                new List<string>() { "Regular", "Fixed", "Grouped by Base Address", "Grouped by Variable"},
-                new List<Action>()
-                {
-                    () => SelectionForm.ShowDataManagerSelectionForm(getVars(), AddToTabTypeEnum.Regular),
-                    () => SelectionForm.ShowDataManagerSelectionForm(getVars(), AddToTabTypeEnum.Fixed),
-                    () => SelectionForm.ShowDataManagerSelectionForm(getVars(), AddToTabTypeEnum.GroupedByBaseAddress),
-                    () => SelectionForm.ShowDataManagerSelectionForm(getVars(), AddToTabTypeEnum.GroupedByVariable),
-                });
-
-            ToolStripMenuItem itemAddToCustomTab = new ToolStripMenuItem("Add to Custom Tab...");
-            ControlUtilities.AddDropDownItems(
-                itemAddToCustomTab,
-                new List<string>() { "Regular", "Fixed", "Grouped by Base Address", "Grouped by Variable" },
-                new List<Action>()
-                {
-                    () => WatchVariableControl.AddVarsToTab(getVars(), AccessScope<StroopMainForm>.content.GetTab<Tabs.CustomTab>().watchVariablePanelCustom, AddToTabTypeEnum.Regular),
-                    () => WatchVariableControl.AddVarsToTab(getVars(), AccessScope<StroopMainForm>.content.GetTab<Tabs.CustomTab>().watchVariablePanelCustom, AddToTabTypeEnum.Fixed),
-                    () => WatchVariableControl.AddVarsToTab(getVars(), AccessScope<StroopMainForm>.content.GetTab<Tabs.CustomTab>().watchVariablePanelCustom, AddToTabTypeEnum.GroupedByBaseAddress),
-                    () => WatchVariableControl.AddVarsToTab(getVars(), AccessScope<StroopMainForm>.content.GetTab<Tabs.CustomTab>().watchVariablePanelCustom, AddToTabTypeEnum.GroupedByVariable),
-                });
-
+            
             return new List<ToolStripItem>()
             {
                 itemHighlight,
@@ -624,8 +545,6 @@ namespace STROOP.Structs
                 itemOpenController,
                 itemOpenTripletController,
                 itemOpenPopOut,
-                itemAddToTab,
-                itemAddToCustomTab,
             };
         }
         

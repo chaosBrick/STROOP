@@ -1,16 +1,9 @@
-﻿using STROOP.Managers;
-using STROOP.Structs.Configurations;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace STROOP.Structs
 {
-    public enum VariableGroup
+    public static class VariableGroup
     {
+        public static string
         Basic,
         Intermediate,
         Advanced,
@@ -41,6 +34,13 @@ namespace STROOP.Structs
         Rng,
         Self,
         QuarterFrameHack,
-        GhostHack,
+        GhostHack;
+
+        static VariableGroup()
+        {
+            foreach (var field in typeof(VariableGroup).GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static))
+                if (field.FieldType == typeof(string))
+                    field.SetValue(null, field.Name);
+        }
     };
 }

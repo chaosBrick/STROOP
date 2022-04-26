@@ -82,7 +82,6 @@ namespace STROOP.Tabs
                 string typeString = TypeUtilities.TypeToString[_memoryType];
                 WatchVariable watchVar = new WatchVariable(
                     memoryTypeName: typeString,
-                    specialType: null,
                     baseAddressType: BaseAddressTypeEnum.Relative,
                     offsetUS: address,
                     offsetJP: address,
@@ -92,22 +91,9 @@ namespace STROOP.Tabs
                     mask: null,
                     shift: null,
                     handleMapping: true);
-                WatchVariableControlPrecursor precursor = new WatchVariableControlPrecursor(
-                    name: typeString + " " + HexUtilities.FormatValue(address),
-                    watchVar: watchVar,
-                    subclass: WatchVariableSubclass.Number,
-                    backgroundColor: null,
-                    displayType: null,
-                    roundingLimit: null,
-                    useHex: _useHex ? true : (bool?)null,
-                    invertBool: null,
-                    isYaw: null,
-                    coordinate: null,
-                    groupList: new List<VariableGroup>() { VariableGroup.Custom });
-                WatchVariableControl control = precursor.CreateWatchVariableControl();
-                controls.Add(control);
+                controls.Add(watchVar.CreateWatchVariableControl());
             }
-            watchVariablePanelSearch. AddVariables(controls);
+            watchVariablePanelSearch.AddVariables(controls);
         }
 
         private void DoFirstScan()

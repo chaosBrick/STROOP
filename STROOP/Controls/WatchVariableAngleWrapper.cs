@@ -1,13 +1,7 @@
-﻿using STROOP.Extensions;
-using STROOP.Managers;
-using STROOP.Structs;
-using STROOP.Structs.Configurations;
+﻿using STROOP.Structs;
 using STROOP.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
 using System.Windows.Forms;
 
 namespace STROOP.Controls
@@ -49,15 +43,15 @@ namespace STROOP.Controls
 
         private readonly bool _isYaw;
 
-        public WatchVariableAngleWrapper(
-            WatchVariable watchVar,
-            WatchVariableControl watchVarControl,
-            Type displayType,
-            bool? isYaw)
-            : base(watchVar, watchVarControl, displayType, 0)
+        public WatchVariableAngleWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl)
+            : base(watchVar, watchVarControl)
         {
-            _baseType = WatchVar.MemoryType ?? displayType;
-            _defaultEffectiveType = displayType ?? WatchVar.MemoryType;
+            var displayType = watchVar.MemoryType;
+            if (TypeUtilities.StringToType.TryGetValue(watchVar.view.GetValueByKey("display")??"", out var dType))
+                displayType = dType;
+
+            _baseType = displayType;
+            _defaultEffectiveType = displayType;
             if (_baseType == null || _defaultEffectiveType == null) throw new ArgumentOutOfRangeException();
 
             _defaultSigned = TypeUtilities.TypeSign[_defaultEffectiveType];
@@ -70,14 +64,16 @@ namespace STROOP.Controls
             _truncateToMultipleOf16 = _defaultTruncateToMultipleOf16;
 
             _defaultConstrainToOneRevolution =
-                displayType != null && TypeUtilities.TypeSize[displayType] == 2 &&
                 watchVar.MemoryType != null && TypeUtilities.TypeSize[watchVar.MemoryType] == 4;
             _constrainToOneRevolution = _defaultConstrainToOneRevolution;
 
             _defaultReverse = false;
             _reverse = _defaultReverse;
 
-            _isYaw = isYaw ?? DEFAULT_IS_YAW;
+            if (bool.TryParse(watchVar.view.GetValueByKey("yaw"), out var isYaw))
+                _isYaw = isYaw;
+            else
+                _isYaw = DEFAULT_IS_YAW;
 
             AddAngleContextMenuStripItems();
         }
@@ -179,7 +175,7 @@ namespace STROOP.Controls
             return signed ? -1 * maxValue / 2 : 0;
         }
 
-        protected override object HandleAngleConverting(object value)
+        protected object HandleAngleConverting(object value)
         {
             double? doubleValueNullable = ParsingUtilities.ParseDoubleNullable(value);
             if (!doubleValueNullable.HasValue) return value;
@@ -199,7 +195,7 @@ namespace STROOP.Controls
             return doubleValue;
         }
 
-        protected override object HandleAngleUnconverting(object value)
+        protected object HandleAngleUnconverting(object value)
         {
             double? doubleValueNullable = ParsingUtilities.ParseDoubleNullable(value);
             if (!doubleValueNullable.HasValue) return value;
@@ -214,7 +210,7 @@ namespace STROOP.Controls
             return doubleValue;
         }
 
-        protected override object HandleAngleRoundingOut(object value)
+        protected object HandleAngleRoundingOut(object value)
         {
             double? doubleValueNullable = ParsingUtilities.ParseDoubleNullable(value);
             if (!doubleValueNullable.HasValue) return value;

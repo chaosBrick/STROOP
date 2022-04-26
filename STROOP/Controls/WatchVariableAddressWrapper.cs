@@ -18,7 +18,7 @@ namespace STROOP.Controls
         public WatchVariableAddressWrapper(
             WatchVariable watchVar,
             WatchVariableControl watchVarControl)
-            : base(watchVar, watchVarControl, DEFAULT_DISPLAY_TYPE, DEFAULT_ROUNDING_LIMIT, true)
+            : base(watchVar, watchVarControl)
         {
             AddAddressContextMenuStripItems();
         }
@@ -48,6 +48,8 @@ namespace STROOP.Controls
             _contextMenuStrip.AddToBeginningList(itemViewAddress);
         }
 
+        public override bool DisplayAsHex() => true;
+
         protected override void HandleVerification(object value)
         {
             base.HandleVerification(value);
@@ -55,9 +57,6 @@ namespace STROOP.Controls
                 throw new ArgumentOutOfRangeException(value + " is not a uint, but represents an address");
         }
 
-        protected override string GetClass()
-        {
-            return "Address";
-        }
+        protected override string GetClass() => "Address";
     }
 }

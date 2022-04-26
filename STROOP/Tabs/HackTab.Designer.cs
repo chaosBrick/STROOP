@@ -30,6 +30,19 @@
         {
             this.splitContainerHacks = new STROOP.BetterSplitContainer();
             this.groupBoxHackRam = new System.Windows.Forms.GroupBox();
+            this.labelInGameFunctionCalls = new System.Windows.Forms.Label();
+            this.labelInjectLevelScriptCommand = new System.Windows.Forms.Label();
+            this.textBoxInGameFunctionCall = new System.Windows.Forms.TextBox();
+            this.buttonBrowseInGameFunctionCallFile = new System.Windows.Forms.Button();
+            this.textBoxLevelScriptCommand = new System.Windows.Forms.TextBox();
+            this.buttonRunInGameFunctionCall = new System.Windows.Forms.Button();
+            this.buttonBrowseLevelScriptCommandsFile = new System.Windows.Forms.Button();
+            this.buttonRunLevelscriptCommand = new System.Windows.Forms.Button();
+            this.buttonInjectDirect = new System.Windows.Forms.Button();
+            this.labelInjectFileAddress = new System.Windows.Forms.Label();
+            this.textBoxInjectFileAddress = new System.Windows.Forms.TextBox();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.buttonInjectFile = new System.Windows.Forms.Button();
             this.labelPureInterpretterRequire = new System.Windows.Forms.Label();
             this.checkedListBoxHacks = new System.Windows.Forms.CheckedListBox();
             this.groupBoxHackSpawn = new System.Windows.Forms.GroupBox();
@@ -79,6 +92,19 @@
             // 
             // groupBoxHackRam
             // 
+            this.groupBoxHackRam.Controls.Add(this.labelInGameFunctionCalls);
+            this.groupBoxHackRam.Controls.Add(this.labelInjectLevelScriptCommand);
+            this.groupBoxHackRam.Controls.Add(this.textBoxInGameFunctionCall);
+            this.groupBoxHackRam.Controls.Add(this.buttonBrowseInGameFunctionCallFile);
+            this.groupBoxHackRam.Controls.Add(this.textBoxLevelScriptCommand);
+            this.groupBoxHackRam.Controls.Add(this.buttonRunInGameFunctionCall);
+            this.groupBoxHackRam.Controls.Add(this.buttonBrowseLevelScriptCommandsFile);
+            this.groupBoxHackRam.Controls.Add(this.buttonRunLevelscriptCommand);
+            this.groupBoxHackRam.Controls.Add(this.buttonInjectDirect);
+            this.groupBoxHackRam.Controls.Add(this.labelInjectFileAddress);
+            this.groupBoxHackRam.Controls.Add(this.textBoxInjectFileAddress);
+            this.groupBoxHackRam.Controls.Add(this.textBox1);
+            this.groupBoxHackRam.Controls.Add(this.buttonInjectFile);
             this.groupBoxHackRam.Controls.Add(this.labelPureInterpretterRequire);
             this.groupBoxHackRam.Controls.Add(this.checkedListBoxHacks);
             this.groupBoxHackRam.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -90,6 +116,124 @@
             this.groupBoxHackRam.TabIndex = 13;
             this.groupBoxHackRam.TabStop = false;
             this.groupBoxHackRam.Text = "RAM Hacks*";
+            // 
+            // labelInGameFunctionCalls
+            // 
+            this.labelInGameFunctionCalls.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.labelInGameFunctionCalls.AutoSize = true;
+            this.labelInGameFunctionCalls.Location = new System.Drawing.Point(4, 324);
+            this.labelInGameFunctionCalls.Name = "labelInGameFunctionCalls";
+            this.labelInGameFunctionCalls.Size = new System.Drawing.Size(114, 13);
+            this.labelInGameFunctionCalls.TabIndex = 32;
+            this.labelInGameFunctionCalls.Text = "In-Game Function Call:";
+            // 
+            // labelInjectLevelScriptCommand
+            // 
+            this.labelInjectLevelScriptCommand.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.labelInjectLevelScriptCommand.AutoSize = true;
+            this.labelInjectLevelScriptCommand.Location = new System.Drawing.Point(4, 363);
+            this.labelInjectLevelScriptCommand.Name = "labelInjectLevelScriptCommand";
+            this.labelInjectLevelScriptCommand.Size = new System.Drawing.Size(121, 13);
+            this.labelInjectLevelScriptCommand.TabIndex = 32;
+            this.labelInjectLevelScriptCommand.Text = "Level Script Commands:";
+            // 
+            // textBoxInGameFunctionCall
+            // 
+            this.textBoxInGameFunctionCall.Location = new System.Drawing.Point(6, 340);
+            this.textBoxInGameFunctionCall.Name = "textBoxInGameFunctionCall";
+            this.textBoxInGameFunctionCall.Size = new System.Drawing.Size(114, 20);
+            this.textBoxInGameFunctionCall.TabIndex = 31;
+            // 
+            // buttonBrowseInGameFunctionCallFile
+            // 
+            this.buttonBrowseInGameFunctionCallFile.Location = new System.Drawing.Point(126, 338);
+            this.buttonBrowseInGameFunctionCallFile.Name = "buttonBrowseInGameFunctionCallFile";
+            this.buttonBrowseInGameFunctionCallFile.Size = new System.Drawing.Size(41, 23);
+            this.buttonBrowseInGameFunctionCallFile.TabIndex = 30;
+            this.buttonBrowseInGameFunctionCallFile.Text = "...";
+            this.buttonBrowseInGameFunctionCallFile.UseVisualStyleBackColor = true;
+            this.buttonBrowseInGameFunctionCallFile.Click += new System.EventHandler(this.buttonBrowseInGameFunctionCallFile_Click);
+            // 
+            // textBoxLevelScriptCommand
+            // 
+            this.textBoxLevelScriptCommand.Location = new System.Drawing.Point(6, 379);
+            this.textBoxLevelScriptCommand.Name = "textBoxLevelScriptCommand";
+            this.textBoxLevelScriptCommand.Size = new System.Drawing.Size(114, 20);
+            this.textBoxLevelScriptCommand.TabIndex = 31;
+            // 
+            // buttonRunInGameFunctionCall
+            // 
+            this.buttonRunInGameFunctionCall.Location = new System.Drawing.Point(173, 338);
+            this.buttonRunInGameFunctionCall.Name = "buttonRunInGameFunctionCall";
+            this.buttonRunInGameFunctionCall.Size = new System.Drawing.Size(94, 23);
+            this.buttonRunInGameFunctionCall.TabIndex = 30;
+            this.buttonRunInGameFunctionCall.Text = "Run Function";
+            this.buttonRunInGameFunctionCall.UseVisualStyleBackColor = true;
+            this.buttonRunInGameFunctionCall.Click += new System.EventHandler(this.buttonRunInGameFunctionCall_Click);
+            // 
+            // buttonBrowseLevelScriptCommandsFile
+            // 
+            this.buttonBrowseLevelScriptCommandsFile.Location = new System.Drawing.Point(126, 377);
+            this.buttonBrowseLevelScriptCommandsFile.Name = "buttonBrowseLevelScriptCommandsFile";
+            this.buttonBrowseLevelScriptCommandsFile.Size = new System.Drawing.Size(41, 23);
+            this.buttonBrowseLevelScriptCommandsFile.TabIndex = 30;
+            this.buttonBrowseLevelScriptCommandsFile.Text = "...";
+            this.buttonBrowseLevelScriptCommandsFile.UseVisualStyleBackColor = true;
+            this.buttonBrowseLevelScriptCommandsFile.Click += new System.EventHandler(this.buttonBrowseLevelScriptCommandsFile_Click);
+            // 
+            // buttonRunLevelscriptCommand
+            // 
+            this.buttonRunLevelscriptCommand.Location = new System.Drawing.Point(173, 377);
+            this.buttonRunLevelscriptCommand.Name = "buttonRunLevelscriptCommand";
+            this.buttonRunLevelscriptCommand.Size = new System.Drawing.Size(94, 23);
+            this.buttonRunLevelscriptCommand.TabIndex = 30;
+            this.buttonRunLevelscriptCommand.Text = "Run Commands";
+            this.buttonRunLevelscriptCommand.UseVisualStyleBackColor = true;
+            this.buttonRunLevelscriptCommand.Click += new System.EventHandler(this.buttonRunLevelscriptCommand_Click);
+            // 
+            // buttonInjectDirect
+            // 
+            this.buttonInjectDirect.Location = new System.Drawing.Point(192, 418);
+            this.buttonInjectDirect.Name = "buttonInjectDirect";
+            this.buttonInjectDirect.Size = new System.Drawing.Size(75, 23);
+            this.buttonInjectDirect.TabIndex = 29;
+            this.buttonInjectDirect.Text = "Inject Bytes";
+            this.buttonInjectDirect.UseVisualStyleBackColor = true;
+            this.buttonInjectDirect.Click += new System.EventHandler(this.buttonInjectDirect_Click);
+            // 
+            // labelInjectFileAddress
+            // 
+            this.labelInjectFileAddress.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.labelInjectFileAddress.AutoSize = true;
+            this.labelInjectFileAddress.Location = new System.Drawing.Point(3, 405);
+            this.labelInjectFileAddress.Name = "labelInjectFileAddress";
+            this.labelInjectFileAddress.Size = new System.Drawing.Size(116, 13);
+            this.labelInjectFileAddress.TabIndex = 28;
+            this.labelInjectFileAddress.Text = "Inject at RAM Address:";
+            // 
+            // textBoxInjectFileAddress
+            // 
+            this.textBoxInjectFileAddress.Location = new System.Drawing.Point(6, 421);
+            this.textBoxInjectFileAddress.Name = "textBoxInjectFileAddress";
+            this.textBoxInjectFileAddress.Size = new System.Drawing.Size(99, 20);
+            this.textBoxInjectFileAddress.TabIndex = 12;
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(-17, -17);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(100, 20);
+            this.textBox1.TabIndex = 11;
+            // 
+            // buttonInjectFile
+            // 
+            this.buttonInjectFile.Location = new System.Drawing.Point(111, 419);
+            this.buttonInjectFile.Name = "buttonInjectFile";
+            this.buttonInjectFile.Size = new System.Drawing.Size(75, 23);
+            this.buttonInjectFile.TabIndex = 10;
+            this.buttonInjectFile.Text = "Inject File";
+            this.buttonInjectFile.UseVisualStyleBackColor = true;
+            this.buttonInjectFile.Click += new System.EventHandler(this.buttonInjectFile_Click);
             // 
             // labelPureInterpretterRequire
             // 
@@ -111,7 +255,7 @@
             this.checkedListBoxHacks.FormattingEnabled = true;
             this.checkedListBoxHacks.Location = new System.Drawing.Point(3, 19);
             this.checkedListBoxHacks.Name = "checkedListBoxHacks";
-            this.checkedListBoxHacks.Size = new System.Drawing.Size(291, 379);
+            this.checkedListBoxHacks.Size = new System.Drawing.Size(291, 304);
             this.checkedListBoxHacks.TabIndex = 9;
             // 
             // groupBoxHackSpawn
@@ -239,7 +383,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.splitContainerHacks);
             this.Name = "HackTab";
-            this.Size = new System.Drawing.Size(915, 463);
             this.splitContainerHacks.Panel1.ResumeLayout(false);
             this.splitContainerHacks.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerHacks)).EndInit();
@@ -269,5 +412,18 @@
         private BetterTextbox textBoxSpawnGfxId;
         private System.Windows.Forms.Button buttonHackSpawn;
         private System.Windows.Forms.ListBox listBoxSpawn;
+        private System.Windows.Forms.Label labelInjectFileAddress;
+        private System.Windows.Forms.TextBox textBoxInjectFileAddress;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button buttonInjectFile;
+        private System.Windows.Forms.Button buttonInjectDirect;
+        private System.Windows.Forms.TextBox textBoxLevelScriptCommand;
+        private System.Windows.Forms.Button buttonBrowseLevelScriptCommandsFile;
+        private System.Windows.Forms.Button buttonRunLevelscriptCommand;
+        private System.Windows.Forms.Label labelInGameFunctionCalls;
+        private System.Windows.Forms.Label labelInjectLevelScriptCommand;
+        private System.Windows.Forms.TextBox textBoxInGameFunctionCall;
+        private System.Windows.Forms.Button buttonBrowseInGameFunctionCallFile;
+        private System.Windows.Forms.Button buttonRunInGameFunctionCall;
     }
 }

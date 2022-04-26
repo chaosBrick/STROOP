@@ -15,7 +15,7 @@ namespace STROOP.Tabs
         public WaterTab()
         {
             InitializeComponent();
-            watchVariablePanelWater.SetGroups(new List<Structs.VariableGroup>(), new List<Structs.VariableGroup>());
+            watchVariablePanelWater.SetGroups(new List<string>(), new List<string>());
         }
 
         public override string GetDisplayName() => "Water";

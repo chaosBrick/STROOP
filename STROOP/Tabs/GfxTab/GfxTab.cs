@@ -37,12 +37,16 @@ namespace STROOP.Tabs.GfxTab
             buttonGfxDumpDisplayList.Click += DumpButton_Click;
             buttonGfxHitboxHack.Click += (sender, e) => InjectHitboxViewCode();
 
+            SpecificVariables = new List<WatchVariableControl>();
+        }
+
+        public override void InitializeTab()
+        {
+            base.InitializeTab();
             SuspendLayout();
-            foreach (WatchVariableControlPrecursor precursor in GfxNode.GetCommonVariables())
+            foreach (var precursor in GfxNode.GetCommonVariables())
                 watchVariablePanelGfx.AddVariable(precursor.CreateWatchVariableControl());
             ResumeLayout();
-
-            SpecificVariables = new List<WatchVariableControl>();
         }
 
         public override string GetDisplayName() => "Gfx";
@@ -101,7 +105,7 @@ namespace STROOP.Tabs.GfxTab
             SpecificVariables.Clear();
             if (node != null)
             {
-                foreach (WatchVariableControlPrecursor precursor in node.GetTypeSpecificVariables())
+                foreach (var precursor in node.GetTypeSpecificVariables())
                 {
                     SpecificVariables.Add(precursor.CreateWatchVariableControl());
                 }

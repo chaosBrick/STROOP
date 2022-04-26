@@ -15,25 +15,14 @@ namespace STROOP.Controls
 {
     public partial class WatchVariableControl : UserControl
     {
-        // Main objects
-        public readonly WatchVariableControlPrecursor WatchVarPrecursor;
         public readonly WatchVariableWrapper WatchVarWrapper;
-        public readonly List<VariableGroup> GroupList;
+        public readonly List<string> GroupList;
+
+        public WatchVariable WatchVar => WatchVarWrapper.WatchVar;
 
         // Parent control
         private WatchVariableFlowLayoutPanel _watchVariablePanel;
-
-        public string TextBoxValue
-        {
-            get { return _valueTextBox.Text; }
-            set { _valueTextBox.Text = value; }
-        }
-
-        public CheckState CheckBoxValue
-        {
-            get { return _valueCheckBox.CheckState; }
-            set { _valueCheckBox.CheckState = value; }
-        }
+        public Control valueControlContainer => _valueControlContainer;
 
         public static readonly Color DEFAULT_COLOR = SystemColors.Control;
         public static readonly Color FAILURE_COLOR = Color.Red;
@@ -100,37 +89,11 @@ namespace STROOP.Controls
                 if (_editMode == value) return;
                 _editMode = value;
                 _watchVariablePanel.UnselectAllVariables();
-                _valueTextBox.ReadOnly = !_editMode;
-                _valueTextBox.BackColor = _editMode ? Color.White : _currentColor;
-                if (_editMode)
-                {
-                    _valueTextBox.Focus();
-                    _valueTextBox.SelectAll();
-                }
             }
         }
 
-        private bool _renameMode;
-        public bool RenameMode
-        {
-            get
-            {
-                return _renameMode;
-            }
-            set
-            {
-                if (_renameMode == value) return;
-                _renameMode = value;
-                _watchVariablePanel.UnselectAllVariables();
-                _nameTextBox.ReadOnly = !_renameMode;
-                _nameTextBox.BackColor = _renameMode ? Color.White : _currentColor;
-                if (_renameMode)
-                {
-                    _nameTextBox.Focus();
-                    _nameTextBox.SelectAll();
-                }
-            }
-        }
+        public bool RenameMode;
+
         public bool IsSelected { get; set; }
 
         private Func<List<uint>> _defaultFixedAddressListGetter;
@@ -143,13 +106,8 @@ namespace STROOP.Controls
         private static readonly Image _disabledLockImage = Properties.Resources.lock_blue;
         private static readonly Image _pinnedImage = Properties.Resources.img_pin;
 
-        private bool _rightFlush;
-
         private static readonly int PIN_OUTER_PADDING = 11;
         private static readonly int PIN_INNER_PADDING = 24;
-
-        private static readonly int VALUE_TEXTBOX_SIZE_DIFF = 6;
-        private static readonly int VALUE_TEXTBOX_MARGIN = 3;
 
         public static readonly int DEFAULT_VARIABLE_NAME_WIDTH = 120;
         public static readonly int DEFAULT_VARIABLE_VALUE_WIDTH = 85;
@@ -169,37 +127,25 @@ namespace STROOP.Controls
         private int _variableTextSize;
         private int _variableOffset;
 
-        public WatchVariableControl(
-            WatchVariableControlPrecursor watchVarPrecursor,
-            string name,
-            WatchVariable watchVar,
-            WatchVariableSubclass subclass,
-            Color? backgroundColor,
-            Type displayType,
-            int? roundingLimit,
-            bool? useHex,
-            bool? invertBool,
-            bool? isYaw,
-            Coordinate? coordinate,
-            List<VariableGroup> groupList,
-            List<uint> fixedAddresses)
+        public WatchVariableControl(WatchVariable watchVar)
         {
-            // Initialize controls
             InitializeComponent();
+            WatchVarWrapper = (WatchVariableWrapper)Activator.CreateInstance(watchVar.view.GetWrapperType(), watchVar, this);
 
             _tableLayoutPanel.BorderColor = Color.Red;
             _tableLayoutPanel.BorderWidth = 3;
-            _nameTextBox.Text = name;
-
-            // Store the precursor
-            WatchVarPrecursor = watchVarPrecursor;
+            _nameTextBox.Text = watchVar.view.Name;
 
             // Initialize main fields
-            _varName = name;
-            GroupList = groupList;
+            _varName = watchVar.view.Name;
+            GroupList = WatchVariableUtilities.ParseVariableGroupList(watchVar.view.GetValueByKey("groupList") ?? "Custom");
             _editMode = false;
-            _renameMode = false;
+            RenameMode = false;
             IsSelected = false;
+
+            List<uint> fixedAddresses = null;
+            if (watchVar.view.GetValueByKey("fixedAddresses") != null)
+                ;
 
             List<uint> copy1 = fixedAddresses == null ? null : new List<uint>(fixedAddresses);
             _defaultFixedAddressListGetter = () => copy1;
@@ -207,6 +153,14 @@ namespace STROOP.Controls
             FixedAddressListGetter = () => copy2;
 
             // Initialize color fields
+            var colorString = watchVar.view.GetValueByKey("color");
+            Color? backgroundColor;
+            if (colorString != null && ColorUtilities.ColorToParamsDictionary.TryGetValue(colorString, out var c))
+                backgroundColor = ColorTranslator.FromHtml(c);
+            else
+                backgroundColor = colorString == null ? (Color?)null : Color.FromName(colorString);
+            if (backgroundColor.HasValue && backgroundColor.Value.A == 0)
+                backgroundColor = null;
             _initialBaseColor = backgroundColor ?? DEFAULT_COLOR;
             _baseColor = _initialBaseColor;
             _currentColor = _baseColor;
@@ -214,19 +168,11 @@ namespace STROOP.Controls
             _flashStartTime = DateTime.Now;
 
             // Initialize flush/size fields
-            _rightFlush = true;
             _variableNameWidth = 0;
             _variableValueWidth = 0;
             _variableHeight = 0;
             _variableTextSize = 0;
             _variableOffset = 0;
-
-            // Create watch var wrapper
-            WatchVarWrapper = WatchVariableWrapper.CreateWatchVariableWrapper(
-                watchVar, this, subclass, displayType, roundingLimit, useHex, invertBool, isYaw, coordinate);
-
-            // Set whether to start as a checkbox
-            SetUseCheckbox(WatchVarWrapper.StartsAsCheckbox());
 
             // Add functions
             _namePanel.Click += (sender, e) => OnVariableClick();
@@ -234,31 +180,18 @@ namespace STROOP.Controls
 
             _nameTextBox.Click += (sender, e) => OnVariableClick();
             _nameTextBox.DoubleClick += (sender, e) => OnNameTextBoxDoubleClick();
-            _nameTextBox.Leave += (sender, e) => { RenameMode = false; };
             _nameTextBox.KeyDown += (sender, e) => OnNameTextValueKeyDown(e);
 
-            _valueTextBox.Click += (sender, e) => _watchVariablePanel.UnselectAllVariables();
-            _valueTextBox.DoubleClick += (sender, e) => { EditMode = true; };
-            _valueTextBox.KeyDown += (sender, e) => OnValueTextValueKeyDown(e);
-            _valueTextBox.Leave += (sender, e) => { EditMode = false; };
-
-            _valueCheckBox.Click += (sender, e) => OnCheckboxClick();
-
             MouseDown += ShowMainContextMenu;
-            _valueTextBox.MouseDown += ShowMainContextMenu;
             _namePanel.MouseDown += ShowMainContextMenu;
-            _valuePanel.MouseDown += ShowMainContextMenu;
 
             _nameTextBox.MouseDown += (sender, e) =>
             {
                 if (e.Button == MouseButtons.Right)
-                    if (RenameMode)
-                        ShowRenameContextMenu();
-                    else
-                        ShowContextMenu();
+                    ShowContextMenu();
             };
 
-            _valueTextBox.ContextMenu = _nameTextBox.ContextMenu = DummyContextMenu;
+            _nameTextBox.ContextMenu = DummyContextMenu;
         }
 
         static ContextMenu DummyContextMenu = new ContextMenu();
@@ -283,47 +216,6 @@ namespace STROOP.Controls
                         ctx.Items.Add(item);
             }
             ctx.Show(System.Windows.Forms.Cursor.Position);
-        }
-
-        void ShowRenameContextMenu()
-        {
-
-        }
-
-        public void SetUseCheckbox(bool useCheckbox)
-        {
-            if (useCheckbox)
-            {
-                _valueTextBox.Visible = false;
-                _valueCheckBox.Visible = true;
-            }
-            else
-            {
-                _valueTextBox.Visible = true;
-                _valueCheckBox.Visible = false;
-            }
-        }
-
-        private void OnValueTextValueKeyDown(System.Windows.Forms.KeyEventArgs e)
-        {
-            if (_editMode)
-            {
-                if (e.KeyData == Keys.Escape)
-                {
-                    EditMode = false;
-                    this.Focus();
-                    return;
-                }
-
-                if (e.KeyData == Keys.Enter ||
-                    e.KeyData == (Keys.Enter | Keys.Control))
-                {
-                    EditMode = false;
-                    SetValue(_valueTextBox.Text);
-                    this.Focus();
-                    return;
-                }
-            }
         }
 
         private void OnVariableClick()
@@ -406,11 +298,6 @@ namespace STROOP.Controls
                 _watchVariablePanel.UnselectAllVariables();
                 WatchVarWrapper.ToggleDisplayAsHex();
             }
-            else if (isRKeyHeld)
-            {
-                _watchVariablePanel.UnselectAllVariables();
-                RenameMode = true;
-            }
             else if (isCKeyHeld)
             {
                 _watchVariablePanel.UnselectAllVariables();
@@ -440,16 +327,6 @@ namespace STROOP.Controls
             {
                 _watchVariablePanel.UnselectAllVariables();
                 SetValue(0);
-            }
-            else if (isMinusHeld)
-            {
-                _watchVariablePanel.UnselectAllVariables();
-                AddValue(1, false);
-            }
-            else if (isPlusHeld)
-            {
-                _watchVariablePanel.UnselectAllVariables();
-                AddValue(1, true);
             }
             else if (isQKeyHeld)
             {
@@ -481,7 +358,7 @@ namespace STROOP.Controls
 
         private void OnNameTextValueKeyDown(System.Windows.Forms.KeyEventArgs e)
         {
-            if (_renameMode)
+            if (RenameMode)
             {
                 if (e.KeyData == Keys.Escape)
                 {
@@ -501,32 +378,14 @@ namespace STROOP.Controls
             }
         }
 
-        private void OnCheckboxClick()
-        {
-            bool success = WatchVarWrapper.SetCheckStateValue(_valueCheckBox.CheckState, FixedAddressListGetter());
-            if (!success) FlashColor(FAILURE_COLOR);
-        }
-
         public void UpdateControl()
         {
             WatchVarWrapper.UpdateItemCheckStates();
 
             UpdateSettings();
-            UpdateFlush();
             UpdateSize();
             UpdateColor();
             UpdatePictureBoxes();
-
-            if (!EditMode)
-            {
-                if (_valueTextBox.Visible) _valueTextBox.Text = WatchVarWrapper.WatchVar.BaseAddressType == BaseAddressTypeEnum.Invalid
-                        ? "Invalid variable"
-                        : WatchVarWrapper.GetValue(true, true, FixedAddressListGetter()).ToString();
-                if (_valueCheckBox.Visible) _valueCheckBox.CheckState = WatchVarWrapper.GetCheckStateValue(FixedAddressListGetter());
-            }
-
-            if (EditMode) _valueTextBox.ShowTheCaret();
-            else _valueTextBox.HideTheCaret();
 
             if (RenameMode) _nameTextBox.ShowTheCaret();
             else _nameTextBox.HideTheCaret();
@@ -585,17 +444,6 @@ namespace STROOP.Controls
             return image;
         }
 
-        private void UpdateFlush()
-        {
-            if (_rightFlush == SavedSettingsConfig.VariableValuesFlushRight) return;
-
-            _rightFlush = SavedSettingsConfig.VariableValuesFlushRight;
-
-            _valueTextBox.TextAlign = _rightFlush ? HorizontalAlignment.Right : HorizontalAlignment.Left;
-            _valueTextBox.Left = _rightFlush ? 0 : VALUE_TEXTBOX_MARGIN;
-            _valueCheckBox.CheckAlign = _rightFlush ? ContentAlignment.MiddleRight : ContentAlignment.MiddleLeft;
-        }
-
         private void UpdateSize()
         {
             if (_variableNameWidth == VariableNameWidth &&
@@ -615,11 +463,8 @@ namespace STROOP.Controls
             _tableLayoutPanel.RowStyles[0].Height = _variableHeight;
             _tableLayoutPanel.ColumnStyles[0].Width = _variableNameWidth;
             _tableLayoutPanel.ColumnStyles[1].Width = _variableValueWidth;
-            _valueTextBox.Width = _variableValueWidth - VALUE_TEXTBOX_SIZE_DIFF;
             _nameTextBox.Font = new Font("Microsoft Sans Serif", _variableTextSize);
-            _valueTextBox.Font = new Font("Microsoft Sans Serif", _variableTextSize);
             _nameTextBox.Location = new Point(_nameTextBox.Location.X, _variableOffset);
-            _valueTextBox.Location = new Point(_valueTextBox.Location.X, _variableOffset);
         }
 
         private void UpdateColor()
@@ -645,11 +490,9 @@ namespace STROOP.Controls
                 _currentColor = selectedOrBaseColor;
             }
             _tableLayoutPanel.BackColor = _currentColor;
-            if (!_editMode) _valueTextBox.BackColor = _currentColor;
-            if (!_renameMode) _nameTextBox.BackColor = _currentColor;
+            if (!RenameMode) _nameTextBox.BackColor = _currentColor;
 
             Color textColor = IsSelected ? Color.White : Color.Black;
-            _valueTextBox.ForeColor = textColor;
             _nameTextBox.ForeColor = textColor;
         }
 
@@ -660,23 +503,19 @@ namespace STROOP.Controls
             _isFlashing = true;
         }
 
-
-
-
-
-        public bool BelongsToGroup(VariableGroup variableGroup)
+        public bool BelongsToGroup(string variableGroup)
         {
             if (variableGroup == VariableGroup.NoGroup)
                 return GroupList.Count == 0;
             return GroupList.Contains(variableGroup);
         }
 
-        public bool BelongsToAnyGroup(List<VariableGroup> variableGroups)
+        public bool BelongsToAnyGroup(List<string> variableGroups)
         {
             return variableGroups.Any(varGroup => BelongsToGroup(varGroup));
         }
 
-        public bool BelongsToAnyGroupOrHasNoGroup(List<VariableGroup> variableGroups)
+        public bool BelongsToAnyGroupOrHasNoGroup(List<string> variableGroups)
         {
             return GroupList.Count == 0 || BelongsToAnyGroup(variableGroups);
         }
@@ -759,11 +598,12 @@ namespace STROOP.Controls
 
         public WatchVariableControl CreateCopy()
         {
-            return WatchVarPrecursor.CreateWatchVariableControl(
-                VarName,
-                _baseColor,
-                new List<VariableGroup>() { VariableGroup.Custom },
-                FixedAddressListGetter());
+            throw new NotImplementedException("What");
+            //return WatchVarPrecursor.CreateWatchVariableControl(
+            //    VarName,
+            //    _baseColor,
+            //    new List<VariableGroup>() { VariableGroup.Custom },
+            //    FixedAddressListGetter());
         }
 
         private static AddToTabTypeEnum GetAddToTabType()
@@ -772,73 +612,6 @@ namespace STROOP.Controls
             if (Keyboard.IsKeyDown(Key.G)) return AddToTabTypeEnum.GroupedByBaseAddress;
             if (Keyboard.IsKeyDown(Key.F)) return AddToTabTypeEnum.Fixed;
             return AddToTabTypeEnum.Regular;
-        }
-
-        public void AddToTab(WatchVariableFlowLayoutPanel dataManager, AddToTabTypeEnum? addToTabTypeNullable = null)
-        {
-            AddVarsToTab(new List<WatchVariableControl>() { this }, dataManager, addToTabTypeNullable);
-        }
-
-        public static void AddVarsToTab(
-            List<WatchVariableControl> watchVars, WatchVariableFlowLayoutPanel variableAdder, AddToTabTypeEnum? addToTabTypeNullable = null)
-        {
-            List<List<WatchVariableControl>> newVarListList = new List<List<WatchVariableControl>>();
-            AddToTabTypeEnum addToTabType = addToTabTypeNullable ?? GetAddToTabType();
-
-            foreach (WatchVariableControl watchVar in watchVars)
-            {
-                List<WatchVariableControl> newVarList = new List<WatchVariableControl>();
-                List<uint> addressList = watchVar.FixedAddressListGetter() ?? watchVar.WatchVarWrapper.GetCurrentAddressesToFix();
-                List<List<uint>> addressesLists =
-                    addToTabType == AddToTabTypeEnum.GroupedByVariable
-                            || addToTabType == AddToTabTypeEnum.GroupedByBaseAddress
-                        ? addressList.ConvertAll(address => new List<uint>() { address })
-                        : new List<List<uint>>() { addressList };
-                for (int i = 0; i < addressesLists.Count; i++)
-                {
-                    string name = watchVar.VarName;
-                    if (addressesLists.Count > 1) name += " " + (i + 1);
-                    bool useFixed =
-                        addToTabType == AddToTabTypeEnum.Fixed ||
-                        addToTabType == AddToTabTypeEnum.GroupedByVariable ||
-                        addToTabType == AddToTabTypeEnum.GroupedByBaseAddress;
-                    List<uint> constructorAddressList = useFixed ? addressesLists[i] : null;
-                    WatchVariableControl newControl =
-                        watchVar.WatchVarPrecursor.CreateWatchVariableControl(
-                            name,
-                            watchVar._baseColor,
-                            new List<VariableGroup>() { VariableGroup.Custom },
-                            constructorAddressList);
-                    newVarList.Add(newControl);
-                }
-                watchVar.FlashColor(ADD_TO_CUSTOM_TAB_COLOR);
-                newVarListList.Add(newVarList);
-            }
-
-            if (addToTabType == AddToTabTypeEnum.GroupedByBaseAddress)
-            {
-                int maxListLength = newVarListList.Max(list => list.Count);
-                for (int i = 0; i < maxListLength; i++)
-                {
-                    for (int j = 0; j < newVarListList.Count; j++)
-                    {
-                        List<WatchVariableControl> newVarList = newVarListList[j];
-                        if (i >= newVarList.Count) continue;
-                        WatchVariableControl newVar = newVarList[i];
-                        variableAdder.AddVariable(newVar);
-                    }
-                }
-            }
-            else
-            {
-                foreach (List<WatchVariableControl> newVarList in newVarListList)
-                {
-                    foreach (WatchVariableControl newVar in newVarList)
-                    {
-                        variableAdder.AddVariable(newVar);
-                    }
-                }
-            }
         }
 
         public void AddToVarHackTab()
@@ -958,37 +731,24 @@ namespace STROOP.Controls
             return success;
         }
 
-        public bool AddValue(object value, bool add)
-        {
-            bool success = WatchVarWrapper.AddValue(value, add, FixedAddressListGetter());
-            if (!success) FlashColor(FAILURE_COLOR);
-            return success;
-        }
-
         public XElement ToXml(bool useCurrentState = true)
         {
-            Color? color = _baseColor == DEFAULT_COLOR ? (Color?)null : _baseColor;
-            if (useCurrentState)
-                return WatchVarPrecursor.ToXML(
-                    VarName, color, GroupList, FixedAddressListGetter());
-            else
-                return WatchVarPrecursor.ToXML();
+            throw new Exception("What");
+            //Color? color = _baseColor == DEFAULT_COLOR ? (Color?)null : _baseColor;
+            //if (useCurrentState)
+            //    return WatchVarPrecursor.ToXML(
+            //        VarName, color, GroupList, FixedAddressListGetter());
+            //else
+            //    return WatchVarPrecursor.ToXML();
         }
 
-        public List<string> GetVarInfo()
-        {
-            return WatchVarWrapper.GetVarInfo();
-        }
+        public List<string> GetVarInfo() => WatchVarWrapper.GetVarInfo();
 
-        public List<Func<object, bool>> GetSetters()
-        {
-            return WatchVarWrapper.GetSetters(FixedAddressListGetter());
-        }
+        public List<Func<object, bool>> GetSetters() => WatchVarWrapper.GetSetters(FixedAddressListGetter());
 
         public void UnselectText()
         {
             _nameTextBox.SelectionLength = 0;
-            _valueTextBox.SelectionLength = 0;
         }
 
         public void StopEditing()
@@ -997,9 +757,6 @@ namespace STROOP.Controls
             RenameMode = false;
         }
 
-        public override string ToString()
-        {
-            return WatchVarPrecursor.ToString();
-        }
+        public override string ToString() => WatchVarWrapper.ToString();
     }
 }

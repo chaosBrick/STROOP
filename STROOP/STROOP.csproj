@@ -350,7 +350,6 @@
       <DependentUpon>DecompilerView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\WatchVariable.cs" />
-    <Compile Include="Controls\WatchVariableControlPrecursor.cs" />
     <Compile Include="Controls\WatchVariableBooleanWrapper.cs" />
     <Compile Include="Controls\WatchVariableObjectWrapper.cs" />
     <Compile Include="Controls\WatchVariableAngleWrapper.cs" />
@@ -427,13 +426,16 @@
     <Compile Include="Tabs\GhostTab\GhostTabHelp.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Tabs\MapTab\DataUtil\CollisionStructure.cs" />
     <Compile Include="Tabs\MapTab\GraphicsUtil.cs" />
     <Compile Include="Tabs\MapTab\IHoverData.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\HoverDatas.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapAllObjectCeilingObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapAllObjectFloorObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapAllObjectWallObject.cs" />
+    <Compile Include="Tabs\MapTab\MapObjects\MapCustomCameraPath.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapTapeMeasureObject.cs" />
+    <Compile Include="Tabs\MapTab\MapObjects\MapNearbyFloorUnits.cs" />
     <Compile Include="Tabs\MapTab\MapView.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapWatersObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapCustomSpherePointsObject.cs" />
@@ -718,6 +720,12 @@
     <Compile Include="Tabs\SearchTab.Designer.cs">
       <DependentUpon>SearchTab.cs</DependentUpon>
     </Compile>
+    <Compile Include="Tabs\SimulationsTab\SimulationsTab.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Tabs\SimulationsTab\SimulationsTab.Designer.cs">
+      <DependentUpon>SimulationsTab.cs</DependentUpon>
+    </Compile>
     <Compile Include="Tabs\SnowTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -932,7 +940,6 @@
     <Compile Include="Utilities\WatchVariableSpecialDictionary.cs" />
     <Compile Include="Utilities\WatchVariableSelectionUtilities.cs" />
     <Compile Include="Utilities\WatchVariableSpecialUtilities.cs" />
-    <Compile Include="Utilities\WatchVariableCoordinateManager.cs" />
     <Compile Include="Utilities\AreaUtilities.cs" />
     <Compile Include="Utilities\DialogUtilities.cs" />
     <Compile Include="Utilities\TypeUtilities.cs" />
@@ -1069,6 +1076,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Tabs\SearchTab.resx">
       <DependentUpon>SearchTab.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tabs\SimulationsTab\SimulationsTab.resx">
+      <DependentUpon>SimulationsTab.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Tabs\SnowTab.resx">
       <DependentUpon>SnowTab.cs</DependentUpon>
@@ -1278,9 +1288,6 @@
     <Content Include="Config\CustomData.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Config\Map3DVars.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Config\WarpData.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

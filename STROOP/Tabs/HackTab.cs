@@ -111,5 +111,84 @@ namespace STROOP.Tabs
                     checkedListBoxHacks.SetItemChecked(i, hack.Enabled);
             }
         }
+
+        private void buttonInjectFile_Click(object sender, EventArgs e)
+        {
+            if (ParsingUtilities.TryParseHex(textBoxInjectFileAddress.Text, out uint address))
+            {
+                var dlg = new OpenFileDialog();
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    if (!Config.Stream.WriteRam(System.IO.File.ReadAllBytes(dlg.FileName), address, EndiannessType.Big))
+                        MessageBox.Show("Failed to write memory");
+                }
+            }
+            else
+                MessageBox.Show("Invalid address.");
+        }
+
+        private void buttonInjectDirect_Click(object sender, EventArgs e)
+        {
+
+            if (ParsingUtilities.TryParseHex(textBoxInjectFileAddress.Text, out uint address))
+            {
+                if (ParsingUtilities.ParseByteString(DialogUtilities.GetStringFromDialog("", "Enter byte data:")?.Trim() ?? "", out var bytes))
+                {
+                    if (bytes.Length > 0 && !Config.Stream.WriteRam(bytes, address, EndiannessType.Big))
+                        MessageBox.Show("Failed to write memory");
+                }
+                else
+                    MessageBox.Show("Invalid byte string!");
+            }
+            else
+                MessageBox.Show("Invalid address.");
+        }
+
+        private void buttonBrowseInGameFunctionCallFile_Click(object sender, EventArgs e)
+        {
+            var dlg = new OpenFileDialog();
+            if (dlg.ShowDialog() == DialogResult.OK)
+                textBoxInGameFunctionCall.Text = System.IO.File.ReadAllText(dlg.FileName);
+        }
+
+        private void buttonRunInGameFunctionCall_Click(object sender, EventArgs e)
+        {
+            var cmdAndArgs = ParsingUtilities.ParseHexList(textBoxInGameFunctionCall.Text);
+            if (cmdAndArgs.Count == 0)
+                MessageBox.Show("No valid function call specified.");
+            else if (cmdAndArgs.Count > 5)
+                MessageBox.Show("Only 4 arguments supported at this time.");
+            else
+            {
+                var command = cmdAndArgs[0];
+                cmdAndArgs.RemoveAt(0);
+                InGameFunctionCall.WriteInGameFunctionCall(command, cmdAndArgs.ToArray());
+            }
+        }
+
+        private void buttonBrowseLevelScriptCommandsFile_Click(object sender, EventArgs e)
+        {
+            var dlg = new OpenFileDialog();
+            if (dlg.ShowDialog() == DialogResult.OK)
+                textBoxLevelScriptCommand.Text = System.IO.File.ReadAllText(dlg.FileName);
+        }
+
+        private void buttonRunLevelscriptCommand_Click(object sender, EventArgs e)
+        {
+            if (ParsingUtilities.ParseByteString(textBoxLevelScriptCommand.Text, out var bytes))
+            {
+                if (bytes.Length % 4 != 0)
+                    MessageBox.Show("Level script commands should be multiple of 4 bytes long!");
+                else
+                {
+                    var uints = new uint[bytes.Length / 4];
+                    for (int i = 0; i < uints.Length; i++)
+                        uints[i] = BitConverter.ToUInt32(bytes, i * 4);
+                    InGameFunctionCall.WriteInGameLevelScriptCall(uints);
+                }
+            }
+            else
+                MessageBox.Show("Invalid byte string!");
+        }
     }
 }

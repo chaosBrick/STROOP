@@ -173,8 +173,7 @@ namespace STROOP
                     () =>
                     {
                         string varFilePath = @"Config/MhsData.xml";
-                        List<WatchVariableControlPrecursor> precursors =
-                            XmlConfigParser.OpenWatchVariableControlPrecursors(varFilePath);
+                        List<WatchVariable> precursors = XmlConfigParser.OpenWatchVariableControlPrecursors(varFilePath);
                         List<WatchVariableControl> controls = precursors.ConvertAll(
                             precursor => precursor.CreateWatchVariableControl());
                         VariablePopOutForm form = new VariablePopOutForm();

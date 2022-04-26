@@ -244,7 +244,7 @@ namespace STROOP.Tabs
             if (coord != null) xElement.Add(new XAttribute("coord", coord));
             if (display != null) xElement.Add(new XAttribute("display", display));
             if (yaw != null) xElement.Add(new XAttribute("yaw", yaw));
-            WatchVariableControlPrecursor precursor = new WatchVariableControlPrecursor(xElement);
+            var precursor = WatchVariable.ParseXml(xElement);
             return precursor.CreateWatchVariableControl();
         }
 
