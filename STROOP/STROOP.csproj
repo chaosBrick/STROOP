@@ -720,12 +720,6 @@
     <Compile Include="Tabs\SearchTab.Designer.cs">
       <DependentUpon>SearchTab.cs</DependentUpon>
     </Compile>
-    <Compile Include="Tabs\SimulationsTab\SimulationsTab.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Tabs\SimulationsTab\SimulationsTab.Designer.cs">
-      <DependentUpon>SimulationsTab.cs</DependentUpon>
-    </Compile>
     <Compile Include="Tabs\SnowTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -1076,9 +1070,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Tabs\SearchTab.resx">
       <DependentUpon>SearchTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\SimulationsTab\SimulationsTab.resx">
-      <DependentUpon>SimulationsTab.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Tabs\SnowTab.resx">
       <DependentUpon>SnowTab.cs</DependentUpon>
