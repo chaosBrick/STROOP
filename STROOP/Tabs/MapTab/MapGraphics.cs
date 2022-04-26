@@ -33,7 +33,7 @@ namespace STROOP.Tabs.MapTab
         public Renderers.TriangleRenderer triangleRenderer, triangleOverlayRenderer;
         public Renderers.LineRenderer lineRenderer;
         public Renderers.ShapeRenderer circleRenderer;
-        public Renderers.CylinderRenderer cylinderRenderer;
+        public Renderers.GeometryRenderer cylinderRenderer, sphereRenderer;
         public Renderers.TransparencyRenderer transparencyRenderer;
         public Vector2 pixelsPerUnit { get; private set; }
 
@@ -197,13 +197,15 @@ namespace STROOP.Tabs.MapTab
             renderers.Add(triangleOverlayRenderer = new Renderers.TriangleRenderer(0x10000) { drawlayer = DrawLayers.GeometryOverlay });
             renderers.Add(lineRenderer = new Renderers.LineRenderer());
             renderers.Add(circleRenderer = new Renderers.ShapeRenderer(DrawLayers.Overlay));
-            renderers.Add(cylinderRenderer = new Renderers.CylinderRenderer());
+            renderers.Add(cylinderRenderer = new Renderers.GeometryRenderer(Renderers.GeometryRenderer.GeometryData.Cylinder()));
+            renderers.Add(sphereRenderer = new Renderers.GeometryRenderer(Renderers.GeometryRenderer.GeometryData.Sphere(128, 64)));
 
             transparencyRenderer = new Renderers.TransparencyRenderer(16);
             transparencyRenderer.transparents.Add(objectRenderer.transparent);
             transparencyRenderer.transparents.Add(triangleRenderer.transparent);
             transparencyRenderer.transparents.Add(circleRenderer.transparent);
             transparencyRenderer.transparents.Add(cylinderRenderer);
+            transparencyRenderer.transparents.Add(sphereRenderer);
             renderers.Add(transparencyRenderer);
         }
 
@@ -285,7 +287,7 @@ namespace STROOP.Tabs.MapTab
                 foreach (var layer in drawLayers)
                     foreach (var action in layer)
                         action.Invoke();
-
+                
                 glControl.SwapBuffers();
             }
         }

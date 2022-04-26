@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
- 
+using OpenTK;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {
@@ -32,7 +32,15 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected override void DrawOrthogonal(MapGraphics graphics)
         {
-            throw new NotImplementedException();
+            graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
+            {
+                var color = new Vector4(Color.R / 255.0f, Color.G / 255.0f, Color.B / 255.0f, (float)Opacity);
+                foreach (var dim in Get3DDimensions())
+                {
+                    var transform = Matrix4.CreateScale(dim.radius3D) * Matrix4.CreateTranslation(dim.centerX, dim.centerY, dim.centerZ);
+                    graphics.sphereRenderer.Add(transform, color);
+                }
+            });
         }
     }
 }
