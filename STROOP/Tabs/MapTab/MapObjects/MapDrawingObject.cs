@@ -93,6 +93,6 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         public void ClearDrawing() => _vertices.Clear();
 
-        public override IHoverData GetHoverData(MapGraphics graphics) => drawingEnabled ? new Drawing(this) : null;
+        public override IHoverData GetHoverData(MapGraphics graphics, ref Vector3 position) => drawingEnabled ? new Drawing(this) : null;
     }
 }

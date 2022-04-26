@@ -16,12 +16,12 @@ namespace STROOP.Tabs.MapTab.MapObjects
             Color = Color.Purple;
         }
 
-        protected override List<(float xMin, float zMin, float xMax, float zMax)> GetQuadList()
+        protected override List<(float xMin, float xMax, float zMin, float zMax, float y)> GetQuadList()
         {
             List<(int y, int xMin, int xMax, int zMin, int zMax)> waters = WaterUtilities.GetWaterLevels();
-            List<(float, float, float, float)> quads = new List<(float, float, float, float)>();
+            var quads = new List<(float, float, float, float, float)>();
             foreach (var water in waters)
-                quads.Add((water.xMin, water.xMax, water.zMin, water.zMax));
+                quads.Add((water.xMin, water.xMax, water.zMin, water.zMax, water.y));
             return quads;
         }
 

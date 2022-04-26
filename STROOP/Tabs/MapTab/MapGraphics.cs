@@ -32,13 +32,30 @@ namespace STROOP.Tabs.MapTab
         public Renderers.SpriteRenderer objectRenderer;
         public Renderers.TriangleRenderer triangleRenderer, triangleOverlayRenderer;
         public Renderers.LineRenderer lineRenderer;
-        public Renderers.CircleRenderer circleRenderer;
+        public Renderers.ShapeRenderer circleRenderer;
         public Renderers.CylinderRenderer cylinderRenderer;
         public Renderers.TransparencyRenderer transparencyRenderer;
         public Vector2 pixelsPerUnit { get; private set; }
 
         public bool hasUnitPrecision { get; private set; }
         public Models.TriangleDataModel hoverTriangle;
+
+        DataUtil.CollisionStructure floors;
+        ulong lastFloorsUpdate;
+        public DataUtil.CollisionStructure GetFloorTriangles()
+        {
+            uint globalTimer = Config.Stream.GetUInt32(MiscConfig.GlobalTimerAddress);
+            if (floors == null || lastFloorsUpdate != globalTimer)
+            {
+                floors = new DataUtil.CollisionStructure(
+                    TriangleUtilities.GetLevelTriangles().Where(_ => _.Classification == TriangleClassification.Floor).ToList(),
+                    TriangleUtilities.GetObjectTriangles().Where(_ => _.Classification == TriangleClassification.Floor).ToList()
+                    );
+                lastFloorsUpdate = globalTimer;
+            }
+            return floors;
+        }
+
 
         const int OBJECTS_TEXTURE_SIZE = 256;
         const int OBJECTS_TEXTURE_LAYERS = 256;
@@ -110,7 +127,8 @@ namespace STROOP.Tabs.MapTab
         public Vector3 mapCursorPosition;
         public bool cursorOnMap = false;
         Vector3 normalAtCursor;
-        float cursorViewPlaneDist = 1000;
+        public float cursorViewPlaneDist = 1000;
+        public bool fixCursorPlane => view.mode == MapView.ViewMode.ThreeDimensional && KeyboardUtilities.IsShiftHeld();
 
         public (Vector3 normal, float d) worldspaceNearPlane { get; private set; }
         public (Vector3 normal, float d) worldspaceFarPlane { get; private set; }
@@ -118,6 +136,7 @@ namespace STROOP.Tabs.MapTab
 
         bool[] mouseDown = new bool[3];
         public bool IsMouseDown(int button) => mouseDown[button];
+
 
         public MapGraphics(MapTab mapTab, GLControl glControl)
         {
@@ -177,12 +196,13 @@ namespace STROOP.Tabs.MapTab
             renderers.Add(triangleRenderer = new Renderers.TriangleRenderer(0x10000));
             renderers.Add(triangleOverlayRenderer = new Renderers.TriangleRenderer(0x10000) { drawlayer = DrawLayers.GeometryOverlay });
             renderers.Add(lineRenderer = new Renderers.LineRenderer());
-            renderers.Add(circleRenderer = new Renderers.CircleRenderer());
+            renderers.Add(circleRenderer = new Renderers.ShapeRenderer(DrawLayers.Overlay));
             renderers.Add(cylinderRenderer = new Renderers.CylinderRenderer());
 
             transparencyRenderer = new Renderers.TransparencyRenderer(16);
             transparencyRenderer.transparents.Add(objectRenderer.transparent);
             transparencyRenderer.transparents.Add(triangleRenderer.transparent);
+            transparencyRenderer.transparents.Add(circleRenderer.transparent);
             transparencyRenderer.transparents.Add(cylinderRenderer);
             renderers.Add(transparencyRenderer);
         }
@@ -372,7 +392,7 @@ namespace STROOP.Tabs.MapTab
             return (closestDistance < float.PositiveInfinity);
         }
 
-        void Update3DCursor()
+        public void Update3DCursor()
         {
             if (levelTrianglesFor3DMap != null)
             {
@@ -383,7 +403,8 @@ namespace STROOP.Tabs.MapTab
                 var dirrrr = BillboardMatrix.Row0.Xyz * dx + BillboardMatrix.Row1.Xyz * dy - BillboardMatrix.Row2.Xyz;
                 if (float.IsNaN(dirrrr.X)) dirrrr = new Vector3(0, 0, 1);
 
-                if (cursorOnMap = FindClosestIntersection(view.position + dirrrr, dirrrr, out Vector3 closestIntersection, out hoverTriangle))
+                if (!fixCursorPlane
+                    && (cursorOnMap = FindClosestIntersection(view.position + dirrrr, dirrrr, out Vector3 closestIntersection, out hoverTriangle)))
                 {
                     normalAtCursor = new Vector3(hoverTriangle.NormX, hoverTriangle.NormY, hoverTriangle.NormZ);
                     mapCursorPosition = closestIntersection;

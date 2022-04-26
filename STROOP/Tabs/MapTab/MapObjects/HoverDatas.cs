@@ -8,7 +8,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
     {
         protected abstract class PointHoverData : IHoverData
         {
-            readonly MapObject parent;
+            protected readonly MapObject parent;
             protected abstract void SetPosition(Vector3 position);
             protected abstract Vector3 GetPosition();
 
@@ -35,7 +35,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 tab.graphics.view.focusPositionAngle = PositionAngle.Custom(GetPosition(), 0);
             }
 
-            public void AddContextMenuItems(MapTab tab, ContextMenuStrip menu)
+            public virtual void AddContextMenuItems(MapTab tab, ContextMenuStrip menu)
             {
                 var myItem = new ToolStripMenuItem(ToString());
                 var copyPositionItem = new ToolStripMenuItem("Copy Position");
@@ -52,6 +52,20 @@ namespace STROOP.Tabs.MapTab.MapObjects
                         SetPosition(v);
                 };
                 myItem.DropDownItems.Add(pastePositionItem);
+
+                var typePositionItem = new ToolStripMenuItem("Type in Position");
+                typePositionItem.Click += (_, __) =>
+                {
+                    var pos = GetPosition();
+                    var pts = MapUtilities.ParsePoints(DialogUtilities.GetStringFromDialog($"{pos.X} \n{pos.Y} \n{pos.Z}", "Enter position as 3 floats"), true);
+                    if (pts != null)
+                        foreach (var pt in pts)
+                        {
+                            SetPosition(new Vector3(pt.x, pt.y, pt.z));
+                            break;
+                        }
+                };
+                myItem.DropDownItems.Add(typePositionItem);
 
                 if (tab.graphics.view.mode != MapView.ViewMode.TopDown)
                 {

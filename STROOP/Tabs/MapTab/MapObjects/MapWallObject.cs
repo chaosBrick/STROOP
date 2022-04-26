@@ -30,7 +30,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             _absoluteHeight = null;
         }
 
-        public override IHoverData GetHoverData(MapGraphics graphics)
+        public override IHoverData GetHoverData(MapGraphics graphics, ref Vector3 position)
         {
             if (graphics.view.mode == MapView.ViewMode.TopDown)
                 foreach (var tri in GetTrianglesWithinDist())
@@ -57,7 +57,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                         }
                     }
                 }
-            return base.GetHoverData(graphics);
+            return base.GetHoverData(graphics, ref position);
         }
 
         protected override (Vector3 low, Vector3 high)[] GetOrthogonalBoundaryProjection(MapGraphics graphics, TriangleDataModel tri, Vector3 projectionA, Vector3 projectionB)

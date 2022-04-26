@@ -6,6 +6,7 @@ using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
 using OpenTK;
+using STROOP.Models;
 
 using System.Windows.Forms;
 
@@ -24,7 +25,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             _maxHeight = null;
         }
 
-        public override IHoverData GetHoverData(MapGraphics graphics)
+        public override IHoverData GetHoverData(MapGraphics graphics, ref Vector3 position)
         {
             if (graphics.view.mode == MapView.ViewMode.TopDown)
                 foreach (var tri in GetTrianglesWithinDist())
@@ -35,8 +36,20 @@ namespace STROOP.Tabs.MapTab.MapObjects
                         return hoverData;
                     }
                 }
-            return base.GetHoverData(graphics);
+            return base.GetHoverData(graphics, ref position);
         }
+
+        protected override Predicate<TriangleDataModel> FilterTriangles()
+        {
+            Predicate<TriangleDataModel> pred = base.FilterTriangles();
+            if (_minHeight != null)
+                pred = PredicateAnd(tri => _minHeight <= tri.GetMaxY(), pred);
+            if (_maxHeight != null)
+                pred = PredicateAnd(tri => _maxHeight >= tri.GetMinY(), pred);
+            return pred;
+        }
+
+        static Predicate<T> PredicateAnd<T>(Predicate<T> A, Predicate<T> B) => _ => A(_) && B(_);
 
         protected override void DrawTopDown(MapGraphics graphics)
         {

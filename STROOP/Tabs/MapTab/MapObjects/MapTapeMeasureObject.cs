@@ -110,7 +110,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         protected override List<Vector3> GetVertices(MapGraphics graphics) =>
             new List<Vector3>(new[] { new Vector3(a.X, 0, a.Y), new Vector3(b.X, 0, b.Y) });
 
-        public override IHoverData GetHoverData(MapGraphics graphics)
+        public override IHoverData GetHoverData(MapGraphics graphics, ref Vector3 position)
         {
             var cursor2D = new Vector2(graphics.mapCursorPosition.X, graphics.mapCursorPosition.Z);
             var rad = (5 / graphics.MapViewScaleValue);

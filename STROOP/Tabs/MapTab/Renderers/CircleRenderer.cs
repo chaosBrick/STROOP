@@ -3,8 +3,51 @@ using OpenTK.Graphics.OpenGL;
 
 namespace STROOP.Tabs.MapTab.Renderers
 {
-    public class CircleRenderer : InstanceRenderer<CircleRenderer.InstanceData>
+    public class ShapeRenderer : InstanceRenderer<ShapeRenderer.InstanceData>
     {
+        class TransparentShapeRenderer : ShapeRenderer, TransparencyRenderer.Transparent
+        {
+            ShapeRenderer parent;
+
+            protected override int GetShader() => GraphicsUtil.GetShaderProgram("Resources/Shaders/Circles.vert.glsl", "Resources/Shaders/DepthMask.frag.glsl");
+            public TransparentShapeRenderer(ShapeRenderer parent, int maxExpectedInstances) : base(maxExpectedInstances)
+            {
+                this.parent = parent;
+            }
+
+            public void DrawMask(TransparencyRenderer renderer)
+            {
+                if (instances.Count == 0)
+                    return;
+                BeginDraw(renderer.graphics, false);
+                renderer.SetUniforms(shader);
+                GL.Disable(EnableCap.CullFace);
+                GL.DrawArraysInstanced(PrimitiveType.TriangleStrip, 0, 4, instances.Count);
+                GL.BindVertexArray(0);
+            }
+
+            public void DrawTransparent(TransparencyRenderer renderer)
+            {
+                if (instances.Count == 0)
+                    return;
+                GL.UseProgram(parent.shader);
+                GL.BindVertexArray(vertexArray);
+                Matrix4 mat = ignoreView ? Matrix4.Identity : renderer.graphics.ViewMatrix;
+                GL.UniformMatrix4(parent.uniform_viewProjection, false, ref mat);
+
+                GL.Disable(EnableCap.CullFace);
+                GL.DrawArraysInstanced(PrimitiveType.TriangleStrip, 0, 4, instances.Count);
+                GL.BindVertexArray(0);
+            }
+
+            public void Prepare(TransparencyRenderer renderer)
+            {
+                if (instances.Count == 0)
+                    return;
+                UpdateBuffer(instances.Count);
+            }
+        }
+
         public struct InstanceData
         {
             public Matrix4 transform;
@@ -19,11 +62,16 @@ namespace STROOP.Tabs.MapTab.Renderers
             Quad = 1
         }
 
-        public CircleRenderer(int numExpectedInstances = 512)
+        public readonly MapGraphics.DrawLayers layer = MapGraphics.DrawLayers.Overlay;
+
+        TransparentShapeRenderer transparentRenderer;
+        public TransparencyRenderer.Transparent transparent => transparentRenderer;
+
+        protected virtual int GetShader() => GraphicsUtil.GetShaderProgram("Resources/Shaders/Circles.vert.glsl", "Resources/Shaders/Circles.frag.glsl");
+
+        protected ShapeRenderer(int numExpectedInstances = 512)
         {
-            shader = GraphicsUtil.GetShaderProgram(
-                "Resources/Shaders/Circles.vert.glsl",
-                "Resources/Shaders/Circles.frag.glsl");
+            shader = GetShader();
             Init(numExpectedInstances);
 
             GL.BindVertexArray(vertexArray);
@@ -39,9 +87,16 @@ namespace STROOP.Tabs.MapTab.Renderers
             GL.VertexAttribPointer(6, 1, VertexAttribPointerType.Float, false, instanceSize, sizeof(float) * 6 * 4);
             GL.BindVertexArray(0);
         }
-        public void AddInstance(Matrix4 transform, float outlineWidth, Vector4 color, Vector4 outlineColor, Shapes shape = Shapes.Circle)
+
+        public ShapeRenderer(MapGraphics.DrawLayers layer, int maxExpectedInstances = 128) : this(maxExpectedInstances)
         {
-            instances.Add(new InstanceData
+            this.layer = layer;
+            transparentRenderer = new TransparentShapeRenderer(this, maxExpectedInstances);
+        }
+
+        public void AddInstance(bool sortTransparent, Matrix4 transform, float outlineWidth, Vector4 color, Vector4 outlineColor, Shapes shape = Shapes.Circle)
+        {
+            (sortTransparent ? transparentRenderer.instances : instances).Add(new InstanceData
             {
                 transform = transform,
                 color = color,
@@ -53,7 +108,8 @@ namespace STROOP.Tabs.MapTab.Renderers
         public override void SetDrawCalls(MapGraphics graphics)
         {
             instances.Clear();
-            graphics.drawLayers[(int)MapGraphics.DrawLayers.Overlay].Add(() =>
+            transparentRenderer.instances.Clear();
+            graphics.drawLayers[(int)layer].Add(() =>
            {
                if (instances.Count == 0)
                    return;

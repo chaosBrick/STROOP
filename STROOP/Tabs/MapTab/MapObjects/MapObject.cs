@@ -101,7 +101,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         ToolStripMenuItem enableDragging = new ToolStripMenuItem("Enable dragging");
 
-        public virtual IHoverData GetHoverData(MapGraphics graphics) => null;
+        public virtual IHoverData GetHoverData(MapGraphics graphics, ref Vector3 position) => null;
 
         public MapTab currentMapTab => AccessScope<MapTab>.content;
         protected event Action OnCleanup = null;

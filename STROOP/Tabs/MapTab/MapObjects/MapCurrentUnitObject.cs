@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
-using STROOP.Structs;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {
@@ -20,9 +19,9 @@ namespace STROOP.Tabs.MapTab.MapObjects
             Color = Color.Purple;
         }
 
-        protected override List<(float xMin, float zMin, float xMax, float zMax)> GetQuadList()
+        protected override List<(float xMin, float xMax, float zMin, float zMax, float y)> GetQuadList()
         {
-            List<(float, float, float, float)> quads = new List<(float, float, float, float)>();
+            var quads = new List<(float, float, float, float, float)>();
 
             foreach (var obj in positionAngleProvider())
             {
@@ -32,7 +31,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 int xMax = xMin + (posAngleX >= 0 ? 1 : -1);
                 int zMin = (short)posAngleZ;
                 int zMax = zMin + (posAngleZ >= 0 ? 1 : -1);
-                quads.Add(((float)xMin, (float)xMax, (float)zMin, (float)zMax));
+                quads.Add((Math.Min(xMin, xMax), Math.Max(xMin, xMax), Math.Min  (zMin, zMax), Math.Max(zMin, zMax), (float)obj.Y));
             }
             return quads;
         }

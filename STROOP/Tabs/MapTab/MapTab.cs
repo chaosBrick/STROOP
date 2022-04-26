@@ -48,6 +48,7 @@ namespace STROOP.Tabs.MapTab
         public bool PauseMapUpdating = false;
         private bool _isLoaded2D = false;
         int _numLevelTriangles = 0;
+        bool makeInGameCameraFollow = false;
 
         public bool HasMouseListeners => hoverData.Count > 0;
         Dictionary<object, MapTracker> semaphoreTrackers = new Dictionary<object, MapTracker>();
@@ -449,6 +450,16 @@ namespace STROOP.Tabs.MapTab
                         ctx.Items.Add(itemCameraModeInGame);
                         ctx.Items.Add(itemCameraModePivot);
                         ctx.Items.Add(itemCameraModeFree);
+
+                        var itemFollowInGame = new ToolStripMenuItem("Match Cam Hack to view");
+                        itemFollowInGame.Checked = makeInGameCameraFollow;
+                        itemFollowInGame.Click += (__, ___) =>
+                        {
+                            makeInGameCameraFollow = (itemFollowInGame.Checked = !itemFollowInGame.Checked);
+                        };
+
+                        ctx.Items.Add(new ToolStripSeparator());
+                        ctx.Items.Add(itemFollowInGame);
                     }
 
                     if (graphics.view.mode == MapView.ViewMode.Orthogonal)
@@ -496,11 +507,18 @@ namespace STROOP.Tabs.MapTab
                         graphics.UpdateFlyingControls(Config.Stream.lastFrameTime);
                     if (!graphics.IsMouseDown(0))
                     {
+                        var newCursor = graphics.mapCursorPosition;
                         hoverData.Clear();
                         foreach (var tracker in flowLayoutPanelMapTrackers.EnumerateTrackers())
                             if (tracker.IsVisible)
                             {
-                                var newHover = tracker.mapObject.GetHoverData(graphics);
+                                var newHover = tracker.mapObject.GetHoverData(graphics, ref newCursor);
+                                if (graphics.fixCursorPlane)
+                                {
+                                    graphics.cursorViewPlaneDist = Vector3.Dot(graphics.view.ComputeViewDirection(), (newCursor - graphics.view.position));
+                                    graphics.Update3DCursor();
+                                }
+
                                 if (newHover != null)
                                     hoverData.Add(newHover);
                             }
@@ -517,6 +535,18 @@ namespace STROOP.Tabs.MapTab
 
                     if (!PauseMapUpdating)
                         glControlMap2D.Invalidate();
+                }
+
+                if (graphics.view.mode == MapView.ViewMode.ThreeDimensional && makeInGameCameraFollow)
+                {
+                    Config.Stream.SetValue(3, CamHackConfig.StructAddress + CamHackConfig.CameraModeOffset);
+                    Config.Stream.SetValue(graphics.view.position.X, CamHackConfig.StructAddress + CamHackConfig.CameraXOffset);
+                    Config.Stream.SetValue(graphics.view.position.Y, CamHackConfig.StructAddress + CamHackConfig.CameraYOffset);
+                    Config.Stream.SetValue(graphics.view.position.Z, CamHackConfig.StructAddress + CamHackConfig.CameraZOffset);
+                    var target = graphics.view.position + graphics.view.ComputeViewDirection();
+                    Config.Stream.SetValue(target.X, CamHackConfig.StructAddress + CamHackConfig.FocusXOffset);
+                    Config.Stream.SetValue(target.Y, CamHackConfig.StructAddress + CamHackConfig.FocusYOffset);
+                    Config.Stream.SetValue(target.Z, CamHackConfig.StructAddress + CamHackConfig.FocusZOffset);
                 }
 
                 int numLevelTriangles = Config.Stream.GetInt32(TriangleConfig.LevelTriangleCountAddress);

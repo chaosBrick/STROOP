@@ -25,6 +25,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 {
                     var transform = graphics.BillboardMatrix * Matrix4.CreateScale(dim.radius) * Matrix4.CreateTranslation(dim.centerX, 0, dim.centerZ);
                     graphics.circleRenderer.AddInstance(
+                        graphics.view.mode != MapView.ViewMode.TopDown,
                         transform,
                         OutlineWidth,
                         color,
@@ -33,7 +34,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             });
         }
 
-        public override IHoverData GetHoverData(MapGraphics graphics) => null;
+        public override IHoverData GetHoverData(MapGraphics graphics, ref Vector3 position) => null;
 
         protected abstract List<(float centerX, float centerZ, float radius)> Get2DDimensions();
     }

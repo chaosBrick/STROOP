@@ -128,13 +128,16 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected List<TriangleDataModel> GetTrianglesWithinDist()
         {
+            return _bufferedTris.FindAll(FilterTriangles());
+        }
+
+        protected virtual System.Predicate<TriangleDataModel> FilterTriangles()
+        {
             float centerY = _withinCenter ?? Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
-            List<TriangleDataModel> tris = _bufferedTris.FindAll(tri => tri.IsTriWithinVerticalDistOfCenter(_withinDist, centerY));
             if (_excludeDeathBarriers)
-            {
-                tris = tris.FindAll(tri => tri.SurfaceType != 0x0A);
-            }
-            return tris;
+                return tri => tri.SurfaceType != 0x0A && tri.IsTriWithinVerticalDistOfCenter(_withinDist, centerY);
+            else
+                return tri => tri.IsTriWithinVerticalDistOfCenter(_withinDist, centerY);
         }
 
         protected abstract List<TriangleDataModel> GetTrianglesOfAnyDist();
@@ -147,7 +150,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 _bufferedTris = newList;
         }
 
-        public override IHoverData GetHoverData(MapGraphics graphics)
+        public override IHoverData GetHoverData(MapGraphics graphics, ref Vector3 position)
         {
             if (graphics.view.mode == MapView.ViewMode.ThreeDimensional)
             {

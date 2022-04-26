@@ -19,12 +19,12 @@ namespace STROOP.Utilities
             skipNew:
             item.Click += (_, __) => handler();
         }
-
+        
         public static ToolStripMenuItem GetSubItem(this ToolStripItemCollection strip, string key)
         {
             ToolStripMenuItem item;
             foreach (ToolStripItem fsjkl in strip)
-                if (fsjkl.Name == key && fsjkl is ToolStripMenuItem result)
+                if (fsjkl.Text == key && fsjkl is ToolStripMenuItem result)
                     return result;
 
             item = new ToolStripMenuItem(key);

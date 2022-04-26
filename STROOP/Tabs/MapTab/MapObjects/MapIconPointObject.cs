@@ -33,7 +33,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             return A + d * System.Math.Max(0, System.Math.Min(1, distThing));
         }
 
-        public override IHoverData GetHoverData(MapGraphics graphics)
+        public override IHoverData GetHoverData(MapGraphics graphics, ref Vector3 position)
         {
             var radius = Size / graphics.MapViewScaleValue;
             var cursorPos = graphics.mapCursorPosition;
@@ -77,7 +77,12 @@ namespace STROOP.Tabs.MapTab.MapObjects
                         }
                     }
             }
-            return hoverData.currentPositionAngle != null ? hoverData : null;
+            if (hoverData.currentPositionAngle != null)
+            {
+                position = hoverData.currentPositionAngle.position;
+                return hoverData;
+            }
+            return null;
         }
     }
 }
