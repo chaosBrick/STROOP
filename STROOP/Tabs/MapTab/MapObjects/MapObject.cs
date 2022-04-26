@@ -6,6 +6,7 @@ using STROOP.Structs;
 using OpenTK;
 using System.Windows.Forms;
 using OpenTK.Graphics;
+using System.Globalization;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {
@@ -256,7 +257,26 @@ namespace STROOP.Tabs.MapTab.MapObjects
         public delegate void SaveSettings(System.Xml.XmlNode node);
         public delegate void LoadSettings(System.Xml.XmlNode node);
 
-        public virtual (SaveSettings save, LoadSettings load) SettingsSaveLoad => (_ => { }, _ => { });
+        public virtual (SaveSettings save, LoadSettings load) SettingsSaveLoad => (
+        (System.Xml.XmlNode node) =>
+        {
+            SaveValueNode(node, "Size", Size.ToString());
+            SaveValueNode(node, "Color", Color.ToArgb().ToString("X"));
+            SaveValueNode(node, "OutlineColor", OutlineColor.ToArgb().ToString("X"));
+            SaveValueNode(node, "OutlineWidth", OutlineWidth.ToString());
+        }
+        , (System.Xml.XmlNode node) =>
+        {
+            if (float.TryParse(LoadValueNode(node, "Size"), out float size))
+                Size = size;
+            if (int.TryParse(LoadValueNode(node, "Color"), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int color))
+                Color = Color.FromArgb(color);
+            if (int.TryParse(LoadValueNode(node, "OutlineColor"), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int outlineColor))
+                OutlineColor = Color.FromArgb(outlineColor);
+            if (float.TryParse(LoadValueNode(node, "OutlineWidth"), out float outlineWidth))
+                OutlineWidth = outlineWidth;
+        }
+        );
 
         protected void SaveValueNode(System.Xml.XmlNode parentNode, string valueName, string value)
         {
