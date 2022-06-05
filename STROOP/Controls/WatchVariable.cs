@@ -8,16 +8,35 @@ using System.Xml.Linq;
 
 namespace STROOP.Controls
 {
+    public struct WatchVariablePrecursor
+    {
+        public (WatchVariable var, WatchVariable.IVariableView view) value;
+        public static implicit operator WatchVariablePrecursor((WatchVariable var, WatchVariable.IVariableView view) value) =>
+            new WatchVariablePrecursor() { value = value };
+    }
+
     public class WatchVariable
     {
         public delegate object GetterFunction(uint address);
         public delegate bool SetterFunction(object value, uint address);
+
+        public static class ViewProperties
+        {
+            public static readonly string
+                useHex = nameof(useHex),
+                invertBool = nameof(invertBool),
+                specialType = nameof(specialType),
+                roundingLimit = nameof(roundingLimit),
+                display = nameof(display)
+                ;
+        }
 
         public interface IVariableView
         {
             string Name { get; }
             GetterFunction _getterFunction { get; }
             SetterFunction _setterFunction { get; }
+            bool SetValueByKey(string key, object value);
             string GetValueByKey(string key);
             Type GetWrapperType();
         }
@@ -27,12 +46,18 @@ namespace STROOP.Controls
             public string Name { get; set; }
             public GetterFunction _getterFunction { get; set; }
             public SetterFunction _setterFunction { get; set; }
-            public Dictionary<string, string> keyedValues = new Dictionary<string, string>();
+            Dictionary<string, string> keyedValues = new Dictionary<string, string>();
+            public CustomView(Type wrapperType) { this.wrapperType = wrapperType; }
             public virtual string GetValueByKey(string key)
             {
                 if (keyedValues.TryGetValue(key, out var result))
                     return result;
                 return null;
+            }
+            public virtual bool SetValueByKey(string key, object value)
+            {
+                keyedValues[key] = value.ToString();
+                return true;
             }
             public Type wrapperType;
             public Type GetWrapperType() => wrapperType;
@@ -44,6 +69,8 @@ namespace STROOP.Controls
             readonly string wrapper;
             readonly XElement xElement;
             public string Name { get; private set; }
+
+            public XElement GetXml() => xElement;
 
             public GetterFunction _getterFunction { get; private set; }
             public SetterFunction _setterFunction { get; private set; }
@@ -74,6 +101,11 @@ namespace STROOP.Controls
             }
             public Type GetWrapperType() => WatchVariableWrapper.GetWrapperType(wrapper);
             public string GetValueByKey(string key) => xElement.Attribute(key)?.Value ?? null;
+            public bool SetValueByKey(string key, object value)
+            {
+                xElement.SetAttributeValue(XName.Get(key), value.ToString());
+                return true;
+            }
         }
 
         public abstract class CustomViewData
@@ -96,6 +128,32 @@ namespace STROOP.Controls
             { }
         }
 
+        public static IVariableView DefaultView(string name, bool isAbsolute, Type effectiveType, int mask = ~0, int shift = ~0)
+        {
+            return new CustomView(typeof(WatchVariableNumberWrapper))
+            {
+                Name = name,
+                _getterFunction = (uint address) =>
+                    Config.Stream.GetValue(
+                    effectiveType,
+                    address,
+                    isAbsolute,
+                    (uint)mask,
+                    shift),
+                _setterFunction = (object value, uint address) =>
+                    Config.Stream.SetValueRoundingWrapping(
+                    effectiveType,
+                    value,
+                    address,
+                    isAbsolute,
+                    (uint)mask,
+                    shift)
+            };
+
+        }
+
+        public IVariableView view { get; private set; }
+
         public readonly string MemoryTypeName;
         public readonly Type MemoryType;
         public readonly int? ByteCount;
@@ -116,8 +174,6 @@ namespace STROOP.Controls
 
         public bool IsSpecial { get => MemoryType == null; }
         public bool UseAbsoluteAddressing { get => BaseAddressType == BaseAddressTypeEnum.Absolute; }
-
-        public IVariableView view;
 
         public uint Offset
         {
@@ -143,7 +199,7 @@ namespace STROOP.Controls
             }
         }
 
-        public WatchVariableControl CreateWatchVariableControl() => new WatchVariableControl(this);
+        public WatchVariableControl CreateWatchVariableControl(XElement xElement) => new WatchVariableControl(this, new XmlView(this, xElement));
 
         public List<uint> GetBaseAddressList()
         {
@@ -169,7 +225,7 @@ namespace STROOP.Controls
             uint? offsetEU = ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("offsetEU"))?.Value);
             uint? offsetDefault = ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("offset"))?.Value);
             uint? mask = element.Attribute(XName.Get("mask")) != null ?
-                (uint?)ParsingUtilities.ParseHex(element.Attribute(XName.Get("mask")).Value) : null;
+                ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("mask")).Value) : null;
             int? shift = element.Attribute(XName.Get("shift")) != null ?
                 int.Parse(element.Attribute(XName.Get("shift")).Value) : (int?)null;
             bool handleMapping = (element.Attribute(XName.Get("handleMapping")) != null) ?
@@ -180,10 +236,11 @@ namespace STROOP.Controls
             return result;
         }
 
-        public WatchVariable(string name, CustomViewData viewData)
+        public WatchVariable(WatchVariable.IVariableView view, BaseAddressTypeEnum baseAddress = BaseAddressTypeEnum.None, uint offset = 0)
         {
-            BaseAddressType = BaseAddressTypeEnum.None;
-            view = new CustomView() { Name = name, _getterFunction = viewData.getter, _setterFunction = viewData.setter, wrapperType = viewData.wrapperType };
+            BaseAddressType = baseAddress;
+            this.OffsetDefault = offset;
+            this.view = view;
         }
 
         private WatchVariable(string memoryTypeName, BaseAddressTypeEnum baseAddressType,
@@ -216,21 +273,25 @@ namespace STROOP.Controls
         public List<object> GetValues(List<uint> addresses = null) =>
             GetAddressList(addresses).ConvertAll(address => view._getterFunction(address));
 
+        private bool SetValueYes(uint address, object value)
+        {
+            bool result = view._setterFunction(value, address);
+            if (result && locks.TryGetValue(address, out var l))
+                l.value = value;
+            return result;
+        }
+
         public bool SetValue(object value, List<uint> addresses = null)
         {
             List<uint> addressList = GetAddressList(addresses);
             if (addressList.Count == 0) return false;
+            if (Config.Stream == null) return false;
 
             bool streamAlreadySuspended = Config.Stream.IsSuspended;
             if (!streamAlreadySuspended) Config.Stream.Suspend();
-            bool success = addressList.ConvertAll(address => view._setterFunction(value, address))
+            bool success = addressList.ConvertAll(address => SetValueYes(address, value))
                     .Aggregate(true, (b1, b2) => b1 && b2);
             if (!streamAlreadySuspended) Config.Stream.Resume();
-
-            if (success)
-            {
-                WatchVariableLockManager.UpdateLockValues(this, value, addresses);
-            }
 
             return success;
         }
@@ -247,52 +308,59 @@ namespace STROOP.Controls
             for (int i = 0; i < minCount; i++)
             {
                 if (values[i] == null) continue;
-                success &= view._setterFunction(values[i], addressList[i]);
+                success &= SetValueYes(addressList[i], values[i]);
             }
             if (!streamAlreadySuspended) Config.Stream.Resume();
 
-            if (success)
-            {
-                WatchVariableLockManager.UpdateLockValues(this, values, addresses);
-            }
 
             return success;
         }
 
-        public List<WatchVariableLock> GetLocks(List<uint> addresses = null)
-        {
-            throw new NotImplementedException("What");
-            //List<uint> baseAddressList = addresses ?? GetBaseAddressList();
-            //List<uint> addressList = GetAddressList(addresses);
-            //List<object> values = GetValues(addresses);
-            //if (values.Count != addressList.Count || values.Count != baseAddressList.Count)
-            //    return new List<WatchVariableLock>();
+        public bool locked => HasLocks() != System.Windows.Forms.CheckState.Unchecked;
 
-            //List<WatchVariableLock> locks = new List<WatchVariableLock>();
-            //for (int i = 0; i < values.Count; i++)
-            //{
-            //    locks.Add(new WatchVariableLock(
-            //        IsSpecial, MemoryType, ByteCount, Mask, Shift, addressList[i], baseAddressList[i], SpecialType, view._setterFunction, values[i]));
-            //}
-            //return locks;
+        Dictionary<uint, (SetterFunction setter, object value)> locks = new Dictionary<uint, (SetterFunction, object)>();
+
+        public bool SetLocked(bool locked, List<uint> addresses)
+        {
+            var addressList = addresses ?? GetAddressList(null);
+            if (!locked)
+                foreach (var address in addressList)
+                    locks.Remove(address);
+            else
+            {
+                WatchVariableLockManager.AddLocks(this);
+                var setter = view._setterFunction;
+                foreach (var address in addressList)
+                    locks[address] = (setter, view._getterFunction(address));
+            }
+            return true;
         }
 
-        public List<WatchVariableLock> GetLocksWithoutValues(List<uint> addresses = null)
-        {
-            return new List<WatchVariableLock>();
-            throw new NotImplementedException("What");
-            //List<uint> baseAddressList = addresses ?? GetBaseAddressList();
-            //List<uint> addressList = GetAddressList(addresses);
-            //if (baseAddressList.Count != addressList.Count)
-            //    return new List<WatchVariableLock>();
+        public void ClearLocks() => locks.Clear();
 
-            //List<WatchVariableLock> locks = new List<WatchVariableLock>();
-            //for (int i = 0; i < addressList.Count; i++)
-            //{
-            //    locks.Add(new WatchVariableLock(
-            //        IsSpecial, MemoryType, ByteCount, Mask, Shift, addressList[i], baseAddressList[i], SpecialType, view._setterFunction, null));
-            //}
-            //return locks;
+        public bool InvokeLocks()
+        {
+            if (locks.Count == 0)
+                return false;
+            foreach (var l in locks)
+                l.Value.setter(l.Value.value, l.Key);
+            return true;
+        }
+
+        public System.Windows.Forms.CheckState HasLocks()
+        {
+            bool? firstLockValue = null;
+            foreach (var addr in GetAddressList(null))
+            {
+                var v = locks.TryGetValue(addr, out var irrelevant);
+                if (firstLockValue == null)
+                    firstLockValue = v;
+                else if (v != firstLockValue)
+                    return System.Windows.Forms.CheckState.Indeterminate;
+            }
+            if (!firstLockValue.HasValue)
+                return System.Windows.Forms.CheckState.Unchecked;
+            return firstLockValue.Value ? System.Windows.Forms.CheckState.Checked : System.Windows.Forms.CheckState.Unchecked;
         }
 
         public List<Func<object, bool>> GetSetters(List<uint> addresses = null)

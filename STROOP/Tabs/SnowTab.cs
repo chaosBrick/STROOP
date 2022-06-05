@@ -96,13 +96,13 @@ namespace STROOP.Tabs
             List<WatchVariableControl> controls = new List<WatchVariableControl>();
             for (int i = 0; i < 3; i++)
             {
-                WatchVariable watchVar = new WatchVariable(names[i],
-                    new WatchVariable.CustomViewData<WatchVariableNumberWrapper>(
-                        _ => Config.Stream.GetInt32(Config.Stream.GetUInt32(SnowConfig.SnowArrayPointerAddress) + offsets[i]),
-                        (val, _) => Config.Stream.SetValue((int)val, Config.Stream.GetUInt32(SnowConfig.SnowArrayPointerAddress) + offsets[i])
-                        )
-                    );
-                controls.Add(watchVar.CreateWatchVariableControl());
+                var view = new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                {
+                    Name = names[i],
+                    _getterFunction = _ => Config.Stream.GetInt32(Config.Stream.GetUInt32(SnowConfig.SnowArrayPointerAddress) + offsets[i]),
+                    _setterFunction = (val, _) => Config.Stream.SetValue((int)val, Config.Stream.GetUInt32(SnowConfig.SnowArrayPointerAddress) + offsets[i])
+                };
+                controls.Add(new WatchVariableControl(new WatchVariable(view)));
             }
             return controls;
         }

@@ -17,7 +17,7 @@ namespace STROOP.Forms
         private long _lastRemoveTime;
 
         public TriangleListForm(
-            MapLevelTriangleObjectI levelTriangleObject, 
+            MapLevelTriangleObjectI levelTriangleObject,
             TriangleClassification classification,
             List<uint> triAddressList)
         {
@@ -46,12 +46,12 @@ namespace STROOP.Forms
         public void RefreshAndSort()
         {
             dataGridView.Rows.Clear();
-            List<(uint address, double dist)> dataList =_triAddressList.ConvertAll(address =>
-            {
-                TriangleDataModel tri = TriangleDataModel.Create(address);
-                double dist = tri.GetDistToMidpoint();
-                return (address, dist);
-            });
+            List<(uint address, double dist)> dataList = _triAddressList.ConvertAll(address =>
+             {
+                 TriangleDataModel tri = TriangleDataModel.Create(address);
+                 double dist = tri.GetDistToMidpoint();
+                 return (address, dist);
+             });
             dataList = Enumerable.OrderBy(dataList, data => data.dist).ToList();
             dataList.ForEach(data =>
             {
@@ -65,8 +65,8 @@ namespace STROOP.Forms
             List<DataGridViewRow> rows = ControlUtilities.GetTableSelectedRows(dataGridView);
             rows.ForEach(row =>
             {
-                uint address = ParsingUtilities.ParseHex(row.Cells[0].Value);
-                ButtonUtilities.AnnihilateTriangle(new List<uint>() { address });
+                if (ParsingUtilities.TryParseHex(row.Cells[0].Value, out uint address))
+                    ButtonUtilities.AnnihilateTriangle(new List<uint>() { address });
             });
         }
 
@@ -88,8 +88,8 @@ namespace STROOP.Forms
             List<DataGridViewRow> rows = ControlUtilities.GetTableSelectedRows(dataGridView);
             rows.ForEach(row =>
             {
-                uint address = ParsingUtilities.ParseHex(row.Cells[0].Value);
-                _triAddressList.Remove(address);
+                if (ParsingUtilities.TryParseHex(row.Cells[0].Value, out uint address))
+                    _triAddressList.Remove(address);
             });
             RefreshDataGridViewAfterRemoval();
         }
@@ -99,11 +99,9 @@ namespace STROOP.Forms
             List<DataGridViewRow> rows = ControlUtilities.GetTableAllRows(dataGridView);
             rows.ForEach(row =>
             {
-                uint address = ParsingUtilities.ParseHex(row.Cells[0].Value);
-                if (!_triAddressList.Contains(address))
-                {
-                    dataGridView.Rows.Remove(row);
-                }
+                if (ParsingUtilities.TryParseHex(row.Cells[0].Value, out uint address))
+                    if (!_triAddressList.Contains(address))
+                        dataGridView.Rows.Remove(row);
             });
             labelNumTriangles.Text = _triAddressList.Count + " Triangles";
         }

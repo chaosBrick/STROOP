@@ -29,7 +29,7 @@ namespace STROOP.Structs
             get
             {
                 if (_watchVariableControls == null)
-                    _watchVariableControls = Precursors.ConvertAll(precursor => precursor.CreateWatchVariableControl());
+                    _watchVariableControls = Precursors.ConvertAll(precursor => new WatchVariableControl(precursor));
                 return _watchVariableControls;
             }
         }

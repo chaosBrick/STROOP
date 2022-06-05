@@ -28,24 +28,6 @@ namespace STROOP.Structs.Configurations
         public static ObjectSlotsManager ObjectSlotsManager => StroopMainForm.ObjectSlotsManager;
         public static InjectionManager InjectionManager;
 
-        public static List<Controls.WatchVariableFlowLayoutPanel> GetVariableAdders()
-        {
-            var variableAdders = new List<Controls.WatchVariableFlowLayoutPanel>();
-            throw new NotImplementedException();
-            // get popouts
-            //List<VariablePopOutForm> popouts = FormManager.GetPopOutForms();
-            //List<VariablePopOutFormHelper> popoutHelpers = popouts.ConvertAll(popout => popout.GetHelper());
-            //variableAdders.AddRange(popoutHelpers);
-
-            // get tabs
-            //List<VariableAdder> tabVariableAdders =
-            //    ControlUtilities.GetFieldsOfType<VariableAdder>(typeof(Config), null);
-            //tabVariableAdders.Sort((d1, d2) => d1.TabIndex - d2.TabIndex);
-            //variableAdders.AddRange(tabVariableAdders);
-
-            return variableAdders;
-        }
-
         public static void Print(object formatNullable = null, params object[] args)
         {
             object format = formatNullable ?? "";

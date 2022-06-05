@@ -108,32 +108,20 @@ namespace STROOP.Structs.Configurations
          */
         public static List<WatchVariableControl> GetVariables()
         {
-            throw new NotImplementedException();
-            //if (mappingCurrent == null) return new List<WatchVariableControl>();
+            if (mappingCurrent == null) return new List<WatchVariableControl>();
 
-            //List<WatchVariableControl> controls = new List<WatchVariableControl>();
-            //foreach (uint address in mappingCurrent.Keys)
-            //{
-            //    string stringValue = mappingCurrent[address];
-            //    (Type type, string name) = GetInfoIfUserAddedWord(stringValue);
-            //    if (type == null) continue;
-            //    string typeString = TypeUtilities.TypeToString[type];
+            List<WatchVariableControl> controls = new List<WatchVariableControl>();
+            foreach (uint address in mappingCurrent.Keys)
+            {
+                string stringValue = mappingCurrent[address];
+                (Type type, string name) = GetInfoIfUserAddedWord(stringValue);
+                if (type == null) continue;
+                string typeString = TypeUtilities.TypeToString[type];
 
-            //    WatchVariable watchVar = new WatchVariable(
-            //        memoryTypeName: typeString,
-            //        baseAddressType: BaseAddressTypeEnum.Relative,
-            //        offsetUS: address,
-            //        offsetJP: address,
-            //        offsetSH: address,
-            //        offsetEU: address,
-            //        offsetDefault: null,
-            //        mask: null,
-            //        shift: null,
-            //        handleMapping: false);
-            //    WatchVariableControl control = watchVar.CreateWatchVariableControl();
-            //    controls.Add(control);
-            //}
-            //return controls;
+                WatchVariable watchVar = new WatchVariable(WatchVariable.DefaultView(name, false, type), BaseAddressTypeEnum.Relative, address);
+                controls.Add(new WatchVariableControl(watchVar));
+            }
+            return controls;
         }
 
         private static (Type type, string name) GetInfoIfUserAddedWord(string word)

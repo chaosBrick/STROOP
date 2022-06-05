@@ -27,7 +27,7 @@ namespace STROOP.Forms
 
         public VariableControllerForm(
             string varName, WatchVariableWrapper watchVarWrapper, List<uint> fixedAddressList) :
-                this (new List<string>() { varName },
+                this(new List<string>() { varName },
                       new List<WatchVariableWrapper>() { watchVarWrapper },
                       new List<List<uint>>() { fixedAddressList })
         {
@@ -68,6 +68,8 @@ namespace STROOP.Forms
             };
             itemInvertedAdd.Click += (sender, e) => setInverted(!itemInvertedAdd.Checked);
             itemInvertedSubtract.Click += (sender, e) => setInverted(!itemInvertedSubtract.Checked);
+            _buttonAdd.ContextMenuStrip = new ContextMenuStrip();
+            _buttonSubtract.ContextMenuStrip = new ContextMenuStrip();
             _buttonAdd.ContextMenuStrip.Items.Add(new ToolStripSeparator());
             _buttonAdd.ContextMenuStrip.Items.Add(itemInvertedAdd);
             _buttonSubtract.ContextMenuStrip.Items.Add(new ToolStripSeparator());
@@ -84,7 +86,7 @@ namespace STROOP.Forms
             {
                 List<bool> lockedBools = new List<bool>();
                 for (int i = 0; i < _watchVarWrappers.Count; i++)
-                    lockedBools.Add(_watchVarWrappers[i].GetLockedBool(_fixedAddressLists[i]));
+                    lockedBools.Add(_watchVarWrappers[i].WatchVar.locked);
                 bool anyLocked = lockedBools.Any(b => b);
                 for (int i = 0; i < _watchVarWrappers.Count; i++)
                     _watchVarWrappers[i].ToggleLocked(!anyLocked, _fixedAddressLists[i]);
@@ -137,10 +139,10 @@ namespace STROOP.Forms
             _textBoxCurrentValue.Text = GetValues();
             List<bool> lockedBools = new List<bool>();
             for (int i = 0; i < _watchVarWrappers.Count; i++)
-                lockedBools.Add(_watchVarWrappers[i].GetLockedBool(_fixedAddressLists[i]));
+                lockedBools.Add(_watchVarWrappers[i].WatchVar.locked);
             _checkBoxLock.CheckState = BoolUtilities.GetCheckState(lockedBools);
         }
-        
+
         public void ToggleFixedAddress()
         {
             bool fixedAddress = _checkBoxFixAddress.Checked;

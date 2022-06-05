@@ -22,70 +22,29 @@ namespace STROOP.Utilities
             return ts;
         }
 
-        public static uint ParseHex(object obj)
+        public static bool TryParseHex(object obj, out uint result)
         {
             string str = obj.ToString();
             int prefixPos = str.IndexOf("0x");
-            if (prefixPos == -1)
-                return uint.Parse(str, NumberStyles.HexNumber);
-            else
-                return uint.Parse(str.Substring(prefixPos + 2), NumberStyles.HexNumber);
+            if (prefixPos != -1)
+                str = str.Substring(prefixPos + 2);
+            return uint.TryParse(str, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out result);
+        }
+
+        public static uint ParseHex(object obj)
+        {
+            if (TryParseHex(obj, out uint result))
+                return result;
+            throw new Exception($"{obj} is not a Hex number.");
         }
 
         public static uint? ParseHexNullable(object obj)
         {
             if (obj == null) return null;
-            try
-            {
-                uint parsed = ParseHex(obj.ToString());
+            if (TryParseHex(obj.ToString(), out uint parsed))
                 return parsed;
-            }
-            catch (Exception)
-            {
+            else
                 return null;
-            }
-        }
-
-        public static UInt64 ParseExtHex(string str)
-        {
-            return UInt64.Parse(str.Substring(str.IndexOf("0x") + 2), NumberStyles.HexNumber);
-        }
-
-        public static bool TryParseHex(string str, out uint hex)
-        {
-            // This is what you call lazy programming (not in python though)
-            try
-            {
-                hex = ParseHex(str);
-            }
-            catch (FormatException)
-            {
-                hex = new uint();
-                return false;
-            }
-
-            return true;
-        }
-
-        public static bool IsHex(string str)
-        {
-            return (str.Contains("0x"));
-        }
-
-        public static bool TryParseExtHex(string str, out UInt64 hex)
-        {
-            // This is what you call lazy programming
-            try
-            {
-                hex = ParseExtHex(str);
-            }
-            catch (FormatException)
-            {
-                hex = new UInt64();
-                return false;
-            }
-
-            return true;
         }
 
         public static int? ParseIntNullable(object obj)
@@ -343,7 +302,7 @@ namespace STROOP.Utilities
 
         public static List<uint> ParseHexList(string text)
         {
-            return ParseStringList(text).ConvertAll(stringValue => ParseHex(stringValue));
+            return ParseStringList(text).ConvertAll(stringValue => ParseHexNullable(stringValue).Value);
         }
 
         public static List<uint> ParseHexListNullable(string text)
@@ -538,8 +497,8 @@ namespace STROOP.Utilities
             for (int i = 0; i < bytes.Length; i++)
                 if (!byte.TryParse(
                     byteString.Substring(i * 2, 2),
-                    System.Globalization.NumberStyles.HexNumber,
-                    System.Globalization.CultureInfo.InvariantCulture,
+                    NumberStyles.HexNumber,
+                    CultureInfo.InvariantCulture,
                     out bytes[i]))
                     return false;
             result = bytes;

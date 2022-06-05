@@ -234,7 +234,7 @@ namespace STROOP.Tabs
                         {
                             List<WatchVariable> overlapped = valueText.GetOverlapped(precursors);
                             overlapped.ForEach(precursor => watchVariablePanelMemory.AddVariable(
-                                precursor.CreateWatchVariableControl())); // newVariableGroupList: new List<VariableGroup>() { VariableGroup.Custom })));
+                                new WatchVariableControl(precursor, precursor.view))); // newVariableGroupList: new List<VariableGroup>() { VariableGroup.Custom })));
                         });
                     }
                 });
@@ -245,8 +245,8 @@ namespace STROOP.Tabs
                 {
                     if (index >= valueText.StringIndex && index <= valueText.StringIndex + valueText.StringSize)
                     {
-                        WatchVariable precursor = valueText.CreatePrecursor(useObjAddress, useHex, useObj, useRelativeName);
-                        watchVariablePanelMemory.AddVariable(precursor.CreateWatchVariableControl());
+                        WatchVariablePrecursor precursor = valueText.CreatePrecursor(useObjAddress, useHex, useObj, useRelativeName);
+                        watchVariablePanelMemory.AddVariable(new WatchVariableControl(precursor.value.var, precursor.value.view));
                     }
                 });
             }
@@ -311,7 +311,7 @@ namespace STROOP.Tabs
                 });
             }
 
-            public WatchVariable CreatePrecursor(bool useObjAddress, bool useHex, bool useObj, bool useRelativeName)
+            public WatchVariablePrecursor CreatePrecursor(bool useObjAddress, bool useHex, bool useObj, bool useRelativeName)
             {
                 WatchVariableSubclass subclass = useObj
                     ? WatchVariableSubclass.Object
@@ -330,23 +330,17 @@ namespace STROOP.Tabs
                     : MemoryType;
                 string typeString = TypeUtilities.TypeToString[effectiveType];
 
-                bool? hexValue = null;
-                if (useHex) hexValue = true;
-                if (isObjectOrTriangle) hexValue = null;
-
                 BaseAddressTypeEnum baseAddressType =
                     useObjAddress ? BaseAddressTypeEnum.Object : BaseAddressTypeEnum.Relative;
                 uint offset = useObjAddress ? (uint)ByteIndex : MemoryAddress;
                 uint nameOffset = useRelativeName ? (uint)ByteIndex : MemoryAddress;
+                bool isAbsolute = baseAddressType == BaseAddressTypeEnum.Absolute;
 
-
-
-                var result = new WatchVariable($"{baseAddressType}: {offset}", new WatchVariable.CustomViewData<WatchVariableNumberWrapper>(null, null));
-                ((WatchVariable.CustomView)result.view)._getterFunction = (uint address) =>
-                   Config.Stream.GetValue(result.MemoryType, address, result.UseAbsoluteAddressing, result.Mask, result.Shift);
-                ((WatchVariable.CustomView)result.view)._setterFunction = (object value, uint address) =>
-                    Config.Stream.SetValueRoundingWrapping(result.MemoryType, value, address, result.UseAbsoluteAddressing, result.Mask, result.Shift);
-                return result;
+                WatchVariable result = null;
+                var view = WatchVariable.DefaultView($"{baseAddressType}: 0x{offset.ToString("X8")}", isAbsolute, effectiveType);
+                result = new WatchVariable(view, baseAddressType, offset);
+                view.SetValueByKey(WatchVariable.ViewProperties.useHex, true);
+                return (result, view);
             }
         }
 

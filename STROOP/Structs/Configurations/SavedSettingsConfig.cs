@@ -22,9 +22,6 @@ namespace STROOP.Structs.Configurations
             {
                 if (_displayYawAnglesAsUnsigned == value && IsLoaded) return;
                 _displayYawAnglesAsUnsigned = value;
-                WatchVariableControlSettingsManager.AddSettings(
-                    new WatchVariableControlSettings(
-                        changeYawSigned: true, newYawSigned: !value));
                 if (IsLoaded) Save();
             }
         }

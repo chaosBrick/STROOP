@@ -8,25 +8,107 @@ namespace STROOP.Controls
 {
     public class WatchVariableAngleWrapper : WatchVariableNumberWrapper
     {
+        static Func<WatchVariableControl, object, bool> CreateBoolWithDefault(
+            Action<WatchVariableAngleWrapper, bool> setValue,
+            Func<WatchVariableAngleWrapper, bool> getDefault
+            ) =>
+            (ctrl, obj) =>
+            {
+                if (ctrl.WatchVarWrapper is WatchVariableAngleWrapper num)
+                    if (obj is bool b)
+                        setValue(num, b);
+                    else if (obj == null)
+                        setValue(num, getDefault(num));
+                    else
+                        return false;
+                else
+                    return false;
+                return true;
+            };
+
+        static Func<WatchVariableControl, bool> WrapperProperty(Func<WatchVariableAngleWrapper, bool> func) =>
+            (ctrl) =>
+            {
+                if (ctrl.WatchVarWrapper is WatchVariableAngleWrapper wrapper)
+                    return func(wrapper);
+                return false;
+            };
+
+        public static readonly WatchVariableSetting DisplaySignedSetting = new WatchVariableSetting(
+                "Angle: Signed",
+                CreateBoolWithDefault((wrapper, val) => wrapper._signed = val, wrapper => wrapper._defaultSigned),
+                ("Default", () => null, WrapperProperty(wr => wr._signed == wr._defaultSigned)),
+                ("Unsigned", () => false, WrapperProperty(wr => !wr._signed)),
+                ("Signed", () => true, WrapperProperty(wr => wr._signed))
+            );
+
+        public static readonly WatchVariableSetting AngleUnitTypeSetting = new WatchVariableSetting(
+                "Angle: Units",
+                (ctrl, obj) =>
+                {
+                    if (ctrl.WatchVarWrapper is WatchVariableAngleWrapper num)
+                        if (obj is AngleUnitType type)
+                            num._angleUnitType = type;
+                        else if (obj == null)
+                            num._angleUnitType = num._defaultAngleUnitType;
+                        else
+                            return false;
+                    else
+                        return false;
+                    return true;
+                },
+                ((Func<(string, Func<object>, Func<WatchVariableControl, bool>)[]>)(() =>
+                {
+                    var lst = new List<(string, Func<object>, Func<WatchVariableControl, bool>)>();
+                    foreach (AngleUnitType angleUnitType in Enum.GetValues(typeof(AngleUnitType)))
+                    {
+                        string stringValue = angleUnitType.ToString();
+                        if (stringValue == AngleUnitType.InGameUnits.ToString()) stringValue = "In-Game Units";
+                        var value = angleUnitType;
+                        lst.Add((stringValue, () => angleUnitType, WrapperProperty(wr => wr._angleUnitType == angleUnitType)));
+                    }
+                    return lst.ToArray();
+                }))()
+            );
+
+        public static readonly WatchVariableSetting TruncateToMultipleOf16Setting = new WatchVariableSetting(
+            "Angle: Truncate to Multiple of 16",
+            CreateBoolWithDefault((wrapper, val) => wrapper._truncateToMultipleOf16 = val, wrapper => wrapper._defaultTruncateToMultipleOf16),
+            ("Default", () => null, WrapperProperty(wr => wr._truncateToMultipleOf16 == wr._defaultTruncateToMultipleOf16)),
+            ("Truncate to Multiple of 16", () => true, WrapperProperty(wr => wr._truncateToMultipleOf16)),
+            ("Don't Truncate to Multiple of 16", () => false, WrapperProperty(wr => !wr._truncateToMultipleOf16))
+            );
+
+        public static readonly WatchVariableSetting ConstrainToOneRevolutionSetting = new WatchVariableSetting(
+            "Angle: Constrain to One Revolution",
+            CreateBoolWithDefault((wrapper, val) => wrapper._constrainToOneRevolution = val, wrapper => wrapper._defaultConstrainToOneRevolution),
+            ("Default", () => null, WrapperProperty(wr => wr._constrainToOneRevolution == wr._defaultConstrainToOneRevolution)),
+            ("Constrain to One Revolution", () => true, WrapperProperty(wr => wr._constrainToOneRevolution)),
+            ("Don't Constrain to One Revolution", () => false, WrapperProperty(wr => !wr._constrainToOneRevolution))
+            );
+
+        public static readonly WatchVariableSetting ReverseSetting = new WatchVariableSetting(
+            "Angle: Reverse",
+            CreateBoolWithDefault((wrapper, val) => wrapper._reverse = val, wrapper => wrapper._defaultReverse),
+            ("Default", () => null, WrapperProperty(wr => wr._reverse == wr._defaultReverse)),
+            ("Reverse", () => true, WrapperProperty(wr => wr._reverse)),
+            ("Don't Reverse", () => false, WrapperProperty(wr => !wr._reverse))
+            );
+
         private readonly bool _defaultSigned;
         private bool _signed;
-        private Action<bool> _setSigned;
 
         private readonly AngleUnitType _defaultAngleUnitType;
         private AngleUnitType _angleUnitType;
-        private Action<AngleUnitType> _setAngleUnitType;
 
         private readonly bool _defaultTruncateToMultipleOf16;
         private bool _truncateToMultipleOf16;
-        private Action<bool> _setTruncateToMultipleOf16;
 
         private readonly bool _defaultConstrainToOneRevolution;
         private bool _constrainToOneRevolution;
-        private Action<bool> _setConstrainToOneRevolution;
 
         private readonly bool _defaultReverse;
         private bool _reverse;
-        private Action<bool> _setReverse;
 
         private readonly Type _baseType;
         private readonly Type _defaultEffectiveType;
@@ -35,19 +117,20 @@ namespace STROOP.Controls
             get
             {
                 if (_constrainToOneRevolution || TypeUtilities.TypeSize[_baseType] == 2)
-                    return _signed ? typeof(short) : typeof(ushort);
+                    return effectiveSigned ? typeof(short) : typeof(ushort);
                 else
-                    return _signed ? typeof(int) : typeof(uint);
+                    return effectiveSigned ? typeof(int) : typeof(uint);
             }
         }
 
         private readonly bool _isYaw;
+        private bool effectiveSigned => _signed && (!_isYaw || Structs.Configurations.SavedSettingsConfig.DisplayYawAnglesAsUnsigned);
 
         public WatchVariableAngleWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl)
             : base(watchVar, watchVarControl)
         {
             var displayType = watchVar.MemoryType;
-            if (TypeUtilities.StringToType.TryGetValue(watchVar.view.GetValueByKey("display")??"", out var dType))
+            if (TypeUtilities.StringToType.TryGetValue(watchVarControl.view.GetValueByKey(WatchVariable.ViewProperties.display) ?? "", out var dType))
                 displayType = dType;
 
             _baseType = displayType;
@@ -70,7 +153,7 @@ namespace STROOP.Controls
             _defaultReverse = false;
             _reverse = _defaultReverse;
 
-            if (bool.TryParse(watchVar.view.GetValueByKey("yaw"), out var isYaw))
+            if (bool.TryParse(watchVarControl.view.GetValueByKey("yaw"), out var isYaw))
                 _isYaw = isYaw;
             else
                 _isYaw = DEFAULT_IS_YAW;
@@ -80,63 +163,11 @@ namespace STROOP.Controls
 
         private void AddAngleContextMenuStripItems()
         {
-            ToolStripMenuItem itemSigned = new ToolStripMenuItem("Signed");
-            _setSigned = (bool signed) =>
-            {
-                _signed = signed;
-                itemSigned.Checked = signed;
-            };
-            itemSigned.Click += (sender, e) => _setSigned(!_signed);
-            itemSigned.Checked = _signed;
-
-            ToolStripMenuItem itemUnits = new ToolStripMenuItem("Units...");
-            _setAngleUnitType = ControlUtilities.AddCheckableDropDownItems(
-                itemUnits,
-                new List<string> { "In-Game Units", "HAU", "Degrees", "Radians", "Revolutions" },
-                new List<AngleUnitType>
-                {
-                    AngleUnitType.InGameUnits,
-                    AngleUnitType.HAU,
-                    AngleUnitType.Degrees,
-                    AngleUnitType.Radians,
-                    AngleUnitType.Revolutions,
-                },
-                (AngleUnitType angleUnitType) => { _angleUnitType = angleUnitType; },
-                _angleUnitType);
-
-            ToolStripMenuItem itemTruncateToMultipleOf16 = new ToolStripMenuItem("Truncate to Multiple of 16");
-            _setTruncateToMultipleOf16 = (bool truncateToMultipleOf16) =>
-            {
-                _truncateToMultipleOf16 = truncateToMultipleOf16;
-                itemTruncateToMultipleOf16.Checked = truncateToMultipleOf16;
-            };
-            itemTruncateToMultipleOf16.Click += (sender, e) => _setTruncateToMultipleOf16(!_truncateToMultipleOf16);
-            itemTruncateToMultipleOf16.Checked = _truncateToMultipleOf16;
-
-            ToolStripMenuItem itemConstrainToOneRevolution = new ToolStripMenuItem("Constrain to One Revolution");
-            _setConstrainToOneRevolution = (bool constrainToOneRevolution) =>
-            {
-                _constrainToOneRevolution = constrainToOneRevolution;
-                itemConstrainToOneRevolution.Checked = constrainToOneRevolution;
-            };
-            itemConstrainToOneRevolution.Click += (sender, e) => _setConstrainToOneRevolution(!_constrainToOneRevolution);
-            itemConstrainToOneRevolution.Checked = _constrainToOneRevolution;
-
-            ToolStripMenuItem itemReverse = new ToolStripMenuItem("Reverse");
-            _setReverse = (bool reverse) =>
-            {
-                _reverse = reverse;
-                itemReverse.Checked = reverse;
-            };
-            itemReverse.Click += (sender, e) => _setReverse(!_reverse);
-            itemReverse.Checked = _reverse;
-
-            _contextMenuStrip.AddToBeginningList(new ToolStripSeparator());
-            _contextMenuStrip.AddToBeginningList(itemSigned);
-            _contextMenuStrip.AddToBeginningList(itemUnits);
-            _contextMenuStrip.AddToBeginningList(itemTruncateToMultipleOf16);
-            _contextMenuStrip.AddToBeginningList(itemConstrainToOneRevolution);
-            _contextMenuStrip.AddToBeginningList(itemReverse);
+            _watchVarControl.AddSetting(DisplaySignedSetting);
+            _watchVarControl.AddSetting(AngleUnitTypeSetting);
+            _watchVarControl.AddSetting(TruncateToMultipleOf16Setting);
+            _watchVarControl.AddSetting(ConstrainToOneRevolutionSetting);
+            _watchVarControl.AddSetting(ReverseSetting);
         }
 
         private double GetAngleUnitTypeMaxValue(AngleUnitType? angleUnitTypeNullable = null)
@@ -162,7 +193,7 @@ namespace STROOP.Controls
         private double GetAngleUnitTypeAndMaybeSignedMaxValue(AngleUnitType? angleUnitTypeNullable = null, bool? signedNullable = null)
         {
             AngleUnitType angleUnitType = angleUnitTypeNullable ?? _angleUnitType;
-            bool signed = signedNullable ?? _signed;
+            bool signed = signedNullable ?? effectiveSigned;
             double maxValue = GetAngleUnitTypeMaxValue(angleUnitType);
             return signed ? maxValue / 2 : maxValue;
         }
@@ -170,9 +201,21 @@ namespace STROOP.Controls
         private double GetAngleUnitTypeAndMaybeSignedMinValue(AngleUnitType? angleUnitTypeNullable = null, bool? signedNullable = null)
         {
             AngleUnitType angleUnitType = angleUnitTypeNullable ?? _angleUnitType;
-            bool signed = signedNullable ?? _signed;
+            bool signed = signedNullable ?? effectiveSigned;
             double maxValue = GetAngleUnitTypeMaxValue(angleUnitType);
             return signed ? -1 * maxValue / 2 : 0;
+        }
+
+        protected override object ConvertValue(object value, bool handleRounding = true, bool handleFormatting = true)
+        {
+            value = HandleAngleConverting(value);
+            return base.ConvertValue(value, handleRounding, handleFormatting);
+        }
+
+        public override object UndisplayValue(object value)
+        {
+            value = HandleAngleUnconverting(value);
+            return base.UndisplayValue(value);
         }
 
         protected object HandleAngleConverting(object value)
@@ -225,64 +268,6 @@ namespace STROOP.Controls
         protected override int? GetHexDigitCount()
         {
             return TypeUtilities.TypeSize[_effectiveType] * 2;
-        }
-
-        public override void ApplySettings(WatchVariableControlSettings settings)
-        {
-            base.ApplySettings(settings);
-            if (settings.ChangeAngleSigned)
-            {
-                if (settings.ChangeAngleSignedToDefault)
-                    _setSigned(_defaultSigned);
-                else
-                    _setSigned(settings.NewAngleSigned);
-            }
-            if (settings.ChangeYawSigned && _isYaw)
-            {
-                if (settings.ChangeYawSignedToDefault)
-                    _setSigned(_defaultSigned);
-                else
-                    _setSigned(settings.NewYawSigned);
-            }
-            if (settings.ChangeAngleUnits)
-            {
-                if (settings.ChangeAngleUnitsToDefault)
-                    _setAngleUnitType(_defaultAngleUnitType);
-                else
-                    _setAngleUnitType(settings.NewAngleUnits);
-            }
-            if (settings.ChangeAngleTruncateToMultipleOf16)
-            {
-                if (settings.ChangeAngleTruncateToMultipleOf16ToDefault)
-                    _setTruncateToMultipleOf16(_defaultTruncateToMultipleOf16);
-                else
-                    _setTruncateToMultipleOf16(settings.NewAngleTruncateToMultipleOf16);
-            }
-            if (settings.ChangeAngleConstrainToOneRevolution)
-            {
-                if (settings.ChangeAngleConstrainToOneRevolutionToDefault)
-                    _setConstrainToOneRevolution(_defaultConstrainToOneRevolution);
-                else
-                    _setConstrainToOneRevolution(settings.NewAngleConstrainToOneRevolution);
-            }
-            if (settings.ChangeAngleReverse)
-            {
-                if (settings.ChangeAngleReverseToDefault)
-                    _setReverse(_defaultReverse);
-                else
-                    _setReverse(settings.NewAngleReverse);
-            }
-            if (settings.ChangeAngleDisplayAsHex)
-            {
-                if (settings.ChangeAngleDisplayAsHexToDefault)
-                    _setDisplayAsHex(_defaultDisplayAsHex);
-                else
-                    _setDisplayAsHex(settings.NewAngleDisplayAsHex);
-            }
-            if (settings.DoTruncateIfYaw && _isYaw)
-            {
-                _setTruncateToMultipleOf16(true);
-            }
         }
 
         protected override string GetClass()

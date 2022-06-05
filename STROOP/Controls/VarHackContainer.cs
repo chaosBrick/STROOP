@@ -191,7 +191,7 @@ namespace STROOP.Controls
             else
             {
                 string varName = element.Attribute(XName.Get("name")).Value;
-                uint address = ParsingUtilities.ParseHex(element.Attribute(XName.Get("address")).Value);
+                uint? address = ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("address")).Value);
                 Type type = TypeUtilities.StringToType[element.Attribute(XName.Get("type")).Value];
                 bool useHex = ParsingUtilities.ParseBool(element.Attribute(XName.Get("useHex")).Value);
                 uint? pointerOffset = ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("pointerOffset"))?.Value);

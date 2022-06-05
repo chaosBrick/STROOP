@@ -91,7 +91,7 @@
             this.splitContainerMemory.Panel2.Padding = new System.Windows.Forms.Padding(2);
             this.splitContainerMemory.Panel2MinSize = 0;
             this.splitContainerMemory.Size = new System.Drawing.Size(915, 463);
-            this.splitContainerMemory.SplitterDistance = 802;
+            this.splitContainerMemory.SplitterDistance = 740;
             this.splitContainerMemory.SplitterWidth = 1;
             this.splitContainerMemory.TabIndex = 38;
             // 
@@ -132,7 +132,7 @@
             // 
             this.splitContainerMemoryControls.Panel2.Controls.Add(this.splitContainerMemoryControlsDisplays);
             this.splitContainerMemoryControls.Panel2MinSize = 0;
-            this.splitContainerMemoryControls.Size = new System.Drawing.Size(802, 463);
+            this.splitContainerMemoryControls.Size = new System.Drawing.Size(740, 463);
             this.splitContainerMemoryControls.SplitterDistance = 55;
             this.splitContainerMemoryControls.SplitterWidth = 1;
             this.splitContainerMemoryControls.TabIndex = 38;
@@ -179,6 +179,8 @@
             // checkBoxMemoryHex
             // 
             this.checkBoxMemoryHex.AutoSize = true;
+            this.checkBoxMemoryHex.Checked = true;
+            this.checkBoxMemoryHex.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxMemoryHex.Location = new System.Drawing.Point(527, 32);
             this.checkBoxMemoryHex.Name = "checkBoxMemoryHex";
             this.checkBoxMemoryHex.Size = new System.Drawing.Size(45, 17);
@@ -321,8 +323,6 @@
             // checkBoxMemoryLittleEndian
             // 
             this.checkBoxMemoryLittleEndian.AutoSize = true;
-            this.checkBoxMemoryLittleEndian.Checked = true;
-            this.checkBoxMemoryLittleEndian.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxMemoryLittleEndian.Location = new System.Drawing.Point(170, 6);
             this.checkBoxMemoryLittleEndian.Name = "checkBoxMemoryLittleEndian";
             this.checkBoxMemoryLittleEndian.Size = new System.Drawing.Size(84, 17);
@@ -349,7 +349,7 @@
             // 
             this.splitContainerMemoryControlsDisplays.Panel2.Controls.Add(this.richTextBoxMemoryValues);
             this.splitContainerMemoryControlsDisplays.Panel2MinSize = 0;
-            this.splitContainerMemoryControlsDisplays.Size = new System.Drawing.Size(802, 407);
+            this.splitContainerMemoryControlsDisplays.Size = new System.Drawing.Size(740, 407);
             this.splitContainerMemoryControlsDisplays.SplitterDistance = 98;
             this.splitContainerMemoryControlsDisplays.SplitterWidth = 1;
             this.splitContainerMemoryControlsDisplays.TabIndex = 39;
@@ -378,19 +378,22 @@
             this.richTextBoxMemoryValues.Margin = new System.Windows.Forms.Padding(2);
             this.richTextBoxMemoryValues.Name = "richTextBoxMemoryValues";
             this.richTextBoxMemoryValues.ReadOnly = true;
-            this.richTextBoxMemoryValues.Size = new System.Drawing.Size(701, 405);
+            this.richTextBoxMemoryValues.Size = new System.Drawing.Size(639, 405);
             this.richTextBoxMemoryValues.TabIndex = 8;
             this.richTextBoxMemoryValues.Text = "";
             // 
             // watchVariablePanelMemory
             // 
+            this.watchVariablePanelMemory.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.watchVariablePanelMemory.AutoScroll = true;
             this.watchVariablePanelMemory.DataPath = "Config/ObjectData.xml";
             this.watchVariablePanelMemory.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelMemory.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelMemory.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelMemory.Name = "watchVariablePanelMemory";
-            this.watchVariablePanelMemory.Size = new System.Drawing.Size(106, 457);
+            this.watchVariablePanelMemory.Size = new System.Drawing.Size(168, 457);
             this.watchVariablePanelMemory.TabIndex = 7;
             // 
             // MemoryTab
@@ -399,7 +402,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.splitContainerMemory);
             this.Name = "MemoryTab";
-            this.Size = new System.Drawing.Size(915, 463);
             this.splitContainerMemory.Panel1.ResumeLayout(false);
             this.splitContainerMemory.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMemory)).EndInit();

@@ -312,9 +312,7 @@
       <DependentUpon>VariableCreationForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Interfaces\IUpdatable.cs" />
-    <Compile Include="Controls\WatchVariableControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Controls\WatchVariableControl.cs" />
     <Compile Include="Controls\WatchVariableControl.Designer.cs">
       <DependentUpon>WatchVariableControl.cs</DependentUpon>
     </Compile>
@@ -329,8 +327,6 @@
     </Compile>
     <Compile Include="Controls\VisualLinkLineText.cs" />
     <Compile Include="Controls\VisualRegexLinkGenerator.cs" />
-    <Compile Include="Controls\WatchVariableControlSettings.cs" />
-    <Compile Include="Controls\WatchVariableLock.cs" />
     <Compile Include="Controls\BetterContextMenuStrip.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -419,7 +415,6 @@
     </Compile>
     <Compile Include="LoadingHandler.cs" />
     <Compile Include="Managers\IVariableAdder.cs" />
-    <Compile Include="Managers\VariableAdder.cs" />
     <Compile Include="Tabs\GhostTab\FileWatchers.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -801,7 +796,6 @@
     <Compile Include="M64\M64Stats.cs" />
     <Compile Include="M64\M64Header.cs" />
     <Compile Include="M64\M64InputFrame.cs" />
-    <Compile Include="Managers\WatchVariableControlSettingsManager.cs" />
     <Compile Include="Managers\InjectionManager.cs" />
     <Compile Include="Controls\ObjectSlot.cs">
       <SubType>Component</SubType>

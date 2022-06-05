@@ -14,15 +14,24 @@ namespace STROOP.Controls
         protected WatchVariableStringWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl, int ignore)
             : base(watchVar, watchVarControl)
         {
+            bool updateValue = true;
             textBox.Multiline = false;
             textBox.KeyDown += (_, e) =>
             {
+                updateValue = true;
                 if (e.KeyCode == Keys.Enter)
-                    SetValue(UnconvertValue(textBox.Text));
-                else if (e.KeyCode == Keys.Escape)
                     textBox.Parent.Focus();
+                else if (e.KeyCode == Keys.Escape)
+                {
+                    updateValue = false;
+                    textBox.Parent.Focus();
+                }
             };
-            textBox.LostFocus += (_, e) => SetValue(UnconvertValue(textBox.Text));
+            textBox.LostFocus += (_, e) =>
+            {
+                if (updateValue)
+                    SetValue(textBox.Text);
+            };
             watchVarControl.valueControlContainer.Controls.Add(textBox);
         }
 
@@ -31,7 +40,7 @@ namespace STROOP.Controls
             WatchVariableControl watchVarControl)
             : this(watchVar, watchVarControl, 0)
         {
-            AddStringContextMenuStripItems(watchVar.view.GetValueByKey("specialType"));
+            AddStringContextMenuStripItems(watchVarControl.view.GetValueByKey(WatchVariable.ViewProperties.specialType));
         }
 
         protected override void UpdateControls()
@@ -39,9 +48,7 @@ namespace STROOP.Controls
             _watchVarControl.EditMode = textBox.Focused;
             if (_watchVarControl.EditMode)
                 return;
-            var values = WatchVar.GetValues();
-            if (values.Count > 0)
-                textBox.Text = ConvertValue(values[0])?.ToString() ?? "<null>";
+            textBox.Text = CombineValues(WatchVar.GetValues().ConvertAll(_ => ConvertValue(_))).value?.ToString() ?? "<null>";
         }
 
         private void AddStringContextMenuStripItems(string specialType)

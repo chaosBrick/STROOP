@@ -29,8 +29,6 @@ namespace STROOP.Controls
         private List<WatchVariableControl> _selectedWatchVarControls;
         private List<WatchVariableControl> _reorderingWatchVarControls;
 
-        private List<ToolStripItem> _selectionToolStripItems;
-
         ToolStripMenuItem filterVariablesItem = new ToolStripMenuItem("Filter Variables...");
 
 
@@ -40,6 +38,8 @@ namespace STROOP.Controls
 
         public WatchVariableFlowLayoutPanel()
         {
+            GetSelectedVars = () => new List<WatchVariableControl>(_selectedWatchVarControls);
+
             _objectLock = new Object();
             _watchVarControls = new List<WatchVariableControl>();
             _allGroups = new List<string>();
@@ -92,15 +92,11 @@ namespace STROOP.Controls
             {
                 SuspendLayout();
 
-                _selectionToolStripItems =
-                    WatchVariableSelectionUtilities.CreateSelectionToolStripItems(
-                        () => new List<WatchVariableControl>(_selectedWatchVarControls), this);
-
                 List<WatchVariable> precursors = _varFilePath == null
                     ? new List<WatchVariable>()
                     : XmlConfigParser.OpenWatchVariableControlPrecursors(_varFilePath);
 
-                foreach (var watchVarControl in precursors.ConvertAll(precursor => precursor.CreateWatchVariableControl()))
+                foreach (var watchVarControl in precursors.ConvertAll(precursor => new WatchVariableControl(precursor)))
                 {
                     _watchVarControls.Add(watchVarControl);
                     watchVarControl.SetPanel(this);
@@ -173,9 +169,22 @@ namespace STROOP.Controls
                     List<WatchVariableControl> controls = new List<WatchVariableControl>();
                     for (int i = 0; i < numEntries; i++)
                     {
-                        WatchVariable watchVariable = new WatchVariable($"Dummy{i}", WatchVariableSpecialUtilities.MakeDummy(typeString));
-                        WatchVariableControl control = watchVariable.CreateWatchVariableControl();
-                        controls.Add(control);
+                        int index = SpecialConfig.DummyValues.Count;
+                        Type type = TypeUtilities.StringToType[typeString];
+                        SpecialConfig.DummyValues.Add(ParsingUtilities.ParseValueRoundingWrapping(0, type));
+                        var view = new WatchVariable.CustomView(type)
+                        {
+                            Name = $"Dummy {index} {StringUtilities.Capitalize(typeString)}",
+                            _getterFunction = (uint dummy) => SpecialConfig.DummyValues[index],
+                            _setterFunction = (object value, uint dummy) =>
+                            {
+                                object o = ParsingUtilities.ParseValueRoundingWrapping(value, type);
+                                if (o == null) return false;
+                                SpecialConfig.DummyValues[index] = o;
+                                return true;
+                            }
+                        };
+                        controls.Add(new WatchVariableControl(new WatchVariable(view)));
                     }
                     AddVariables(controls);
                 };
@@ -184,30 +193,30 @@ namespace STROOP.Controls
             ToolStripMenuItem openSaveClearItem = new ToolStripMenuItem("Open / Save / Clear ...");
             ControlUtilities.AddDropDownItems(
                 openSaveClearItem,
-                new List<string>() { "Open", "Open as Pop Out", "Save in Place", "Save As", "Clear" },
-                new List<Action>()
-                {
+                    new List<string>() { "Restore", "Open", "Open as Pop Out", "Save in Place", "Save As", "Clear" },
+                    new List<Action>()
+                    {
+                    () => OpenVariables(DialogUtilities.OpenXmlElements(FileType.StroopVariables, _dataPath)),
                     () => OpenVariables(),
                     () => OpenVariablesAsPopOut(),
                     () => SaveVariablesInPlace(),
                     () => SaveVariables(),
                     () => ClearVariables(),
-                });
+                    });
 
             ToolStripMenuItem doToAllVariablesItem = new ToolStripMenuItem("Do to all variables...");
-            WatchVariableSelectionUtilities.CreateSelectionToolStripItems(
-                () => GetCurrentVariableControls(), this)
-                .ForEach(item => doToAllVariablesItem.DropDownItems.Add(item));
+            WatchVariableSelectionUtilities.CreateSelectionToolStripItems(GetCurrentVariableControls(), this)
+                            .ForEach(item => doToAllVariablesItem.DropDownItems.Add(item));
 
             filterVariablesItem.DropDown.MouseEnter += (sender, e) =>
-            {
-                filterVariablesItem.DropDown.AutoClose = false;
-            };
+                        {
+                            filterVariablesItem.DropDown.AutoClose = false;
+                        };
             filterVariablesItem.DropDown.MouseLeave += (sender, e) =>
-            {
-                filterVariablesItem.DropDown.AutoClose = true;
-                filterVariablesItem.DropDown.Close();
-            };
+                        {
+                            filterVariablesItem.DropDown.AutoClose = true;
+                            filterVariablesItem.DropDown.Close();
+                        };
 
             var strip = new ContextMenuStrip();
             strip.Items.Add(resetVariablesItem);
@@ -222,10 +231,9 @@ namespace STROOP.Controls
             strip.Show(Cursor.Position);
         }
 
-        public List<ToolStripItem> GetSelectionToolStripItems()
-        {
-            return _selectionToolStripItems;
-        }
+
+        public readonly Func<List<WatchVariableControl>> GetSelectedVars;
+
 
         private ToolStripMenuItem CreateFilterItem(string varGroup)
         {
@@ -375,7 +383,7 @@ namespace STROOP.Controls
             List<WatchVariable> precursors = _varFilePath == null
                 ? new List<WatchVariable>()
                 : XmlConfigParser.OpenWatchVariableControlPrecursors(_varFilePath);
-            AddVariables(precursors.ConvertAll(precursor => precursor.CreateWatchVariableControl()));
+            AddVariables(precursors.ConvertAll(precursor => new WatchVariableControl(precursor)));
         }
 
         public void UnselectAllVariables()
@@ -423,8 +431,7 @@ namespace STROOP.Controls
         {
             List<XElement> elements = DialogUtilities.OpenXmlElements(FileType.StroopVariables);
             if (elements.Count == 0) return;
-            List<WatchVariable> precursors = elements.ConvertAll(element => WatchVariable.ParseXml(element));
-            List<WatchVariableControl> controls = precursors.ConvertAll(p => p.CreateWatchVariableControl());
+            List<WatchVariableControl> controls = elements.ConvertAll(element => WatchVariable.ParseXml(element).CreateWatchVariableControl(element));
             VariablePopOutForm form = new VariablePopOutForm();
             form.Initialize(controls);
             form.ShowForm();
@@ -432,8 +439,8 @@ namespace STROOP.Controls
 
         public void OpenVariables(List<XElement> elements)
         {
-            List<WatchVariable> precursors = elements.ConvertAll(element => WatchVariable.ParseXml(element));
-            AddVariables(precursors.ConvertAll(w => w.CreateWatchVariableControl()));
+            List<WatchVariableControl> controls = elements.ConvertAll(element => WatchVariable.ParseXml(element).CreateWatchVariableControl(element));
+            AddVariables(controls);
         }
 
         public void SaveVariablesInPlace()

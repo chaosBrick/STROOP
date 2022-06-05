@@ -70,8 +70,10 @@ namespace STROOP.Controls
             return Config.ObjectSlotsManager.GetDescriptiveSlotLabelFromAddress(uintValue, false);
         }
 
-        protected object HandleObjectUndisplaying(object value)
+        public override object UndisplayValue(object value)
         {
+            if (value == null)
+                return null;
             string slotName = value.ToString().ToLower();
 
             if (slotName == "(no object)" || slotName == "no object") return 0;
@@ -81,7 +83,9 @@ namespace STROOP.Controls
             slotName = slotName.Remove(0, "slot".Length);
             slotName = slotName.Trim();
             ObjectDataModel obj = Config.ObjectSlotsManager.GetObjectFromLabel(slotName);
-            return obj != null ? obj.Address : value;
+            if (obj != null)
+                value = obj.Address;
+            return base.UndisplayValue(value);
         }
 
         public override bool DisplayAsHex() => _displayAsHex && !_displayAsObject;

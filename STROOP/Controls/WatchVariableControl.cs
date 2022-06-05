@@ -13,12 +13,179 @@ using System.Xml.Linq;
 
 namespace STROOP.Controls
 {
+    public class WatchVariableSetting
+    {
+        public readonly string Name;
+        public readonly Func<WatchVariableControl, object, bool> SetterFunction;
+        public readonly (string name, Func<object> valueGetter, Func<WatchVariableControl, bool> isSelected)[] DropDownValues;
+        public WatchVariableSetting(
+            string name,
+            Func<WatchVariableControl, object, bool> setterFunction,
+            params (string name, Func<object> valueGetter, Func<WatchVariableControl, bool> isSelected)[] dropDownValues
+            )
+        {
+            this.Name = name;
+            this.SetterFunction = setterFunction;
+            this.DropDownValues = dropDownValues;
+        }
+        public void CreateContextMenuEntry(ToolStripItemCollection target, Func<List<WatchVariableControl>> getWatchVars)
+        {
+            var newThingy = new ToolStripMenuItem(Name + "...");
+            foreach (var option in DropDownValues)
+            {
+                var item = new ToolStripMenuItem(option.name);
+                var getter = option.valueGetter;
+                item.Click += (_, __) =>
+                {
+                    var value = getter();
+                    getWatchVars().ForEach(v => v.ApplySettings(Name, value));
+                };
+
+                if (option.isSelected != null)
+                {
+                    bool? firstValue = null;
+                    CheckState state = CheckState.Unchecked;
+                    foreach (var c in getWatchVars())
+                    {
+                        bool selected = option.isSelected(c);
+                        if (firstValue == null)
+                            firstValue = selected;
+                        else if (selected != firstValue)
+                            state = CheckState.Indeterminate;
+                    }
+                    if (state == CheckState.Indeterminate)
+                        item.CheckState = CheckState.Indeterminate;
+                    else
+                        item.Checked = !firstValue.HasValue ? false : firstValue.Value;
+                }
+                newThingy.DropDownItems.Add(item);
+            }
+
+            target.Add(newThingy);
+        }
+    }
+
     public partial class WatchVariableControl : UserControl
     {
+        class DefaultSettings
+        {
+            public static readonly WatchVariableSetting HighlightSetting = new WatchVariableSetting(
+                    "Highlight",
+                    (ctrl, obj) =>
+                    {
+                        if (obj is bool newHighlighted)
+                            ctrl.Highlighted = newHighlighted;
+                        else return false;
+                        return true;
+                    },
+                    ("Highlight", () => true, ctrl => ctrl.Highlighted),
+                    ("Don't Highlight", () => false, ctrl => !ctrl.Highlighted)
+                    );
+
+            public static readonly WatchVariableSetting HighlightColorSetting = new WatchVariableSetting(
+                    "Highlight Color",
+                    (ctrl, obj) =>
+                    {
+                        if (obj is Color newColor)
+                        {
+                            ctrl._tableLayoutPanel.BorderColor = newColor;
+                            ctrl._tableLayoutPanel.ShowBorder = true;
+                        }
+                        else return false;
+                        return true;
+                    },
+                    ("Red", () => Color.Red, ctrl => ctrl._tableLayoutPanel.BorderColor == Color.Red),
+                    ("Orange", () => Color.Orange, ctrl => ctrl._tableLayoutPanel.BorderColor == Color.Orange),
+                    ("Yellow", () => Color.Yellow, ctrl => ctrl._tableLayoutPanel.BorderColor == Color.Yellow),
+                    ("Green", () => Color.Green, ctrl => ctrl._tableLayoutPanel.BorderColor == Color.Green),
+                    ("Blue", () => Color.Blue, ctrl => ctrl._tableLayoutPanel.BorderColor == Color.Blue),
+                    ("Purple", () => Color.Purple, ctrl => ctrl._tableLayoutPanel.BorderColor == Color.Purple),
+                    ("Pink", () => Color.Pink, ctrl => ctrl._tableLayoutPanel.BorderColor == Color.Pink),
+                    ("Brown", () => Color.Brown, ctrl => ctrl._tableLayoutPanel.BorderColor == Color.Brown),
+                    ("Black", () => Color.Black, ctrl => ctrl._tableLayoutPanel.BorderColor == Color.Black),
+                    ("White", () => Color.White, ctrl => ctrl._tableLayoutPanel.BorderColor == Color.White)
+                    );
+
+            public static readonly WatchVariableSetting LockSetting = new WatchVariableSetting(
+                    "Lock",
+                    (ctrl, obj) =>
+                    {
+                        if (obj is bool newLock)
+                            return ctrl.WatchVar.SetLocked(newLock, null);
+                        else
+                            return false;
+                    },
+                    ("Lock", () => true, ctrl => ctrl.WatchVar.locked),
+                    ("Don't Lock", () => false, ctrl => !ctrl.WatchVar.locked)
+                    );
+
+            private static readonly object FixSpecial = new object();
+            public static readonly WatchVariableSetting FixAddressSetting = new WatchVariableSetting(
+                    "Fix Address",
+                    (ctrl, obj) =>
+                    {
+                        if (obj is bool newFixAddress)
+                            ctrl.SetFixedAddress(newFixAddress);
+                        else if (obj == FixSpecial)
+                        {
+                            List<uint> addresses = ctrl.FixedAddressListGetter() ?? ctrl.WatchVarWrapper.GetCurrentAddressesToFix();
+                            if (addresses.Count > 0)
+                            {
+                                uint objAddress = addresses[0];
+                                uint parent = Config.Stream.GetUInt32(objAddress + ObjectConfig.ParentOffset);
+                                int subtype = Config.Stream.GetInt32(objAddress + ObjectConfig.BehaviorSubtypeOffset);
+                                ctrl.FixedAddressListGetter = () =>
+                                    Config.ObjectSlotsManager.GetLoadedObjectsWithPredicate(
+                                     _obj => _obj.Parent == parent && _obj.SubType == subtype && _obj.Address != _obj.Parent)
+                                    .ConvertAll(_obj => _obj.Address);
+                            }
+                        }
+                        else if (obj == null)
+                            ctrl.FixedAddressListGetter = ctrl._defaultFixedAddressListGetter;
+                        else return false;
+                        return true;
+                    },
+                    ("Default", () => null, null),
+                    ("Fix Address", () => false, null),
+                    ("Fix Address Special", () => FixSpecial, null),
+                    ("Don't Fix Address", () => false, null)
+                    );
+
+            private static readonly object RevertToDefaultColor = new object();
+            public static readonly WatchVariableSetting BackgroundColorSetting = new WatchVariableSetting(
+                "Background Color",
+                (ctrl, obj) =>
+                {
+                    if (obj is Color newColor)
+                        ctrl.BaseColor = newColor;
+                    else if (obj == RevertToDefaultColor)
+                        ctrl.BaseColor = ctrl._initialBaseColor;
+                    else return false;
+                    return true;
+                },
+                ((Func<(string, Func<object>, Func<WatchVariableControl, bool>)[]>)(() =>
+                {
+                    var lst = new List<(string, Func<object>, Func<WatchVariableControl, bool>)>();
+                    lst.Add(("Default", () => RevertToDefaultColor, ctrl => ctrl.BaseColor == ctrl._initialBaseColor));
+                    foreach (KeyValuePair<string, string> pair in ColorUtilities.ColorToParamsDictionary)
+                    {
+                        Color color = ColorTranslator.FromHtml(pair.Value);
+                        string colorString = pair.Key;
+                        if (colorString == "LightBlue") colorString = "Light Blue";
+                        lst.Add((colorString, () => color, ctrl => ctrl.BaseColor == color));
+                    }
+                    lst.Add(("Control (No Color)", () => SystemColors.Control, ctrl => ctrl.BaseColor == SystemColors.Control));
+                    lst.Add(("Custom Color", () => ColorUtilities.GetColorFromDialog(SystemColors.Control), null));
+                    return lst.ToArray();
+                }))()
+                );
+        }
+
         public readonly WatchVariableWrapper WatchVarWrapper;
         public readonly List<string> GroupList;
 
         public WatchVariable WatchVar => WatchVarWrapper.WatchVar;
+        public WatchVariable.IVariableView view;
 
         // Parent control
         private WatchVariableFlowLayoutPanel _watchVariablePanel;
@@ -99,8 +266,6 @@ namespace STROOP.Controls
         private Func<List<uint>> _defaultFixedAddressListGetter;
         public Func<List<uint>> FixedAddressListGetter;
 
-        private int _settingsLevel = 0;
-
         private static readonly Image _lockedImage = Properties.Resources.img_lock;
         private static readonly Image _someLockedImage = Properties.Resources.img_lock_grey;
         private static readonly Image _disabledLockImage = Properties.Resources.lock_blue;
@@ -127,24 +292,27 @@ namespace STROOP.Controls
         private int _variableTextSize;
         private int _variableOffset;
 
-        public WatchVariableControl(WatchVariable watchVar)
+        public WatchVariableControl(WatchVariable watchVar) : this(watchVar, watchVar.view) { }
+
+        public WatchVariableControl(WatchVariable watchVar, WatchVariable.IVariableView view)
         {
+            this.view = view;
             InitializeComponent();
-            WatchVarWrapper = (WatchVariableWrapper)Activator.CreateInstance(watchVar.view.GetWrapperType(), watchVar, this);
+            WatchVarWrapper = (WatchVariableWrapper)Activator.CreateInstance(view.GetWrapperType(), watchVar, this);
 
             _tableLayoutPanel.BorderColor = Color.Red;
             _tableLayoutPanel.BorderWidth = 3;
-            _nameTextBox.Text = watchVar.view.Name;
+            _nameTextBox.Text = view.Name;
 
             // Initialize main fields
-            _varName = watchVar.view.Name;
-            GroupList = WatchVariableUtilities.ParseVariableGroupList(watchVar.view.GetValueByKey("groupList") ?? "Custom");
+            _varName = view.Name;
+            GroupList = WatchVariableUtilities.ParseVariableGroupList(view.GetValueByKey("groupList") ?? "Custom");
             _editMode = false;
             RenameMode = false;
             IsSelected = false;
 
             List<uint> fixedAddresses = null;
-            if (watchVar.view.GetValueByKey("fixedAddresses") != null)
+            if (view.GetValueByKey("fixedAddresses") != null)
                 ;
 
             List<uint> copy1 = fixedAddresses == null ? null : new List<uint>(fixedAddresses);
@@ -153,7 +321,7 @@ namespace STROOP.Controls
             FixedAddressListGetter = () => copy2;
 
             // Initialize color fields
-            var colorString = watchVar.view.GetValueByKey("color");
+            var colorString = view.GetValueByKey("color");
             Color? backgroundColor;
             if (colorString != null && ColorUtilities.ColorToParamsDictionary.TryGetValue(colorString, out var c))
                 backgroundColor = ColorTranslator.FromHtml(c);
@@ -192,6 +360,12 @@ namespace STROOP.Controls
             };
 
             _nameTextBox.ContextMenu = DummyContextMenu;
+
+            AddSetting(DefaultSettings.BackgroundColorSetting);
+            AddSetting(DefaultSettings.HighlightColorSetting);
+            AddSetting(DefaultSettings.FixAddressSetting);
+            AddSetting(DefaultSettings.HighlightSetting);
+            AddSetting(DefaultSettings.LockSetting);
         }
 
         static ContextMenu DummyContextMenu = new ContextMenu();
@@ -202,7 +376,6 @@ namespace STROOP.Controls
                 ShowContextMenu();
         }
 
-
         void ShowContextMenu()
         {
             ContextMenuStrip ctx;
@@ -212,8 +385,21 @@ namespace STROOP.Controls
             {
                 ctx = new ContextMenuStrip();
                 if (_watchVariablePanel != null)
-                    foreach (var item in _watchVariablePanel.GetSelectionToolStripItems())
+                {
+                    var uniqueSettings = new HashSet<WatchVariableSetting>();
+                    foreach (var selectedVar in _watchVariablePanel.GetSelectedVars())
+                        foreach (var setting in selectedVar.availableSettings)
+                            uniqueSettings.Add(setting.Value);
+
+                    var sortedOptions = uniqueSettings.ToList();
+                    sortedOptions.Sort((a, b) => string.Compare(a.Name, b.Name));
+                    foreach (var setting in sortedOptions)
+                        setting.CreateContextMenuEntry(ctx.Items, _watchVariablePanel.GetSelectedVars);
+
+                    ctx.Items.Add(new ToolStripSeparator());
+                    foreach (var item in WatchVariableSelectionUtilities.CreateSelectionToolStripItems(_watchVariablePanel.GetSelectedVars(), _watchVariablePanel))
                         ctx.Items.Add(item);
+                }
             }
             ctx.Show(System.Windows.Forms.Cursor.Position);
         }
@@ -382,7 +568,6 @@ namespace STROOP.Controls
         {
             WatchVarWrapper.UpdateItemCheckStates();
 
-            UpdateSettings();
             UpdateSize();
             UpdateColor();
             UpdatePictureBoxes();
@@ -391,19 +576,9 @@ namespace STROOP.Controls
             else _nameTextBox.HideTheCaret();
         }
 
-        private void UpdateSettings()
-        {
-            if (_settingsLevel < WatchVariableControlSettingsManager.GetSettingsLevel())
-            {
-                WatchVariableControlSettingsManager.GetSettingsToApply(_settingsLevel)
-                    .ForEach(settings => ApplySettings(settings));
-                _settingsLevel = WatchVariableControlSettingsManager.GetSettingsLevel();
-            }
-        }
-
         private void UpdatePictureBoxes()
         {
-            Image currentLockImage = GetImageForCheckState(WatchVarWrapper.GetLockedCheckState(FixedAddressListGetter()));
+            Image currentLockImage = GetImageForCheckState(WatchVar.HasLocks());
             bool isLocked = currentLockImage != null;
             bool isFixedAddress = FixedAddressListGetter() != null;
 
@@ -439,7 +614,7 @@ namespace STROOP.Controls
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            if (image != null && LockConfig.LockingDisabled)
+            if (LockConfig.LockingDisabled)
                 image = _disabledLockImage;
             return image;
         }
@@ -520,63 +695,18 @@ namespace STROOP.Controls
             return GroupList.Count == 0 || BelongsToAnyGroup(variableGroups);
         }
 
+        Dictionary<string, WatchVariableSetting> availableSettings = new Dictionary<string, WatchVariableSetting>();
 
-
-
-
-        public void ApplySettings(WatchVariableControlSettings settings)
+        public void AddSetting(WatchVariableSetting setting)
         {
-            if (settings.ChangeHighlighted)
-            {
-                Highlighted = settings.NewHighlighted;
-            }
+            availableSettings[setting.Name] = setting;
+        }
 
-            if (settings.ChangeHighlightColor)
-            {
-                _tableLayoutPanel.BorderColor = settings.NewHighlightColor.Value;
-                _tableLayoutPanel.ShowBorder = true;
-            }
-
-            if (settings.ChangeBackgroundColor)
-            {
-                if (settings.ChangeBackgroundColorToDefault)
-                {
-                    BaseColor = _initialBaseColor;
-                }
-                else
-                {
-                    BaseColor = settings.NewBackgroundColor.Value;
-                }
-            }
-
-            if (settings.ChangeFixedAddress)
-            {
-                if (settings.ChangeFixedAddressToDefault)
-                {
-                    FixedAddressListGetter = _defaultFixedAddressListGetter;
-                }
-                else
-                {
-                    SetFixedAddress(settings.NewFixedAddress);
-                }
-            }
-
-            if (settings.DoFixAddressSpecial)
-            {
-                List<uint> addresses = FixedAddressListGetter() ?? WatchVarWrapper.GetCurrentAddressesToFix();
-                if (addresses.Count > 0)
-                {
-                    uint objAddress = addresses[0];
-                    uint parent = Config.Stream.GetUInt32(objAddress + ObjectConfig.ParentOffset);
-                    int subtype = Config.Stream.GetInt32(objAddress + ObjectConfig.BehaviorSubtypeOffset);
-                    FixedAddressListGetter = () =>
-                        Config.ObjectSlotsManager.GetLoadedObjectsWithPredicate(
-                            obj => obj.Parent == parent && obj.SubType == subtype && obj.Address != obj.Parent)
-                        .ConvertAll(obj => obj.Address);
-                }
-            }
-
-            WatchVarWrapper.ApplySettings(settings);
+        public bool ApplySettings(string settingName, object settingValue)
+        {
+            if (availableSettings.TryGetValue(settingName, out var setting))
+                return setting.SetterFunction(this, settingValue);
+            return false;
         }
 
         public void SetPanel(WatchVariableFlowLayoutPanel panel)
@@ -598,12 +728,12 @@ namespace STROOP.Controls
 
         public WatchVariableControl CreateCopy()
         {
-            throw new NotImplementedException("What");
-            //return WatchVarPrecursor.CreateWatchVariableControl(
-            //    VarName,
-            //    _baseColor,
-            //    new List<VariableGroup>() { VariableGroup.Custom },
-            //    FixedAddressListGetter());
+            var copy = new WatchVariableControl(WatchVar);
+            copy.BaseColor = _baseColor;
+            copy.VarName = VarName;
+            copy.GroupList.Clear();
+            copy.GroupList.Add(VariableGroup.Custom);
+            return copy;
         }
 
         private static AddToTabTypeEnum GetAddToTabType()
@@ -733,13 +863,10 @@ namespace STROOP.Controls
 
         public XElement ToXml(bool useCurrentState = true)
         {
-            throw new Exception("What");
-            //Color? color = _baseColor == DEFAULT_COLOR ? (Color?)null : _baseColor;
-            //if (useCurrentState)
-            //    return WatchVarPrecursor.ToXML(
-            //        VarName, color, GroupList, FixedAddressListGetter());
-            //else
-            //    return WatchVarPrecursor.ToXML();
+            Color? color = _baseColor == DEFAULT_COLOR ? (Color?)null : _baseColor;
+            if (WatchVar.view is WatchVariable.XmlView xmlView)
+                return xmlView.GetXml();
+            return null;
         }
 
         public List<string> GetVarInfo() => WatchVarWrapper.GetVarInfo();

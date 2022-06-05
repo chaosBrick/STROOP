@@ -72,29 +72,18 @@ namespace STROOP.Tabs
 
         private void AddTableRowsAsVars(List<DataGridViewRow> rows)
         {
-            throw new NotImplementedException();
-            //List<WatchVariableControl> controls = new List<WatchVariableControl>();
-            //foreach (DataGridViewRow row in rows)
-            //{
-            //    uint? addressNullable = ParsingUtilities.ParseHexNullable(row.Cells[0].Value);
-            //    if (!addressNullable.HasValue) continue;
-            //    uint address = addressNullable.Value;
+            List<WatchVariableControl> controls = new List<WatchVariableControl>();
+            foreach (DataGridViewRow row in rows)
+            {
+                uint? addressNullable = ParsingUtilities.ParseHexNullable(row.Cells[0].Value);
+                if (!addressNullable.HasValue) continue;
+                uint address = addressNullable.Value;
 
-            //    string typeString = TypeUtilities.TypeToString[_memoryType];
-            //    WatchVariable watchVar = new WatchVariable(
-            //        memoryTypeName: typeString,
-            //        baseAddressType: BaseAddressTypeEnum.Relative,
-            //        offsetUS: address,
-            //        offsetJP: address,
-            //        offsetSH: address,
-            //        offsetEU: address,
-            //        offsetDefault: null,
-            //        mask: null,
-            //        shift: null,
-            //        handleMapping: true);
-            //    controls.Add(watchVar.CreateWatchVariableControl());
-            //}
-            //watchVariablePanelSearch.AddVariables(controls);
+                string typeString = TypeUtilities.TypeToString[_memoryType];
+                WatchVariable watchVar = new WatchVariable(WatchVariable.DefaultView(typeString, false, _memoryType), BaseAddressTypeEnum.Relative, address);
+                controls.Add(new WatchVariableControl(watchVar));
+            }
+            watchVariablePanelSearch.AddVariables(controls);
         }
 
         private void DoFirstScan()

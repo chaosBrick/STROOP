@@ -219,22 +219,12 @@ namespace STROOP.Controls
             tab.UpdateHexDisplay();
         }
 
-        public CheckState GetLockedCheckState(List<uint> addresses = null)
-        {
-            return WatchVariableLockManager.ContainsLocksCheckState(WatchVar, addresses);
-        }
-
-        public bool GetLockedBool(List<uint> addresses = null)
-        {
-            return WatchVariableLockManager.ContainsLocksBool(WatchVar, addresses);
-        }
-
         public void UpdateItemCheckStates(List<uint> addresses = null)
         {
             _itemHighlight.Checked = _watchVarControl.Highlighted;
-            _itemLock.Checked = GetLockedBool(addresses);
-            _itemRemoveAllLocks.Visible = WatchVariableLockManager.ContainsAnyLocks();
-            _itemDisableAllLocks.Visible = WatchVariableLockManager.ContainsAnyLocks() || LockConfig.LockingDisabled;
+            _itemLock.Checked = WatchVar.locked;
+            _itemRemoveAllLocks.Visible = WatchVar.locked;
+            _itemDisableAllLocks.Visible = WatchVar.locked  || LockConfig.LockingDisabled;
             _itemDisableAllLocks.Checked = LockConfig.LockingDisabled;
             _itemFixAddress.Checked = _watchVarControl.FixedAddressListGetter() != null;
             UpdateControls();
@@ -244,18 +234,7 @@ namespace STROOP.Controls
 
         public void ToggleLocked(bool? newLockedValueNullable, List<uint> addresses = null)
         {
-            bool currentLockedValue = WatchVariableLockManager.ContainsLocksBool(WatchVar, addresses);
-            bool newLockedValue = newLockedValueNullable ?? !currentLockedValue;
-            if (newLockedValue == currentLockedValue) return;
-
-            if (newLockedValue)
-            {
-                WatchVariableLockManager.AddLocks(WatchVar, addresses);
-            }
-            else
-            {
-                WatchVariableLockManager.RemoveLocks(WatchVar, addresses);
-            }
+            WatchVar.SetLocked(newLockedValueNullable ?? !WatchVar.locked, addresses);
         }
 
         public Type GetMemoryType()
@@ -308,17 +287,17 @@ namespace STROOP.Controls
 
         public bool SetValues(List<object> values, List<uint> addresses = null)
         {
-            values = values.ConvertAll(value => UnconvertValue(value));
+            values = values.ConvertAll(value => UndisplayValue(value));
             return WatchVar.SetValues(values, addresses);
         }
 
         public bool SetValue(object value, List<uint> addresses = null)
         {
-            value = UnconvertValue(value);
+            value = UndisplayValue(value);
             return WatchVar.SetValue(value, addresses);
         }
 
-        public virtual object UnconvertValue(object value) => value;
+        public virtual object UndisplayValue(object value) => value;
 
         public List<uint> GetCurrentAddressesToFix()
         {
@@ -330,9 +309,8 @@ namespace STROOP.Controls
             if (values.Count == 0) return (false, "(none)");
             object firstValue = values[0];
             for (int i = 1; i < values.Count; i++)
-            {
-                if (!Object.Equals(values[i], firstValue)) return (false, "(multiple values)");
-            }
+                if (!Object.Equals(values[i], firstValue))
+                    return (false, "(multiple values)");
             return (true, firstValue);
         }
 
@@ -351,17 +329,6 @@ namespace STROOP.Controls
 
         public virtual bool DisplayAsHex() => false;
 
-        public virtual void ApplySettings(WatchVariableControlSettings settings)
-        {
-            if (settings.ChangeLocked)
-            {
-                ToggleLocked(settings.NewLocked, _watchVarControl.FixedAddressListGetter());
-            }
-        }
-
-        public virtual void ToggleDisplayAsHex(bool? displayAsHexNullable = null)
-        {
-
-        }
+        public virtual void ToggleDisplayAsHex(bool? displayAsHexNullable = null) { }
     }
 }

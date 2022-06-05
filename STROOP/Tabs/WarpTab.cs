@@ -77,29 +77,49 @@ namespace STROOP.Tabs
 
         private List<WatchVariableControl> GetWarpNodeVariables(uint address, int index)
         {
-            List<string> names = new List<string>()
+            WatchVariable.CustomView[] views = new WatchVariable.CustomView[]
             {
-                string.Format("Warp {0} ID", index),
-                string.Format("Warp {0} Dest Level", index),
-                string.Format("Warp {0} Dest Area", index),
-                string.Format("Warp {0} Dest Node", index),
-                string.Format("Warp {0} Object", index),
-                string.Format("Warp {0} Next", index),
-            };
-            
-            WatchVariable.CustomViewData[] varData = new WatchVariable.CustomViewData[]
-            {
-                new WatchVariable.CustomViewData<WatchVariableNumberWrapper>(_ => Config.Stream.GetByte(address), (val, _) => Config.Stream.SetValue((byte)val, address)),
-                new WatchVariable.CustomViewData<WatchVariableNumberWrapper>(_ => Config.Stream.GetByte(address + 0x1), (val, _) => Config.Stream.SetValue((byte)val, address + 0x1)),
-                new WatchVariable.CustomViewData<WatchVariableNumberWrapper>(_ => Config.Stream.GetByte(address + 0x2), (val, _) => Config.Stream.SetValue((byte)val, address + 0x2)),
-                new WatchVariable.CustomViewData<WatchVariableNumberWrapper>(_ => Config.Stream.GetByte(address + 0x3), (val, _) => Config.Stream.SetValue((byte)val, address + 0x3)),
-                new WatchVariable.CustomViewData<WatchVariableObjectWrapper>(_ => Config.Stream.GetUInt32(address + 0x4), (val, _) => Config.Stream.SetValue((uint)val, address + 0x4)),
-                new WatchVariable.CustomViewData<WatchVariableAddressWrapper>(_ => Config.Stream.GetUInt32(address + 0x8), (val, _) => Config.Stream.SetValue((uint)val, address + 0x8)),
+                new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                {
+                    Name = $"Warp {index} ID",
+                    _getterFunction = _ => Config.Stream.GetByte(address),
+                    _setterFunction = (val, _) => Config.Stream.SetValue(System.Convert.ToByte(val), address)
+                },
+                new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                {
+                    Name = $"Warp {index} Dest Level",
+                    _getterFunction = _ => Config.Stream.GetByte(address + 0x1),
+                    _setterFunction = (val, _) => Config.Stream.SetValue(System.Convert.ToByte(val), address + 0x1)
+                },
+                new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                {
+                    Name = $"Warp {index} Dest Area",
+                    _getterFunction = _ => Config.Stream.GetByte(address + 0x2),
+                    _setterFunction = (val, _) => Config.Stream.SetValue(System.Convert.ToByte(val), address + 0x2)
+                },
+                new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                {
+                    Name = $"Warp {index} Dest Node",
+                    _getterFunction = _ => Config.Stream.GetByte(address + 0x3),
+                    _setterFunction = (val, _) => Config.Stream.SetValue(System.Convert.ToByte(val), address + 0x3)
+                },
+                new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                {
+                    Name = $"Warp {index} Object",
+                    _getterFunction = _ => Config.Stream.GetUInt32(address + 0x4),
+                    _setterFunction = (val, _) => Config.Stream.SetValue((uint)val, address + 0x4)
+                },
+                new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                {
+                    Name = $"Warp {index} Next",
+                    _getterFunction = _ => Config.Stream.GetUInt32(address + 0x8),
+                    _setterFunction = (val, _) => Config.Stream.SetValue((uint)val, address + 0x8)
+                },
             };
 
             List<WatchVariableControl> controls = new List<WatchVariableControl>();
             for (int i = 0; i < 6; i++)
-                controls.Add(new WatchVariable(names[i], varData[i]).CreateWatchVariableControl());
+                controls.Add(new WatchVariableControl(new WatchVariable(views[i])));
 
             return controls;
         }

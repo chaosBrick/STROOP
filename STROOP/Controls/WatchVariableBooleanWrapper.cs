@@ -12,7 +12,7 @@ namespace STROOP.Controls
             : base(watchVar, watchVarControl)
         {
             _displayAsCheckbox = true;
-            if (bool.TryParse(watchVar.view.GetValueByKey("invertBool"), out var invertBool))
+            if (bool.TryParse(watchVarControl.view.GetValueByKey(WatchVariable.ViewProperties.invertBool), out var invertBool))
                 _displayAsInverted = invertBool;
             else
                 _displayAsInverted = false;

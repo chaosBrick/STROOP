@@ -45,8 +45,7 @@ namespace STROOP.Tabs
                 EnumUtilities.GetEnumValues<CopyTypeEnum>(typeof(CopyTypeEnum)),
                 copyType => _copyType = copyType,
                 _copyType);
-            CopyUtilities.AddContextMenuStripFunctions(
-                buttonCopyVars, watchVariablePanelCustom.GetCurrentVariableControls);
+            CopyUtilities.AddContextMenuStripFunctions(buttonCopyVars, watchVariablePanelCustom.GetCurrentVariableControls);
 
             Button buttonClearVars = splitContainerCustomControls.Panel1.Controls["buttonClearVars"] as Button;
             buttonClearVars.Click += (sender, e) => watchVariablePanelCustom.ClearVariables();
@@ -64,7 +63,7 @@ namespace STROOP.Tabs
             buttonCustomShowValues.Click += (sender, e) => ShowRecordedValues();
 
             buttonCustomClearValues.Click += (sender, e) => ClearRecordedValues();
-            
+
             // Panel 2 controls
 
             Button buttonResetVariableSizeToDefault = splitContainerCustomControls.Panel2.Controls["buttonResetVariableSizeToDefault"] as Button;

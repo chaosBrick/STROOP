@@ -1,14 +1,8 @@
 ﻿using STROOP.Structs;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using STROOP.Extensions;
 using STROOP.Utilities;
 using STROOP.Controls;
 
@@ -54,30 +48,26 @@ namespace STROOP.Forms
 
         private WatchVariableControl CreateWatchVariableControl()
         {
-            throw new NotImplementedException();
+            string name = textBoxNameValue.Text;
+            string memoryTypeString = comboBoxTypeValue.SelectedItem.ToString();
+            BaseAddressTypeEnum baseAddressType = (BaseAddressTypeEnum)comboBoxBaseValue.SelectedItem;
+            uint offset = ParsingUtilities.ParseHexNullable(textBoxOffsetValue.Text) ?? 0;
 
-            //string name = textBoxNameValue.Text;
-            //string memoryType = comboBoxTypeValue.SelectedItem.ToString();
-            //BaseAddressTypeEnum baseAddressType = (BaseAddressTypeEnum)comboBoxBaseValue.SelectedItem;
-            //uint offset = ParsingUtilities.ParseHexNullable(textBoxOffsetValue.Text) ?? 0;
+            var memoryType = TypeUtilities.StringToType[memoryTypeString];
 
-            //bool useOffsetDefault =
-            //    baseAddressType != BaseAddressTypeEnum.Absolute &&
-            //    baseAddressType != BaseAddressTypeEnum.Relative &&
-            //    baseAddressType != BaseAddressTypeEnum.None;
+            var isAbsolute = baseAddressType == BaseAddressTypeEnum.Absolute;
 
-            //WatchVariable watchVar = new WatchVariable(
-            //    memoryTypeName: memoryType,
-            //    baseAddressType: baseAddressType,
-            //    offsetUS: useOffsetDefault ? (uint?)null : offset,
-            //    offsetJP: useOffsetDefault ? (uint?)null : offset,
-            //    offsetSH: useOffsetDefault ? (uint?)null : offset,
-            //    offsetEU: useOffsetDefault ? (uint?)null : offset,
-            //    offsetDefault: useOffsetDefault ? offset : (uint?)null,
-            //    mask: null,
-            //    shift: null,
-            //    handleMapping: !_disableMapping);
-            //return watchVar.CreateWatchVariableControl();
+            WatchVariable watchVar = new WatchVariable(
+                new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                {
+                    Name = name,
+                    _getterFunction = b => Structs.Configurations.Config.Stream.GetValue(memoryType, b, isAbsolute),
+                    _setterFunction = (value, b) => Structs.Configurations.Config.Stream.SetValue(memoryType, value, b, isAbsolute),
+                },
+                baseAddressType,
+                offset
+                );
+            return new WatchVariableControl(watchVar);
         }
     }
 }

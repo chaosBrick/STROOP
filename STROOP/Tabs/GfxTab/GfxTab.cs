@@ -45,7 +45,7 @@ namespace STROOP.Tabs.GfxTab
             base.InitializeTab();
             SuspendLayout();
             foreach (var precursor in GfxNode.GetCommonVariables())
-                watchVariablePanelGfx.AddVariable(precursor.CreateWatchVariableControl());
+                watchVariablePanelGfx.AddVariable(new WatchVariableControl(precursor.value.var, precursor.value.view));
             ResumeLayout();
         }
 
@@ -107,7 +107,7 @@ namespace STROOP.Tabs.GfxTab
             {
                 foreach (var precursor in node.GetTypeSpecificVariables())
                 {
-                    SpecificVariables.Add(precursor.CreateWatchVariableControl());
+                    SpecificVariables.Add(new WatchVariableControl(precursor.value.var, precursor.value.view));
                 }
             }
             watchVariablePanelGfx.AddVariables(SpecificVariables);

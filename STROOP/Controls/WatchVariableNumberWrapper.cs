@@ -10,6 +10,65 @@ namespace STROOP.Controls
 {
     public class WatchVariableNumberWrapper : WatchVariableStringWrapper
     {
+        static Func<WatchVariableControl, bool> WrapperProperty(Func<WatchVariableNumberWrapper, bool> func) =>
+            (ctrl) =>
+            {
+                if (ctrl.WatchVarWrapper is WatchVariableNumberWrapper wrapper)
+                    return func(wrapper);
+                return false;
+            };
+
+        public static readonly WatchVariableSetting RoundToSetting = new WatchVariableSetting(
+                "Round To",
+                (ctrl, obj) =>
+                {
+                    if (ctrl.WatchVarWrapper is WatchVariableNumberWrapper num)
+                        if (obj is bool doRounding && doRounding == false)
+                            num._roundingLimit = -1;
+                        else if (obj is int roundingLimit)
+                            num._roundingLimit = roundingLimit;
+                        else if (obj == null)
+                            num._roundingLimit = num._defaultRoundingLimit;
+                        else
+                            return false;
+                    else
+                        return false;
+                    return true;
+                },
+                ((Func<(string, Func<object>, Func<WatchVariableControl, bool>)[]>)(() =>
+                {
+                    var lst = new List<(string, Func<object>, Func<WatchVariableControl, bool>)>();
+                    lst.Add(("Default", () => null, WrapperProperty(wr => wr._roundingLimit == wr._defaultRoundingLimit)));
+                    lst.Add(("No Rounding", () => false, WrapperProperty(wr => wr._roundingLimit == -1)));
+                    for (int i = 0; i < 10; i++)
+                    {
+                        var c = i;
+                        lst.Add(($"{i} decimal places", () => c, WrapperProperty(wr => wr._roundingLimit == c)));
+                    }
+                    return lst.ToArray();
+                }))()
+                );
+
+        public static readonly WatchVariableSetting DisplayAsHexSetting = new WatchVariableSetting(
+                "Display as Hex",
+                (ctrl, obj) =>
+                {
+                    if (ctrl.WatchVarWrapper is WatchVariableNumberWrapper num)
+                        if (obj is bool doHexDisplay)
+                            num.ToggleDisplayAsHex(doHexDisplay);
+                        else if (obj == null)
+                            num.ToggleDisplayAsHex(num._defaultDisplayAsHex);
+                        else
+                            return false;
+                    else
+                        return false;
+                    return true;
+                },
+                ("Default", () => null, WrapperProperty(wr => wr._displayAsHex == wr._defaultDisplayAsHex)),
+                ("Hex", () => true, WrapperProperty(wr => wr._displayAsHex)),
+                ("Decimal", () => false, WrapperProperty(wr => !wr._displayAsHex))
+            );
+
         protected const int DEFAULT_ROUNDING_LIMIT = 3;
         protected const bool DEFAULT_DISPLAY_AS_HEX = false;
         protected const bool DEFAULT_USE_CHECKBOX = false;
@@ -23,7 +82,6 @@ namespace STROOP.Controls
 
         private readonly int _defaultRoundingLimit;
         private int _roundingLimit;
-        private Action<int> _setRoundingLimit;
 
         protected readonly bool _defaultDisplayAsHex;
         protected bool _displayAsHex;
@@ -32,7 +90,7 @@ namespace STROOP.Controls
         public WatchVariableNumberWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl)
             : base(watchVar, watchVarControl, 0)
         {
-            if (int.TryParse(WatchVar.view.GetValueByKey("roundingLimit"), out var roundingLimit))
+            if (int.TryParse(watchVarControl.view.GetValueByKey(WatchVariable.ViewProperties.roundingLimit), out var roundingLimit))
                 _defaultRoundingLimit = roundingLimit;
             else
                 _defaultRoundingLimit = DEFAULT_ROUNDING_LIMIT;
@@ -41,7 +99,7 @@ namespace STROOP.Controls
             if (_roundingLimit < -1 || _roundingLimit > MAX_ROUNDING_LIMIT)
                 throw new ArgumentOutOfRangeException();
 
-            _defaultDisplayAsHex = (bool.TryParse(WatchVar.view.GetValueByKey("useHex"), out var a)) ? a : DEFAULT_DISPLAY_AS_HEX;
+            _defaultDisplayAsHex = (bool.TryParse(watchVarControl.view.GetValueByKey(WatchVariable.ViewProperties.useHex), out var a)) ? a : DEFAULT_DISPLAY_AS_HEX;
             _displayAsHex = _defaultDisplayAsHex;
 
             AddCoordinateContextMenuStripItems();
@@ -50,27 +108,8 @@ namespace STROOP.Controls
 
         private void AddNumberContextMenuStripItems()
         {
-            ToolStripMenuItem itemRoundTo = new ToolStripMenuItem("Round to ...");
-            List<int> roundingLimitNumbers = Enumerable.Range(-1, MAX_ROUNDING_LIMIT + 2).ToList();
-            _setRoundingLimit = ControlUtilities.AddCheckableDropDownItems(
-                itemRoundTo,
-                roundingLimitNumbers.ConvertAll(i => i == -1 ? "No Rounding" : i + " decimal place(s)"),
-                roundingLimitNumbers,
-                (int roundingLimit) => { _roundingLimit = roundingLimit; },
-                _roundingLimit);
-
-            ToolStripMenuItem itemDisplayAsHex = new ToolStripMenuItem("Display as Hex");
-            _setDisplayAsHex = (bool displayAsHex) =>
-            {
-                _displayAsHex = displayAsHex;
-                itemDisplayAsHex.Checked = displayAsHex;
-            };
-            itemDisplayAsHex.Click += (sender, e) => _setDisplayAsHex(!_displayAsHex);
-            itemDisplayAsHex.Checked = _displayAsHex;
-
-            _contextMenuStrip.AddToBeginningList(new ToolStripSeparator());
-            _contextMenuStrip.AddToBeginningList(itemRoundTo);
-            _contextMenuStrip.AddToBeginningList(itemDisplayAsHex);
+            _watchVarControl.AddSetting(RoundToSetting);
+            _watchVarControl.AddSetting(DisplayAsHexSetting);
         }
 
         private void AddCoordinateContextMenuStripItems()
@@ -139,7 +178,6 @@ namespace STROOP.Controls
         }
 
 
-
         protected override void HandleVerification(object value)
         {
             if (!TypeUtilities.IsNumber(value))
@@ -154,6 +192,22 @@ namespace STROOP.Controls
             if (!DisplayAsHex()) value = HandleRounding(value, handleRounding);
             if (handleFormatting) value = HandleHexDisplaying(value);
             return value;
+        }
+
+        public override object UndisplayValue(object value)
+        {
+            if (value is string strValue)
+            {
+                if (strValue.IndexOf("0x") != -1 && ParsingUtilities.TryParseHex(strValue, out uint uintV))
+                    value = uintV;
+                else if (ulong.TryParse(strValue, out ulong ulongV))
+                    value = ulongV;
+                else if (long.TryParse(strValue, out long longV))
+                    value = longV;
+                else if (Double.TryParse(strValue, out double doubleV))
+                    value = doubleV;
+            }
+            return base.UndisplayValue(value);
         }
 
         protected object HandleRounding(object value, bool handleRounding)
@@ -205,29 +259,10 @@ namespace STROOP.Controls
 
         public override bool DisplayAsHex() => _displayAsHex;
 
-        public override void ApplySettings(WatchVariableControlSettings settings)
-        {
-            base.ApplySettings(settings);
-            if (settings.ChangeRoundingLimit && _roundingLimit != 0)
-            {
-                if (settings.ChangeRoundingLimitToDefault)
-                    _setRoundingLimit(_defaultRoundingLimit);
-                else
-                    _setRoundingLimit(settings.NewRoundingLimit);
-            }
-            if (settings.ChangeDisplayAsHex)
-            {
-                if (settings.ChangeDisplayAsHexToDefault)
-                    _setDisplayAsHex(_defaultDisplayAsHex);
-                else
-                    _setDisplayAsHex(settings.NewDisplayAsHex);
-            }
-        }
-
         public override void ToggleDisplayAsHex(bool? displayAsHexNullable = null)
         {
             bool displayAsHex = displayAsHexNullable ?? !_displayAsHex;
-            _setDisplayAsHex(displayAsHex);
+           _displayAsHex = displayAsHex;
         }
 
         protected object HandleNumberConversion(object value)
