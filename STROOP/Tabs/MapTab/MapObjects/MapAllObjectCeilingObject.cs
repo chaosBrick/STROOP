@@ -19,35 +19,15 @@ namespace STROOP.Tabs.MapTab.MapObjects
     [ObjectDescription("All Object Ceiling Triangles", "Triangles")]
     public class MapAllObjectCeilingObject : MapCeilingObject
     {
-        private bool _autoUpdate;
-
-        public MapAllObjectCeilingObject()
-            : base()
-        {
-            _autoUpdate = true;
-        }
-
-        protected override List<TriangleDataModel> GetTrianglesOfAnyDist()
-        {
-            if (_autoUpdate)
-                return TriangleUtilities.GetObjectTriangles().FindAll(tri => tri.IsCeiling());
-            return null;
-        }
+        CustomTriangleList customTris = new CustomTriangleList(() => TriangleUtilities.GetObjectTriangles().FindAll(tri => tri.IsCeiling()));
+        protected override List<TriangleDataModel> GetTrianglesOfAnyDist() => customTris.GetTriangles();
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {
-                ToolStripMenuItem itemAutoUpdate = new ToolStripMenuItem("Auto Update");
-                itemAutoUpdate.Click += (sender, e) =>
-                {
-                    _autoUpdate = !_autoUpdate;
-                    itemAutoUpdate.Checked = _autoUpdate;
-                };
-                itemAutoUpdate.Checked = _autoUpdate;
-
                 _contextMenuStrip = new ContextMenuStrip();
-                _contextMenuStrip.Items.Add(itemAutoUpdate);
+                customTris.AddToContextStrip(_contextMenuStrip.Items);
                 _contextMenuStrip.Items.Add(new ToolStripSeparator());
                 GetHorizontalTriangleToolStripMenuItems(targetTracker).ForEach(item => _contextMenuStrip.Items.Add(item));
                 _contextMenuStrip.Items.Add(new ToolStripSeparator());

@@ -157,6 +157,9 @@ namespace STROOP.Tabs.MapTab.MapObjects
             currentItem.DropDownItems.AddHandlerToItem("Add Tracker for Nearby Floor Units",
                             tracker.MakeCreateTrackerHandler(mapTab, "NearbyFloorUnits", _ => new MapNearbyFloorUnits(positionAngleProvider)));
 
+            currentItem.DropDownItems.AddHandlerToItem("Add Tracker for Nearby Ceiling Units",
+                            tracker.MakeCreateTrackerHandler(mapTab, "NearbyCeilingUnits", _ => new MapNearbyCeilingUnits(positionAngleProvider)));
+
             targetStrip.Items.Add(currentItem);
         }
 

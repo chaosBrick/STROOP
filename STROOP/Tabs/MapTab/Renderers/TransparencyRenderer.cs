@@ -22,7 +22,7 @@ namespace STROOP.Tabs.MapTab.Renderers
         int renderTexture;
         int width, height;
 
-        int originalDepth, originalDepthFBO;
+        Func<int> originalDepthGetter;
 
         bool canStencil;
 
@@ -30,8 +30,9 @@ namespace STROOP.Tabs.MapTab.Renderers
         public List<Transparent> transparents = new List<Transparent>();
         public MapGraphics graphics { get; private set; }
 
-        public TransparencyRenderer(int maxDepthComplexity)
+        public TransparencyRenderer(int maxDepthComplexity, Func<int> originalDepthGetter, int initialWidth, int initialHeight)
         {
+            this.originalDepthGetter = originalDepthGetter;
             shader = GraphicsUtil.GetShaderProgram("Resources/Shaders/Sprites.vert.glsl", "Resources/Shaders/BlendTransparency.frag.glsl");
             Init(1);
             SpriteRenderer.GenSpriteVAO(vertexArray, instanceBuffer);
@@ -48,7 +49,6 @@ namespace STROOP.Tabs.MapTab.Renderers
             stencilBuffer = GL.GenRenderbuffer();
             renderTexture = GL.GenTexture();
             renderFBO = GL.GenFramebuffer();
-            originalDepth = GL.GenTexture();
 
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, renderFBO);
             GL.FramebufferTexture(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, renderTexture, 0);
@@ -58,7 +58,7 @@ namespace STROOP.Tabs.MapTab.Renderers
 
             SetMaxDepthComplexity(maxDepthComplexity);
 
-            SetDimensions(800, 600);
+            SetDimensions(initialWidth, initialHeight);
 
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, maskFBO);
             GL.FramebufferTexture(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, maskTexture[0], 0);
@@ -75,11 +75,6 @@ namespace STROOP.Tabs.MapTab.Renderers
                 canStencil = false;
                 goto tryMakeMaskFBO;
             }
-
-            originalDepthFBO = GL.GenFramebuffer();
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, originalDepthFBO);
-            GL.FramebufferTexture(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, originalDepth, 0);
-            GL.DrawBuffers(0, new DrawBuffersEnum[0]);
 
             if ((error = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer)) != FramebufferErrorCode.FramebufferComplete)
             {
@@ -98,7 +93,7 @@ namespace STROOP.Tabs.MapTab.Renderers
             for (int i = 0; i < complexity; i++)
             {
                 GL.BindTexture(TextureTarget.Texture2D, maskTexture[i]);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.DepthComponent24, width, height, 0, PixelFormat.DepthComponent, PixelType.Float, IntPtr.Zero);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.DepthComponent32f, width, height, 0, PixelFormat.DepthComponent, PixelType.Float, IntPtr.Zero);
             }
         }
 
@@ -115,17 +110,11 @@ namespace STROOP.Tabs.MapTab.Renderers
             for (int i = 0; i < maskTexture.Length; i++)
             {
                 GL.BindTexture(TextureTarget.Texture2D, maskTexture[i]);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.DepthComponent24, width, height, 0, PixelFormat.DepthComponent, PixelType.Int, IntPtr.Zero);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.DepthComponent32f, width, height, 0, PixelFormat.DepthComponent, PixelType.Float, IntPtr.Zero);
 
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
             }
-
-            GL.BindTexture(TextureTarget.Texture2D, originalDepth);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.DepthComponent16, width, height, 0, PixelFormat.DepthComponent, PixelType.Int, IntPtr.Zero);
-
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
         }
 
         int currentMaskLayer = -1;
@@ -152,12 +141,7 @@ namespace STROOP.Tabs.MapTab.Renderers
                 graphics.drawLayers[(int)MapGraphics.DrawLayers.Transparency].Add(() =>
                 {
                     var error = GL.GetError();
-                    GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
-                    GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, originalDepthFBO);
-
-                    GL.BlitFramebuffer(0, 0, graphics.glControl.Width, graphics.glControl.Height, 0, 0, width, height, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
-                    var newRrror = GL.GetError();
-                    Render(graphics, originalDepth);
+                    Render(graphics, originalDepthGetter());
                 });
         }
 
@@ -170,7 +154,9 @@ namespace STROOP.Tabs.MapTab.Renderers
                 t.Prepare(this);
 
             int[] prevViewport = new int[4];
+            int prevFramebuffer;
             GL.GetInteger(GetPName.Viewport, prevViewport);
+            GL.GetInteger(GetPName.FramebufferBinding, out prevFramebuffer);
             GL.Viewport(0, 0, width, height);
 
             GL.ClearDepth(1);
@@ -201,7 +187,7 @@ namespace STROOP.Tabs.MapTab.Renderers
                     t.DrawTransparent(this);
             }
 
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, prevFramebuffer);
             GL.Viewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
 
             ignoreView = true;

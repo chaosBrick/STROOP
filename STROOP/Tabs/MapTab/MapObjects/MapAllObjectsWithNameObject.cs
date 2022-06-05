@@ -36,8 +36,9 @@ namespace STROOP.Tabs.MapTab.MapObjects
             if (objName == null) return null;
             ObjectBehaviorAssociation assoc = Config.ObjectAssociations.GetObjectAssociation(objName);
             if (assoc == null) return null;
+            objName = objName.ToLower();
             var objByName = new MapMultipleObjects(creationParameters, "All " + assoc.Name, assoc.Image, assoc.MapImage);
-            objByName.predicate = _ => _.BehaviorAssociation.Name == objName;
+            objByName.predicate = _ => _.BehaviorAssociation.Name.ToLower() == objName;
             return objByName;
         }
 

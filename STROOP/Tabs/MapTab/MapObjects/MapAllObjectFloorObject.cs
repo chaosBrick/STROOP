@@ -11,35 +11,18 @@ namespace STROOP.Tabs.MapTab.MapObjects
     [ObjectDescription("All Object Floor Trianlges", "Triangles")]
     public class MapAllObjectFloorObject : MapFloorObject
     {
-        private bool _autoUpdate;
+        CustomTriangleList customTris = new CustomTriangleList(() => TriangleUtilities.GetObjectTriangles().FindAll(tri => tri.IsFloor()));
 
-        public MapAllObjectFloorObject()
-            : base(null)
-        {
-            _autoUpdate = true;
-        }
+        public MapAllObjectFloorObject() : base(null) { }
 
-        protected override List<TriangleDataModel> GetTrianglesOfAnyDist()
-        {
-            if (_autoUpdate)
-                return TriangleUtilities.GetObjectTriangles().FindAll(tri => tri.IsFloor());
-            return null;
-        }
+        protected override List<TriangleDataModel> GetTrianglesOfAnyDist() => customTris.GetTriangles();
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             if (_contextMenuStrip == null)
             {
-                ToolStripMenuItem itemAutoUpdate = new ToolStripMenuItem("Auto Update");
-                itemAutoUpdate.Click += (sender, e) =>
-                {
-                    _autoUpdate = !_autoUpdate;
-                    itemAutoUpdate.Checked = _autoUpdate;
-                };
-                itemAutoUpdate.Checked = _autoUpdate;
-
                 _contextMenuStrip = new ContextMenuStrip();
-                _contextMenuStrip.Items.Add(itemAutoUpdate);
+                customTris.AddToContextStrip(_contextMenuStrip.Items);
                 _contextMenuStrip.Items.Add(new ToolStripSeparator());
                 GetFloorToolStripMenuItems().ForEach(item => _contextMenuStrip.Items.Add(item));
                 _contextMenuStrip.Items.Add(new ToolStripSeparator());

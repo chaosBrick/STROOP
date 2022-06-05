@@ -37,24 +37,39 @@ namespace STROOP.Tabs.MapTab
         public Renderers.TransparencyRenderer transparencyRenderer;
         public Vector2 pixelsPerUnit { get; private set; }
 
-        public bool hasUnitPrecision { get; private set; }
         public Models.TriangleDataModel hoverTriangle;
 
-        DataUtil.CollisionStructure floors;
-        ulong lastFloorsUpdate;
-        public DataUtil.CollisionStructure GetFloorTriangles()
+        int mainFrameBuffer, mainColorBuffer, mainDepthBuffer;
+
+        public class CachedCollisionStructure
         {
-            uint globalTimer = Config.Stream.GetUInt32(MiscConfig.GlobalTimerAddress);
-            if (floors == null || lastFloorsUpdate != globalTimer)
+            readonly Func<Models.TriangleDataModel, bool> filter;
+            public CachedCollisionStructure(Func<Models.TriangleDataModel, bool> filter)
             {
-                floors = new DataUtil.CollisionStructure(
-                    TriangleUtilities.GetLevelTriangles().Where(_ => _.Classification == TriangleClassification.Floor).ToList(),
-                    TriangleUtilities.GetObjectTriangles().Where(_ => _.Classification == TriangleClassification.Floor).ToList()
-                    );
-                lastFloorsUpdate = globalTimer;
+                this.filter = filter;
+                triangles = null;
+                lastUpdate = ulong.MaxValue;
             }
-            return floors;
+
+            DataUtil.CollisionStructure triangles;
+            ulong lastUpdate;
+            public DataUtil.CollisionStructure GetTriangles()
+            {
+                uint globalTimer = Config.Stream.GetUInt32(MiscConfig.GlobalTimerAddress);
+                if (triangles == null || lastUpdate != globalTimer)
+                {
+                    triangles = new DataUtil.CollisionStructure(
+                        TriangleUtilities.GetLevelTriangles().Where(filter).ToList(),
+                        TriangleUtilities.GetObjectTriangles().Where(filter).ToList()
+                        );
+                    lastUpdate = globalTimer;
+                }
+                return triangles;
+            }
         }
+
+        public readonly CachedCollisionStructure floors = new CachedCollisionStructure(_ => _.Classification == TriangleClassification.Floor);
+        public readonly CachedCollisionStructure ceilings = new CachedCollisionStructure(_ => _.Classification == TriangleClassification.Ceiling);
 
 
         const int OBJECTS_TEXTURE_SIZE = 256;
@@ -185,6 +200,11 @@ namespace STROOP.Tabs.MapTab
                 if (activeControl == glControl)
                     form.ActiveControl = previouslyActiveControl;
             };
+            glControl.Resize += (_, __) =>
+            {
+                DeleteMainSurfaces();
+                InitMainSurfaces();
+            };
 
             GL.ClearColor(Color.FromKnownColor(KnownColor.Control));
             GL.Enable(EnableCap.Texture2D);
@@ -192,21 +212,57 @@ namespace STROOP.Tabs.MapTab
             GL.BlendFuncSeparate(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha, BlendingFactorSrc.OneMinusDstAlpha, BlendingFactorDest.One);
             GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
 
+            InitMainSurfaces();
+
             CreateObjectsRenderer();
-            renderers.Add(triangleRenderer = new Renderers.TriangleRenderer(0x10000));
-            renderers.Add(triangleOverlayRenderer = new Renderers.TriangleRenderer(0x10000) { drawlayer = DrawLayers.GeometryOverlay });
+            renderers.Add(triangleRenderer = new Renderers.TriangleRenderer(0x100000));
+            renderers.Add(triangleOverlayRenderer = new Renderers.TriangleRenderer(0x100000) { drawlayer = DrawLayers.GeometryOverlay });
             renderers.Add(lineRenderer = new Renderers.LineRenderer());
             renderers.Add(circleRenderer = new Renderers.ShapeRenderer(DrawLayers.Overlay));
             renderers.Add(cylinderRenderer = new Renderers.GeometryRenderer(Renderers.GeometryRenderer.GeometryData.Cylinder()));
             renderers.Add(sphereRenderer = new Renderers.GeometryRenderer(Renderers.GeometryRenderer.GeometryData.Sphere(128, 64)));
 
-            transparencyRenderer = new Renderers.TransparencyRenderer(16);
+            transparencyRenderer = new Renderers.TransparencyRenderer(16, () => mainDepthBuffer, glControl.Width, glControl.Height);
             transparencyRenderer.transparents.Add(objectRenderer.transparent);
             transparencyRenderer.transparents.Add(triangleRenderer.transparent);
             transparencyRenderer.transparents.Add(circleRenderer.transparent);
             transparencyRenderer.transparents.Add(cylinderRenderer);
             transparencyRenderer.transparents.Add(sphereRenderer);
             renderers.Add(transparencyRenderer);
+        }
+
+        void DeleteMainSurfaces()
+        {
+            GL.DeleteTextures(2, new int[] { mainColorBuffer, mainDepthBuffer });
+            GL.DeleteFramebuffer(mainFrameBuffer);
+            transparencyRenderer.SetDimensions(glControl.Width, glControl.Height);
+        }
+
+        void InitMainSurfaces()
+        {
+            mainFrameBuffer = GL.GenFramebuffer();
+            mainColorBuffer = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, mainColorBuffer);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, glControl.Width, glControl.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, IntPtr.Zero);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+
+            mainDepthBuffer = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, mainDepthBuffer);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.DepthComponent32f, glControl.Width, glControl.Height, 0, PixelFormat.DepthComponent, PixelType.Float, IntPtr.Zero);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, mainFrameBuffer);
+            GL.FramebufferTexture(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, mainColorBuffer, 0);
+            GL.FramebufferTexture(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, mainDepthBuffer, 0);
+            GL.DrawBuffers(1, new[] { DrawBuffersEnum.ColorAttachment0 });
+
+            FramebufferErrorCode error;
+            if ((error = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer)) != FramebufferErrorCode.FramebufferComplete)
+                throw null;
+
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }
 
         void CreateObjectsRenderer()
@@ -244,7 +300,7 @@ namespace STROOP.Tabs.MapTab
                 glControl.MakeCurrent();
                 UpdateMapView();
 
-                // Set default background color (clear drawing area)
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, mainFrameBuffer);
                 GL.ClearColor(0, 0, 0.5f, 1.0f);
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
@@ -287,7 +343,11 @@ namespace STROOP.Tabs.MapTab
                 foreach (var layer in drawLayers)
                     foreach (var action in layer)
                         action.Invoke();
-                
+
+                GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
+                GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, mainFrameBuffer);
+                GL.BlitFramebuffer(0, 0, glControl.Width, glControl.Height, 0, 0, glControl.Width, glControl.Height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
+
                 glControl.SwapBuffers();
             }
         }
@@ -373,7 +433,6 @@ namespace STROOP.Tabs.MapTab
             }
 
             pixelsPerUnit = new Vector2(scale * glControl.Height, scale * glControl.Height) * 0.5f;
-            hasUnitPrecision = pixelsPerUnit.X >= 2 && pixelsPerUnit.Y >= 2;
         }
 
         bool FindClosestIntersection(Vector3 rayOrigin, Vector3 rayDirection, out Vector3 intersection, out Models.TriangleDataModel triangle)
@@ -402,18 +461,18 @@ namespace STROOP.Tabs.MapTab
                 float tan = 2 * (float)Math.Tan(.5f);
                 var dx = tan * (glControlCursorPos.X - glControl.Width / 2.0f) / glControl.Height;
                 var dy = -tan * (glControlCursorPos.Y - glControl.Height / 2.0f) / glControl.Height;
-                var dirrrr = BillboardMatrix.Row0.Xyz * dx + BillboardMatrix.Row1.Xyz * dy - BillboardMatrix.Row2.Xyz;
-                if (float.IsNaN(dirrrr.X)) dirrrr = new Vector3(0, 0, 1);
+                var dir = BillboardMatrix.Row0.Xyz * dx + BillboardMatrix.Row1.Xyz * dy - BillboardMatrix.Row2.Xyz;
+                if (float.IsNaN(dir.X)) dir = new Vector3(0, 0, 1);
 
                 if (!fixCursorPlane
-                    && (cursorOnMap = FindClosestIntersection(view.position + dirrrr, dirrrr, out Vector3 closestIntersection, out hoverTriangle)))
+                    && (cursorOnMap = FindClosestIntersection(view.position + dir, dir, out Vector3 closestIntersection, out hoverTriangle)))
                 {
                     normalAtCursor = new Vector3(hoverTriangle.NormX, hoverTriangle.NormY, hoverTriangle.NormZ);
                     mapCursorPosition = closestIntersection;
                     cursorViewPlaneDist = Vector3.Dot(mapCursorPosition - view.position, -BillboardMatrix.Row2.Xyz);
                 }
                 else
-                    mapCursorPosition = view.position + dirrrr * cursorViewPlaneDist;
+                    mapCursorPosition = view.position + dir * cursorViewPlaneDist;
             }
         }
 

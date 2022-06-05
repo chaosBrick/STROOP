@@ -424,6 +424,7 @@
     <Compile Include="Tabs\MapTab\DataUtil\CollisionStructure.cs" />
     <Compile Include="Tabs\MapTab\GraphicsUtil.cs" />
     <Compile Include="Tabs\MapTab\IHoverData.cs" />
+    <Compile Include="Tabs\MapTab\MapObjects\CustomTriangleList.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\HoverDatas.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapAllObjectCeilingObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapAllObjectFloorObject.cs" />
@@ -457,7 +458,7 @@
     <Compile Include="Tabs\MapTab\MapObjects\MapFloorObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapTriangleObject.cs" />
     <Compile Include="Tabs\MapTab\MapIwerlipsesObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapCustomGridlinesObject.cs" />
+    <Compile Include="Tabs\MapTab\MapObjects\MapGridlinesObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapCustomBackgroundObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapLevelCeilingObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapLevelFloorObject.cs" />
@@ -487,7 +488,6 @@
     <Compile Include="Tabs\MapTab\MapObjects\MapCurrentCellObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapCircleObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapQuadObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapUnitGridlinesObject.cs" />
     <Compile Include="Tabs\MapTab\MapUtilities.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapHorizontalTriangleObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapCurrentMapObject.cs" />

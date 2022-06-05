@@ -37,46 +37,6 @@ namespace STROOP.Tabs.MapTab
             return triAddresses.FindAll(triAddress => triAddress != 0)
                 .ConvertAll(triAddress => TriangleDataModel.Create(triAddress));
         }
-        
-        public static List<List<(float x, float y, float z)>> ConvertUnitPointsToQuads(List<(int x, int z)> unitPoints)
-        {
-            List<List<(float x, float y, float z)>> quadList = new List<List<(float x, float y, float z)>>();
-            Action<int, int, int, int> addQuad = (int xBase, int zBase, int xAdd, int zAdd) =>
-            {
-                quadList.Add(new List<(float x, float y, float z)>()
-                {
-                    (xBase, 0, zBase),
-                    (xBase + xAdd, 0, zBase),
-                    (xBase + xAdd, 0, zBase + zAdd),
-                    (xBase, 0, zBase + zAdd),
-                });
-            };
-            foreach ((int x, int z) in unitPoints)
-            {
-                if (x == 0 && z == 0)
-                {
-                    addQuad(x, z, 1, 1);
-                    addQuad(x, z, 1, -1);
-                    addQuad(x, z, -1, 1);
-                    addQuad(x, z, -1, -1);
-                }
-                else if (x == 0)
-                {
-                    addQuad(x, z, 1, Math.Sign(z));
-                    addQuad(x, z, -1, Math.Sign(z));
-                }
-                else if (z == 0)
-                {
-                    addQuad(x, z, Math.Sign(x), 1);
-                    addQuad(x, z, Math.Sign(x), -1);
-                }
-                else
-                {
-                    addQuad(x, z, Math.Sign(x), Math.Sign(z));
-                }
-            }
-            return quadList;
-        }
 
         public static (float x1, float z1, float x2, float z2, bool xProjection, double pushAngle)? Get2DWallDataFromTri(
             TriangleDataModel tri, float? heightNullable = null)

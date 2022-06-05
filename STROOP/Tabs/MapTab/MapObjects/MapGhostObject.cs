@@ -25,6 +25,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             public override bool SetY(double value) => false;
             public override bool SetZ(double value) => false;
             public override bool SetAngle(double value) => false;
+            public override string GetMapName() => "Ghost";
         }
 
         public MapGhostObject()

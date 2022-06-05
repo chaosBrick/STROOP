@@ -103,6 +103,10 @@ namespace STROOP.Tabs.MapTab.MapObjects
             public override string ToString() => $"{(MapCustomCameraPath)parent}[{((MapCustomCameraPath)parent).GetIndex(currentKeyFrame)}]({currentKeyFrame.frame})";
         }
 
+
+        ToolStripMenuItem itemPlayback;
+        bool playback => itemPlayback.Checked;
+
         List<KeyFrame> keyFrames = new List<KeyFrame>();
 
         void SortKeyFrames()
@@ -146,9 +150,6 @@ namespace STROOP.Tabs.MapTab.MapObjects
         }
 
         int GetIndex(KeyFrame frame) => keyFrames.IndexOf(frame);
-
-        bool playback = false;
-        bool frozen = false;
 
         KeyFrameHoverData actualHoverData;
 
@@ -224,16 +225,21 @@ namespace STROOP.Tabs.MapTab.MapObjects
         {
             base.GetContextMenuStrip(targetTracker);
 
-            var itemAddShit = new ToolStripMenuItem("Add Keyframe");
-            itemAddShit.Click += (_, __) =>
+            var itemAddKeyframe = new ToolStripMenuItem("Add Keyframe");
+            itemAddKeyframe.Click += (_, __) =>
             {
                 var f = new KeyFrame();
                 f.position = targetTracker.mapTab.graphics.view.position;
                 f.targetPoint.position = targetTracker.mapTab.graphics.view.position + targetTracker.mapTab.graphics.view.ComputeViewDirection() * 400;
                 keyFrames.Add(f);
             };
+            _contextMenuStrip.Items.Add(itemAddKeyframe);
 
-            _contextMenuStrip.Items.Add(itemAddShit);
+            itemPlayback = new ToolStripMenuItem("Playback");
+            itemPlayback.Checked = true;
+            itemPlayback.Click += (_, __) => itemPlayback.Checked = !itemPlayback.Checked;
+            _contextMenuStrip.Items.Add(itemPlayback);
+
             return _contextMenuStrip;
         }
 
@@ -244,7 +250,6 @@ namespace STROOP.Tabs.MapTab.MapObjects
         public override void Update()
         {
             base.Update();
-            playback = true;
             if (playback && keyFrames.Count > 0)
             {
                 var globalTimer = Config.Stream.GetUInt32(MiscConfig.GlobalTimerAddress);

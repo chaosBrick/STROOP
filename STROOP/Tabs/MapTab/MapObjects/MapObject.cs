@@ -235,9 +235,9 @@ namespace STROOP.Tabs.MapTab.MapObjects
         {
             if (_contextMenuStrip == null)
             {
+                _contextMenuStrip = new ContextMenuStrip();
                 enableDragging.Checked = false;
                 enableDragging.Click += (_, __) => enableDragging.Checked = !enableDragging.Checked;
-                _contextMenuStrip = new ContextMenuStrip();
                 _contextMenuStrip.Items.Add(enableDragging);
             }
 

@@ -1,13 +1,15 @@
 ﻿using System.Collections.Generic;
 using STROOP.Utilities;
 using OpenTK;
-
+using System.Windows.Forms;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {
     public abstract class MapLineObject : MapObject
     {
         public MapLineObject() : base() { }
+
+        protected virtual Vector4 GetColor(MapGraphics graphics) => ColorUtilities.ColorToVec4(OutlineColor, OpacityByte);
 
         protected override void DrawTopDown(MapGraphics graphics)
         {
@@ -17,16 +19,22 @@ namespace STROOP.Tabs.MapTab.MapObjects
             {
                 bool isFirstVertex = false;
                 Vector3 lastVertex = default(Vector3);
+                Vector4 color = GetColor(graphics);
                 foreach (var vert in GetVertices(graphics))
                 {
                     var newVertex = vert;
                     if (isFirstVertex)
-                        graphics.lineRenderer.Add(lastVertex, newVertex, ColorUtilities.ColorToVec4(OutlineColor, OpacityByte), OutlineWidth);
+                        graphics.lineRenderer.Add(lastVertex, newVertex, color, OutlineWidth);
 
                     isFirstVertex = !isFirstVertex;
                     lastVertex = newVertex;
                 }
             });
+        }
+
+        protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
+        {
+            return _contextMenuStrip = new ContextMenuStrip();
         }
 
         protected override void DrawOrthogonal(MapGraphics graphics) => DrawTopDown(graphics);

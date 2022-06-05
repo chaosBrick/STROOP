@@ -80,6 +80,10 @@ namespace STROOP.Tabs.MapTab
             InitializeControls();
 
             comboBoxViewMode.SelectedIndex = 0;
+            if (!System.IO.File.Exists(DEFAULT_TRACKER_FILE))
+                flowLayoutPanelMapTrackers.Controls.Clear();
+            else
+                LoadTrackerConfigAndDisplay(DEFAULT_TRACKER_FILE);
             RequireGeometryUpdate();
         }
 
@@ -132,7 +136,7 @@ namespace STROOP.Tabs.MapTab
                 (checkBoxMapOptionsTrackFloorTri, new MapTracker(this, "SemaphoreFloorTri", new MapMarioFloorObject())),
                 (checkBoxMapOptionsTrackWallTri, new MapTracker(this, "SemaphoreWallTri", new MapMarioWallObject())),
                 (checkBoxMapOptionsTrackCeilingTri, new MapTracker(this, "SemaphoreCeilingTri", new MapMarioCeilingObject())),
-                (checkBoxMapOptionsTrackUnitGridlines, new MapTracker(this, "SemaphoreUnitGridlines", new MapUnitGridlinesObject())),
+                (checkBoxMapOptionsTrackUnitGridlines, new MapTracker(this, "SemaphoreUnitGridlines", MapGridlinesObject.CreateUnits(null))),
             });
             foreach (var it in quickSemaphores)
             {
@@ -371,9 +375,16 @@ namespace STROOP.Tabs.MapTab
             contextMenu.Show(Cursor.Position);
         }
 
+        private void LoadDefaultTrackers()
+        {
+            if (!System.IO.File.Exists(DEFAULT_TRACKER_FILE))
+                flowLayoutPanelMapTrackers.Controls.Clear();
+            else
+                LoadTrackerConfigAndDisplay(DEFAULT_TRACKER_FILE);
+        }
+
         private void ResetToInitialState()
         {
-            flowLayoutPanelMapTrackers.Controls.Clear();
             comboBoxMapOptionsLevel.SelectedItem = "Recommended";
             comboBoxMapOptionsBackground.SelectedItem = "Recommended";
             radioButtonMapControllersScaleCourseDefault.Checked = true;
@@ -704,6 +715,10 @@ namespace STROOP.Tabs.MapTab
         {
             if (LoadTrackerConfig(trackerFile, out var loadedTrackers))
             {
+                foreach (var ctrl in flowLayoutPanelMapTrackers.Controls)
+                    if (ctrl is MapTracker tracker)
+                        tracker.CleanUp();
+                semaphoreTrackers.Clear();
                 flowLayoutPanelMapTrackers.Controls.Clear();
                 foreach (var tracker in loadedTrackers)
                     flowLayoutPanelMapTrackers.Controls.Add(tracker);
