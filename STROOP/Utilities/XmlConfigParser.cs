@@ -80,7 +80,7 @@ namespace STROOP.Utilities
                             {
                                 Name = subElement.Attribute(XName.Get("name")).Value,
                                 ProcessName = subElement.Attribute(XName.Get("processName")).Value,
-                                RamStart = ParsingUtilities.ParseHex(subElement.Attribute(XName.Get("ramStart")).Value),
+                                RamStart = ParsingUtilities.ParseHexNullable(subElement.Attribute(XName.Get("ramStart")).Value).Value,
                                 AllowAutoDetect = allowAutoDetect,
                                 Dll = subElement.Attribute(XName.Get("offsetDll"))?.Value ?? null,
                                 Endianness = subElement.Attribute(XName.Get("endianness")).Value == "big"
@@ -197,7 +197,7 @@ namespace STROOP.Utilities
 
         public static List<WatchVariableControl> OpenWatchVariableControls(string path)
         {
-            return OpenWatchVariableControlPrecursors(path).ConvertAll(precursor => precursor.CreateWatchVariableControl());
+            return OpenWatchVariableControlPrecursors(path).ConvertAll(precursor => new WatchVariableControl(precursor));
         }
 
         public static List<WatchVariable> OpenWatchVariableControlPrecursors(string path)

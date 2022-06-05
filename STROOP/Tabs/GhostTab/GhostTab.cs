@@ -11,7 +11,32 @@ namespace STROOP.Tabs.GhostTab
 {
     public partial class GhostTab : STROOPTab
     {
+        const uint COLORED_HATS_CODE_TARGET_ADDR = 0x80408200;
+        const uint COLORED_HATS_LIGHTS_ADDR = 0x80408500;
+        static void __DebugInjectHeadKillers()
+        {
+            uint jumpinOffset = 0xe0;
+
+            var krasserScheiss = new[] {
+                new [] {0xF0A74, 0xF12F0, 0xF2990, 0xF320C, 0xF4898, 0xF5114 },
+                new [] { 0xF0A8C, 0xF1308, 0xF29A8, 0xF3224, 0xF48B0, 0xF512C},
+                new [] { 0xf0aa4, 0xf1320, 0xf29c0, 0xf323c, 0xf48c8, 0xf5144},
+                new [] { 0xf0b1c, 0xf1398, 0xf2a38, 0xf32b4, 0xf4940, 0xf51bc},
+            };
+            foreach (var scheiss in krasserScheiss)
+                foreach (var addr in scheiss)
+                {
+                    Config.Stream.SetValue((COLORED_HATS_CODE_TARGET_ADDR + jumpinOffset), (uint)addr);
+                    Config.Stream.SetValue((ushort)0x12A, (uint)(addr - 0x14));
+                }
+
+            uint jumpOutOfHeadAddr = 0x90580 + 0x8;
+            Config.Stream.WriteRam(new byte[] { 0xB8, 0, 0, 0, 0, 0, 0, 0 }, jumpOutOfHeadAddr, EndiannessType.Big);
+        }
+
+        bool waitForHatColorInjection = false;
         static GhostTab instance;
+        Vector4 marioHatColor = new Vector4(1, 0, 0, 1);
 
         [InitializeSpecial]
         static void AddSpecialVariables()
@@ -28,19 +53,13 @@ namespace STROOP.Tabs.GhostTab
             target.Add("GhostRoll", ((uint _) => displayGhostVarFloat(frame => frame.oRoll)(), (object _, uint __) => false));
         }
 
-        uint bufferBaseAddress = 0x80408200;
-
-        Task recordingTask;
-        volatile Dictionary<uint, GhostFrame> recordingFrames = null;
-        uint recordingBaseFrame = 0;
-
-        int recIndex;
+        uint bufferBaseAddress = 0x80408800;
 
         Ghost selectedGhost => listBoxGhosts.SelectedItem as Ghost;
         GhostFrame lastValidPlaybackFrame => selectedGhost?.lastValidPlaybackFrame ?? default(GhostFrame);
         GhostFrame currentGhostFrame;
 
-        RomHack hack;
+        RomHack ghostHack, transparentGhostsHack;
 
         public Vector3 GhostPosition { get; private set; }
         public uint GhostAngle { get; private set; }
@@ -51,7 +70,8 @@ namespace STROOP.Tabs.GhostTab
             listBoxGhosts.KeyDown += listBoxGhosts_KeyDown;
 
             instance = this;
-            hack = new RomHack("Resources/Hacks/GhostHack.hck", "Ghost Hack");
+            ghostHack = new RomHack("Resources/Hacks/GhostHack.hck", "Ghost Hack");
+            transparentGhostsHack = new RomHack("Resources/Hacks/TransparentGhosts.hck", "Transparent Ghosts");
             UpdateFileWatchers();
         }
 
@@ -79,210 +99,160 @@ namespace STROOP.Tabs.GhostTab
                 selectedGhost.playbackBaseFrame = newValue;
         }
 
-        void RecordGhostThread()
-        {
-            var sleepTime = new TimeSpan(100000); //0.1ms
-            bool hasBaseFrame = false;
-
-            GhostFrame lastRecorded = default(GhostFrame);
-            int currentTimer = Config.Stream.GetInt32(MiscConfig.GlobalTimerAddress);
-            recordingFrames = new Dictionary<uint, GhostFrame>();
-            int lastCurrentTimer = 0;
-            Config.Stream.WriteRam(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF }, 0x80407FF4, EndiannessType.Little);
-            Config.Stream.WriteRam(new byte[4], 0x80407FF8, EndiannessType.Little);
-            while (recordingFrames != null)
-            {
-                boring:;
-                System.Threading.Thread.Sleep(sleepTime);
-
-                byte[] theEntireRam;
-                Config.Stream.GetAllRam(out theEntireRam);
-
-                var semaphoreState = BitConverter.ToInt32(theEntireRam, 0x00407FF8);
-                //Wait for the game to notify us that it is about to increase global timer
-                //The game will loop until we're done reading data, at which point we will reset the semaphore
-                switch (semaphoreState)
-                {
-                    case 0:
-                        continue;
-                    case 1:
-                        currentTimer = BitConverter.ToInt32(theEntireRam, (int)(MiscConfig.GlobalTimerAddress & 0x00FFFFFF));
-                        if (currentTimer == lastCurrentTimer)
-                            goto boring;
-                        uint marioObjRef = BitConverter.ToUInt32(theEntireRam, (int)(MarioObjectConfig.PointerAddress & 0x00FFFFFF)) & 0x00FFFFFF;
-                        int baseOffsetYeah = (int)(marioObjRef + 0x18);
-                        //marioGfx = Config.Stream.ReadRam(marioObjRef + 0x18, 0x34, EndiannessType.Little);
-                        if (!hasBaseFrame)
-                        {
-                            hasBaseFrame = true;
-                            recordingBaseFrame = (uint)currentTimer;
-                            lastCurrentTimer = currentTimer;
-                        }
-
-                        lastCurrentTimer = currentTimer;
-
-                        short animation = BitConverter.ToInt16(theEntireRam, baseOffsetYeah + (int)MarioObjectConfig.AnimationOffset - 0x16); // Config.Stream.GetInt16(marioObjRef + MarioObjectConfig.AnimationOffset);
-                        short animationFrame = BitConverter.ToInt16(theEntireRam, baseOffsetYeah + (int)MarioObjectConfig.AnimationTimerOffset - 0x16); // Config.Stream.GetInt16(marioObjRef + MarioObjectConfig.AnimationTimerOffset);
-
-                        var position = new Vector3(
-                            BitConverter.ToSingle(theEntireRam, baseOffsetYeah + 0x08), //x
-                            BitConverter.ToSingle(theEntireRam, baseOffsetYeah + 0x0C), //y
-                            BitConverter.ToSingle(theEntireRam, baseOffsetYeah + 0x10) //z
-                        );
-
-                        lastRecorded = new GhostFrame()
-                        {
-                            position = position,
-                            animationIndex = animation,
-                            animationFrame = animationFrame,
-                            oPitch = (uint)BitConverter.ToUInt16(theEntireRam, baseOffsetYeah + 0x0),
-                            oYaw = (uint)BitConverter.ToUInt16(theEntireRam, baseOffsetYeah + 0x6),
-                            oRoll = (uint)BitConverter.ToUInt16(theEntireRam, baseOffsetYeah + 0x4)
-                        };
-                        if (recordingFrames != null)
-                            recordingFrames[(uint)(currentTimer - recordingBaseFrame)] = lastRecorded;
-                        System.Threading.Thread.Sleep(sleepTime);
-
-                        while (!Config.Stream.WriteRam(new byte[4], 0x80407FF8, EndiannessType.Little))
-                            System.Threading.Thread.Sleep(sleepTime);
-                        break;
-                }
-            }
-            Config.Stream.WriteRam(new byte[8], 0x80407FF4, EndiannessType.Little);
-        }
-
         float yTargetPosition;
         int lastGlobalTimer;
 
         static float EaseIn(float f) => 1 - 1 / (float)Math.Exp(f);
 
+        bool updateGhostData => ghostHack.Enabled;
+
         public override void Update(bool active)
         {
             base.Update(active);
+            var ghostPointer = Config.Stream.GetInt32(0x80407FF8);
+            bool ghostsActive = (ghostPointer & 0xFF000000) == 0x80000000;
+
+            if (ghostHack.Enabled && !ghostsActive)
+                waitForHatColorInjection = true;
+            if (waitForHatColorInjection && ghostsActive)
+            {
+                InGameFunctionCall.CreateInGameSemaphore();
+                waitForHatColorInjection = false;
+            }
+            else if (InGameFunctionCall.IsSemaphoreSet())
+            {
+                __DebugInjectHeadKillers();
+                InGameFunctionCall.ClearSemaphore();
+            }
 
             var buffer = new byte[0x1000];
-            var ghostPointer = Config.Stream.GetInt32(0x80407FFC);
-            hack.UpdateEnabledStatus();
-            labelHackActiveState.Text = (ghostPointer & 0xFF000000) == 0x80000000 && hack.Enabled ?
+            ghostHack.UpdateEnabledStatus();
+            labelHackActiveState.Text = (ghostsActive && ghostHack.Enabled) ?
                                          "Ghost hack is enabled." :
-                                         (hack.Enabled ?
+                                         (ghostHack.Enabled ?
                                          "Ghost hack is enabled\nbut not running.\nInside a level,\nsave state and load state,\nthen frame advance." :
                                          "Ghost hack is disabled.");
 
+            var oldEnabled = transparentGhostsHack.Enabled;
+            transparentGhostsHack.UpdateEnabledStatus();
+            if (transparentGhostsHack.Enabled != oldEnabled)
+            {
+                suppressCheckChanged = true;
+                checkTransparentGhosts.Checked = transparentGhostsHack.Enabled;
+            }
+            suppressCheckChanged = false;
+
             var globalTimer = Config.Stream.GetInt32(MiscConfig.GlobalTimerAddress);
+            var ghostList = new List<Ghost>();
+            foreach (var item in listBoxGhosts.SelectedItems)
+                if (item is Ghost ghost)
+                    ghostList.Add(ghost);
+            var ghostArr = ghostList.ToArray();
+            int numGhosts = Math.Max(1, ghostArr.Length);
 
-            if (selectedGhost != null)
+            listBoxGhosts.SelectionMode = SelectionMode.MultiExtended;
+
+            if (updateGhostData)
             {
-                for (int tm = 0; tm < 0x80; tm++)
-                {
-                    int i = (tm + globalTimer) & 0x7F;
-                    GhostFrame newFrame = default(GhostFrame);
-                    var index = globalTimer + tm - selectedGhost.playbackBaseFrame;
-                    if (index >= 0 && selectedGhost.playbackFrames.TryGetValue((uint)index, out newFrame))
-                        selectedGhost.lastValidPlaybackFrame = newFrame;
+                Config.Stream.SetValue(numGhosts, 0x80407FFC);
+                Config.Stream.WriteRam(ColorToLights(marioHatColor), (UIntPtr)(COLORED_HATS_LIGHTS_ADDR), EndiannessType.Big);
 
-                    Array.Copy(BitConverter.GetBytes(lastValidPlaybackFrame.position.X), 0, buffer, i * 0x20 + 0x00, 4);
-                    Array.Copy(BitConverter.GetBytes(lastValidPlaybackFrame.position.Y), 0, buffer, i * 0x20 + 0x04, 4);
-                    Array.Copy(BitConverter.GetBytes(lastValidPlaybackFrame.position.Z), 0, buffer, i * 0x20 + 0x08, 4);
-                    Array.Copy(BitConverter.GetBytes(lastValidPlaybackFrame.animationIndex), 0, buffer, i * 0x20 + 0x0C, 2);
-                    Array.Copy(BitConverter.GetBytes(lastValidPlaybackFrame.oPitch), 0, buffer, i * 0x20 + 0x10, 4);
-                    Array.Copy(BitConverter.GetBytes(lastValidPlaybackFrame.oYaw), 0, buffer, i * 0x20 + 0x14, 4);
-                    Array.Copy(BitConverter.GetBytes(lastValidPlaybackFrame.oRoll), 0, buffer, i * 0x20 + 0x18, 4);
-                    Array.Copy(BitConverter.GetBytes(lastValidPlaybackFrame.animationFrame), 0, buffer, i * 0x20 + 0x1E, 2);
-                }
-
-                GhostFrame currentFrame;
-                var idx = (globalTimer - 1) - selectedGhost.playbackBaseFrame;
-                if (idx >= 0 && selectedGhost.playbackFrames.TryGetValue((uint)idx, out currentFrame))
-                {
-                    this.currentGhostFrame = currentFrame;
-                    GhostPosition = currentFrame.position;
-                    GhostAngle = currentFrame.oYaw;
-                }
-
+                //Disable low poly Mario
+                Config.Stream.SetValue(0x02587fff, 0x800f470c);
+                Config.Stream.SetValue(0x7fff7fff, 0x800f6634);
             }
-            else
-            {
-                var marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
 
-                Vector3 marioPosition = new Vector3(Config.Stream.GetSingle(marioObjRef + 0x20), Config.Stream.GetSingle(marioObjRef + 0x24), Config.Stream.GetSingle(marioObjRef + 0x28));
-                if (globalTimer < lastGlobalTimer)
-                    yTargetPosition = marioPosition.Y;
+            for (int ghostIndex = 0; ghostIndex < numGhosts; ghostIndex++)
+            {
+                if (ghostArr.Length > ghostIndex)
+                {
+                    var ghost = ghostArr[ghostIndex];
+                    for (int tm = 0; tm < 0x80; tm++)
+                    {
+                        int i = (tm + globalTimer) & 0x7F;
+                        GhostFrame newFrame = default(GhostFrame);
+                        var index = globalTimer + tm - ghost.playbackBaseFrame;
+                        if (index >= 0 && ghost.playbackFrames.TryGetValue((uint)index, out newFrame))
+                            ghost.lastValidPlaybackFrame = newFrame;
+
+                        Array.Copy(BitConverter.GetBytes(ghost.lastValidPlaybackFrame.position.X), 0, buffer, i * 0x20 + 0x00, 4);
+                        Array.Copy(BitConverter.GetBytes(ghost.lastValidPlaybackFrame.position.Y), 0, buffer, i * 0x20 + 0x04, 4);
+                        Array.Copy(BitConverter.GetBytes(ghost.lastValidPlaybackFrame.position.Z), 0, buffer, i * 0x20 + 0x08, 4);
+                        Array.Copy(BitConverter.GetBytes(ghost.lastValidPlaybackFrame.animationIndex), 0, buffer, i * 0x20 + 0x0C, 2);
+                        Array.Copy(BitConverter.GetBytes(ghost.lastValidPlaybackFrame.oPitch), 0, buffer, i * 0x20 + 0x10, 4);
+                        Array.Copy(BitConverter.GetBytes(ghost.lastValidPlaybackFrame.oYaw), 0, buffer, i * 0x20 + 0x14, 4);
+                        Array.Copy(BitConverter.GetBytes(ghost.lastValidPlaybackFrame.oRoll), 0, buffer, i * 0x20 + 0x18, 4);
+                        Array.Copy(BitConverter.GetBytes(ghost.lastValidPlaybackFrame.animationFrame), 0, buffer, i * 0x20 + 0x1E, 2);
+                    }
+
+                    GhostFrame currentFrame;
+                    var idx = (globalTimer - 1) - ghost.playbackBaseFrame;
+                    if (idx >= 0 && ghost.playbackFrames.TryGetValue((uint)idx, out currentFrame))
+                    {
+                        this.currentGhostFrame = currentFrame;
+                        GhostPosition = currentFrame.position;
+                        GhostAngle = currentFrame.oYaw;
+                    }
+                }
                 else
-                    yTargetPosition += (marioPosition.Y + 200 - yTargetPosition) * EaseIn((globalTimer - lastGlobalTimer) / 10.0f);
-
-                for (int tm = 0; tm < 0x80; tm++)
                 {
-                    int i = (tm + globalTimer) & 0x7F;
-                    var index = globalTimer + tm;
+                    var marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
 
-                    float f = (index % 60) / 60.0f;
-                    float angle = f * (float)Math.PI * 2;
-                    var x = marioPosition.X + (float)Math.Cos(angle) * 200;
-                    var z = marioPosition.Z + (float)Math.Sin(angle) * -200;
+                    Vector3 marioPosition = new Vector3(Config.Stream.GetSingle(marioObjRef + 0x20), Config.Stream.GetSingle(marioObjRef + 0x24), Config.Stream.GetSingle(marioObjRef + 0x28));
+                    if (globalTimer < lastGlobalTimer)
+                        yTargetPosition = marioPosition.Y;
+                    else
+                        yTargetPosition += (marioPosition.Y + 200 - yTargetPosition) * EaseIn((globalTimer - lastGlobalTimer) / 10.0f);
 
-                    int barrelRoll = 0;
-                    const int rollSpeed = 0x800;
-                    int indexMod150 = index % 150;
-                    if (indexMod150 < 0x10000 / rollSpeed) barrelRoll = indexMod150 * -rollSpeed;
+                    for (int tm = 0; tm < 0x80; tm++)
+                    {
+                        int i = (tm + globalTimer) & 0x7F;
+                        var index = globalTimer + tm;
 
-                    Array.Copy(BitConverter.GetBytes(x), 0, buffer, i * 0x20 + 0x00, 4);
-                    Array.Copy(BitConverter.GetBytes(yTargetPosition), 0, buffer, i * 0x20 + 0x04, 4);
-                    Array.Copy(BitConverter.GetBytes(z), 0, buffer, i * 0x20 + 0x08, 4);
-                    Array.Copy(BitConverter.GetBytes((ushort)0x2A), 0, buffer, i * 0x20 + 0x0C, 2);
-                    Array.Copy(BitConverter.GetBytes((uint)0), 0, buffer, i * 0x20 + 0x10, 4);
-                    Array.Copy(BitConverter.GetBytes((uint)(f * ushort.MaxValue + 0x8000)), 0, buffer, i * 0x20 + 0x14, 4);
-                    Array.Copy(BitConverter.GetBytes(0xE800 + barrelRoll), 0, buffer, i * 0x20 + 0x18, 4);
-                    Array.Copy(BitConverter.GetBytes((ushort)0), 0, buffer, i * 0x20 + 0x1E, 2);
+                        float f = (index % 60) / 60.0f;
+                        float angle = f * (float)Math.PI * 2;
+                        var x = marioPosition.X + (float)Math.Cos(angle) * 200;
+                        var z = marioPosition.Z + (float)Math.Sin(angle) * -200;
+
+                        int barrelRoll = 0;
+                        const int rollSpeed = 0x800;
+                        int indexMod150 = index % 150;
+                        if (indexMod150 < 0x10000 / rollSpeed) barrelRoll = indexMod150 * -rollSpeed;
+
+                        Array.Copy(BitConverter.GetBytes(x), 0, buffer, i * 0x20 + 0x00, 4);
+                        Array.Copy(BitConverter.GetBytes(yTargetPosition + ghostIndex * 500 / numGhosts), 0, buffer, i * 0x20 + 0x04, 4);
+                        Array.Copy(BitConverter.GetBytes(z), 0, buffer, i * 0x20 + 0x08, 4);
+                        Array.Copy(BitConverter.GetBytes((ushort)0x2A), 0, buffer, i * 0x20 + 0x0C, 2);
+                        Array.Copy(BitConverter.GetBytes((uint)0), 0, buffer, i * 0x20 + 0x10, 4);
+                        Array.Copy(BitConverter.GetBytes((uint)(f * ushort.MaxValue + 0x8000)), 0, buffer, i * 0x20 + 0x14, 4);
+                        Array.Copy(BitConverter.GetBytes(0xE800 + barrelRoll), 0, buffer, i * 0x20 + 0x18, 4);
+                        Array.Copy(BitConverter.GetBytes((ushort)0), 0, buffer, i * 0x20 + 0x1E, 2);
+                    }
+                }
+                if (updateGhostData)
+                {
+                    Config.Stream.WriteRam(buffer, (UIntPtr)(bufferBaseAddress + ghostIndex * 0x1000), EndiannessType.Little);
+
+                    var color = ghostIndex < ghostArr.Length ? ghostArr[ghostIndex].hatColor : new Vector4(0.8f, 0.8f, 0.8f, 1.0f);
+
+                    Config.Stream.WriteRam(ColorToLights(color), (UIntPtr)(COLORED_HATS_LIGHTS_ADDR + (ghostIndex + 1) * 0x20), EndiannessType.Big);
+                    lastGlobalTimer = globalTimer;
                 }
             }
-            if (hack.Enabled)
-            {
-                Config.Stream.WriteRam(buffer, bufferBaseAddress, EndiannessType.Little);
-                lastGlobalTimer = globalTimer;
-            }
         }
 
-        void StartRecording()
+        static byte[] ColorToLights(Vector4 color)
         {
-            if (!recordingGhost)
-            {
-                recordingFrames = new Dictionary<uint, GhostFrame>();
-                (recordingTask = new Task(RecordGhostThread)).Start();
-            }
-        }
+            var c2 = color * 0.5f;
+            var R1 = (byte)Math.Max(0, Math.Min(255, (color.X * 255)));
+            var G1 = (byte)Math.Max(0, Math.Min(255, (color.Y * 255)));
+            var B1 = (byte)Math.Max(0, Math.Min(255, (color.Z * 255)));
 
-        void EndRecording()
-        {
-            if (recordingGhost)
-            {
-                var dict = recordingFrames;
-                recordingFrames = null;
-                recordingTask.Wait();
-                var ghost = new Ghost(recordingBaseFrame, dict);
-                AddGhost($"rec {++recIndex}", ghost);
-            }
-        }
+            var R2 = (byte)Math.Max(0, Math.Min(255, (c2.X * 255)));
+            var G2 = (byte)Math.Max(0, Math.Min(255, (c2.Y * 255)));
+            var B2 = (byte)Math.Max(0, Math.Min(255, (c2.Z * 255)));
 
-        bool recordingGhost => recordingFrames != null;
-
-        private void buttonRecordGhost_Click(object sender, EventArgs e)
-        {
-            if (!hack.Enabled)
-            {
-                MessageBox.Show("Ghost hack must be enabled to record a ghost from within STROOP.");
-                return;
-            }
-            if (recordingGhost)
-            {
-                ((Button)sender).Text = "Record Ghost";
-                EndRecording();
-            }
-            else
-            {
-                ((Button)sender).Text = "Stop Recording";
-                StartRecording();
-            }
+            return new byte[] { R2, G2, B2, 0x00, R2, G2, B2, 0x00, R1, G1, B1, 0x00, R1, G1, B1, 0x00, 0x28, 0x28, 0x28, 0x00, 0x00, 0x00, 0x00, 0x00 };
         }
 
         private void buttonLoadGhost_Click(object sender, EventArgs e)
@@ -336,6 +306,13 @@ namespace STROOP.Tabs.GhostTab
             if (suspendSelectedIndexChanged)
                 return;
             Ghost ghost = listBoxGhosts.SelectedItem as Ghost;
+            if (ghost == null)
+                buttonGhostColor.Enabled = false;
+            else
+            {
+                buttonGhostColor.BackColor = Utilities.ColorUtilities.Vec4ToColor(ghost.hatColor);
+                buttonGhostColor.Enabled = true;
+            }
             labelGhostFile.Text = $"File: {ghost?.fileName ?? "-"}";
             labelNumFrames.Text = $"Number of frames: {ghost?.numFrames.ToString() ?? "-"}";
             labelGhostPlaybackStart.Text = $"Original playback start: {ghost?.originalPlaybackBaseFrame.ToString() ?? "-"}";
@@ -353,17 +330,23 @@ namespace STROOP.Tabs.GhostTab
         {
             if (Config.Stream.GetInt32(0x80000000) != 0)
             {
-                var buffer = new byte[0x1000];
-                hack.LoadPayload();
+                ghostHack.LoadPayload();
                 Config.Stream.WriteRam(new byte[4], 0x80407FFC, EndiannessType.Little);
-                Config.Stream.WriteRam(new byte[0x1000], bufferBaseAddress, EndiannessType.Little);
+                //Config.Stream.WriteRam(new byte[0x1000], bufferBaseAddress, EndiannessType.Little);
                 Config.Stream.WriteRam(new byte[0x70], 0x80407F90, EndiannessType.Little);
+                Config.Stream.WriteRam(File.ReadAllBytes("Resources/Hacks/gfx_generate_colored_hats.bin"), COLORED_HATS_CODE_TARGET_ADDR, EndiannessType.Big);
+                waitForHatColorInjection = true;
+                if (checkTransparentGhosts.Checked)
+                    transparentGhostsHack.LoadPayload();
+
+                //Tell ROM Hacks to suck it and get rid of the 01010101 pattern
+                Config.Stream.WriteRam(new byte[0x1000], 0x80408000 - 0x1000, EndiannessType.Big);
             }
         }
 
         private void buttonDisableGhostHack_Click(object sender, EventArgs e)
         {
-            hack.ClearPayload();
+            ghostHack.ClearPayload();
         }
 
         private void numericUpDownStartOfPlayback_ValueChanged(object sender, EventArgs e)
@@ -386,6 +369,46 @@ namespace STROOP.Tabs.GhostTab
                     break;
                 }
                 i++;
+            }
+        }
+
+        bool suppressCheckChanged = false;
+        private void checkTransparentGhosts_CheckedChanged(object sender, EventArgs e)
+        {
+            if (suppressCheckChanged)
+                return;
+            suppressCheckChanged = true;
+            transparentGhostsHack.UpdateEnabledStatus();
+            if (transparentGhostsHack.Enabled)
+                transparentGhostsHack.ClearPayload();
+            else
+                transparentGhostsHack.LoadPayload();
+            transparentGhostsHack.UpdateEnabledStatus();
+            checkTransparentGhosts.Checked = !transparentGhostsHack.Enabled;
+            suppressCheckChanged = false;
+        }
+
+        private void buttonMarioColor_Click(object sender, EventArgs e)
+        {
+            var dlg = new ColorDialog();
+            dlg.Color = System.Drawing.Color.Red;
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                marioHatColor = Utilities.ColorUtilities.ColorToVec4(dlg.Color);
+                buttonMarioColor.BackColor = dlg.Color;
+            }
+        }
+
+        private void buttonGhostColor_Click(object sender, EventArgs e)
+        {
+            if (selectedGhost != null)
+            {
+                var dlg = new ColorDialog();
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    selectedGhost.hatColor = Utilities.ColorUtilities.ColorToVec4(dlg.Color);
+                    buttonGhostColor.BackColor = dlg.Color;
+                }
             }
         }
     }

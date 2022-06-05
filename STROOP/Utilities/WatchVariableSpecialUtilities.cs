@@ -241,24 +241,7 @@ namespace STROOP.Structs
                     throw new ArgumentOutOfRangeException();
             }
         }
-
-        public static WatchVariable.CustomViewData MakeDummy(string typeString)
-        {
-            int index = SpecialConfig.DummyValues.Count;
-            Type type = TypeUtilities.StringToType[typeString];
-            SpecialConfig.DummyValues.Add(ParsingUtilities.ParseValueRoundingWrapping(0, type));
-            string specialType = "Dummy" + index + StringUtilities.Capitalize(typeString);
-
-            return new WatchVariable.CustomViewData<WatchVariableNumberWrapper>((uint dummy) => SpecialConfig.DummyValues[index],
-                 (object value, uint dummy) =>
-                 {
-                     object o = ParsingUtilities.ParseValueRoundingWrapping(value, type);
-                     if (o == null) return false;
-                     SpecialConfig.DummyValues[index] = o;
-                     return true;
-                 }
-            );
-        }
+        
 
         public static string AddSchedulerEntry(int index)
         {

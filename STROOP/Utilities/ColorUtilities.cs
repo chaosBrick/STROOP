@@ -138,6 +138,12 @@ namespace STROOP.Utilities
         public static Vector4 ColorToVec4(Color color, int alpha = -1) =>
             new Vector4(color.R / 255f, color.G / 255f, color.B / 255f, (alpha == -1 ? color.A : alpha) / 255f);
 
+        public static Color Vec4ToColor(Vector4 color) =>
+            Color.FromArgb((byte)(Math.Max(0, Math.Min(255, color.W * 255))),
+                (byte)(Math.Max(0, Math.Min(255, color.X * 255))),
+                (byte)(Math.Max(0, Math.Min(255, color.Y * 255))),
+                (byte)(Math.Max(0, Math.Min(255, color.Z * 255))));
+
         public static Vector4 ColorFromHSV(float hue, float saturation, float value, float alpha = 1)
         {
             int hi = Convert.ToInt32(Math.Floor(hue / 60)) % 6;

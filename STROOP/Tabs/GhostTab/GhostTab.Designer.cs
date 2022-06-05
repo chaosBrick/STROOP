@@ -31,10 +31,12 @@
             this.components = new System.ComponentModel.Container();
             this.groupBoxGhosts = new System.Windows.Forms.GroupBox();
             this.listBoxGhosts = new System.Windows.Forms.ListBox();
+            this.buttonMarioColor = new System.Windows.Forms.Button();
             this.buttonWatchGhostFile = new System.Windows.Forms.Button();
-            this.buttonRecordGhost = new System.Windows.Forms.Button();
             this.buttonLoadGhost = new System.Windows.Forms.Button();
             this.groupBoxGhostInfo = new System.Windows.Forms.GroupBox();
+            this.checkTransparentGhosts = new System.Windows.Forms.CheckBox();
+            this.buttonGhostColor = new System.Windows.Forms.Button();
             this.textBoxGhostName = new System.Windows.Forms.TextBox();
             this.labelNumFrames = new System.Windows.Forms.Label();
             this.labelName = new System.Windows.Forms.Label();
@@ -69,8 +71,8 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBoxGhosts.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.groupBoxGhosts.Controls.Add(this.listBoxGhosts);
+            this.groupBoxGhosts.Controls.Add(this.buttonMarioColor);
             this.groupBoxGhosts.Controls.Add(this.buttonWatchGhostFile);
-            this.groupBoxGhosts.Controls.Add(this.buttonRecordGhost);
             this.groupBoxGhosts.Controls.Add(this.buttonLoadGhost);
             this.groupBoxGhosts.Controls.Add(this.groupBoxGhostInfo);
             this.groupBoxGhosts.Controls.Add(this.buttonSaveGhost);
@@ -93,6 +95,18 @@
             this.listBoxGhosts.TabIndex = 5;
             this.listBoxGhosts.SelectedIndexChanged += new System.EventHandler(this.listBoxGhosts_SelectedIndexChanged);
             // 
+            // buttonMarioColor
+            // 
+            this.buttonMarioColor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonMarioColor.BackColor = System.Drawing.Color.Red;
+            this.buttonMarioColor.Location = new System.Drawing.Point(365, 118);
+            this.buttonMarioColor.Name = "buttonMarioColor";
+            this.buttonMarioColor.Size = new System.Drawing.Size(115, 23);
+            this.buttonMarioColor.TabIndex = 5;
+            this.buttonMarioColor.Text = "Main Mario Color";
+            this.buttonMarioColor.UseVisualStyleBackColor = false;
+            this.buttonMarioColor.Click += new System.EventHandler(this.buttonMarioColor_Click);
+            // 
             // buttonWatchGhostFile
             // 
             this.buttonWatchGhostFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -103,17 +117,6 @@
             this.buttonWatchGhostFile.Text = "Edit File Watch List";
             this.buttonWatchGhostFile.UseVisualStyleBackColor = true;
             this.buttonWatchGhostFile.Click += new System.EventHandler(this.buttonWatchGhostFile_Click);
-            // 
-            // buttonRecordGhost
-            // 
-            this.buttonRecordGhost.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonRecordGhost.Location = new System.Drawing.Point(365, 305);
-            this.buttonRecordGhost.Name = "buttonRecordGhost";
-            this.buttonRecordGhost.Size = new System.Drawing.Size(143, 23);
-            this.buttonRecordGhost.TabIndex = 0;
-            this.buttonRecordGhost.Text = "Record Ghost";
-            this.buttonRecordGhost.UseVisualStyleBackColor = true;
-            this.buttonRecordGhost.Click += new System.EventHandler(this.buttonRecordGhost_Click);
             // 
             // buttonLoadGhost
             // 
@@ -130,6 +133,8 @@
             // 
             this.groupBoxGhostInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBoxGhostInfo.Controls.Add(this.checkTransparentGhosts);
+            this.groupBoxGhostInfo.Controls.Add(this.buttonGhostColor);
             this.groupBoxGhostInfo.Controls.Add(this.textBoxGhostName);
             this.groupBoxGhostInfo.Controls.Add(this.labelNumFrames);
             this.groupBoxGhostInfo.Controls.Add(this.labelName);
@@ -143,6 +148,32 @@
             this.groupBoxGhostInfo.TabIndex = 1;
             this.groupBoxGhostInfo.TabStop = false;
             this.groupBoxGhostInfo.Text = "Ghost Info";
+            // 
+            // checkTransparentGhosts
+            // 
+            this.checkTransparentGhosts.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.checkTransparentGhosts.AutoSize = true;
+            this.checkTransparentGhosts.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.checkTransparentGhosts.Checked = true;
+            this.checkTransparentGhosts.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkTransparentGhosts.Location = new System.Drawing.Point(374, 15);
+            this.checkTransparentGhosts.Name = "checkTransparentGhosts";
+            this.checkTransparentGhosts.Size = new System.Drawing.Size(119, 17);
+            this.checkTransparentGhosts.TabIndex = 6;
+            this.checkTransparentGhosts.Text = "Transparent Ghosts";
+            this.checkTransparentGhosts.UseVisualStyleBackColor = true;
+            this.checkTransparentGhosts.CheckedChanged += new System.EventHandler(this.checkTransparentGhosts_CheckedChanged);
+            // 
+            // buttonGhostColor
+            // 
+            this.buttonGhostColor.Enabled = false;
+            this.buttonGhostColor.Location = new System.Drawing.Point(156, 11);
+            this.buttonGhostColor.Name = "buttonGhostColor";
+            this.buttonGhostColor.Size = new System.Drawing.Size(49, 23);
+            this.buttonGhostColor.TabIndex = 5;
+            this.buttonGhostColor.Text = "Color";
+            this.buttonGhostColor.UseVisualStyleBackColor = true;
+            this.buttonGhostColor.Click += new System.EventHandler(this.buttonGhostColor_Click);
             // 
             // textBoxGhostName
             // 
@@ -365,7 +396,6 @@
 
         private System.Windows.Forms.GroupBox groupBoxGhosts;
         private System.Windows.Forms.ListBox listBoxGhosts;
-        private System.Windows.Forms.Button buttonRecordGhost;
         private System.Windows.Forms.Button buttonLoadGhost;
         private System.Windows.Forms.GroupBox groupBoxGhostInfo;
         private System.Windows.Forms.Label labelBaseGlobalTimer;
@@ -388,5 +418,8 @@
         private System.Windows.Forms.Button buttonTutorialPlayback;
         private System.Windows.Forms.Button buttonTutorialNotes;
         private System.Windows.Forms.Button buttonTutorialFileWatch;
+        private System.Windows.Forms.Button buttonGhostColor;
+        private System.Windows.Forms.CheckBox checkTransparentGhosts;
+        private System.Windows.Forms.Button buttonMarioColor;
     }
 }

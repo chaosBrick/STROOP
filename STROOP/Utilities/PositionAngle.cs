@@ -485,7 +485,7 @@ namespace STROOP.Utilities
             return string.Join(" ", parts);
         }
 
-        public string GetMapName()
+        public virtual string GetMapName()
         {
             switch (PosAngleType)
             {

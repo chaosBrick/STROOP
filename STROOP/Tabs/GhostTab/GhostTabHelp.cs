@@ -7,22 +7,15 @@ namespace STROOP.Tabs.GhostTab
         private void buttonTutorialRecord_Click(object sender, EventArgs e)
         {
             Forms.InfoForm frm = new Forms.InfoForm();
-            frm.Size = new System.Drawing.Size(850, 400);
+            frm.Size = new System.Drawing.Size(850, 250);
             frm.SetText("Ghost Help",
                         "How to record ghosts",
-@"The best way to record a ghost file is to use the 'recordghost.lua' script.
+@"To record a ghost use the 'recordghost.lua' script.
 This script should be located next to your STROOP executable. (You can move it to a different location though.)
 When you press 'Start', a new recording will begin at the current frame.
 Hitting 'Stop' will save the ghost to 'tmp.ghost' at the location of the script file.
 You can then load this file into STROOP to play it back later, or store it somewhere else.
-
-Alternatively, you can record a ghost directly using STROOP using the 'Record Ghost' button.
-To do this, you must first enable the ghost hack such that the respective panel reads 'Ghost hack is running'.
-Then, when you hit 'Record Ghost', a new recording will begin at the current frame.
-'Stop Recording' will end the recording and create a new entry in the ghost list directly.
-You can then watch this ghost back immediately or save it to a file using the 'Save Selected' button.
-IMPORTANT: Using this method to record ghosts may (and likely will) generate game lag to record all frame data.
-Because of this, movie VI counts can desync and end movie playback prematurely.");
+You can also use a File Watcher to automatically load in the last recorded ghost (see ""Using File Watchers"").");
             frm.ShowDialog();
         }
 

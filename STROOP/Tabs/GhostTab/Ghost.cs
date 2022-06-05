@@ -13,12 +13,13 @@ namespace STROOP.Tabs.GhostTab
         public uint maxFrame { get; private set; }
         public uint numFrames => maxFrame + 1;
         public string name, fileName = "-";
+        public OpenTK.Vector4 hatColor = new OpenTK.Vector4(0, 1, 0, 1);
         public Ghost() { }
         public Ghost(uint playbackBaseFrame, Dictionary<uint, GhostFrame> playbackFrames)
         {
             this.playbackBaseFrame = originalPlaybackBaseFrame = playbackBaseFrame;
             this.playbackFrames = playbackFrames;
-            
+
         }
         public static Ghost FromFile(BinaryReader reader)
         {
