@@ -48,17 +48,20 @@ namespace STROOP.Structs
             {
                 nextEnd = remData.IndexOf(":");
 
-                uint address = ParsingUtilities.ParseHex(data.Substring(prevEnd - 8, 8));
-                string byteData = (nextEnd == -1) ? remData : remData.Substring(0, nextEnd - 8);
-
-                var hackBytes = new byte[byteData.Length / 2];
-                for (int i = 0; i < hackBytes.Length; i++)
+                if (ParsingUtilities.TryParseHex(data.Substring(prevEnd - 8, 8), out uint address))
                 {
-                    hackBytes[i] = (byte)ParsingUtilities.ParseHex(byteData.Substring(i * 2, 2));
+                    string byteData = (nextEnd == -1) ? remData : remData.Substring(0, nextEnd - 8);
+
+                    var hackBytes = new byte[byteData.Length / 2];
+                    for (int i = 0; i < hackBytes.Length; i++)
+                        if (ParsingUtilities.TryParseHex(byteData.Substring(i * 2, 2), out uint b))
+                            hackBytes[i] = (byte)b;
+                        else
+                            goto invalidPayload;
+
+                    _payload.Add(new Tuple<uint, byte[]>(address, hackBytes));
+                    invalidPayload:;
                 }
-
-                _payload.Add(new Tuple<uint, byte[]>(address, hackBytes));
-
                 remData = remData.Substring(nextEnd + 1);
                 prevEnd += nextEnd + 1;
             }
