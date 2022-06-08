@@ -25,7 +25,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
             public bool CanDrag() => parent.itemEnableDragging.Checked;
 
-            public void DragTo(Vector3 newPosition)
+            public void DragTo(Vector3 newPosition, bool setY)
             {
                 if (dragA)
                     parent.a = new Vector2(newPosition.X, newPosition.Z);

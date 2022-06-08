@@ -23,10 +23,14 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
             public virtual bool CanDrag() => parent.enableDragging.Checked;
 
-            public void DragTo(Vector3 newPosition)
+            public void DragTo(Vector3 newPosition, bool setY)
             {
                 if (CanDrag())
+                {
+                    if (!setY)
+                        newPosition.Y = GetPosition().Y;
                     SetPosition(newPosition);
+                }
             }
 
             public virtual void Pivot(MapTab tab)

@@ -8,7 +8,7 @@ namespace STROOP.Tabs.MapTab
         void AddContextMenuItems(MapTab tab, ContextMenuStrip menu);
         void LeftClick(Vector3 position);
         void RightClick(Vector3 position);
-        void DragTo(Vector3 position);
+        void DragTo(Vector3 position, bool setY);
         bool CanDrag();
     }
 }

@@ -22,7 +22,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 this.parent = parent;
             }
 
-            public void DragTo(Vector3 position) { }
+            public void DragTo(Vector3 position, bool setY) { }
 
             public void LeftClick(Vector3 position) { }
 

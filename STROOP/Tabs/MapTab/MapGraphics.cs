@@ -800,7 +800,7 @@ namespace STROOP.Tabs.MapTab
                 foreach (var hover in mapTab.hoverData)
                     if (mouseDown[0] && hover.CanDrag())
                     {
-                        hover.DragTo(mapCursorPosition);
+                        hover.DragTo(mapCursorPosition, view.mode != MapView.ViewMode.TopDown);
                         return;
                     }
             }

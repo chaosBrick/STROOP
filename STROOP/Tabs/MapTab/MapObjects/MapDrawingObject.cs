@@ -31,7 +31,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
             public bool CanDrag() => true;
 
-            public void DragTo(Vector3 newPosition)
+            public void DragTo(Vector3 newPosition, bool setY)
             {
                 Vector3 currentVertex = newPosition;
                 if (currentVertex != parent._lastVertex)
