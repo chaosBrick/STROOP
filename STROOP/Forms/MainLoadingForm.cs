@@ -39,13 +39,13 @@ namespace STROOP.Forms
             for (int i = 0; i < tasks.Length; i++)
             {
                 var taskNumber = i;
-                tasks[i].task();
                 Invoke(new Action(() =>
                 {
                     progressBarLoading.Maximum = _maxStatus;
                     progressBarLoading.Value = taskNumber;
                     labelLoadingStatus.Text = $"{tasks[taskNumber].name} [{(taskNumber + 1)} / {_maxStatus}]";
                 }));
+                tasks[i].task();
             }
             Invoke(new Action(() => labelLoadingStatus.Text = "Finishing"));
         }
