@@ -508,7 +508,7 @@ namespace STROOP.Utilities
             return string.Format("[{0}] {1}", slotLabel, objectName);
         }
 
-        public static string NameOfMultiple(IEnumerable<PositionAngle> positionAngles)
+        public static string NameOfMultiple(IEnumerable<PositionAngle> positionAngles, string nameIfNone = null)
         {
             int count = 0;
             string result = "None";
@@ -539,6 +539,9 @@ namespace STROOP.Utilities
                 }
                 count++;
             }
+            if (count == 0)
+                return nameIfNone == null ? "None" : $"Multiple {nameIfNone}";
+
             if (count == 1)
                 result = singleObjectName;
 

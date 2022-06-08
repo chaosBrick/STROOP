@@ -437,7 +437,7 @@
     <Compile Include="Tabs\MapTab\MapObjects\MapCustomSpherePointsObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapFacingDividerObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapSectorObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapAllObjectsWithNameObject.cs" />
+    <Compile Include="Tabs\MapTab\MapObjects\MapMultipleObjectsObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapPunchDetectorObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapHomeLineObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapCeilingObject.cs" />

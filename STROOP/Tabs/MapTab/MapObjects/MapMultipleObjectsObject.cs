@@ -18,6 +18,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         private readonly Lazy<Image> _objImage;
         private readonly Lazy<Image> _objMapImage;
         Func<ObjectDataModel, bool> predicate;
+        string objName = "Object";
 
         private MapMultipleObjects(ObjectCreateParams creationParameters, string name, Lazy<Image> image, Lazy<Image> mapImage)
             : base(creationParameters)
@@ -25,7 +26,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
             _objName = name;
             _objImage = image;
             _objMapImage = mapImage;
-            positionAngleProvider = () => Config.StroopMainForm.ObjectSlotsManager.GetLoadedObjectsWithPredicate(predicate).ConvertAll(_ => PositionAngle.Obj(_.Address)).ToArray();
+            positionAngleProvider = () => Config.StroopMainForm.ObjectSlotsManager.GetLoadedObjectsWithPredicate(predicate).ConvertAll(_ => PositionAngle.Obj(_.Address));
+            objName = _objName;
         }
 
         public static MapMultipleObjects CreateByName(ObjectCreateParams creationParameters)
@@ -38,7 +40,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             ObjectBehaviorAssociation assoc = Config.ObjectAssociations.GetObjectAssociation(objName);
             if (assoc == null) return null;
             objName = objName.ToLower();
-            var objByName = new MapMultipleObjects(creationParameters, "All " + assoc.Name, assoc.Image, assoc.MapImage);
+            var objByName = new MapMultipleObjects(creationParameters, assoc.Name, assoc.Image, assoc.MapImage);
             objByName.predicate = _ => _.BehaviorAssociation.Name.ToLower() == objName;
             return objByName;
         }
@@ -67,7 +69,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 _objMapImage;
         }
 
-        public override string GetName() => PositionAngle.NameOfMultiple(positionAngleProvider());
+        public override string GetName() => PositionAngle.NameOfMultiple(positionAngleProvider(), objName);
 
         protected override void DrawTopDown(MapGraphics graphics)
         {
