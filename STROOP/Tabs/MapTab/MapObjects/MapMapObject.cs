@@ -12,10 +12,10 @@ using OpenTK;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {
-    public abstract class MapMapObject : MapIconRectangleObject
+    public abstract class MapMapObject : MapBackgroundObject
     {
         Renderers.SpriteRenderer renderer;
-        public MapMapObject() : base(null)
+        public MapMapObject() : base()
         {
             InternalRotates = true;
             renderer = new Renderers.SpriteRenderer(MapGraphics.DrawLayers.Background);
@@ -23,30 +23,31 @@ namespace STROOP.Tabs.MapTab.MapObjects
         }
 
         public abstract MapLayout GetMapLayout();
-
-        public override Lazy<Image> GetInternalImage() => GetMapLayout().MapImage;
+        protected override BackgroundImage GetBackgroundImage() => GetMapLayout().MapImage.Value;
 
         protected override void DrawTopDown(MapGraphics graphics)
         {
-            renderer.texture = GraphicsUtil.TextureFromImage(GetInternalImage().Value);
             renderer.SetDrawCalls(graphics);
+            var img = GetInternalImage();
+            if (img == null)
+                return;
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
             {
-                var dimooof = GetDimensions(graphics);
-                foreach (var dim in dimooof)
+            renderer.texture = GraphicsUtil.TextureFromImage(img.Value);
+                foreach (var dim in GetDimensions(graphics))
                     renderer.AddInstance(
                         graphics.BillboardMatrix
                         * Matrix4.CreateScale(dim.size.Width, 1, dim.size.Height)
                         * Matrix4.CreateTranslation(dim.loc.X, 0, dim.loc.Y),
                         graphics.GetObjectTextureLayer(GetInternalImage().Value),
-                        1
+                        new Vector4(1)
                     );
             });
         }
 
         protected override void DrawOrthogonal(MapGraphics graphics) { }
 
-        protected override List<(PointF loc, SizeF size)> GetDimensions(MapGraphics graphics)
+        protected List<(PointF loc, SizeF size)> GetDimensions(MapGraphics graphics)
         {
             RectangleF rectangle = GetMapLayout().Coordinates;
             float rectangleCenterX = rectangle.X + rectangle.Width / 2;

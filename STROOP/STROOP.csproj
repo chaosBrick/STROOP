@@ -517,7 +517,7 @@
     <Compile Include="Structs\Gui\ObjectSlotManagerGui.cs" />
     <Compile Include="Structs\InitializeSpecialAttribute.cs" />
     <Compile Include="Structs\InputFrame.cs" />
-    <Compile Include="Structs\Map\BackgroundImage.cs" />
+    <Compile Include="Tabs\GhostTab\BackgroundImage.cs" />
     <Compile Include="Structs\MusicEntry.cs" />
     <Compile Include="Structs\MusicTable.cs" />
     <Compile Include="Structs\PushHitbox.cs" />
@@ -853,8 +853,8 @@
     <Compile Include="Structs\Configurations\TriangleOffsetsConfig.cs" />
     <Compile Include="Structs\Emulator.cs" />
     <Compile Include="Structs\GameScript.cs" />
-    <Compile Include="Structs\Map\MapLayout.cs" />
-    <Compile Include="Structs\Map\MapAssociations.cs" />
+    <Compile Include="Tabs\GhostTab\MapLayout.cs" />
+    <Compile Include="Tabs\GhostTab\MapAssociations.cs" />
     <Compile Include="Structs\Configurations\MarioConfig.cs" />
     <Compile Include="Structs\ObjectBehaviorAssociation.cs" />
     <Compile Include="Structs\ObjectAssociations.cs" />
@@ -1459,13 +1459,18 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>del "$(TargetDir)OpenTK.dll.config"
+del "$(TargetDir)STROOP.exe.config"
+
 del "$(TargetDir)OpenTK.GLControl.xml"
 del "$(TargetDir)OpenTK.xml"
-del "$(TargetDir)STROOP.exe.config"
-</PostBuildEvent>
+del "$(TargetDir)ICSharpCode.SharpZipLib.xml"
+del "$(TargetDir)ICSharpCode.AvalonEdit.xml"
+del "$(TargetDir)Newtonsoft.Json.xml"
+del "$(TargetDir)System.ValueTuple.xml"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>xcopy /E /Y /I "$(ProjectDir)Resources" "$(TargetDir)Resources" /D</PreBuildEvent>
+    <PreBuildEvent>xcopy /E /Y /I "$(ProjectDir)Resources" "$(TargetDir)Resources" /D
+copy /Y "$(ProjectDir)recordghost.lua" "$(TargetDir)recordghost.lua"</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

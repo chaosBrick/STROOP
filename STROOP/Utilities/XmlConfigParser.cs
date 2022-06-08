@@ -11,6 +11,8 @@ using STROOP.Extensions;
 using System.Xml;
 using STROOP.Structs.Configurations;
 using STROOP.Controls;
+using STROOP.Tabs.MapTab;
+
 
 namespace STROOP.Utilities
 {
@@ -1047,12 +1049,7 @@ namespace STROOP.Utilities
                         {
                             string name = element.Attribute(XName.Get("name")).Value;
                             string imagePath = element.Element(XName.Get("Image")).Attribute(XName.Get("path")).Value;
-                            Lazy<Image> image = new Lazy<Image>(() => Image.FromFile(assoc.BackgroundImageFolderPath + imagePath));
-                            BackgroundImage backgroundImage = new BackgroundImage()
-                            {
-                                Name = name,
-                                Image = image,
-                            };
+                            BackgroundImage backgroundImage = new BackgroundImage(name, assoc.BackgroundImageFolderPath + imagePath);
                             assoc.AddBackgroundImage(backgroundImage);
                         }
                         break;
@@ -1070,7 +1067,7 @@ namespace STROOP.Utilities
 
                             string backgroundImageName = (element.Element(XName.Get("BackgroundImage")) != null) ?
                               element.Element(XName.Get("BackgroundImage")).Attribute(XName.Get("name")).Value : null;
-                            BackgroundImage? backgroundImage = assoc.GetBackgroundImage(backgroundImageName);
+                            BackgroundImage backgroundImage = assoc.GetBackgroundImage(backgroundImageName);
 
                             var coordinatesElement = element.Element(XName.Get("Coordinates"));
                             float x1 = float.Parse(coordinatesElement.Attribute(XName.Get("x1")).Value);
@@ -1085,7 +1082,7 @@ namespace STROOP.Utilities
                                 element.Attribute(XName.Get("subName")).Value : null;
 
                             var coordinates = new RectangleF(x1, z1, x2 - x1, z2 - z1);
-
+                            
                             MapLayout map = new MapLayout()
                             {
                                 Id = id,

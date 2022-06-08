@@ -6,7 +6,7 @@ using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
 using System.Windows.Forms;
-
+using OpenTK;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {
@@ -36,7 +36,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 List<(float x, float y, float z, float angle, Lazy<Image> tex)> data = GetData();
                 data.Reverse();
                 foreach (var dataPoint in data)
-                    DrawIcon(graphics, graphics.view.mode == MapView.ViewMode.ThreeDimensional, dataPoint.x, dataPoint.y, dataPoint.z, dataPoint.angle, dataPoint.tex?.Value, 1);
+                    DrawIcon(graphics, graphics.view.mode == MapView.ViewMode.ThreeDimensional, dataPoint.x, dataPoint.y, dataPoint.z, dataPoint.angle, dataPoint.tex?.Value, new Vector4(1));
             });
         }
 

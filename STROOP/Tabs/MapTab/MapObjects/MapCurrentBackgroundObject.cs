@@ -7,7 +7,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
     {
         public MapCurrentBackgroundObject() : base() { }
 
-        public override Lazy<Image> GetInternalImage() => currentMapTab.GetBackgroundImage();
+        protected override BackgroundImage GetBackgroundImage() => currentMapTab.GetBackgroundImage();
 
         public override string GetName()
         {

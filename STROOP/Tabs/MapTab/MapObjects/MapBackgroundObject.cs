@@ -1,4 +1,6 @@
-﻿using OpenTK;
+﻿using System;
+using System.Drawing;
+using OpenTK;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {
@@ -15,13 +17,20 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected override void DrawTopDown(MapGraphics graphics)
         {
-            var image = GetInternalImage();
             renderer.ignoreView = true;
-            renderer.texture = image != null ? GraphicsUtil.TextureFromImage(image.Value) : 0;
             renderer.SetDrawCalls(graphics);
-            graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() => renderer.AddInstance(Matrix4.CreateScale(2), 0, 1));
+            var img = GetInternalImage();
+            if (img != null)
+            {
+                renderer.texture = GraphicsUtil.TextureFromImage(img.Value);
+                graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() => renderer.AddInstance(Matrix4.CreateScale(2), 0, new Vector4(1)));
+            }
         }
 
         protected override void DrawOrthogonal(MapGraphics graphics) => DrawTopDown(graphics);
+
+        protected abstract BackgroundImage GetBackgroundImage();
+
+        public override sealed Lazy<Image> GetInternalImage() => GetBackgroundImage().GetImage();
     }
 }

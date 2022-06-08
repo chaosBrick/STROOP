@@ -114,7 +114,7 @@ namespace STROOP.Utilities
 
             const int COMPARISON_READ_OFFSET = 0x2462b4; // Address of create_thread
 
-            var autoDetectPattern = System.IO.File.ReadAllBytes("AutoDetectFile.bin");
+            var autoDetectPattern = System.IO.File.ReadAllBytes("Resources/AutoDetectFile.bin");
             var comparisonBuffer = new byte[autoDetectPattern.Length];
 
             var processScanner = new SigScanSharp(Process.Handle);

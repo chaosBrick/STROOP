@@ -53,10 +53,10 @@ namespace STROOP.Tabs.MapTab.Renderers
 
         public struct InstanceData
         {
-            public const int Size = sizeof(float) * 4 * 4 + 2 * sizeof(float);
+            public const int Size = sizeof(float) * 4 * 4 + 5 * sizeof(float);
             public Matrix4 transform;
+            public Vector4 color;
             public float textureIndex;
-            public float alpha;
         }
 
 
@@ -64,7 +64,7 @@ namespace STROOP.Tabs.MapTab.Renderers
         {
             GL.BindVertexArray(vertexArray);
             GL.BindBuffer(BufferTarget.ArrayBuffer, instanceBuffer);
-            for (int i = 0; i <= 4; i++)
+            for (int i = 0; i <= 5; i++)
             {
                 GL.EnableVertexAttribArray(i);
                 GL.VertexAttribDivisor(i, 1);
@@ -73,7 +73,8 @@ namespace STROOP.Tabs.MapTab.Renderers
             GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, InstanceData.Size, sizeof(float) * 4);
             GL.VertexAttribPointer(2, 4, VertexAttribPointerType.Float, false, InstanceData.Size, sizeof(float) * 8);
             GL.VertexAttribPointer(3, 4, VertexAttribPointerType.Float, false, InstanceData.Size, sizeof(float) * 12);
-            GL.VertexAttribPointer(4, 2, VertexAttribPointerType.Float, false, InstanceData.Size, sizeof(float) * 16);
+            GL.VertexAttribPointer(4, 4, VertexAttribPointerType.Float, false, InstanceData.Size, sizeof(float) * 16);
+            GL.VertexAttribPointer(5, 1, VertexAttribPointerType.Float, false, InstanceData.Size, sizeof(float) * 20);
 
             GL.BindVertexArray(0);
         }
@@ -102,12 +103,13 @@ namespace STROOP.Tabs.MapTab.Renderers
             transparentRenderer = new TransparentSpriteRenderer(this, maxExpectedInstances);
         }
 
-        public void AddInstance(Matrix4 transform, int textureIndex, float alpha)
+        public void AddInstance(Matrix4 transform, int textureIndex, Vector4 color)
         {
-            instances.Add(new InstanceData { transform = transform, textureIndex = textureIndex, alpha = alpha });
+            instances.Add(new InstanceData { transform = transform, textureIndex = textureIndex, color = color });
         }
 
-        public void AddTransparentInstance(Matrix4 transform, int textureIndex, float alpha) => transparentRenderer.AddInstance(transform, textureIndex, alpha);
+        public void AddTransparentInstance(Matrix4 transform, int textureIndex, Vector4 color) =>
+            transparentRenderer.AddInstance(transform, textureIndex, color);
 
         public override void SetDrawCalls(MapGraphics graphics)
         {

@@ -61,7 +61,7 @@ namespace STROOP
                 () => XmlConfigParser.OpenFileImageAssoc(@"Config/FileImageAssociations.xml", Config.FileImageGui)
             ),
                 ("Loading Map Associations",
-                () => Config.MapAssociations = XmlConfigParser.OpenMapAssoc(@"Config/MapAssociations.xml")
+                () => Tabs.MapTab.MapTab.MapAssociations = XmlConfigParser.OpenMapAssoc(@"Config/MapAssociations.xml")
             ),
                 ("Loading Scripts",
                 () => _scriptParser = XmlConfigParser.OpenScripts(@"Config/Scripts.xml")

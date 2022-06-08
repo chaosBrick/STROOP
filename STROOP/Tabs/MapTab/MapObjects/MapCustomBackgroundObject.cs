@@ -25,7 +25,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             _backgroundChoice = "Recommended";
         }
 
-        public override Lazy<Image> GetInternalImage()=>currentMapTab.GetBackgroundImage(_backgroundChoice);
+        protected override BackgroundImage GetBackgroundImage() => currentMapTab.GetBackgroundImage(_backgroundChoice);
 
         public override string GetName()
         {
@@ -36,7 +36,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         {
             if (_contextMenuStrip == null)
             {
-                List<BackgroundImage> backgroundImages = Config.MapAssociations.GetAllBackgroundImages();
+                List<BackgroundImage> backgroundImages = MapTab.MapAssociations.GetAllBackgroundImages();
                 List<object> backgroundImageChoices = new List<object>() { "Recommended" };
                 backgroundImages.ForEach(backgroundImage => backgroundImageChoices.Add(backgroundImage));
 

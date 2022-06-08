@@ -8,14 +8,27 @@ using System.IO;
 using System.Windows.Forms;
 using STROOP.Structs.Configurations;
 
-namespace STROOP.Structs
+using STROOP.Structs;
+
+namespace STROOP.Tabs.MapTab
 {
     public class MapAssociations
     {
+        public readonly Lazy<Image> BrokenBackgroundImage = new Lazy<Image>(() => Image.FromFile("Resources/Maps/broken.png"));
+        public readonly Lazy<Image> DownloadingBackgroundImage = new Lazy<Image>(() => Image.FromFile("Resources/Maps/downloading.png"));
+
         Dictionary<Tuple<byte, byte>, List<MapLayout>> _maps = new Dictionary<Tuple<byte, byte>, List<MapLayout>>();
         Dictionary<string, BackgroundImage> _backgroundImageDictionary = new Dictionary<string, BackgroundImage>();
 
         public MapLayout DefaultMap;
+        public MapLayout ROMHackMap = new MapLayout() {
+            ImagePath = "Transparent.png",
+            Background = new BackgroundImage(
+                "ROM Hack Background", 
+                "Resources/Maps/Background Images/Blue Background.png"
+                ),
+            Coordinates = new RectangleF(-8192, -8192, 2 * 8192, 2 * 8192)
+        };
 
         public string MapImageFolderPath;
         public string BackgroundImageFolderPath;
@@ -49,7 +62,7 @@ namespace STROOP.Structs
         {
             List<MapLayout> mapList = GetLevelAreaMaps(level, area, loadingPoint, missionLayout);
             mapList = mapList.FindAll(map => map.Y <= y);
-            if (mapList.Count == 0) return Config.MapAssociations.DefaultMap;
+            if (mapList.Count == 0) return MapTab.MapAssociations.ROMHackMap;
             MapLayout bestMap = mapList.First();
             foreach (MapLayout map in mapList)
             {
@@ -60,6 +73,10 @@ namespace STROOP.Structs
 
         public MapLayout GetBestMap()
         {
+            bool isRomHack = Config.Stream.GetUInt32(0x80402000) != 0;
+            if (isRomHack)
+                return ROMHackMap;
+
             byte level = Config.Stream.GetByte(MiscConfig.WarpDestinationAddress + MiscConfig.LevelOffset);
             byte area = Config.Stream.GetByte(MiscConfig.WarpDestinationAddress + MiscConfig.AreaOffset);
             ushort loadingPoint = Config.Stream.GetUInt16(MiscConfig.LoadingPointAddress);
@@ -89,11 +106,11 @@ namespace STROOP.Structs
             _backgroundImageDictionary.Add(backgroundImage.Name, backgroundImage);
         }
 
-        public BackgroundImage? GetBackgroundImage(string name)
+        public BackgroundImage GetBackgroundImage(string name)
         {
             if (name == null) return null;
-            if (_backgroundImageDictionary.ContainsKey(name))
-                return _backgroundImageDictionary[name];
+            if (_backgroundImageDictionary.TryGetValue(name, out BackgroundImage img))
+                return img;
             else
                 return null;
         }

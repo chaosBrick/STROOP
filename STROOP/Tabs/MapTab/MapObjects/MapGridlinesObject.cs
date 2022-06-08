@@ -85,7 +85,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             List<Vector3> vertices = new List<Vector3>();
             AddVerticesToPositionAngle(graphics,
                 vertices,
-                PositionAngle.Mario.position,
+                graphics.mapCursorPosition,
                 _hExpanse,
                 _vExpanse,
                 graphics.view.mode == MapView.ViewMode.ThreeDimensional ? 1 : float.NaN,

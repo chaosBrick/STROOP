@@ -55,9 +55,12 @@ namespace STROOP.Tabs.MapTab.MapObjects
             {
                 var data = GetData();
                 foreach (var dataPoint in data)
-                {
-                    DrawIcon(graphics, graphics.view.mode == MapView.ViewMode.ThreeDimensional, dataPoint.x, dataPoint.y, dataPoint.z, dataPoint.angle, dataPoint.tex.Value, 1);
-                }
+                    DrawIcon(
+                        graphics, 
+                        graphics.view.mode == MapView.ViewMode.ThreeDimensional, 
+                        dataPoint.x, dataPoint.y, dataPoint.z, dataPoint.angle, 
+                        dataPoint.tex.Value, 
+                        new Vector4(1));
 
                 if (OutlineWidth != 0)
                 {

@@ -18,7 +18,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                         (float)a.X, (float)a.Y, (float)a.Z,
                         Rotates ? (float)a.Angle : 0x8000 - graphics.MapViewAngleValue,
                         GetInternalImage()?.Value,
-                        hoverData.currentPositionAngle == a ? ObjectUtilities.HoverAlpha() : 1);
+                        new Vector4(1, 1, 1, hoverData.currentPositionAngle == a ? ObjectUtilities.HoverAlpha() : 1));
             });
         }
 

@@ -199,7 +199,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                         (float)a.X, (float)a.Y, (float)a.Z,
                         Rotates ? (float)a.Angle : 0x8000 - graphics.MapViewAngleValue,
                         GetInternalImage()?.Value,
-                        actualHoverData.currentKeyFrame == a ? ObjectUtilities.HoverAlpha() : 1);
+                        new Vector4(1, 1, 1, actualHoverData.currentKeyFrame == a ? ObjectUtilities.HoverAlpha() : 1));
 
                     float desiredDiameter = Size * 2;
                     if (graphics.view.mode == MapView.ViewMode.ThreeDimensional)

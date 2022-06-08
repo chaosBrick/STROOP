@@ -46,7 +46,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             : base()
         {
             base.positionAngleProvider = positionAngleProvider;
-            _currentLocationStats = Config.MapAssociations.GetCurrentLocationStats();
+            _currentLocationStats = MapTab.MapAssociations.GetCurrentLocationStats();
             _numSkips = 0;
             _skippedKeys = new HashSet<uint>();
             _highestGlobalTimerValue = 0;
@@ -92,7 +92,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         public override void Update()
         {
             (byte level, byte area, ushort loadingPoint, ushort missionLayout) currentLocationStats =
-                Config.MapAssociations.GetCurrentLocationStats();
+                MapTab.MapAssociations.GetCurrentLocationStats();
             if (currentLocationStats.level != _currentLocationStats.level ||
                 currentLocationStats.area != _currentLocationStats.area ||
                 currentLocationStats.loadingPoint != _currentLocationStats.loadingPoint ||

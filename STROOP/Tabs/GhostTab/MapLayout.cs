@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
 using System.IO;
 using STROOP.Structs.Configurations;
 
-namespace STROOP.Structs
+namespace STROOP.Tabs.MapTab
 {
     public class MapLayout : IComparable
     {
         public string ImagePath;
-        public BackgroundImage? Background;
+        public BackgroundImage Background;
+        public Lazy<BackgroundImage> MapImage;
 
         public string Id;
         public byte Level;
@@ -26,21 +23,10 @@ namespace STROOP.Structs
 
         public MapLayout()
         {
-            MapImage = new Lazy<Image>(() =>
+            MapImage = new Lazy<BackgroundImage>(() =>
             {
-                var path = Path.Combine(Config.MapAssociations.MapImageFolderPath, ImagePath);
-                if (!File.Exists(path))
-                    return Config.MapAssociations.DefaultMap.MapImage.Value;
-                using (Bitmap preLoad = Bitmap.FromFile(path) as Bitmap)
-                {
-                    int maxSize = 1080;
-                    int largest = Math.Max(preLoad.Width, preLoad.Height);
-                    float scale = 1;
-                    if (largest > maxSize)
-                        scale = largest / maxSize;
-
-                    return new Bitmap(preLoad, new Size((int)(preLoad.Width / scale), (int)(preLoad.Height / scale)));
-                }
+                var path = Path.Combine(MapTab.MapAssociations.MapImageFolderPath, ImagePath);
+                return new BackgroundImage(ToString(), path);
             });
         }
 
@@ -69,17 +55,6 @@ namespace STROOP.Structs
             if (!(obj is MapLayout)) return -1;
             MapLayout other = (MapLayout)obj;
             return Id.CompareTo(other.Id);
-        }
-
-        public readonly Lazy<Image> MapImage;
-
-        public Lazy<Image> BackgroundImage
-        {
-            get
-            {
-                if (!Background.HasValue) return null;
-                return Background.Value.Image;
-            }
         }
     }
 }

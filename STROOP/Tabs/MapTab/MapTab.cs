@@ -16,6 +16,8 @@ namespace STROOP.Tabs.MapTab
 {
     public partial class MapTab : STROOPTab, IDisposable
     {
+        public static MapAssociations MapAssociations;
+
         const string DEFAULT_TRACKER_FILE = "MapTrackers.default.xml";
         const string CONFIG_NODE_NAME = "LastMapTrackerFileName";
 
@@ -88,7 +90,7 @@ namespace STROOP.Tabs.MapTab
         }
 
         public MapLayout GetMapLayout(object mapLayoutChoice = null) =>
-            (mapLayoutChoice ?? comboBoxMapOptionsLevel.SelectedItem) as MapLayout ?? Config.MapAssociations.GetBestMap();
+            (mapLayoutChoice ?? comboBoxMapOptionsLevel.SelectedItem) as MapLayout ?? MapAssociations.GetBestMap();
 
 
         bool needsGeometryRefresh, _needsGeometryRefreshInternal;
@@ -96,11 +98,11 @@ namespace STROOP.Tabs.MapTab
         public void RequireGeometryUpdate() => _needsGeometryRefreshInternal = true;
 
 
-        public Lazy<Image> GetBackgroundImage(object backgroundChoice = null)
+        public BackgroundImage GetBackgroundImage(object backgroundChoice = null)
         {
             if ((backgroundChoice ?? comboBoxMapOptionsBackground.SelectedItem) is BackgroundImage result)
-                return result.Image;
-            return Config.MapAssociations.GetBestMap().BackgroundImage;
+                return result;
+            return MapAssociations.GetBestMap().Background;
         }
 
         public List<(float x, float z)> GetPuCenters(MapGraphics graphics)
@@ -161,13 +163,13 @@ namespace STROOP.Tabs.MapTab
             flowLayoutPanelMapTrackers.Initialize(new MapCurrentMapObject(), new MapCurrentBackgroundObject());
 
             // ComboBox for Level
-            List<MapLayout> mapLayouts = Config.MapAssociations.GetAllMaps();
+            List<MapLayout> mapLayouts = MapAssociations.GetAllMaps();
             List<object> mapLayoutChoices = new List<object>() { "Recommended" };
             mapLayouts.ForEach(mapLayout => mapLayoutChoices.Add(mapLayout));
             comboBoxMapOptionsLevel.DataSource = mapLayoutChoices;
 
             // ComboBox for Background
-            List<BackgroundImage> backgroundImages = Config.MapAssociations.GetAllBackgroundImages();
+            List<BackgroundImage> backgroundImages = MapAssociations.GetAllBackgroundImages();
             List<object> backgroundImageChoices = new List<object>() { "Recommended" };
             backgroundImages.ForEach(backgroundImage => backgroundImageChoices.Add(backgroundImage));
             comboBoxMapOptionsBackground.DataSource = backgroundImageChoices;
@@ -599,7 +601,7 @@ namespace STROOP.Tabs.MapTab
             ushort loadingPoint = Config.Stream.GetUInt16(MiscConfig.LoadingPointAddress);
             ushort missionLayout = Config.Stream.GetUInt16(MiscConfig.MissionAddress);
 
-            MapLayout map = Config.MapAssociations.GetBestMap();
+            MapLayout map = MapAssociations.GetBestMap();
 
             labelMapDataMapName.Text = map.Name;
             labelMapDataMapSubName.Text = map.SubName ?? "";
