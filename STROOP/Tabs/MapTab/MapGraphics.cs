@@ -215,8 +215,8 @@ namespace STROOP.Tabs.MapTab
             InitMainSurfaces();
 
             CreateObjectsRenderer();
-            renderers.Add(triangleRenderer = new Renderers.TriangleRenderer(0x100000));
-            renderers.Add(triangleOverlayRenderer = new Renderers.TriangleRenderer(0x100000) { drawlayer = DrawLayers.GeometryOverlay });
+            renderers.Add(triangleRenderer = new Renderers.TriangleRenderer(0x10000));
+            renderers.Add(triangleOverlayRenderer = new Renderers.TriangleRenderer(0x10000) { drawlayer = DrawLayers.GeometryOverlay });
             renderers.Add(lineRenderer = new Renderers.LineRenderer());
             renderers.Add(circleRenderer = new Renderers.ShapeRenderer(DrawLayers.Overlay));
             renderers.Add(cylinderRenderer = new Renderers.GeometryRenderer(Renderers.GeometryRenderer.GeometryData.Cylinder()));

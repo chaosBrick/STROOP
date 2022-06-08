@@ -67,6 +67,7 @@ namespace STROOP.Tabs.MapTab.Renderers
         int buffer;
         int vao;
 
+        int bufferSize = 0;
         IntPtr dataPtr;
 
         List<Triangle> triangles = new List<Triangle>();
@@ -115,7 +116,7 @@ namespace STROOP.Tabs.MapTab.Renderers
             uniform_pixelsPerUnit = GL.GetUniformLocation(shader, "pixelsPerUnit");
             uniform_unitDivisor = GL.GetUniformLocation(shader, "unitDivisor");
 
-            dataPtr = Marshal.AllocHGlobal(expectedSize);
+            dataPtr = Marshal.AllocHGlobal((IntPtr)(bufferSize = expectedSize));
         }
 
         public override void SetDrawCalls(MapGraphics graphics)
@@ -176,6 +177,15 @@ namespace STROOP.Tabs.MapTab.Renderers
 
         void WriteDataToBuffer()
         {
+            var dataSize = triangles.Count * TriangleVertex.Size * 3;
+            GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
+            if (dataSize > bufferSize)
+            {
+                Marshal.FreeHGlobal(dataPtr);
+                dataPtr = Marshal.AllocHGlobal((IntPtr)(bufferSize = Math.Max(dataSize, bufferSize * 2)));
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)bufferSize, IntPtr.Zero, BufferUsageHint.DynamicDraw);
+            }
+
             IntPtr ptr = dataPtr;
             foreach (var instance in triangles)
             {
@@ -193,8 +203,7 @@ namespace STROOP.Tabs.MapTab.Renderers
 
                 }
             }
-            GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
-            GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, (IntPtr)(TriangleVertex.Size * triangles.Count * 3), dataPtr);
+            GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, (IntPtr)(dataSize), dataPtr);
         }
     }
 }
