@@ -147,9 +147,27 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         public static float Get3DIconScale(MapGraphics graphics, float x, float y, float z) => (0.5f * (float)Math.Tan(1) * (new Vector3(x, y, z) - graphics.view.position).Length) / graphics.glControl.Height;
 
-        public void DrawIcon(MapGraphics graphics, bool sortTransparent, float x, float y, float z, float angle, Image image, float alpha) =>
-            DrawIcon(graphics, sortTransparent, x, y, z, graphics.view.mode != MapView.ViewMode.TopDown ? 0x8000 : angle, Size, image, alpha);
-        public static void DrawIcon(MapGraphics graphics, bool sortTransparent, float x, float y, float z, float angle, float size, Image image, float alpha)
+        public void DrawIcon(
+            MapGraphics graphics, 
+            bool sortTransparent, 
+            float x, float y, float z, float angle, 
+            Image image, 
+            Vector4 color) =>
+            DrawIcon(
+                graphics, 
+                sortTransparent, 
+                x, y, z, graphics.view.mode != MapView.ViewMode.TopDown ? 0x8000 : angle, 
+                Size, 
+                image, 
+                color);
+
+        public static void DrawIcon(
+            MapGraphics graphics, 
+            bool sortTransparent, 
+            float x, float y, float z, float angle, 
+            float size, 
+            Image image, 
+            Vector4 color)
         {
             if (image == null)
                 return;
@@ -167,9 +185,9 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
             var textureIndex = graphics.GetObjectTextureLayer(image);
             if (sortTransparent)
-                graphics.objectRenderer.AddTransparentInstance(transform, textureIndex, alpha);
+                graphics.objectRenderer.AddTransparentInstance(transform, textureIndex, color);
             else
-                graphics.objectRenderer.AddInstance(transform, textureIndex, alpha);
+                graphics.objectRenderer.AddInstance(transform, textureIndex, color);
         }
 
         public void Draw(MapGraphics graphics)

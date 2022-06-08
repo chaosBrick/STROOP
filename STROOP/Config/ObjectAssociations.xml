@@ -17,6 +17,8 @@
 
   <MapImage name="Mario" path = "Mario.png"/>
   <MapImage name="MarioMap" path = "Mario Top.png"/>
+  <MapImage name="MarioMapHatOnly" path = "Mario Hat Top.png"/>
+  <MapImage name="MarioMapNoHat" path = "Mario Top No Hat.png"/>
   <MapImage name="Holp" path = "HOLP.png"/>
   <MapImage name="Home" path = "Home.png"/>
   <MapImage name="IntendedNextPosition" path = "Intended Next Position.png"/>

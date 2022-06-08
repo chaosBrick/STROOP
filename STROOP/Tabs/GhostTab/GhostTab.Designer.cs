@@ -162,7 +162,6 @@
             this.checkTransparentGhosts.TabIndex = 6;
             this.checkTransparentGhosts.Text = "Transparent Ghosts";
             this.checkTransparentGhosts.UseVisualStyleBackColor = true;
-            this.checkTransparentGhosts.CheckedChanged += new System.EventHandler(this.checkTransparentGhosts_CheckedChanged);
             // 
             // buttonGhostColor
             // 

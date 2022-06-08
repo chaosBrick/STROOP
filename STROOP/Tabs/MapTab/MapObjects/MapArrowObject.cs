@@ -38,33 +38,48 @@ namespace STROOP.Tabs.MapTab.MapObjects
             OutlineColor = Color.Yellow;
         }
 
-        protected override List<Vector3> GetVertices(MapGraphics graphics)
+        protected override void DrawTopDown(MapGraphics graphics)
+        {
+            bool isFirstVertex = false;
+            Vector3 lastVertex = default(Vector3);
+            Vector4 color = GetColor(graphics);
+            foreach (var posAngle in positionAngleProvider())
+                foreach (var vert in GetVertices(graphics, posAngle))
+                {
+                    var newVertex = vert;
+                    if (isFirstVertex)
+                        graphics.lineRenderer.Add(lastVertex, newVertex, posAngle.GetArrowColor(color), OutlineWidth);
+
+                    isFirstVertex = !isFirstVertex;
+                    lastVertex = newVertex;
+                }
+        }
+        protected override List<Vector3> GetVertices(MapGraphics graphics) => new List<Vector3>();
+
+        protected List<Vector3> GetVertices(MapGraphics graphics, PositionAngle posAngle)
         {
             List<Vector3> vertices = new List<Vector3>();
-            foreach (var posAngle in positionAngleProvider())
-            {
-                float x = (float)posAngle.X;
-                float y = (float)posAngle.Y;
-                float z = (float)posAngle.Z;
-                float yaw = (float)getYaw(posAngle);
-                float size = useRecommendedArrowLength ? (float)getRecommendedSize(posAngle) : Size;
-                (float arrowHeadX, float arrowHeadZ) =
-                    ((float, float))MoreMath.AddVectorToPoint(size, yaw, x, z);
+            float x = (float)posAngle.X;
+            float y = (float)posAngle.Y;
+            float z = (float)posAngle.Z;
+            float yaw = (float)getYaw(posAngle);
+            float size = useRecommendedArrowLength ? (float)getRecommendedSize(posAngle) : Size;
+            (float arrowHeadX, float arrowHeadZ) =
+                ((float, float))MoreMath.AddVectorToPoint(size, yaw, x, z);
 
-                (float pointSide1X, float pointSide1Z) =
-                    ((float, float))MoreMath.AddVectorToPoint(_arrowHeadSideLength, yaw + 32768 + 8192, arrowHeadX, arrowHeadZ);
-                (float pointSide2X, float pointSide2Z) =
-                    ((float, float))MoreMath.AddVectorToPoint(_arrowHeadSideLength, yaw + 32768 - 8192, arrowHeadX, arrowHeadZ);
+            (float pointSide1X, float pointSide1Z) =
+                ((float, float))MoreMath.AddVectorToPoint(_arrowHeadSideLength, yaw + 32768 + 8192, arrowHeadX, arrowHeadZ);
+            (float pointSide2X, float pointSide2Z) =
+                ((float, float))MoreMath.AddVectorToPoint(_arrowHeadSideLength, yaw + 32768 - 8192, arrowHeadX, arrowHeadZ);
 
-                vertices.Add(new Vector3(x, y, z));
-                vertices.Add(new Vector3(arrowHeadX, y, arrowHeadZ));
+            vertices.Add(new Vector3(x, y, z));
+            vertices.Add(new Vector3(arrowHeadX, y, arrowHeadZ));
 
-                vertices.Add(new Vector3(arrowHeadX, y, arrowHeadZ));
-                vertices.Add(new Vector3(pointSide1X, y, pointSide1Z));
+            vertices.Add(new Vector3(arrowHeadX, y, arrowHeadZ));
+            vertices.Add(new Vector3(pointSide1X, y, pointSide1Z));
 
-                vertices.Add(new Vector3(arrowHeadX, y, arrowHeadZ));
-                vertices.Add(new Vector3(pointSide2X, y, pointSide2Z));
-            }
+            vertices.Add(new Vector3(arrowHeadX, y, arrowHeadZ));
+            vertices.Add(new Vector3(pointSide2X, y, pointSide2Z));
             return vertices;
         }
 

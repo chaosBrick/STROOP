@@ -18,7 +18,7 @@ namespace STROOP.Tabs.GhostTab
             uint jumpinOffset = 0xe0;
 
             var krasserScheiss = new[] {
-                new [] {0xF0A74, 0xF12F0, 0xF2990, 0xF320C, 0xF4898, 0xF5114 },
+                new [] { 0xF0A74, 0xF12F0, 0xF2990, 0xF320C, 0xF4898, 0xF5114},
                 new [] { 0xF0A8C, 0xF1308, 0xF29A8, 0xF3224, 0xF48B0, 0xF512C},
                 new [] { 0xf0aa4, 0xf1320, 0xf29c0, 0xf323c, 0xf48c8, 0xf5144},
                 new [] { 0xf0b1c, 0xf1398, 0xf2a38, 0xf32b4, 0xf4940, 0xf51bc},
@@ -34,7 +34,6 @@ namespace STROOP.Tabs.GhostTab
             Config.Stream.WriteRam(new byte[] { 0xB8, 0, 0, 0, 0, 0, 0, 0 }, jumpOutOfHeadAddr, EndiannessType.Big);
         }
 
-        bool waitForHatColorInjection = false;
         static GhostTab instance;
         Vector4 marioHatColor = new Vector4(1, 0, 0, 1);
 
@@ -43,7 +42,7 @@ namespace STROOP.Tabs.GhostTab
         {
             var target = WatchVariableSpecialUtilities.dictionary;
             Func<Func<GhostFrame, object>, Func<object>> displayGhostVarFloat =
-                selectMember => (() => selectMember(instance.currentGhostFrame));
+                selectMember => (() => selectMember(instance.selectedGhost?.currentFrame ?? default(GhostFrame)));
 
             target.Add("GhostX", ((uint _) => displayGhostVarFloat(frame => frame.position.X)(), (object _, uint __) => false));
             target.Add("GhostY", ((uint _) => displayGhostVarFloat(frame => frame.position.Y)(), (object _, uint __) => false));
@@ -57,21 +56,17 @@ namespace STROOP.Tabs.GhostTab
 
         Ghost selectedGhost => listBoxGhosts.SelectedItem as Ghost;
         GhostFrame lastValidPlaybackFrame => selectedGhost?.lastValidPlaybackFrame ?? default(GhostFrame);
-        GhostFrame currentGhostFrame;
 
-        RomHack ghostHack, transparentGhostsHack;
-
-        public Vector3 GhostPosition { get; private set; }
-        public uint GhostAngle { get; private set; }
+        RomHack ghostHack;
 
         public GhostTab()
         {
             InitializeComponent();
+            listBoxGhosts.SelectionMode = SelectionMode.MultiExtended;
             listBoxGhosts.KeyDown += listBoxGhosts_KeyDown;
 
             instance = this;
             ghostHack = new RomHack("Resources/Hacks/GhostHack.hck", "Ghost Hack");
-            transparentGhostsHack = new RomHack("Resources/Hacks/TransparentGhosts.hck", "Transparent Ghosts");
             UpdateFileWatchers();
         }
 
@@ -106,25 +101,30 @@ namespace STROOP.Tabs.GhostTab
 
         bool updateGhostData => ghostHack.Enabled;
 
+        public IEnumerable<Utilities.PositionAngle> GetGhosts()
+        {
+            foreach (var item in listBoxGhosts.SelectedItems)
+                if (item is Ghost ghost)
+                    yield return ghost.positionAngle;
+        }
+
         public override void Update(bool active)
         {
             base.Update(active);
             var ghostPointer = Config.Stream.GetInt32(0x80407FF8);
             bool ghostsActive = (ghostPointer & 0xFF000000) == 0x80000000;
-
-            if (ghostHack.Enabled && !ghostsActive)
-                waitForHatColorInjection = true;
-            if (waitForHatColorInjection && ghostsActive)
+            bool shouldDelete = Config.Stream.GetByte(0x80407FFC) == 0xFF;
+            if (shouldDelete)
             {
-                InGameFunctionCall.CreateInGameSemaphore();
-                waitForHatColorInjection = false;
+                labelHackActiveState.Text = "Disabling Ghost hack...\nInside a level, frame advance\nthen save state and load state.\nNot doing so will crash.\n(Not on Pure Interpreter)";
+                if (!ghostsActive)
+                {
+                    ghostHack.ClearPayload();
+                    Config.Stream.SetValue((byte)0, 0x80407FFC);
+                }
+                else
+                    return;
             }
-            else if (InGameFunctionCall.IsSemaphoreSet())
-            {
-                __DebugInjectHeadKillers();
-                InGameFunctionCall.ClearSemaphore();
-            }
-
             var buffer = new byte[0x1000];
             ghostHack.UpdateEnabledStatus();
             labelHackActiveState.Text = (ghostsActive && ghostHack.Enabled) ?
@@ -132,15 +132,7 @@ namespace STROOP.Tabs.GhostTab
                                          (ghostHack.Enabled ?
                                          "Ghost hack is enabled\nbut not running.\nInside a level,\nsave state and load state,\nthen frame advance." :
                                          "Ghost hack is disabled.");
-
-            var oldEnabled = transparentGhostsHack.Enabled;
-            transparentGhostsHack.UpdateEnabledStatus();
-            if (transparentGhostsHack.Enabled != oldEnabled)
-            {
-                suppressCheckChanged = true;
-                checkTransparentGhosts.Checked = transparentGhostsHack.Enabled;
-            }
-            suppressCheckChanged = false;
+            buttonDisableGhostHack.Enabled = ghostHack.Enabled;
 
             var globalTimer = Config.Stream.GetInt32(MiscConfig.GlobalTimerAddress);
             var ghostList = new List<Ghost>();
@@ -150,13 +142,12 @@ namespace STROOP.Tabs.GhostTab
             var ghostArr = ghostList.ToArray();
             int numGhosts = Math.Max(1, ghostArr.Length);
 
-            listBoxGhosts.SelectionMode = SelectionMode.MultiExtended;
 
             if (updateGhostData)
             {
-                Config.Stream.SetValue(numGhosts, 0x80407FFC);
+                Config.Stream.SetValue((byte)numGhosts, 0x80407FFF);
+                Config.Stream.SetValue((byte)(checkTransparentGhosts.Checked ? 1 : 0), 0x80407FFE);
                 Config.Stream.WriteRam(ColorToLights(marioHatColor), (UIntPtr)(COLORED_HATS_LIGHTS_ADDR), EndiannessType.Big);
-
                 //Disable low poly Mario
                 Config.Stream.SetValue(0x02587fff, 0x800f470c);
                 Config.Stream.SetValue(0x7fff7fff, 0x800f6634);
@@ -189,9 +180,8 @@ namespace STROOP.Tabs.GhostTab
                     var idx = (globalTimer - 1) - ghost.playbackBaseFrame;
                     if (idx >= 0 && ghost.playbackFrames.TryGetValue((uint)idx, out currentFrame))
                     {
-                        this.currentGhostFrame = currentFrame;
-                        GhostPosition = currentFrame.position;
-                        GhostAngle = currentFrame.oYaw;
+                        ghost.positionAngle.SetGlobalTimer((uint)idx);
+                        ghost.currentFrame = currentFrame;
                     }
                 }
                 else
@@ -332,12 +322,9 @@ namespace STROOP.Tabs.GhostTab
             {
                 ghostHack.LoadPayload();
                 Config.Stream.WriteRam(new byte[4], 0x80407FFC, EndiannessType.Little);
-                //Config.Stream.WriteRam(new byte[0x1000], bufferBaseAddress, EndiannessType.Little);
                 Config.Stream.WriteRam(new byte[0x70], 0x80407F90, EndiannessType.Little);
                 Config.Stream.WriteRam(File.ReadAllBytes("Resources/Hacks/gfx_generate_colored_hats.bin"), COLORED_HATS_CODE_TARGET_ADDR, EndiannessType.Big);
-                waitForHatColorInjection = true;
-                if (checkTransparentGhosts.Checked)
-                    transparentGhostsHack.LoadPayload();
+                __DebugInjectHeadKillers();
 
                 //Tell ROM Hacks to suck it and get rid of the 01010101 pattern
                 Config.Stream.WriteRam(new byte[0x1000], 0x80408000 - 0x1000, EndiannessType.Big);
@@ -346,7 +333,18 @@ namespace STROOP.Tabs.GhostTab
 
         private void buttonDisableGhostHack_Click(object sender, EventArgs e)
         {
-            ghostHack.ClearPayload();
+            var txt =
+@"Warning!
+Disabling the ghost hack incorrectly will result in a game crash.
+It is recommended that you load a savestate without the hack enabled instead.
+If the game is not running in ""Pure Interpreter"" mode, FOLLOW THE STEPS EXACTLY.
+
+Are you sure you want to continue?";
+            if (MessageBox.Show(txt, "You should not have to do this.", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                Config.Stream.SetValue((byte)0, 0x80407FFF);
+                Config.Stream.SetValue((byte)0xFF, 0x80407FFC);
+            }
         }
 
         private void numericUpDownStartOfPlayback_ValueChanged(object sender, EventArgs e)
@@ -370,22 +368,6 @@ namespace STROOP.Tabs.GhostTab
                 }
                 i++;
             }
-        }
-
-        bool suppressCheckChanged = false;
-        private void checkTransparentGhosts_CheckedChanged(object sender, EventArgs e)
-        {
-            if (suppressCheckChanged)
-                return;
-            suppressCheckChanged = true;
-            transparentGhostsHack.UpdateEnabledStatus();
-            if (transparentGhostsHack.Enabled)
-                transparentGhostsHack.ClearPayload();
-            else
-                transparentGhostsHack.LoadPayload();
-            transparentGhostsHack.UpdateEnabledStatus();
-            checkTransparentGhosts.Checked = !transparentGhostsHack.Enabled;
-            suppressCheckChanged = false;
         }
 
         private void buttonMarioColor_Click(object sender, EventArgs e)

@@ -40,6 +40,8 @@ namespace STROOP.Utilities
         private readonly List<Func<double>> Getters;
         private readonly List<Func<double, bool>> Setters;
 
+        public virtual Vector4 GetArrowColor(Vector4 baseColor) => baseColor;
+
         public static Dictionary<uint, (double, double, double, double, List<double>)> Schedule =
             new Dictionary<uint, (double, double, double, double, List<double>)>();
         public static int ScheduleOffset = 0;

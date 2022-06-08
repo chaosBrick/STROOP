@@ -39,6 +39,8 @@ namespace STROOP.Structs
             HomeImage,
             IntendedNextPositionImage,
             MarioMapImage,
+            MarioMapNoHatImage,
+            MarioMapHatOnlyImage,
             GreenMarioMapImage,
             OrangeMarioMapImage,
             PurpleMarioMapImage,

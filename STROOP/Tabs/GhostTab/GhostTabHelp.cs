@@ -51,16 +51,18 @@ Always make sure your runs work from a clean savestate.
             frm.SetText("Ghost Help",
                         "Notes",
 @"The ghost hack currently works only on the US version of Super Mario 64 (and therefore also on numerous ROM hacks).
+It works best when mupen is set to ""Pure Interpreter"" mode to apply code changes immediately.
+If you are not on ""Pure Interpreter"", follow the steps displayed under the ""Enable Ghost Hack"" button exactly and it should still work.
 
-While in most cases the use of the ghost hack is unproblematic, there are several instances in which enabling the ghost hack may alter game behavior. It is therefore recommended that you only use the hack during a recording or playback, but never in a savestate from which an m64 file stars.
+While in most cases the use of the ghost hack is unproblematic, there are several instances in which enabling the ghost hack may alter game behavior. It is therefore recommended that you only use the hack during a recording or playback, but never in a savestate from which an m64 file starts.
 Always verify that your runs work without the hack.
 
-Disabling the ghost hack via the 'Disabel Ghost hack' button may have unintended side effects, including crashing the game.
+Disabling the ghost hack via the 'Disable Ghost hack' button may have unintended side effects, including crashing the game.
 Try to keep a savestate around that doesn't have the hack enabled instead.
 
 Ghost recordings are purely visual recordings. Some visual effects, such as Mario's upper body tilt, will not perfectly match.
 Certain data may look misleading in the map tab. (For instance, the ghost's 'graphics angle' during a sideflip looks inverted.)
-The cap state of the ghost is the same as the real Mario's, except that the vanish cap effect will always be active.
+The displayed cap state of the ghost is not representative of its actual cap state in the run.
 ");
             frm.ShowDialog();
         }
