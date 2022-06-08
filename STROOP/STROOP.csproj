@@ -1470,7 +1470,8 @@ del "$(TargetDir)System.ValueTuple.xml"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>xcopy /E /Y /I "$(ProjectDir)Resources" "$(TargetDir)Resources" /D
-copy /Y "$(ProjectDir)recordghost.lua" "$(TargetDir)recordghost.lua"</PreBuildEvent>
+copy /Y "$(ProjectDir)recordghost.lua" "$(TargetDir)recordghost.lua"
+copy /Y "$(ProjectDir)MapTrackers.default.xml" "$(TargetDir)MapTrackers.default.xml"</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
