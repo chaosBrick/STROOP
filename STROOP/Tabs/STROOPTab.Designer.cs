@@ -32,6 +32,7 @@
             // 
             // STROOPTab
             // 
+            this.AllowDrop = true;
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
             this.Name = "STROOPTab";
             this.ResumeLayout(false);

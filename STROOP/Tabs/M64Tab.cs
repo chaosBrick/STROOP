@@ -63,6 +63,17 @@ namespace STROOP.Tabs
             propertyGridM64Stats.ContextMenuStrip = _m64File.Stats.CreateContextMenuStrip();
             tabControlM64Details.SelectedIndexChanged += TabControlDetails_SelectedIndexChanged;
 
+            dataGridViewM64Inputs.DragOver += (object sender, DragEventArgs e) =>
+                e.Effect = DragDropEffects.Copy;
+            dataGridViewM64Inputs.DragDrop += (object sender, DragEventArgs e) =>
+            {
+                string[] filePaths = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+                if (filePaths.Length == 0) return;
+                string filePath = filePaths[0];
+                string fileName = Path.GetFileName(filePath);
+                Open(filePath, fileName);
+            };
+
             buttonM64TurnOffRowRange.Click += (sender, e) => SetValuesOfSelection(CellSelectionType.RowRange, false);
             buttonM64TurnOffInputRange.Click += (sender, e) => SetValuesOfSelection(CellSelectionType.PartialRowRange, false);
             buttonM64TurnOffCells.Click += (sender, e) => SetValuesOfSelection(CellSelectionType.Cells, false);

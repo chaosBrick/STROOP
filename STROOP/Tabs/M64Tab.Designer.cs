@@ -693,6 +693,7 @@
             // 
             // dataGridViewM64Inputs
             // 
+            this.dataGridViewM64Inputs.AllowDrop = true;
             this.dataGridViewM64Inputs.AllowUserToDeleteRows = false;
             this.dataGridViewM64Inputs.AllowUserToResizeColumns = false;
             this.dataGridViewM64Inputs.AllowUserToResizeRows = false;
