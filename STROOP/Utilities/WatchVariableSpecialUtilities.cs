@@ -23,7 +23,7 @@ namespace STROOP.Structs
             AddLiteralEntriesToDictionary();
             AddGeneratedEntriesToDictionary();
             AddPanEntriesToDictionary();
-            InitializeSpecialAttribute.ExecuteInitializers();
+            GeneralUtilities.ExecuteInitializers<InitializeSpecialAttribute>();
         }
 
         public static (WatchVariable.GetterFunction, WatchVariable.SetterFunction)
@@ -241,7 +241,7 @@ namespace STROOP.Structs
                     throw new ArgumentOutOfRangeException();
             }
         }
-        
+
 
         public static string AddSchedulerEntry(int index)
         {
@@ -4712,81 +4712,6 @@ namespace STROOP.Structs
                 (double doubleValue, uint dummy) =>
                 {
                     return SpecialConfig.SelfAnglePA.SetAngle(doubleValue);
-                }
-            ));
-
-            // Ghost vars
-
-            dictionary.Add("GhostActionDescription",
-                ((uint dummy) =>
-                {
-                    uint action = Config.Stream.GetUInt32(GhostHackConfig.CurrentGhostStruct + GhostHackConfig.ActionOffset);
-                    return TableConfig.MarioActions.GetActionName(action);
-                }
-            ,
-                DEFAULT_SETTER));
-
-            dictionary.Add("GhostDeltaHSpeed",
-                ((uint dummy) =>
-                {
-                    float marioHSpeed = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.HSpeedOffset);
-                    float ghostHSpeed = Config.Stream.GetSingle(GhostHackConfig.CurrentGhostStruct + GhostHackConfig.HSpeedOffset);
-                    return marioHSpeed - ghostHSpeed;
-                }
-            ,
-                (float deltaHSpeed, uint dummy) =>
-                {
-                    float ghostHSpeed = Config.Stream.GetSingle(GhostHackConfig.CurrentGhostStruct + GhostHackConfig.HSpeedOffset);
-                    float newMarioHSpeed = ghostHSpeed + deltaHSpeed;
-                    return Config.Stream.SetValue(newMarioHSpeed, MarioConfig.StructAddress + MarioConfig.HSpeedOffset);
-                }
-            ));
-
-            dictionary.Add("GhostDeltaYSpeed",
-                ((uint dummy) =>
-                {
-                    float marioYSpeed = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YSpeedOffset);
-                    float ghostYSpeed = Config.Stream.GetSingle(GhostHackConfig.CurrentGhostStruct + GhostHackConfig.YSpeedOffset);
-                    return marioYSpeed - ghostYSpeed;
-                }
-            ,
-                (float deltaYSpeed, uint dummy) =>
-                {
-                    float ghostYSpeed = Config.Stream.GetSingle(GhostHackConfig.CurrentGhostStruct + GhostHackConfig.YSpeedOffset);
-                    float newMarioYSpeed = ghostYSpeed + deltaYSpeed;
-                    return Config.Stream.SetValue(newMarioYSpeed, MarioConfig.StructAddress + MarioConfig.YSpeedOffset);
-                }
-            ));
-
-            dictionary.Add("GhostDeltaYawFacing",
-                ((uint dummy) =>
-                {
-                    ushort marioYawFacing = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
-                    ushort ghostYawFacing = Config.Stream.GetUInt16(GhostHackConfig.CurrentGhostStruct + GhostHackConfig.YawFacingOffset);
-                    return MoreMath.NormalizeAngleShort(marioYawFacing - ghostYawFacing);
-                }
-            ,
-                (short deltaYawFacing, uint dummy) =>
-                {
-                    ushort ghostYawFacing = Config.Stream.GetUInt16(GhostHackConfig.CurrentGhostStruct + GhostHackConfig.YawFacingOffset);
-                    ushort newMarioYawFacing = MoreMath.NormalizeAngleUshort(ghostYawFacing + deltaYawFacing);
-                    return Config.Stream.SetValue(newMarioYawFacing, MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
-                }
-            ));
-
-            dictionary.Add("GhostDeltaYawIntended",
-                ((uint dummy) =>
-                {
-                    ushort marioYawIntended = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.IntendedYawOffset);
-                    ushort ghostYawIntended = Config.Stream.GetUInt16(GhostHackConfig.CurrentGhostStruct + GhostHackConfig.YawIntendedOffset);
-                    return MoreMath.NormalizeAngleShort(marioYawIntended - ghostYawIntended);
-                }
-            ,
-                (short deltaYawIntended, uint dummy) =>
-                {
-                    ushort ghostYawIntended = Config.Stream.GetUInt16(GhostHackConfig.CurrentGhostStruct + GhostHackConfig.YawIntendedOffset);
-                    ushort newMarioYawIntended = MoreMath.NormalizeAngleUshort(ghostYawIntended + deltaYawIntended);
-                    return Config.Stream.SetValue(newMarioYawIntended, MarioConfig.StructAddress + MarioConfig.IntendedYawOffset);
                 }
             ));
 

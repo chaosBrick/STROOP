@@ -1,9 +1,22 @@
 ﻿using STROOP.Structs.Configurations;
+using STROOP.Utilities;
+using System.Collections.Generic;
+using STROOP.Structs;
 
 namespace STROOP.Tabs
 {
     public partial class MusicTab : STROOPTab
     {
+        [InitializeBaseAddress]
+        static void InitBaseAddresses()
+        {
+            WatchVariableUtilities.baseAddressGetters["Music"] = () =>
+            {
+                uint? musicAddress = AccessScope<StroopMainForm>.content.GetTab<MusicTab>().GetMusicAddress();
+                return musicAddress != null ? new List<uint>() { musicAddress.Value } : WatchVariableUtilities.BaseAddressListEmpty;
+            };
+        }
+
         public MusicTab()
         {
             InitializeComponent();

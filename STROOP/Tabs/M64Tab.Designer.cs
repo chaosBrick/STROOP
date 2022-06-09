@@ -663,7 +663,7 @@
             this.progressBarM64.Location = new System.Drawing.Point(134, 0);
             this.progressBarM64.Margin = new System.Windows.Forms.Padding(2);
             this.progressBarM64.Name = "progressBarM64";
-            this.progressBarM64.Size = new System.Drawing.Size(615, 20);
+            this.progressBarM64.Size = new System.Drawing.Size(618, 20);
             this.progressBarM64.TabIndex = 41;
             // 
             // tabControlM64Details
@@ -899,7 +899,7 @@
             this.tabPageM64Header.Location = new System.Drawing.Point(4, 22);
             this.tabPageM64Header.Margin = new System.Windows.Forms.Padding(0);
             this.tabPageM64Header.Name = "tabPageM64Header";
-            this.tabPageM64Header.Size = new System.Drawing.Size(535, 429);
+            this.tabPageM64Header.Size = new System.Drawing.Size(541, 435);
             this.tabPageM64Header.TabIndex = 2;
             this.tabPageM64Header.Text = "Header";
             // 
@@ -909,7 +909,7 @@
             this.propertyGridM64Header.HelpVisible = false;
             this.propertyGridM64Header.Location = new System.Drawing.Point(0, 0);
             this.propertyGridM64Header.Name = "propertyGridM64Header";
-            this.propertyGridM64Header.Size = new System.Drawing.Size(533, 427);
+            this.propertyGridM64Header.Size = new System.Drawing.Size(539, 433);
             this.propertyGridM64Header.TabIndex = 0;
             this.propertyGridM64Header.ToolbarVisible = false;
             // 
@@ -921,7 +921,7 @@
             this.tabPageM64Stats.Location = new System.Drawing.Point(4, 22);
             this.tabPageM64Stats.Margin = new System.Windows.Forms.Padding(0);
             this.tabPageM64Stats.Name = "tabPageM64Stats";
-            this.tabPageM64Stats.Size = new System.Drawing.Size(535, 429);
+            this.tabPageM64Stats.Size = new System.Drawing.Size(541, 435);
             this.tabPageM64Stats.TabIndex = 4;
             this.tabPageM64Stats.Text = "Stats";
             // 
@@ -932,7 +932,7 @@
             this.propertyGridM64Stats.Location = new System.Drawing.Point(0, 0);
             this.propertyGridM64Stats.Margin = new System.Windows.Forms.Padding(0);
             this.propertyGridM64Stats.Name = "propertyGridM64Stats";
-            this.propertyGridM64Stats.Size = new System.Drawing.Size(533, 427);
+            this.propertyGridM64Stats.Size = new System.Drawing.Size(539, 433);
             this.propertyGridM64Stats.TabIndex = 1;
             this.propertyGridM64Stats.ToolbarVisible = false;
             // 
@@ -942,7 +942,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.splitContainerM64);
             this.Name = "M64Tab";
-            this.Size = new System.Drawing.Size(915, 463);
             this.splitContainerM64.Panel1.ResumeLayout(false);
             this.splitContainerM64.Panel1.PerformLayout();
             this.splitContainerM64.Panel2.ResumeLayout(false);

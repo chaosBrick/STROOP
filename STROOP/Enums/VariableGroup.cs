@@ -1,13 +1,17 @@
-﻿
+﻿using System.Reflection;
+
 namespace STROOP.Structs
 {
     public static class VariableGroup
     {
+        static VariableGroup() => Utilities.StringUtilities.InitializeDeclaredStrings(typeof(VariableGroup));
+
+        [Utilities.DeclaredString]
         public static string
         Basic,
         Intermediate,
         Advanced,
-
+            
         ObjectSpecific,
         Scheduler,
         Snow,
@@ -35,12 +39,5 @@ namespace STROOP.Structs
         Self,
         QuarterFrameHack,
         GhostHack;
-
-        static VariableGroup()
-        {
-            foreach (var field in typeof(VariableGroup).GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static))
-                if (field.FieldType == typeof(string))
-                    field.SetValue(null, field.Name);
-        }
     };
 }

@@ -135,7 +135,7 @@ namespace STROOP.Tabs.GfxTab
             };
 
             var view = new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper)) { Name = name, _getterFunction = getter, _setterFunction = setter, wrapperType = typeof(WatchVariableNumberWrapper) };
-            var result = new WatchVariable(view, BaseAddressTypeEnum.Relative, offset);
+            var result = new WatchVariable(view, BaseAddressType.Relative, offset);
             if (type != typeof(float))
                 view.SetValueByKey(WatchVariable.ViewProperties.useHex, true);
             return (result, view);

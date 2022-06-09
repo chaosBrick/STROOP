@@ -3,11 +3,27 @@ using STROOP.Structs;
 using System.Windows.Forms;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
+using System.Linq;
 
 namespace STROOP.Tabs
 {
     public partial class MiscTab : STROOPTab
     {
+
+        [InitializeBaseAddress]
+        static void InitBaseAddresses()
+        {
+            WatchVariableUtilities.baseAddressGetters["LastCoin"] = () =>
+            {
+                List<uint> coinAddresses = Config.ObjectSlotsManager.GetLoadedObjectsWithPredicate(
+                    o => o.BehaviorAssociation?.Name == "Yellow Coin" || o.BehaviorAssociation?.Name == "Blue Coin")
+                    .ConvertAll(objectDataModel => objectDataModel.Address);
+                return coinAddresses.Count > 0 ? new List<uint>() { coinAddresses.Last() } : WatchVariableUtilities.BaseAddressListEmpty;
+            };
+
+            WatchVariableUtilities.baseAddressGetters["WarpDestination"] = () => new List<uint>() { MiscConfig.WarpDestinationAddress };
+        }
+
         private static readonly List<string> ALL_VAR_GROUPS =
             new List<string>()
             {

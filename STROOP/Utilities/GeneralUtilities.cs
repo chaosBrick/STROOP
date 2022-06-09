@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 
 namespace STROOP.Utilities
 {
@@ -20,6 +19,14 @@ namespace STROOP.Utilities
             stroopTypes = typeof(GeneralUtilities).Assembly.GetTypes();
         }
 
+        public static void ExecuteInitializers<T>(params object[] args) where T : InitializerAttribute
+        {
+            foreach (var type in typeof(T).Assembly.GetTypes())
+                foreach (var m in type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic))
+                    if (m.GetParameters().Length == 0 && m.GetCustomAttribute<T>() != null)
+                        m.Invoke(null, args);
+        }
+
         public static List<TOut> ConvertAndRemoveNull<TIn, TOut>(this IEnumerable<TIn> lstIn, Func<TIn, TOut> converter) where TOut : class
         {
             var lstOut = new List<TOut>();
@@ -30,6 +37,12 @@ namespace STROOP.Utilities
                     lstOut.Add(convertedObj);
             }
             return lstOut;
+        }
+
+        public static IEnumerable<TOut> ConvertAll<TIn, TOut>(this IEnumerable<TIn> lstIn, Func<TIn, TOut> converter)
+        {
+            foreach (var obj in lstIn)
+                yield return converter(obj);
         }
     }
 }

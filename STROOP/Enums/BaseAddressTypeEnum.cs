@@ -10,9 +10,12 @@ using System.Threading.Tasks;
 namespace STROOP.Structs
 {
     // TODO add new offset types
-    public enum BaseAddressTypeEnum
+    public static class BaseAddressType
     {
-        Invalid,
+        static BaseAddressType() => Utilities.StringUtilities.InitializeDeclaredStrings(typeof(BaseAddressType));
+
+        [Utilities.DeclaredString]
+        public static string
         None,
 
         Absolute,
@@ -25,29 +28,7 @@ namespace STROOP.Structs
         File,
         MainSave,
         Object,
-        ProcessGroup,
         Triangle,
-        TriangleExertionForceTable,
-        CellsTriangle,
-        CellsTriangleExertionForceTable,
-        Floor,
-        Wall,
-        Ceiling,
-        InputCurrent,
-        InputJustPressed,
-        InputBuffered,
-        Graphics,
-        Animation,
-        Waypoint,
-        Water,
-        Area,
-        Painting,
-        Music,
-        LastCoin,
-        WarpDestination,
-
-        HackedArea,
-        CamHack,
-        GhostHack,
+        Area;
     };
 }

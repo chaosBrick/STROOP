@@ -1,12 +1,20 @@
 ﻿using System.Collections.Generic;
 using STROOP.Structs;
-using System.Windows.Forms;
 using STROOP.Utilities;
+using STROOP.Structs.Configurations;
 
 namespace STROOP.Tabs
 {
     public partial class InputTab : STROOPTab
     {
+        [InitializeBaseAddress]
+        static void InitBaseAddresses()
+        {
+            WatchVariableUtilities.baseAddressGetters["InputCurrent"] = () => new List<uint> { InputConfig.CurrentInputAddress };
+            WatchVariableUtilities.baseAddressGetters["InputJustPressed"] = () => new List<uint> { InputConfig.JustPressedInputAddress };
+            WatchVariableUtilities.baseAddressGetters["InputBuffered"] = () => new List<uint> { InputConfig.BufferedInputAddress };
+        }
+
         List<InputImageGui> _guiList;
 
         public InputTab()

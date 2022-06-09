@@ -160,7 +160,7 @@ namespace STROOP.Controls
         public readonly int? NibbleCount;
         public readonly bool? SignedType;
 
-        public readonly BaseAddressTypeEnum BaseAddressType;
+        public readonly string BaseAddressType;
 
         public readonly uint? OffsetUS;
         public readonly uint? OffsetJP;
@@ -173,7 +173,7 @@ namespace STROOP.Controls
         public readonly bool HandleMapping;
 
         public bool IsSpecial { get => MemoryType == null; }
-        public bool UseAbsoluteAddressing { get => BaseAddressType == BaseAddressTypeEnum.Absolute; }
+        public bool UseAbsoluteAddressing { get => BaseAddressType == Structs.BaseAddressType.Absolute; }
 
         public uint Offset
         {
@@ -201,16 +201,14 @@ namespace STROOP.Controls
 
         public WatchVariableControl CreateWatchVariableControl(XElement xElement) => new WatchVariableControl(this, new XmlView(this, xElement));
 
-        public List<uint> GetBaseAddressList()
-        {
-            return WatchVariableUtilities.GetBaseAddressListFromBaseAddressType(BaseAddressType);
-        }
+        public List<uint> GetBaseAddressList() =>
+            WatchVariableUtilities.GetBaseAddressListFromBaseAddressType(BaseAddressType).ToList();
 
         public List<uint> GetAddressList(List<uint> addresses)
         {
-            List<uint> baseAddresses = addresses ?? GetBaseAddressList();
+            var baseAddresses = addresses ?? GetBaseAddressList();
             uint offset = Offset;
-            return baseAddresses.ConvertAll(baseAddress => baseAddress + offset);
+            return baseAddresses.ConvertAll(baseAddress => baseAddress + offset).ToList();
         }
 
         public static WatchVariable ParseXml(XElement element)
@@ -218,7 +216,7 @@ namespace STROOP.Controls
             /// Watchvariable params
             string typeName = (element.Attribute(XName.Get("type"))?.Value);
             string specialType = element.Attribute(XName.Get("specialType"))?.Value;
-            BaseAddressTypeEnum baseAddressType = WatchVariableUtilities.GetBaseAddressType(element.Attribute(XName.Get("base")).Value);
+            string baseAddressType = element.Attribute(XName.Get("base")).Value;
             uint? offsetUS = ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("offsetUS"))?.Value);
             uint? offsetJP = ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("offsetJP"))?.Value);
             uint? offsetSH = ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("offsetSH"))?.Value);
@@ -236,14 +234,14 @@ namespace STROOP.Controls
             return result;
         }
 
-        public WatchVariable(WatchVariable.IVariableView view, BaseAddressTypeEnum baseAddress = BaseAddressTypeEnum.None, uint offset = 0)
+        public WatchVariable(WatchVariable.IVariableView view, string baseAddress = nameof(Structs.BaseAddressType.None), uint offset = 0)
         {
             BaseAddressType = baseAddress;
             this.OffsetDefault = offset;
             this.view = view;
         }
 
-        private WatchVariable(string memoryTypeName, BaseAddressTypeEnum baseAddressType,
+        private WatchVariable(string memoryTypeName, string baseAddressType,
             uint? offsetUS, uint? offsetJP, uint? offsetSH, uint? offsetEU, uint? offsetDefault, uint? mask, int? shift, bool handleMapping)
         {
             if (offsetDefault.HasValue && (offsetUS.HasValue || offsetJP.HasValue || offsetSH.HasValue || offsetEU.HasValue))
@@ -271,7 +269,7 @@ namespace STROOP.Controls
         }
 
         public List<object> GetValues(List<uint> addresses = null) =>
-            GetAddressList(addresses).ConvertAll(address => view._getterFunction(address));
+            GetAddressList(addresses).ConvertAll(address => view._getterFunction(address)).ToList();
 
         private bool SetValueYes(uint address, object value)
         {
@@ -283,14 +281,14 @@ namespace STROOP.Controls
 
         public bool SetValue(object value, List<uint> addresses = null)
         {
-            List<uint> addressList = GetAddressList(addresses);
-            if (addressList.Count == 0) return false;
+            var addressList = GetAddressList(addresses);
+            if (addressList.Count() == 0) return false;
             if (Config.Stream == null) return false;
 
             bool streamAlreadySuspended = Config.Stream.IsSuspended;
             if (!streamAlreadySuspended) Config.Stream.Suspend();
             bool success = addressList.ConvertAll(address => SetValueYes(address, value))
-                    .Aggregate(true, (b1, b2) => b1 && b2);
+                .Aggregate(true, (b1, b2) => b1 && b2);
             if (!streamAlreadySuspended) Config.Stream.Resume();
 
             return success;
@@ -451,7 +449,7 @@ namespace STROOP.Controls
 
         public string GetBaseAddressListString(List<uint> addresses = null)
         {
-            List<uint> baseAddresses = addresses ?? GetBaseAddressList();
+            var baseAddresses = addresses ?? GetBaseAddressList();
             if (baseAddresses.Count == 0) return "(none)";
             List<string> baseAddressesString = baseAddresses.ConvertAll(address => HexUtilities.FormatValue(address, 8));
             return string.Join(",", baseAddressesString);

@@ -80,7 +80,7 @@ namespace STROOP.Tabs
                 uint address = addressNullable.Value;
 
                 string typeString = TypeUtilities.TypeToString[_memoryType];
-                WatchVariable watchVar = new WatchVariable(WatchVariable.DefaultView(typeString, false, _memoryType), BaseAddressTypeEnum.Relative, address);
+                WatchVariable watchVar = new WatchVariable(WatchVariable.DefaultView(typeString, false, _memoryType), BaseAddressType.Relative, address);
                 controls.Add(new WatchVariableControl(watchVar));
             }
             watchVariablePanelSearch.AddVariables(controls);

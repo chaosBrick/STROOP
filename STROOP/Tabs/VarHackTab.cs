@@ -170,7 +170,7 @@ namespace STROOP.Tabs
             WatchVariableWrapper watchVarWrapper = control.WatchVarWrapper;
             WatchVariable watchVar = watchVarWrapper.WatchVar;
 
-            if (watchVar.BaseAddressType == BaseAddressTypeEnum.Triangle)
+            if (watchVar.BaseAddressType == BaseAddressType.Triangle)
             {
                 var trianglePointerAddress = AccessScope<StroopMainForm>.content.GetTab<TrianglesTab>().TrianglePointerAddress;
                 if (trianglePointerAddress.HasValue)

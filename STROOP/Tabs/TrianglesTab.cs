@@ -13,6 +13,26 @@ namespace STROOP.Tabs
 {
     public partial class TrianglesTab : STROOPTab
     {
+        static IEnumerable<uint> GetTriangleAddresses()
+        {
+            var trianglesTab = AccessScope<StroopMainForm>.content.GetTab<TrianglesTab>();
+            List<uint> triangleAddresses = trianglesTab.TriangleAddresses;
+            if (triangleAddresses.Count == 1 && triangleAddresses[0] == 0) return WatchVariableUtilities.BaseAddressListEmpty;
+            return trianglesTab.TriangleAddresses;
+        }
+
+        [InitializeBaseAddress]
+        static void InitBaseAddresses()
+        {
+            WatchVariableUtilities.baseAddressGetters[BaseAddressType.Triangle] = GetTriangleAddresses;
+            WatchVariableUtilities.baseAddressGetters["TriangleExertionForceTable"] = () =>
+                GetTriangleAddresses().ConvertAll(triangleAddress =>
+                       {
+                           uint exertionForceIndex = Config.Stream.GetByte(triangleAddress + TriangleOffsetsConfig.ExertionForceIndex);
+                           return TriangleConfig.ExertionForceTableAddress + 2 * exertionForceIndex;
+                       });
+        }
+
         public enum TriangleMode { Floor, Wall, Ceiling, Custom };
         public TriangleMode Mode = TriangleMode.Floor;
 

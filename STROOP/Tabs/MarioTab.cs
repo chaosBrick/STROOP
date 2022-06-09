@@ -9,6 +9,27 @@ namespace STROOP.Tabs
 {
     public partial class MarioTab : STROOPTab
     {
+
+        [InitializeBaseAddress]
+        static void InitBaseAddresses()
+        {
+            WatchVariableUtilities.baseAddressGetters["Floor"] = () =>
+            {
+                uint floorAddress = Config.Stream.GetUInt32(MarioConfig.StructAddress + MarioConfig.FloorTriangleOffset);
+                return floorAddress != 0 ? new List<uint>() { floorAddress } : WatchVariableUtilities.BaseAddressListEmpty;
+            };
+            WatchVariableUtilities.baseAddressGetters["Wall"] = () =>
+            {
+                uint wallAddress = Config.Stream.GetUInt32(MarioConfig.StructAddress + MarioConfig.WallTriangleOffset);
+                return wallAddress != 0 ? new List<uint>() { wallAddress } : WatchVariableUtilities.BaseAddressListEmpty;
+            };
+            WatchVariableUtilities.baseAddressGetters["Ceiling"] = () =>
+            {
+                uint ceilingAddress = Config.Stream.GetUInt32(MarioConfig.StructAddress + MarioConfig.CeilingTriangleOffset);
+                return ceilingAddress != 0 ? new List<uint>() { ceilingAddress } : WatchVariableUtilities.BaseAddressListEmpty;
+            };
+        }
+
         private static readonly List<string> ALL_VAR_GROUPS =
             new List<string>()
             {

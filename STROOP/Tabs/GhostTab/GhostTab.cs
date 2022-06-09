@@ -1,11 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using OpenTK;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
+using STROOP.Utilities;
 
 namespace STROOP.Tabs.GhostTab
 {
@@ -13,7 +13,7 @@ namespace STROOP.Tabs.GhostTab
     {
         const uint COLORED_HATS_CODE_TARGET_ADDR = 0x80408200;
         const uint COLORED_HATS_LIGHTS_ADDR = 0x80408500;
-        static void __DebugInjectHeadKillers()
+        static void InjectHeadRenderOverrides()
         {
             uint jumpinOffset = 0xe0;
 
@@ -324,7 +324,7 @@ namespace STROOP.Tabs.GhostTab
                 Config.Stream.WriteRam(new byte[4], 0x80407FFC, EndiannessType.Little);
                 Config.Stream.WriteRam(new byte[0x70], 0x80407F90, EndiannessType.Little);
                 Config.Stream.WriteRam(File.ReadAllBytes("Resources/Hacks/gfx_generate_colored_hats.bin"), COLORED_HATS_CODE_TARGET_ADDR, EndiannessType.Big);
-                __DebugInjectHeadKillers();
+                InjectHeadRenderOverrides();
 
                 //Tell ROM Hacks to suck it and get rid of the 01010101 pattern
                 Config.Stream.WriteRam(new byte[0x1000], 0x80408000 - 0x1000, EndiannessType.Big);

@@ -1,11 +1,22 @@
 ﻿using System.Collections.Generic;
 using STROOP.Structs;
-using System.Windows.Forms;
+using STROOP.Utilities;
 
 namespace STROOP.Tabs
 {
     public partial class PaintingTab : STROOPTab
     {
+
+        [InitializeBaseAddress]
+        static void InitBaseAddresses()
+        {
+            WatchVariableUtilities.baseAddressGetters["Painting"] = () =>
+            {
+                uint? paintingAddress = AccessScope<StroopMainForm>.content.GetTab<PaintingTab>().GetPaintingAddress();
+                return paintingAddress != null ? new List<uint>() { paintingAddress.Value } : WatchVariableUtilities.BaseAddressListEmpty;
+            };
+        }
+
         private class PaintingData
         {
             private readonly string _name;

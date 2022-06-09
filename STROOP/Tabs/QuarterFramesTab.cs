@@ -10,6 +10,12 @@ namespace STROOP.Tabs
 {
     public partial class QuarterFramesTab : STROOPTab
     {
+        [InitializeBaseAddress]
+        static void InitBaseAddresses()
+        {
+            WatchVariableUtilities.baseAddressGetters["HackedArea"] = () => new List<uint> { MiscConfig.HackedAreaAddress };
+        }
+
         private static readonly List<string> ALL_VAR_GROUPS =
             new List<string>()
             {

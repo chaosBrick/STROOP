@@ -52,6 +52,7 @@ namespace STROOP
             this.saveFileDialogSt = new System.Windows.Forms.SaveFileDialog();
             this.splitContainerMain = new STROOP.BetterSplitContainer();
             this.tabControlMain = new STROOP.TabControlEx();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBoxObjects = new System.Windows.Forms.GroupBox();
             this.comboBoxSelectionMethod = new System.Windows.Forms.ComboBox();
             this.labelSelectionMethod = new System.Windows.Forms.Label();
@@ -73,7 +74,6 @@ namespace STROOP
             this.buttonMoveTabLeft = new System.Windows.Forms.Button();
             this.buttonMoveTabRight = new System.Windows.Forms.Button();
             this.buttonShowLeftPane = new System.Windows.Forms.Button();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
             this.panelConnect.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
@@ -295,6 +295,15 @@ namespace STROOP
             this.tabControlMain.SelectedIndex = 0;
             this.tabControlMain.Size = new System.Drawing.Size(923, 489);
             this.tabControlMain.TabIndex = 3;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Size = new System.Drawing.Size(915, 463);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Dummy";
+            this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // groupBoxObjects
             // 
@@ -551,15 +560,6 @@ namespace STROOP
             this.buttonShowLeftPane.TabIndex = 20;
             this.buttonShowLeftPane.UseVisualStyleBackColor = true;
             this.buttonShowLeftPane.Click += new System.EventHandler(this.buttonShowLeftPanel_Click);
-            // 
-            // tabPage1
-            // 
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Size = new System.Drawing.Size(915, 463);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Dummy";
-            this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // StroopMainForm
             // 

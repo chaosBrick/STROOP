@@ -16,11 +16,13 @@ namespace STROOP.Forms
         {
             InitializeComponent();
             comboBoxTypeValue.DataSource = TypeUtilities.InGameTypeList;
-            comboBoxBaseValue.DataSource = Enum.GetValues(typeof(BaseAddressTypeEnum));
+            comboBoxBaseValue.DataSource = WatchVariableUtilities.baseAddressGetters.Keys.ToArray();
             comboBoxTypeValue.SelectedIndex = TypeUtilities.InGameTypeList.IndexOf("int");
-            comboBoxBaseValue.SelectedIndex =
-                EnumUtilities.GetEnumValues<BaseAddressTypeEnum>(
-                    typeof(BaseAddressTypeEnum)).IndexOf(BaseAddressTypeEnum.Object);
+            comboBoxBaseValue.SelectedIndex = Array.IndexOf(
+                WatchVariableUtilities.baseAddressGetters.Values.ToArray(),
+                BaseAddressType.Object
+                );
+
             ControlUtilities.AddCheckableContextMenuStripFunctions(
                 buttonAddVariable,
                 new List<string>()
@@ -50,12 +52,12 @@ namespace STROOP.Forms
         {
             string name = textBoxNameValue.Text;
             string memoryTypeString = comboBoxTypeValue.SelectedItem.ToString();
-            BaseAddressTypeEnum baseAddressType = (BaseAddressTypeEnum)comboBoxBaseValue.SelectedItem;
+            string baseAddressType = (string)comboBoxBaseValue.SelectedItem;
             uint offset = ParsingUtilities.ParseHexNullable(textBoxOffsetValue.Text) ?? 0;
 
             var memoryType = TypeUtilities.StringToType[memoryTypeString];
 
-            var isAbsolute = baseAddressType == BaseAddressTypeEnum.Absolute;
+            var isAbsolute = baseAddressType == BaseAddressType.Absolute;
 
             WatchVariable watchVar = new WatchVariable(
                 new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))

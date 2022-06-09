@@ -11,7 +11,13 @@ using System.Xml.Linq;
 namespace STROOP.Tabs
 {
     public partial class CamHackTab : STROOPTab
-    {
+    { 
+        [InitializeBaseAddress]
+        static void InitBaseAddresses()
+        {
+            WatchVariableUtilities.baseAddressGetters["CamHack"] = () => new List<uint> { CamHackConfig.StructAddress };
+        }
+
         public CamHackMode CurrentCamHackMode { get; private set; }
         
         private int _numPans = 0;

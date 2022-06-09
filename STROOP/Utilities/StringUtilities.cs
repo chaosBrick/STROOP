@@ -1,10 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace STROOP.Utilities
 {
+    [AttributeUsage(AttributeTargets.Field)]
+    public class DeclaredStringAttribute : Attribute { }
+
     public static class StringUtilities
     {
+        public static void InitializeDeclaredStrings(Type t)
+        {
+            foreach (var field in t.GetFields(BindingFlags.Public | BindingFlags.Static))
+                if (field.FieldType == typeof(string))
+                    field.SetValue(null, field.Name);
+        }
+
         public static string Cap(string stringValue, int length)
         {
             if (stringValue == null) return stringValue;

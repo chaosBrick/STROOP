@@ -118,7 +118,7 @@ namespace STROOP.Structs.Configurations
                 if (type == null) continue;
                 string typeString = TypeUtilities.TypeToString[type];
 
-                WatchVariable watchVar = new WatchVariable(WatchVariable.DefaultView(name, false, type), BaseAddressTypeEnum.Relative, address);
+                WatchVariable watchVar = new WatchVariable(WatchVariable.DefaultView(name, false, type), BaseAddressType.Relative, address);
                 controls.Add(new WatchVariableControl(watchVar));
             }
             return controls;

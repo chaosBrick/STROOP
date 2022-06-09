@@ -298,12 +298,12 @@ namespace STROOP.Tabs
                     uint minPrecursorOffset = watchVar.Offset;
                     uint maxPrecursorOffset = watchVar.Offset + (uint)watchVar.ByteCount.Value - 1;
 
-                    if (watchVar.BaseAddressType == BaseAddressTypeEnum.Object)
+                    if (watchVar.BaseAddressType == BaseAddressType.Object)
                     {
                         if (!minObjOffset.HasValue || !maxObjOffset.HasValue) return false;
                         return minObjOffset <= maxPrecursorOffset && maxObjOffset >= minPrecursorOffset;
                     }
-                    if (watchVar.BaseAddressType == BaseAddressTypeEnum.Relative)
+                    if (watchVar.BaseAddressType == BaseAddressType.Relative)
                     {
                         return minOffset <= maxPrecursorOffset && maxOffset >= minPrecursorOffset;
                     }
@@ -330,11 +330,10 @@ namespace STROOP.Tabs
                     : MemoryType;
                 string typeString = TypeUtilities.TypeToString[effectiveType];
 
-                BaseAddressTypeEnum baseAddressType =
-                    useObjAddress ? BaseAddressTypeEnum.Object : BaseAddressTypeEnum.Relative;
+                string baseAddressType = useObjAddress ? BaseAddressType.Object : BaseAddressType.Relative;
                 uint offset = useObjAddress ? (uint)ByteIndex : MemoryAddress;
                 uint nameOffset = useRelativeName ? (uint)ByteIndex : MemoryAddress;
-                bool isAbsolute = baseAddressType == BaseAddressTypeEnum.Absolute;
+                bool isAbsolute = baseAddressType == BaseAddressType.Absolute;
 
                 WatchVariable result = null;
                 var view = WatchVariable.DefaultView($"{baseAddressType}: 0x{offset.ToString("X8")}", isAbsolute, effectiveType);

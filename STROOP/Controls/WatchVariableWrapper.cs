@@ -242,7 +242,7 @@ namespace STROOP.Controls
             return WatchVar.MemoryType;
         }
 
-        public List<uint> GetBaseAddresses(List<uint> addresses = null)
+        public IEnumerable<uint> GetBaseAddresses(List<uint> addresses = null)
         {
             return addresses ?? WatchVar.GetBaseAddressList();
         }

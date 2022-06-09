@@ -2,13 +2,32 @@
 using STROOP.Utilities;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using STROOP.Structs;
 
 namespace STROOP.Tabs
 {
     public partial class CellsTab : STROOPTab
     {
+        static IEnumerable<uint> GetTriangleAddresses()
+        {
+            var addr = AccessScope<StroopMainForm>.content.GetTab<CellsTab>().TriangleAddress;
+            return addr != 0 ? new List<uint> { addr } : WatchVariableUtilities.BaseAddressListEmpty;
+        }
+
+        [InitializeBaseAddress]
+        static void InitBaseAddresses()
+        {
+            WatchVariableUtilities.baseAddressGetters["CellsTriangle"] = GetTriangleAddresses;
+            WatchVariableUtilities.baseAddressGetters["CellsTriangleExertionForceTable"] = () =>
+                GetTriangleAddresses().ConvertAll(triangleAddress =>
+                {
+                    uint exertionForceIndex = Config.Stream.GetByte(triangleAddress + TriangleOffsetsConfig.ExertionForceIndex);
+                    return TriangleConfig.ExertionForceTableAddress + 2 * exertionForceIndex;
+                });
+        }
+
         public uint TriangleAddress;
-        
+
         public CellsTab()
         {
             InitializeComponent();
