@@ -79,5 +79,5 @@ function write_file()
 	file:close()
 end
 
-emu.atvi(main)
+emu.atinput(main)
 emu.atstop(write_file)
