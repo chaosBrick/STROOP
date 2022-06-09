@@ -6,6 +6,7 @@ using OpenTK;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
+using System.Linq;
 
 namespace STROOP.Tabs.GhostTab
 {
@@ -94,6 +95,8 @@ namespace STROOP.Tabs.GhostTab
             UpdateFileWatchers();
         }
 
+        IEnumerable<Ghost> GetSelectedGhosts() => listBoxGhosts.SelectedItems.ConvertAndRemoveNull(_ => _ as Ghost);
+
         public override string GetDisplayName() => "Ghost";
 
         void AddGhost(string name, Ghost newGhost)
@@ -116,8 +119,8 @@ namespace STROOP.Tabs.GhostTab
 
         void SetStartOfPlayback(uint newValue)
         {
-            if (selectedGhost != null)
-                selectedGhost.playbackBaseFrame = newValue;
+            foreach (var g in GetSelectedGhosts())
+                g.playbackBaseFrame = newValue;
         }
 
         float yTargetPosition;
@@ -127,7 +130,7 @@ namespace STROOP.Tabs.GhostTab
 
         bool updateGhostData => ghostHack.Enabled;
 
-        public IEnumerable<Utilities.PositionAngle> GetGhosts()
+        public IEnumerable<PositionAngle> GetGhosts()
         {
             foreach (var item in listBoxGhosts.SelectedItems)
                 if (item is Ghost ghost)
@@ -161,13 +164,8 @@ namespace STROOP.Tabs.GhostTab
             buttonDisableGhostHack.Enabled = ghostHack.Enabled;
 
             var globalTimer = Config.Stream.GetInt32(MiscConfig.GlobalTimerAddress);
-            var ghostList = new List<Ghost>();
-            foreach (var item in listBoxGhosts.SelectedItems)
-                if (item is Ghost ghost)
-                    ghostList.Add(ghost);
-            var ghostArr = ghostList.ToArray();
+            var ghostArr = GetSelectedGhosts().ToArray();
             int numGhosts = Math.Max(1, ghostArr.Length);
-
 
             if (updateGhostData)
             {
@@ -296,11 +294,11 @@ namespace STROOP.Tabs.GhostTab
             dlg.Filter = "ghost files (*.ghost)|*.ghost";
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                var selectedGhosts = listBoxGhosts.SelectedItems.ConvertAndRemoveNull(item => item as Ghost);
+                var selectedGhosts = GetSelectedGhosts().ToArray();
                 var nameRepetitions = new Dictionary<string, Wrapper<int>>();
                 IEnumerable<(Ghost, string)> ghostFileNames =
-                        selectedGhosts.Count == 1
-                        ? (IEnumerable<(Ghost, string)>)new[] { (selectedGhost, dlg.FileName) }
+                        selectedGhosts.Length == 1
+                        ? new[] { (selectedGhost, dlg.FileName) }
                         : selectedGhosts.ConvertAll(
                             g =>
                             {
@@ -343,14 +341,47 @@ namespace STROOP.Tabs.GhostTab
                 buttonGhostColor.Enabled = false;
             else
             {
-                buttonGhostColor.BackColor = Utilities.ColorUtilities.Vec4ToColor(ghost.hatColor);
+                buttonGhostColor.BackColor = ColorUtilities.Vec4ToColor(ghost.hatColor);
                 buttonGhostColor.Enabled = true;
             }
-            labelGhostFile.Text = $"File: {ghost?.fileName ?? "-"}";
-            labelNumFrames.Text = $"Number of frames: {ghost?.numFrames.ToString() ?? "-"}";
-            labelGhostPlaybackStart.Text = $"Original playback start: {ghost?.originalPlaybackBaseFrame.ToString() ?? "-"}";
-            numericUpDownStartOfPlayback.Value = ghost?.playbackBaseFrame ?? 0;
-            textBoxGhostName.Text = ghost?.name ?? "";
+
+
+            void GetMeaningfulValue(ref string result, string input, string failString)
+            {
+                if (result != failString)
+                    if (result == null)
+                        result = input;
+                    else if (input != result)
+                        result = failString;
+            }
+
+            string fileValue = null;
+            string numFramesValue = null;
+            string originalPlaybackStartValue = null;
+            string playbackStartValue = null;
+            string nameValue = null;
+
+            foreach (var g in GetSelectedGhosts())
+            {
+                GetMeaningfulValue(ref fileValue, g.fileName, "<Multiple Files>");
+                GetMeaningfulValue(ref numFramesValue, g.numFrames.ToString(), "<Multiple values>");
+                GetMeaningfulValue(ref originalPlaybackStartValue, g.originalPlaybackBaseFrame.ToString(), "<Multiple values>");
+                GetMeaningfulValue(ref playbackStartValue, g.playbackBaseFrame.ToString(), "<Multiple values>");
+                GetMeaningfulValue(ref nameValue, g.name, "<Multiple Names>");
+            }
+
+            labelGhostFile.Text = $"File: {fileValue ?? "-"}";
+            labelNumFrames.Text = $"Number of frames: {numFramesValue ?? "-"}";
+            labelGhostPlaybackStart.Text = $"Original playback start: {originalPlaybackStartValue ?? "-"}";
+
+            if (uint.TryParse(playbackStartValue, out uint val))
+                numericUpDownStartOfPlayback.Value = val;
+            else if (numericUpDownStartOfPlayback.Controls[1] is TextBox txt)
+                txt.Text = "<Multiple values>";
+
+            suspendNameChanged = true;
+            textBoxGhostName.Text = nameValue;
+            suspendNameChanged = false;
         }
 
         private void listBoxGhosts_KeyDown(object sender, KeyEventArgs e)
@@ -396,22 +427,27 @@ Are you sure you want to continue?";
             SetStartOfPlayback((uint)numericUpDownStartOfPlayback.Value);
         }
 
+        bool suspendNameChanged;
         private void textBoxGhostName_TextChanged(object sender, EventArgs e)
         {
-            if (selectedGhost != null)
-                selectedGhost.name = textBoxGhostName.Text;
-            int i = 0;
-            foreach (var obj in listBoxGhosts.Items)
-            {
-                if (obj == selectedGhost)
+            if (suspendNameChanged)
+                return;
+            suspendSelectedIndexChanged = true;
+            var selectedIndexList = new List<int>();
+            foreach (int idx in listBoxGhosts.SelectedIndices)
+                selectedIndexList.Add(idx);
+
+            foreach (int idx in listBoxGhosts.SelectedIndices)
+                if (listBoxGhosts.Items[idx] is Ghost g)
                 {
-                    suspendSelectedIndexChanged = true;
-                    listBoxGhosts.Items[i] = selectedGhost;
-                    suspendSelectedIndexChanged = false;
-                    break;
+                    g.name = textBoxGhostName.Text;
+                    listBoxGhosts.Items[idx] = g;
                 }
-                i++;
-            }
+
+            foreach (int idx in selectedIndexList)
+                listBoxGhosts.SetSelected(idx, true);
+
+            suspendSelectedIndexChanged = false;
         }
 
         private void buttonMarioColor_Click(object sender, EventArgs e)
@@ -432,7 +468,7 @@ Are you sure you want to continue?";
                 var dlg = new ColorDialog();
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
-                    foreach (var g in listBoxGhosts.SelectedItems.ConvertAndRemoveNull(_ => _ as Ghost))
+                    foreach (var g in GetSelectedGhosts())
                         g.hatColor = ColorUtilities.ColorToVec4(dlg.Color);
                     buttonGhostColor.BackColor = dlg.Color;
                 }
