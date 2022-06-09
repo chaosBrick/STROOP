@@ -145,6 +145,8 @@ namespace STROOP.Tabs.MapTab
         public float cursorViewPlaneDist = 1000;
         public bool fixCursorPlane => view.mode == MapView.ViewMode.ThreeDimensional && KeyboardUtilities.IsShiftHeld();
 
+        public float nearClip { get; private set; }
+        public float farClip { get; private set; }
         public (Vector3 normal, float d) worldspaceNearPlane { get; private set; }
         public (Vector3 normal, float d) worldspaceFarPlane { get; private set; }
         public (Vector3 normal, float d) orthographicZero { get; private set; }
@@ -420,13 +422,14 @@ namespace STROOP.Tabs.MapTab
                             break;
                     }
 
-                    float nearClip = Math.Max(1, Math.Min(50, (target - view.position).Length / 100));
+                    nearClip = Math.Max(1, Math.Min(50, (target - view.position).Length / 100));
+                    farClip = nearClip * 5000;
 
                     ViewMatrix = Matrix4.LookAt(view.position, target, new Vector3(0, 1, 0));
                     var mat = Matrix4.Invert(ViewMatrix);
                     mat.Row3 = new Vector4(0, 0, 0, 1);
                     BillboardMatrix = mat;
-                    ViewMatrix *= Matrix4.CreatePerspectiveFieldOfView(1, glControl.Width / (float)glControl.Height, nearClip, nearClip * 5000);
+                    ViewMatrix *= Matrix4.CreatePerspectiveFieldOfView(1, glControl.Width / (float)glControl.Height, nearClip, farClip);
                     Update3DCursor();
 
                     break;

@@ -14,7 +14,6 @@ namespace STROOP.Tabs.MapTab.Renderers
             void DrawTransparent(TransparencyRenderer renderer);
         }
 
-
         int[] maskTexture;
         int colorBuffer;
         int maskFBO, renderFBO;
@@ -130,7 +129,9 @@ namespace STROOP.Tabs.MapTab.Renderers
             GL.Uniform1(GL.GetUniformLocation(shader, "referenceDepthMask"), 0);
             GL.Uniform1(GL.GetUniformLocation(shader, "referenceSolidDepth"), 1);
             GL.Uniform1(GL.GetUniformLocation(shader, "readDepthMask"), (int)currentMaskLayer);
-            GL.Uniform1(GL.GetUniformLocation(shader, "solidDepthBias"), 0.00005f);
+            GL.Uniform1(GL.GetUniformLocation(shader, "solidDepthBias"), 0.05f);
+            GL.Uniform1(GL.GetUniformLocation(shader, "zNear"), graphics.nearClip);
+            GL.Uniform1(GL.GetUniformLocation(shader, "zFar"), graphics.farClip);
 
             GL.ActiveTexture(TextureUnit.Texture0);
         }
