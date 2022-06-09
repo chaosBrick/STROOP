@@ -96,6 +96,46 @@ namespace STROOP.Tabs.MapTab.MapObjects
             return new[] { (new[] { tri.p1 + d, tri.p2 + d, tri.p3 + d }, new Vector4(1)) };
         }
 
+        protected override void Draw3D(MapGraphics graphics)
+        {
+            base.Draw3D(graphics);
+            if (showArrows)
+                graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
+                {
+                    var regularBaseColor = new Vector4(Color.R / 255f, Color.G / 255f, Color.B / 255f, OpacityByte / 255f);
+                    foreach (var tri in GetTrianglesWithinDist())
+                    {
+                        Vector4 baseColor;
+                        if (!individualTriangleColors.TryGetValue(tri.Address, out baseColor))
+                            if (useRandomColors)
+                                baseColor = ColorUtilities.GetRandomColor((int)tri.Address);
+                            else
+                                baseColor = regularBaseColor;
+
+                        double uphillAngle = WatchVariableSpecialUtilities.GetTriangleUphillAngle(tri);
+                        double pushAngle = MoreMath.ReverseAngle(uphillAngle);
+
+                        float d = Size / (tri.XProjection ? tri.NormX : tri.NormZ);
+                        Vector3 pos = (tri.p1 + tri.p2 + tri.p3) / 3;
+                        if (tri.XProjection)
+                            pos.X += d * Math.Sign(tri.NormX);
+                        else
+                            pos.Z += d * Math.Sign(tri.NormZ);
+
+
+                        graphics.lineRenderer.AddArrow(
+                            pos.X,
+                            pos.Y + _hitboxVerticalOffset,
+                            pos.Z,
+                            100,
+                            (float)pushAngle,
+                            15,
+                            new Vector4(baseColor.Xyz, 1),
+                            OutlineWidth * 2);
+                    }
+                });
+        }
+
         protected override void DrawTopDown(MapGraphics graphics)
         {
 
@@ -103,19 +143,19 @@ namespace STROOP.Tabs.MapTab.MapObjects
             float? height = _relativeHeight.HasValue ? marioHeight - _relativeHeight.Value : (float?)null;
             height = height ?? _absoluteHeight;
 
-            List<(float x1, float z1, float x2, float z2, bool xProjection, double pushAngle)> dsjakl = new List<(float x1, float z1, float x2, float z2, bool xProjection, double pushAngle)>();
+            List<(float x1, float z1, float x2, float z2, bool xProjection, double pushAngle)> topDownWallData = new List<(float x1, float z1, float x2, float z2, bool xProjection, double pushAngle)>();
             foreach (var tri in GetTrianglesWithinDist())
             {
                 var d = MapUtilities.Get2DWallDataFromTri(tri, height);
                 if (d.HasValue)
-                    dsjakl.Add(d.Value);
+                    topDownWallData.Add(d.Value);
             }
 
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
             {
                 Vector4 color = ColorUtilities.ColorToVec4(Color, OpacityByte),
                     outlineColor = ColorUtilities.ColorToVec4(OutlineColor);
-                foreach ((float x1, float z1, float x2, float z2, bool xProjection, double pushAngle) in dsjakl)
+                foreach ((float x1, float z1, float x2, float z2, bool xProjection, double pushAngle) in topDownWallData)
                 {
                     float angle = (float)MoreMath.AngleTo_Radians(x1, z1, x2, z2);
                     float projectionDist = Size / (float)Math.Abs(xProjection ? Math.Cos(angle) : Math.Sin(angle));
@@ -156,6 +196,41 @@ namespace STROOP.Tabs.MapTab.MapObjects
                         false, color, outlineColor,
                         new Vector3(OutlineWidth, OutlineWidth, 0),
                         false);
+
+                    if (showArrows)
+                    {
+                        Vector2 baseVtx = new Vector2(x1, z1);
+                        Vector2 diff = new Vector2(x2 - x1, z2 - z1);
+                        float len = diff.LengthFast;
+                        var side = diff / len;
+                        var norm = new Vector2(-side.Y, side.X);
+
+                        var pushNorm = new Vector2((float)Math.Sin(MoreMath.AngleUnitsToRadians(pushAngle)), (float)Math.Cos(MoreMath.AngleUnitsToRadians(pushAngle)));
+                        var pushSide = new Vector2(-pushNorm.Y, pushNorm.X) * 0.75f;
+
+                        float arrowSize = Size * 0.5f;
+                        float arrowRad = arrowSize;
+                        var arrowSpace = arrowSize * 2.5f;
+                        int numArrows = (int)((len - arrowSize) / arrowSpace + 1);
+                        for (int i = 0; i < numArrows; i++)
+                        {
+                            float d = len / 2 + (i + 0.5f - numArrows / 2.0f) * arrowSpace;
+                            foreach (int k in new[] { -1, 1 })
+                            {
+                                var vtxBase = baseVtx + side * d + k * pushNorm * arrowSize;
+                                var vtx1 = vtxBase - pushSide * arrowRad - pushNorm * arrowRad * 0.5f;
+                                var vtx2 = vtxBase + pushSide * arrowRad - pushNorm * arrowRad * 0.5f;
+                                var vtx3 = vtxBase + pushNorm * arrowRad * 0.5f;
+
+                                graphics.triangleRenderer.Add(
+                                    new Vector3(vtx1.X, 0, vtx1.Y),
+                                    new Vector3(vtx2.X, 0, vtx2.Y),
+                                    new Vector3(vtx3.X, 0, vtx3.Y),
+                                    false, color, outlineColor, OutlineWidth, false
+                                    );
+                            }
+                        }
+                    }
                 }
             });
         }

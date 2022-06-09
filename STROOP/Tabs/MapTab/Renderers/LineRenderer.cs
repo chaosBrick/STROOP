@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
-using System.Runtime.InteropServices;
+using STROOP.Utilities;
 
 namespace STROOP.Tabs.MapTab.Renderers
 {
@@ -50,6 +49,21 @@ namespace STROOP.Tabs.MapTab.Renderers
                 color = color,
                 width = thickness
             });
+        }
+
+        public void AddArrow(float x, float y, float z, float size, float yaw, float _arrowHeadSideLength, Vector4 color, float thickness)
+        {
+            (float arrowHeadX, float arrowHeadZ) =
+                ((float, float))MoreMath.AddVectorToPoint(size, yaw, x, z);
+
+            (float pointSide1X, float pointSide1Z) =
+                ((float, float))MoreMath.AddVectorToPoint(_arrowHeadSideLength, yaw + 32768 + 8192, arrowHeadX, arrowHeadZ);
+            (float pointSide2X, float pointSide2Z) =
+                ((float, float))MoreMath.AddVectorToPoint(_arrowHeadSideLength, yaw + 32768 - 8192, arrowHeadX, arrowHeadZ);
+
+            Add(new Vector3(x, y, z), new Vector3(arrowHeadX, y, arrowHeadZ), color, thickness);
+            Add(new Vector3(arrowHeadX, y, arrowHeadZ), new Vector3(pointSide1X, y, pointSide1Z), color, thickness);
+            Add(new Vector3(arrowHeadX, y, arrowHeadZ), new Vector3(pointSide2X, y, pointSide2Z), color, thickness);
         }
 
         public override void SetDrawCalls(MapGraphics graphics)

@@ -108,8 +108,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
         protected bool _excludeDeathBarriers;
         protected TriangleHoverData hoverData;
         float _projectionAlphaMultiplier = 0.5f;
-        Dictionary<uint, Vector4> individualTriangleColors = new Dictionary<uint, Vector4>();
-        bool useRandomColors => itemUseRandomColors.Checked;
+        protected Dictionary<uint, Vector4> individualTriangleColors = new Dictionary<uint, Vector4>();
+        protected bool useRandomColors => itemUseRandomColors.Checked;
         ToolStripMenuItem itemUseRandomColors;
 
         protected MapTriangleObject(ObjectCreateParams creationParameters)
