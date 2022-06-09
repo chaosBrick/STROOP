@@ -11,6 +11,34 @@ namespace STROOP.Tabs.GhostTab
 {
     public partial class GhostTab : STROOPTab
     {
+        static IEnumerable<uint> GetActiveGhostIndices()
+        {
+            foreach (var ind in instance.listBoxGhosts.SelectedIndices)
+                yield return (uint)(int)ind;
+        }
+
+        [InitializeBaseAddress]
+        static void InitializeBaseAddress()
+        {
+            WatchVariableUtilities.baseAddressGetters["Ghost"] = GetActiveGhostIndices;
+        }
+
+        [InitializeSpecial]
+        static void AddSpecialVariables()
+        {
+            var target = WatchVariableSpecialUtilities.dictionary;
+            Func<uint, Func<GhostFrame, object>, Func<object>> displayGhostVarFloat =
+                (index, selectMember) => (() => selectMember((instance.listBoxGhosts.Items[(int)index] as Ghost)?.currentFrame ?? default(GhostFrame)));
+
+            target.Add("GhostX", ((uint _) => displayGhostVarFloat(_, frame => frame.position.X)(), (object _, uint __) => false));
+            target.Add("GhostY", ((uint _) => displayGhostVarFloat(_, frame => frame.position.Y)(), (object _, uint __) => false));
+            target.Add("GhostZ", ((uint _) => displayGhostVarFloat(_, frame => frame.position.Z)(), (object _, uint __) => false));
+            target.Add("GhostYaw", ((uint _) => displayGhostVarFloat(_, frame => frame.oYaw)(), (object _, uint __) => false));
+            target.Add("GhostPitch", ((uint _) => displayGhostVarFloat(_, frame => frame.oPitch)(), (object _, uint __) => false));
+            target.Add("GhostRoll", ((uint _) => displayGhostVarFloat(_, frame => frame.oRoll)(), (object _, uint __) => false));
+        }
+        static GhostTab instance;
+
         const uint COLORED_HATS_CODE_TARGET_ADDR = 0x80408200;
         const uint COLORED_HATS_LIGHTS_ADDR = 0x80408500;
         static void InjectHeadRenderOverrides()
@@ -34,23 +62,7 @@ namespace STROOP.Tabs.GhostTab
             Config.Stream.WriteRam(new byte[] { 0xB8, 0, 0, 0, 0, 0, 0, 0 }, jumpOutOfHeadAddr, EndiannessType.Big);
         }
 
-        static GhostTab instance;
         Vector4 marioHatColor = new Vector4(1, 0, 0, 1);
-
-        [InitializeSpecial]
-        static void AddSpecialVariables()
-        {
-            var target = WatchVariableSpecialUtilities.dictionary;
-            Func<Func<GhostFrame, object>, Func<object>> displayGhostVarFloat =
-                selectMember => (() => selectMember(instance.selectedGhost?.currentFrame ?? default(GhostFrame)));
-
-            target.Add("GhostX", ((uint _) => displayGhostVarFloat(frame => frame.position.X)(), (object _, uint __) => false));
-            target.Add("GhostY", ((uint _) => displayGhostVarFloat(frame => frame.position.Y)(), (object _, uint __) => false));
-            target.Add("GhostZ", ((uint _) => displayGhostVarFloat(frame => frame.position.Z)(), (object _, uint __) => false));
-            target.Add("GhostYaw", ((uint _) => displayGhostVarFloat(frame => frame.oYaw)(), (object _, uint __) => false));
-            target.Add("GhostPitch", ((uint _) => displayGhostVarFloat(frame => frame.oPitch)(), (object _, uint __) => false));
-            target.Add("GhostRoll", ((uint _) => displayGhostVarFloat(frame => frame.oRoll)(), (object _, uint __) => false));
-        }
 
         uint bufferBaseAddress = 0x80408800;
 
