@@ -11,6 +11,18 @@ namespace STROOP.Tabs.GhostTab
 {
     public partial class GhostTab : STROOPTab
     {
+        static int defaultGhostColorCounter = 1;
+        static readonly Vector4[] DefaultGhostColors = new[] {
+            new Vector4(1, 0, 0, 1),
+            new Vector4(1, 0.5f, 0, 1),
+            new Vector4(1, 1, 0, 1),
+            new Vector4(0, 1, 0, 1),
+            new Vector4(0, 1, 1, 1),
+            new Vector4(0, 0, 1, 0),
+            new Vector4(1, 1, 1, 1),
+            new Vector4(0.2f, 0.2f, 0.2f, 1),
+        };
+
         static IEnumerable<uint> GetActiveGhostIndices()
         {
             foreach (var ind in instance.listBoxGhosts.SelectedIndices)
@@ -87,6 +99,8 @@ namespace STROOP.Tabs.GhostTab
         void AddGhost(string name, Ghost newGhost)
         {
             newGhost.name = name;
+            newGhost.hatColor = DefaultGhostColors[defaultGhostColorCounter];
+            defaultGhostColorCounter = (defaultGhostColorCounter + 1) % DefaultGhostColors.Length;
             listBoxGhosts.Items.Add(newGhost);
             listBoxGhosts.SelectedItem = newGhost;
         }
@@ -261,17 +275,19 @@ namespace STROOP.Tabs.GhostTab
         {
             var dlg = new OpenFileDialog();
             dlg.Filter = "ghost files (*.ghost)|*.ghost";
+            dlg.Multiselect = true;
             if (dlg.ShowDialog() == DialogResult.OK)
-            {
-                Ghost newGhost;
-                using (var rd = new BinaryReader(new FileStream(dlg.FileName, FileMode.Open)))
-                    newGhost = Ghost.FromFile(rd);
-                if (newGhost != null)
+                foreach (var fn in dlg.FileNames)
                 {
-                    newGhost.fileName = dlg.FileName;
-                    AddGhost(Path.GetFileNameWithoutExtension(dlg.FileName), newGhost);
+                    Ghost newGhost;
+                    using (var rd = new BinaryReader(new FileStream(fn, FileMode.Open)))
+                        newGhost = Ghost.FromFile(rd);
+                    if (newGhost != null)
+                    {
+                        newGhost.fileName = fn;
+                        AddGhost(Path.GetFileNameWithoutExtension(fn), newGhost);
+                    }
                 }
-            }
         }
 
         private void buttonSaveGhost_Click(object sender, EventArgs e)
@@ -280,25 +296,40 @@ namespace STROOP.Tabs.GhostTab
             dlg.Filter = "ghost files (*.ghost)|*.ghost";
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                var wr = new BinaryWriter(new FileStream(dlg.FileName, FileMode.Create));
-                int missedFrameCount = 0;
-                uint lastFrame = 0;
-                try
-                {
-                    wr.Write(selectedGhost.originalPlaybackBaseFrame);
-                    wr.Write(selectedGhost.playbackFrames.Count);
-                    foreach (var frame in selectedGhost.playbackFrames)
+                var selectedGhosts = listBoxGhosts.SelectedItems.ConvertAndRemoveNull(item => item as Ghost);
+                var nameRepetitions = new Dictionary<string, Wrapper<int>>();
+                IEnumerable<(Ghost, string)> ghostFileNames =
+                        selectedGhosts.Count == 1
+                        ? (IEnumerable<(Ghost, string)>)new[] { (selectedGhost, dlg.FileName) }
+                        : selectedGhosts.ConvertAll(
+                            g =>
+                            {
+                                var repetitonString = "";
+                                Wrapper<int> repeatCount;
+                                if (!nameRepetitions.TryGetValue(g.name, out repeatCount))
+                                    nameRepetitions[g.name] = repeatCount = new Wrapper<int>();
+                                else
+                                    repetitonString = (repeatCount.value + 1).ToString();
+                                repeatCount.value += 1;
+                                return (g, $"{dlg.FileName.Substring(0, dlg.FileName.Length - ".ghost".Length)}.{g.name}{repetitonString}.ghost");
+                            }
+                            );
+
+                foreach (var fn in ghostFileNames)
+                    using (var wr = new BinaryWriter(new FileStream(fn.Item2, FileMode.Create)))
                     {
-                        missedFrameCount += (int)(frame.Key - lastFrame - 1);
-                        lastFrame = frame.Key;
-                        wr.Write(frame.Key);
-                        frame.Value.WriteTo(wr);
+                        int missedFrameCount = 0;
+                        uint lastFrame = 0;
+                        wr.Write(fn.Item1.originalPlaybackBaseFrame);
+                        wr.Write(fn.Item1.playbackFrames.Count);
+                        foreach (var frame in fn.Item1.playbackFrames)
+                        {
+                            missedFrameCount += (int)(frame.Key - lastFrame - 1);
+                            lastFrame = frame.Key;
+                            wr.Write(frame.Key);
+                            frame.Value.WriteTo(wr);
+                        }
                     }
-                }
-                finally
-                {
-                    wr.Close();
-                }
             }
         }
 
@@ -325,7 +356,8 @@ namespace STROOP.Tabs.GhostTab
         private void listBoxGhosts_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Delete)
-                listBoxGhosts.Items.Remove(listBoxGhosts.SelectedItem);
+                foreach (var item in listBoxGhosts.SelectedItems.ConvertAndRemoveNull(_ => _))
+                    listBoxGhosts.Items.Remove(item);
         }
 
         private void buttonEnableGhostHack_Click(object sender, EventArgs e)
@@ -388,7 +420,7 @@ Are you sure you want to continue?";
             dlg.Color = System.Drawing.Color.Red;
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                marioHatColor = Utilities.ColorUtilities.ColorToVec4(dlg.Color);
+                marioHatColor = ColorUtilities.ColorToVec4(dlg.Color);
                 buttonMarioColor.BackColor = dlg.Color;
             }
         }
@@ -400,7 +432,8 @@ Are you sure you want to continue?";
                 var dlg = new ColorDialog();
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
-                    selectedGhost.hatColor = Utilities.ColorUtilities.ColorToVec4(dlg.Color);
+                    foreach (var g in listBoxGhosts.SelectedItems.ConvertAndRemoveNull(_ => _ as Ghost))
+                        g.hatColor = ColorUtilities.ColorToVec4(dlg.Color);
                     buttonGhostColor.BackColor = dlg.Color;
                 }
             }

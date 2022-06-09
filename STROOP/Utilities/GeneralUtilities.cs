@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace STROOP.Utilities
 {
+    public class Wrapper<T> where T : struct
+    {
+        public T value;
+    }
+
     public static class GeneralUtilities
     {
         static Type[] stroopTypes;
@@ -28,6 +32,18 @@ namespace STROOP.Utilities
         }
 
         public static List<TOut> ConvertAndRemoveNull<TIn, TOut>(this IEnumerable<TIn> lstIn, Func<TIn, TOut> converter) where TOut : class
+        {
+            var lstOut = new List<TOut>();
+            foreach (var obj in lstIn)
+            {
+                var convertedObj = converter(obj);
+                if (convertedObj != null)
+                    lstOut.Add(convertedObj);
+            }
+            return lstOut;
+        }
+
+        public static List<TOut> ConvertAndRemoveNull<TOut>(this System.Collections.IEnumerable lstIn, Func<object, TOut> converter) where TOut : class
         {
             var lstOut = new List<TOut>();
             foreach (var obj in lstIn)
