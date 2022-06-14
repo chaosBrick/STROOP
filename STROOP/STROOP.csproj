@@ -424,6 +424,8 @@
     <Compile Include="Tabs\MapTab\DataUtil\CollisionStructure.cs" />
     <Compile Include="Tabs\MapTab\GraphicsUtil.cs" />
     <Compile Include="Tabs\MapTab\IHoverData.cs" />
+    <Compile Include="Tabs\MapTab\MapAssociations.cs" />
+    <Compile Include="Tabs\MapTab\MapLayout.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\CustomTriangleList.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\HoverDatas.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapAllObjectCeilingObject.cs" />
@@ -852,8 +854,6 @@
     <Compile Include="Structs\Configurations\TriangleOffsetsConfig.cs" />
     <Compile Include="Structs\Emulator.cs" />
     <Compile Include="Structs\GameScript.cs" />
-    <Compile Include="Tabs\GhostTab\MapLayout.cs" />
-    <Compile Include="Tabs\GhostTab\MapAssociations.cs" />
     <Compile Include="Structs\Configurations\MarioConfig.cs" />
     <Compile Include="Structs\ObjectBehaviorAssociation.cs" />
     <Compile Include="Structs\ObjectAssociations.cs" />
