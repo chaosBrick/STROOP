@@ -188,10 +188,8 @@
             // 
             // watchVariablePanelArea
             // 
-            this.watchVariablePanelArea.AutoScroll = true;
             this.watchVariablePanelArea.DataPath = "Config/AreaData.xml";
             this.watchVariablePanelArea.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.watchVariablePanelArea.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelArea.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelArea.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelArea.Name = "watchVariablePanelArea";

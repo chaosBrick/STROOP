@@ -769,9 +769,7 @@
             this.watchVariablePanelMario.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.watchVariablePanelMario.AutoScroll = true;
             this.watchVariablePanelMario.DataPath = "Config/MarioData.xml";
-            this.watchVariablePanelMario.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelMario.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelMario.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelMario.Name = "watchVariablePanelMario";

@@ -990,10 +990,8 @@
             // 
             // watchVariablePanelObject
             // 
-            this.watchVariablePanelObject.AutoScroll = true;
             this.watchVariablePanelObject.DataPath = "Config/ObjectData.xml";
             this.watchVariablePanelObject.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.watchVariablePanelObject.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelObject.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelObject.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelObject.Name = "watchVariablePanelObject";

@@ -22,7 +22,7 @@ namespace STROOP.Tabs.GfxTab
         */
 
         public GfxNode SelectedNode;
-        List<WatchVariableControl> SpecificVariables;
+        IEnumerable<WatchVariableControl> SpecificVariables;
 
         public GfxTab()
         {
@@ -45,7 +45,7 @@ namespace STROOP.Tabs.GfxTab
             base.InitializeTab();
             SuspendLayout();
             foreach (var precursor in GfxNode.GetCommonVariables())
-                watchVariablePanelGfx.AddVariable(new WatchVariableControl(precursor.value.var, precursor.value.view));
+                watchVariablePanelGfx.AddVariable(precursor.value.var, precursor.value.view);
             ResumeLayout();
         }
 
@@ -102,15 +102,12 @@ namespace STROOP.Tabs.GfxTab
         void UpdateSpecificVariables(GfxNode node)
         {
             watchVariablePanelGfx.RemoveVariables(SpecificVariables);
-            SpecificVariables.Clear();
             if (node != null)
-            {
-                foreach (var precursor in node.GetTypeSpecificVariables())
-                {
-                    SpecificVariables.Add(new WatchVariableControl(precursor.value.var, precursor.value.view));
-                }
-            }
-            watchVariablePanelGfx.AddVariables(SpecificVariables);
+                SpecificVariables = watchVariablePanelGfx.AddVariables(
+                    node.GetTypeSpecificVariables().ConvertAll(
+                        precursor => (precursor.value.var, precursor.value.view)));
+            else
+                SpecificVariables = new WatchVariableControl[0];
         }
 
         // Build a GFX tree for every object that is selected in the object slot view

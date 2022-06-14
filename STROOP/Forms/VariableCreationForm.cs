@@ -43,12 +43,12 @@ namespace STROOP.Forms
         {
             buttonAddVariable.Click += (sender, e) =>
             {
-                WatchVariableControl control = CreateWatchVariableControl();
-                varPanel.AddVariable(control);
+                var watchVar = CreateWatchVariableControl();
+                varPanel.AddVariable(watchVar, watchVar.view);
             };
         }
 
-        private WatchVariableControl CreateWatchVariableControl()
+        private WatchVariable CreateWatchVariableControl()
         {
             string name = textBoxNameValue.Text;
             string memoryTypeString = comboBoxTypeValue.SelectedItem.ToString();
@@ -59,7 +59,7 @@ namespace STROOP.Forms
 
             var isAbsolute = baseAddressType == BaseAddressType.Absolute;
 
-            WatchVariable watchVar = new WatchVariable(
+            return new WatchVariable(
                 new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
                 {
                     Name = name,
@@ -69,7 +69,6 @@ namespace STROOP.Forms
                 baseAddressType,
                 offset
                 );
-            return new WatchVariableControl(watchVar);
         }
     }
 }

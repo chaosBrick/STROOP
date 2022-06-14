@@ -387,9 +387,7 @@
             this.watchVariablePanelMemory.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.watchVariablePanelMemory.AutoScroll = true;
             this.watchVariablePanelMemory.DataPath = "Config/ObjectData.xml";
-            this.watchVariablePanelMemory.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelMemory.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelMemory.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelMemory.Name = "watchVariablePanelMemory";

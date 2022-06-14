@@ -256,18 +256,7 @@ namespace STROOP.Tabs
                 TriangleUtilities.ConvertSurfaceTypes(classification, fromType.Value, toType.Value);
             };
         }
-
-
-        public void AddVariable(WatchVariableControl watchVarControl)
-        {
-            watchVariablePanelTriangles.AddVariable(watchVarControl);
-        }
-
-        public void AddVariables(List<WatchVariableControl> watchVarControls)
-        {
-            watchVariablePanelTriangles.AddVariables(watchVarControls);
-        }
-
+        
         public void SetTriangleAddresses(uint triangleAddress)
         {
             SetTriangleAddresses(new List<uint> { triangleAddress });

@@ -123,10 +123,8 @@
             // 
             // watchVariablePanelTas
             // 
-            this.watchVariablePanelTas.AutoScroll = true;
             this.watchVariablePanelTas.DataPath = "Config/TasData.xml";
             this.watchVariablePanelTas.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.watchVariablePanelTas.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelTas.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelTas.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelTas.Name = "watchVariablePanelTas";

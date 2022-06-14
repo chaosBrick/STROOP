@@ -472,10 +472,8 @@
             // 
             // watchVariablePanelPu
             // 
-            this.watchVariablePanelPu.AutoScroll = true;
             this.watchVariablePanelPu.DataPath = "Config/PuData.xml";
             this.watchVariablePanelPu.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.watchVariablePanelPu.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelPu.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelPu.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelPu.Name = "watchVariablePanelPu";

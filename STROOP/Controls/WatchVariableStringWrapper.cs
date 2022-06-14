@@ -9,31 +9,10 @@ namespace STROOP.Controls
     {
         public static Dictionary<string, EventHandler> specialTypeContextMenuHandlers = new Dictionary<string, EventHandler>();
 
-        protected CarretlessTextBox textBox = new CarretlessTextBox();
+        protected CarretlessTextBox textBox = null;
 
         protected WatchVariableStringWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl, int ignore)
-            : base(watchVar, watchVarControl)
-        {
-            bool updateValue = true;
-            textBox.Multiline = false;
-            textBox.KeyDown += (_, e) =>
-            {
-                updateValue = true;
-                if (e.KeyCode == Keys.Enter)
-                    textBox.Parent.Focus();
-                else if (e.KeyCode == Keys.Escape)
-                {
-                    updateValue = false;
-                    textBox.Parent.Focus();
-                }
-            };
-            textBox.LostFocus += (_, e) =>
-            {
-                if (updateValue)
-                    SetValue(textBox.Text);
-            };
-            watchVarControl.valueControlContainer.Controls.Add(textBox);
-        }
+            : base(watchVar, watchVarControl) { }
 
         public WatchVariableStringWrapper(
             WatchVariable watchVar,
@@ -43,13 +22,7 @@ namespace STROOP.Controls
             AddStringContextMenuStripItems(watchVarControl.view.GetValueByKey(WatchVariable.ViewProperties.specialType));
         }
 
-        protected override void UpdateControls()
-        {
-            _watchVarControl.EditMode = textBox.Focused;
-            if (_watchVarControl.EditMode)
-                return;
-            textBox.Text = CombineValues(WatchVar.GetValues().ConvertAll(_ => ConvertValue(_))).value?.ToString() ?? "<null>";
-        }
+        protected override void UpdateControls() { }
 
         private void AddStringContextMenuStripItems(string specialType)
         {
@@ -104,6 +77,43 @@ namespace STROOP.Controls
             base.HandleVerification(value);
             if (!(value is string))
                 throw new ArgumentOutOfRangeException(value + " is not a string");
+        }
+
+        public override void Edit(Control parent, System.Drawing.Rectangle bounds)
+        {
+            base.Edit(parent, bounds);
+            textBox = new CarretlessTextBox();
+            textBox.Bounds = bounds;
+            textBox.Text = GetValueText();
+
+            bool updateValue = true;
+            textBox.Multiline = false;
+            textBox.KeyDown += (_, e) =>
+            {
+                updateValue = true;
+                if (e.KeyCode == Keys.Enter)
+                    textBox.Parent.Focus();
+                else if (e.KeyCode == Keys.Escape)
+                {
+                    updateValue = false;
+                    textBox.Parent.Focus();
+                }
+            };
+            EventHandler asf = null;
+            asf = (_, e) =>
+            {
+                if (updateValue)
+                    SetValue(textBox.Text);
+                textBox.Parent.LostFocus -= asf;
+                textBox.Parent.Controls.Remove(textBox);
+                textBox.Dispose();
+            };
+
+            textBox.LostFocus += asf;
+
+            parent.Controls.Add(textBox);
+            textBox.Parent.LostFocus += asf;
+            textBox.Focus();
         }
 
         protected override string GetClass()

@@ -57,27 +57,27 @@ namespace STROOP.Tabs
             if (!Enumerable.SequenceEqual(warpNodeAddresses, _warpNodeAddresses))
             {
                 watchVariablePanelWarp.RemoveVariableGroup(VariableGroup.WarpNode);
-                watchVariablePanelWarp.AddVariables(GetWarpNodeVariables(warpNodeAddresses));
+                watchVariablePanelWarp.AddVariables(
+                    GetWarpNodeVariables(warpNodeAddresses).ConvertAll( _ => (new WatchVariable(_), (WatchVariable.IVariableView)_))
+                    );
                 _warpNodeAddresses = warpNodeAddresses;
             }
 
             base.Update(updateView);
         }
 
-        private List<WatchVariableControl> GetWarpNodeVariables(List<uint> addresses)
+        private List<WatchVariable.CustomView> GetWarpNodeVariables(List<uint> addresses)
         {
-            List<WatchVariableControl> controls = new List<WatchVariableControl>();
-            for (int i = 0; i < addresses.Count; i++)
-            {
-                uint address = addresses[i];
-                controls.AddRange(GetWarpNodeVariables(address, i));
-            }
+            var controls = new List<WatchVariable.CustomView>();
+            int i = 0;
+            foreach (var address in addresses)
+                controls.AddRange(GetWarpNodeVariables(address, i++));
             return controls;
         }
 
-        private List<WatchVariableControl> GetWarpNodeVariables(uint address, int index)
+        private IEnumerable<WatchVariable.CustomView> GetWarpNodeVariables(uint address, int index)
         {
-            WatchVariable.CustomView[] views = new WatchVariable.CustomView[]
+            return new WatchVariable.CustomView[]
             {
                 new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
                 {
@@ -116,12 +116,6 @@ namespace STROOP.Tabs
                     _setterFunction = (val, _) => Config.Stream.SetValue((uint)val, address + 0x8)
                 },
             };
-
-            List<WatchVariableControl> controls = new List<WatchVariableControl>();
-            for (int i = 0; i < 6; i++)
-                controls.Add(new WatchVariableControl(new WatchVariable(views[i])));
-
-            return controls;
         }
 
         public void HookUpTeleporters()

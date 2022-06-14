@@ -21,7 +21,7 @@ namespace STROOP.Tabs
         public CamHackMode CurrentCamHackMode { get; private set; }
         
         private int _numPans = 0;
-        private List<List<WatchVariableControl>> _panVars = new List<List<WatchVariableControl>>();
+        private List<IEnumerable<WatchVariableControl>> _panVars = new List<IEnumerable<WatchVariableControl>>();
 
         public CamHackTab()
         {
@@ -215,9 +215,7 @@ namespace STROOP.Tabs
                 for (int i = _numPans; i < numPans; i++)
                 {
                     SpecialConfig.PanModels.Add(new PanModel());
-                    List<WatchVariableControl> panVars = CreatePanVars(i);
-                    _panVars.Add(panVars);
-                    watchVariablePanelCamHack.AddVariables(panVars);
+                    _panVars.Add(watchVariablePanelCamHack.AddVariables(CreatePanVars(i)));
                 }
             }
             if (numPans < _numPans) // Need to remove vars
@@ -225,7 +223,7 @@ namespace STROOP.Tabs
                 for (int i = _numPans - 1; i >= numPans; i--)
                 {
                     SpecialConfig.PanModels.RemoveAt(i);
-                    List<WatchVariableControl> panVars = _panVars[i];
+                    var panVars = _panVars[i];
                     _panVars.Remove(panVars);
                     watchVariablePanelCamHack.RemoveVariables(panVars);
                 }
@@ -233,7 +231,7 @@ namespace STROOP.Tabs
             _numPans = numPans;
         }
 
-        private WatchVariableControl CreatePanVar(
+        private (WatchVariable, WatchVariable.IVariableView) CreatePanVar(
             string name,
             string specialType,
             string color,
@@ -251,13 +249,13 @@ namespace STROOP.Tabs
             if (display != null) xElement.Add(new XAttribute("display", display));
             if (yaw != null) xElement.Add(new XAttribute("yaw", yaw));
             var precursor = WatchVariable.ParseXml(xElement);
-            return precursor.CreateWatchVariableControl(xElement);
+            return (precursor, precursor.view);
         }
 
-        private List<WatchVariableControl> CreatePanVars(int index)
+        private List<(WatchVariable, WatchVariable.IVariableView)> CreatePanVars(int index)
         {
             WatchVariableSpecialUtilities.AddPanEntriesToDictionary(index);
-            return new List<WatchVariableControl>
+            return new List<(WatchVariable, WatchVariable.IVariableView)>
             {
                 CreatePanVar("Global Timer", String.Format("Pan{0}GlobalTimer", index), "Orange"),
                 CreatePanVar(String.Format("Pan{0} Start Time", index), String.Format("Pan{0}StartTime", index), "Orange"),

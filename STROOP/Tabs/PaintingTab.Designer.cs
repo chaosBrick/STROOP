@@ -77,10 +77,8 @@
             // 
             // watchVariablePanelPainting
             // 
-            this.watchVariablePanelPainting.AutoScroll = true;
             this.watchVariablePanelPainting.DataPath = "Config/PaintingData.xml";
             this.watchVariablePanelPainting.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.watchVariablePanelPainting.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelPainting.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelPainting.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelPainting.Name = "watchVariablePanelPainting";

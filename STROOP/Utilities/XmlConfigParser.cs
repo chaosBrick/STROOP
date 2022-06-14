@@ -197,10 +197,7 @@ namespace STROOP.Utilities
             SavedSettingsConfig.IsLoaded = true;
         }
 
-        public static List<WatchVariableControl> OpenWatchVariableControls(string path)
-        {
-            return OpenWatchVariableControlPrecursors(path).ConvertAll(precursor => new WatchVariableControl(precursor));
-        }
+        public static List<WatchVariable> OpenWatchVariables(string path) => OpenWatchVariableControlPrecursors(path);
 
         public static List<WatchVariable> OpenWatchVariableControlPrecursors(string path)
         {

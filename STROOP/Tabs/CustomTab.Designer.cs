@@ -700,10 +700,8 @@
             // 
             // watchVariablePanelCustom
             // 
-            this.watchVariablePanelCustom.AutoScroll = true;
             this.watchVariablePanelCustom.DataPath = "Config/CustomData.xml";
             this.watchVariablePanelCustom.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.watchVariablePanelCustom.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelCustom.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelCustom.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelCustom.Name = "watchVariablePanelCustom";

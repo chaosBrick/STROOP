@@ -23,17 +23,6 @@ namespace STROOP.Structs
         public PushHitbox PushHitbox;
         public List<WatchVariable> Precursors = new List<WatchVariable>();
 
-        private List<WatchVariableControl> _watchVariableControls = null;
-        public List<WatchVariableControl> WatchVariableControls
-        {
-            get
-            {
-                if (_watchVariableControls == null)
-                    _watchVariableControls = Precursors.ConvertAll(precursor => new WatchVariableControl(precursor));
-                return _watchVariableControls;
-            }
-        }
-
         public bool MeetsCriteria(BehaviorCriteria behaviorCriteria)
         {
             return Criteria.CongruentTo(behaviorCriteria);

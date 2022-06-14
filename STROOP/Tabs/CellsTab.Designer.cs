@@ -119,10 +119,8 @@
             // 
             // watchVariablePanelCells
             // 
-            this.watchVariablePanelCells.AutoScroll = true;
             this.watchVariablePanelCells.DataPath = "Config/CellsData.xml";
             this.watchVariablePanelCells.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.watchVariablePanelCells.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelCells.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelCells.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelCells.Name = "watchVariablePanelCells";

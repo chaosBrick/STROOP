@@ -707,10 +707,8 @@
             // 
             // watchVariablePanelTriangles
             // 
-            this.watchVariablePanelTriangles.AutoScroll = true;
             this.watchVariablePanelTriangles.DataPath = "Config/TrianglesData.xml";
             this.watchVariablePanelTriangles.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.watchVariablePanelTriangles.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelTriangles.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelTriangles.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelTriangles.Name = "watchVariablePanelTriangles";

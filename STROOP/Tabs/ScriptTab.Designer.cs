@@ -160,10 +160,8 @@
             // 
             // watchVariablePanelScript
             // 
-            this.watchVariablePanelScript.AutoScroll = true;
             this.watchVariablePanelScript.DataPath = "Config/ScriptData.xml";
             this.watchVariablePanelScript.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.watchVariablePanelScript.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelScript.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelScript.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelScript.Name = "watchVariablePanelScript";

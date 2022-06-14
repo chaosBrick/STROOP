@@ -30,7 +30,7 @@ namespace STROOP.Tabs
             };
 
         private short _numSnowParticles;
-        private List<List<WatchVariableControl>> _snowParticleControls;
+        private List<IEnumerable<WatchVariableControl>> _snowParticleControls;
 
         public SnowTab()
         {
@@ -45,8 +45,7 @@ namespace STROOP.Tabs
             base.InitializeTab();
 
             _numSnowParticles = 0;
-            _snowParticleControls = new List<List<WatchVariableControl>>();
-
+            _snowParticleControls = new List<IEnumerable<WatchVariableControl>>();
 
             buttonSnowRetrieve.Click += (sender, e) =>
             {
@@ -77,7 +76,7 @@ namespace STROOP.Tabs
                 });
         }
 
-        private List<WatchVariableControl> GetSnowParticleControls(int index)
+        private List<(WatchVariable, WatchVariable.IVariableView)> GetSnowParticleControls(int index)
         {
             uint structOffset = (uint)index * SnowConfig.ParticleStructSize;
             List<uint> offsets = new List<uint>()
@@ -93,7 +92,7 @@ namespace STROOP.Tabs
                 String.Format("Particle {0} Z", index),
             };
 
-            List<WatchVariableControl> controls = new List<WatchVariableControl>();
+            var controls = new List<(WatchVariable, WatchVariable.IVariableView)>();
             for (int i = 0; i < 3; i++)
             {
                 var view = new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
@@ -102,7 +101,7 @@ namespace STROOP.Tabs
                     _getterFunction = _ => Config.Stream.GetInt32(Config.Stream.GetUInt32(SnowConfig.SnowArrayPointerAddress) + offsets[i]),
                     _setterFunction = (val, _) => Config.Stream.SetValue((int)val, Config.Stream.GetUInt32(SnowConfig.SnowArrayPointerAddress) + offsets[i])
                 };
-                controls.Add(new WatchVariableControl(new WatchVariable(view)));
+                controls.Add((new WatchVariable(view), view));
             }
             return controls;
         }
@@ -115,20 +114,16 @@ namespace STROOP.Tabs
             if (numSnowParticles > _numSnowParticles) // need to add controls
             {
                 for (int i = _numSnowParticles; i < numSnowParticles; i++)
-                {
-                    List<WatchVariableControl> snowParticle = GetSnowParticleControls(i);
-                    _snowParticleControls.Add(snowParticle);
-                    watchVariablePanelSnow.AddVariables(snowParticle);
-                }
+                _snowParticleControls.Add(watchVariablePanelSnow.AddVariables(GetSnowParticleControls(i)));
                 _numSnowParticles = numSnowParticles;
             }
             else if (numSnowParticles < _numSnowParticles) // need to remove controls
             {
                 for (int i = _numSnowParticles - 1; i >= numSnowParticles; i--)
                 {
-                    List<WatchVariableControl> snowParticle = _snowParticleControls[i];
-                    _snowParticleControls.Remove(snowParticle);
-                    watchVariablePanelSnow.RemoveVariables(snowParticle);
+                    var snowParticleControls = _snowParticleControls[i];
+                    _snowParticleControls.Remove(snowParticleControls);
+                    watchVariablePanelSnow.RemoveVariables(snowParticleControls);
                 }
                 _numSnowParticles = numSnowParticles;
             }

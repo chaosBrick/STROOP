@@ -77,10 +77,8 @@
             // 
             // watchVariablePanelInput
             // 
-            this.watchVariablePanelInput.AutoScroll = true;
             this.watchVariablePanelInput.DataPath = "Config/InputData.xml";
             this.watchVariablePanelInput.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.watchVariablePanelInput.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelInput.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelInput.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelInput.Name = "watchVariablePanelInput";

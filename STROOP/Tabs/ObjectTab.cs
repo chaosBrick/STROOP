@@ -431,11 +431,11 @@ namespace STROOP.Tabs
             Config.StroopMainForm.SwitchTab("tabPageScripts");
         }
 
-        public void SetBehaviorWatchVariables(List<WatchVariableControl> watchVarControls, Color color)
+        public void SetBehaviorWatchVariables(IEnumerable<WatchVariable> watchVars, Color color)
         {
             watchVariablePanelObject.RemoveVariableGroup(VariableGroup.ObjectSpecific);
-            watchVarControls.ForEach(watchVarControl => watchVarControl.BaseColor = color);
-            watchVariablePanelObject.AddVariables(watchVarControls);
+            foreach (var ctrl in watchVariablePanelObject.AddVariables(watchVars.ConvertAll(_ => (_, _.view))))
+                ctrl.BaseColor = color;
         }
 
         private void ObjAddressLabel_Click(object sender, EventArgs e)
@@ -485,7 +485,7 @@ namespace STROOP.Tabs
                 SlotPos = "";
                 labelObjAddValue.Text = "";
                 _lastGeneralizedBehavior = null;
-                SetBehaviorWatchVariables(new List<WatchVariableControl>(), Color.White);
+                SetBehaviorWatchVariables(new WatchVariable[0], Color.White);
             }
             else if (_objects.Count() == 1)
             {
@@ -535,7 +535,7 @@ namespace STROOP.Tabs
                     else
                     {
                         Behavior = "";
-                        SetBehaviorWatchVariables(new List<WatchVariableControl>(), Color.White);
+                        SetBehaviorWatchVariables(new WatchVariable[0], Color.White);
                     }
                     _lastGeneralizedBehavior = multiBehavior;
                 }

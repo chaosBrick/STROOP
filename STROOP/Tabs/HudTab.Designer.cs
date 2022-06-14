@@ -194,10 +194,8 @@
             // 
             // watchVariablePanelHud
             // 
-            this.watchVariablePanelHud.AutoScroll = true;
             this.watchVariablePanelHud.DataPath = "Config/HudData.xml";
             this.watchVariablePanelHud.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.watchVariablePanelHud.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelHud.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelHud.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelHud.Name = "watchVariablePanelHud";

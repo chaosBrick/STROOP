@@ -1512,9 +1512,7 @@
             this.watchVariablePanelMainSave.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.watchVariablePanelMainSave.AutoScroll = true;
             this.watchVariablePanelMainSave.DataPath = "Config/MainSaveData.xml";
-            this.watchVariablePanelMainSave.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelMainSave.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelMainSave.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelMainSave.Name = "watchVariablePanelMainSave";

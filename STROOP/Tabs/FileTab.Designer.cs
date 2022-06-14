@@ -3744,10 +3744,8 @@
             // 
             // watchVariablePanelFile
             // 
-            this.watchVariablePanelFile.AutoScroll = true;
             this.watchVariablePanelFile.DataPath = null;
             this.watchVariablePanelFile.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.watchVariablePanelFile.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelFile.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelFile.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelFile.Name = "watchVariablePanelFile";

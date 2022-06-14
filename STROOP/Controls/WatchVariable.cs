@@ -199,8 +199,6 @@ namespace STROOP.Controls
             }
         }
 
-        public WatchVariableControl CreateWatchVariableControl(XElement xElement) => new WatchVariableControl(this, new XmlView(this, xElement));
-
         public List<uint> GetBaseAddressList() =>
             WatchVariableUtilities.GetBaseAddressListFromBaseAddressType(BaseAddressType).ToList();
 

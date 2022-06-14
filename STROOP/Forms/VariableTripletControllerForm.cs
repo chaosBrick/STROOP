@@ -12,6 +12,8 @@ namespace STROOP.Forms
 {
     public partial class VariableTripletControllerForm : Form
     {
+        public Controls.WatchVariableFlowLayoutPanel panel => _watchVariablePanel;
+
         public VariableTripletControllerForm()
         {
             InitializeComponent();

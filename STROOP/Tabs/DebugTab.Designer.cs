@@ -302,10 +302,8 @@
             // 
             // watchVariablePanelDebug
             // 
-            this.watchVariablePanelDebug.AutoScroll = true;
             this.watchVariablePanelDebug.DataPath = "Config/DebugData.xml";
             this.watchVariablePanelDebug.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.watchVariablePanelDebug.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelDebug.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelDebug.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelDebug.Name = "watchVariablePanelDebug";

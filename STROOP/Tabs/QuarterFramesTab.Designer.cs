@@ -37,9 +37,7 @@
             this.watchVariablePanelQuarterFrame.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.watchVariablePanelQuarterFrame.AutoScroll = true;
             this.watchVariablePanelQuarterFrame.DataPath = "Config/QuarterFrameData.xml";
-            this.watchVariablePanelQuarterFrame.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelQuarterFrame.Location = new System.Drawing.Point(0, 0);
             this.watchVariablePanelQuarterFrame.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelQuarterFrame.Name = "watchVariablePanelQuarterFrame";

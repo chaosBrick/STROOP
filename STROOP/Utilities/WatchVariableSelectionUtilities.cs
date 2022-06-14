@@ -132,7 +132,7 @@ namespace STROOP.Structs
                                     return false;
                             }
                         };
-                        panel.AddVariable(new WatchVariableControl(new WatchVariable(view)));
+                        panel.AddVariable(new WatchVariable(view), view);
                     }
             }
             void createAggregateMathOperationVariable(AggregateMathOperation operation)
@@ -145,7 +145,7 @@ namespace STROOP.Structs
                     _getterFunction = getter,
                     _setterFunction = WatchVariableSpecialUtilities.DEFAULT_SETTER
                 };
-                panel.AddVariable(new WatchVariableControl(new WatchVariable(view)));
+                panel.AddVariable(new WatchVariable(view), view);
             }
             void createDistanceMathOperationVariable(bool use3D)
             {
@@ -224,7 +224,7 @@ namespace STROOP.Structs
                     _getterFunction = use3D ? getter3D : getter2D,
                     _setterFunction = use3D ? setter3D : setter2D
                 };
-                panel.AddVariable(new WatchVariableControl(new WatchVariable(view)));
+                panel.AddVariable(new WatchVariable(view), view);
             }
 
             void createRealTimeVariable()
@@ -245,7 +245,7 @@ namespace STROOP.Structs
                         _getterFunction = getter,
                         _setterFunction = WatchVariableSpecialUtilities.DEFAULT_SETTER
                     };
-                    panel.AddVariable(new WatchVariableControl(new WatchVariable(view)));
+                    panel.AddVariable(new WatchVariable(view), view);
                 }
             }
             ToolStripMenuItem itemAddVariables = new ToolStripMenuItem("Add Variable(s)...");
@@ -359,7 +359,7 @@ namespace STROOP.Structs
                 itemOpenTripletController.Click += (sender, e) =>
                 {
                     VariableTripletControllerForm form = new VariableTripletControllerForm();
-                    form.Initialize(vars.ConvertAll(control => control.CreateCopy()));
+                    form.Initialize(vars.ConvertAll(control => control.CreateCopy(form.panel)));
                     form.ShowForm();
                 };
                 itemList.Add(itemOpenTripletController);
@@ -369,7 +369,7 @@ namespace STROOP.Structs
             itemOpenPopOut.Click += (sender, e) =>
             {
                 VariablePopOutForm form = new VariablePopOutForm();
-                form.Initialize(vars.ConvertAll(control => control.CreateCopy()));
+                form.Initialize(vars.ConvertAll(control => control.WatchVar));
                 form.ShowForm();
             };
             itemList.Add(itemOpenPopOut);

@@ -72,7 +72,6 @@ namespace STROOP.Tabs
 
         private void AddTableRowsAsVars(List<DataGridViewRow> rows)
         {
-            List<WatchVariableControl> controls = new List<WatchVariableControl>();
             foreach (DataGridViewRow row in rows)
             {
                 uint? addressNullable = ParsingUtilities.ParseHexNullable(row.Cells[0].Value);
@@ -81,9 +80,8 @@ namespace STROOP.Tabs
 
                 string typeString = TypeUtilities.TypeToString[_memoryType];
                 WatchVariable watchVar = new WatchVariable(WatchVariable.DefaultView(typeString, false, _memoryType), BaseAddressType.Relative, address);
-                controls.Add(new WatchVariableControl(watchVar));
+                watchVariablePanelSearch.AddVariable(watchVar, watchVar.view);
             }
-            watchVariablePanelSearch.AddVariables(controls);
         }
 
         private void DoFirstScan()

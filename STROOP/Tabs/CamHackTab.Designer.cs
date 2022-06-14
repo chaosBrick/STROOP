@@ -959,10 +959,8 @@
             // 
             // watchVariablePanelCamHack
             // 
-            this.watchVariablePanelCamHack.AutoScroll = true;
             this.watchVariablePanelCamHack.DataPath = "Config/CamHackData.xml";
             this.watchVariablePanelCamHack.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.watchVariablePanelCamHack.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelCamHack.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelCamHack.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelCamHack.Name = "watchVariablePanelCamHack";

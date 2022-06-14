@@ -161,7 +161,6 @@
             // 
             this.watchVariablePanelGfx.DataPath = null;
             this.watchVariablePanelGfx.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.watchVariablePanelGfx.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelGfx.Location = new System.Drawing.Point(0, 0);
             this.watchVariablePanelGfx.Name = "watchVariablePanelGfx";
             this.watchVariablePanelGfx.Size = new System.Drawing.Size(325, 399);

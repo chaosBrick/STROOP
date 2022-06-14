@@ -769,10 +769,8 @@
             // 
             // watchVariablePanelCamera
             // 
-            this.watchVariablePanelCamera.AutoScroll = true;
             this.watchVariablePanelCamera.DataPath = "Config/CameraData.xml";
             this.watchVariablePanelCamera.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.watchVariablePanelCamera.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelCamera.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelCamera.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelCamera.Name = "watchVariablePanelCamera";

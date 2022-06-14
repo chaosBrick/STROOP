@@ -157,10 +157,8 @@
             // 
             // watchVariablePanelMisc
             // 
-            this.watchVariablePanelMisc.AutoScroll = true;
             this.watchVariablePanelMisc.DataPath = "Config/MiscData.xml";
             this.watchVariablePanelMisc.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.watchVariablePanelMisc.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelMisc.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelMisc.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelMisc.Name = "watchVariablePanelMisc";

@@ -235,14 +235,14 @@ namespace STROOP.Structs
             }
         }
 
-        public List<WatchVariableControl> GetWatchVarControls(BehaviorCriteria behaviorCriteria)
+        public IEnumerable<WatchVariable> GetWatchVarControls(BehaviorCriteria behaviorCriteria)
         {
             var assoc = FindObjectAssociation(behaviorCriteria);
 
             if (assoc == null)
-                return new List<WatchVariableControl>();
+                return new WatchVariable[0];
 
-            else return assoc.WatchVariableControls;
+            else return assoc.Precursors;
         }
 
         public uint AlignJPBehavior(uint segmented)

@@ -1,18 +1,17 @@
 ﻿using STROOP.Controls;
-using STROOP.Managers;
 using STROOP.Structs;
-using STROOP.Structs.Configurations;
-using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using System.Xml.Linq;
 
 namespace STROOP.Forms
 {
     public partial class VariablePopOutForm : Form, IUpdatableForm
     {
+
         public static int? WIDTH = null;
         public static int? HEIGHT = null;
+
+        public Controls.WatchVariableFlowLayoutPanel panel => _watchVariablePanel;
 
         private bool _borderless = false;
         private bool _isDragging = false;
@@ -41,11 +40,11 @@ namespace STROOP.Forms
             };
         }
 
-        public void Initialize(List<WatchVariableControl> controls)
+        public void Initialize(List<WatchVariable> vars)
         {
             // initialize panel
             _watchVariablePanel.Initialize();
-            _watchVariablePanel.AddVariables(controls);
+            _watchVariablePanel.AddVariables(vars.ConvertAll(_ => (_, _.view)));
             _watchVariablePanel.DeferredInitialize();
 
             // add borderless item to panel
@@ -107,38 +106,6 @@ namespace STROOP.Forms
         {
             Show();
             _watchVariablePanel.UnselectText();
-        }
-
-        public VariablePopOutFormHelper GetHelper()
-        {
-            return new VariablePopOutFormHelper(_watchVariablePanel, Text);
-        }
-
-        public class VariablePopOutFormHelper : IVariableAdder
-        {
-            private WatchVariableFlowLayoutPanel _watchVariablePanel;
-            private string _text;
-
-            public VariablePopOutFormHelper(WatchVariableFlowLayoutPanel watchVariablePanel, string text)
-            {
-                _watchVariablePanel = watchVariablePanel;
-                _text = text;
-            }
-
-            public void AddVariable(WatchVariableControl watchVarControl)
-            {
-                _watchVariablePanel.AddVariable(watchVarControl);
-            }
-
-            public void AddVariables(List<WatchVariableControl> watchVarControls)
-            {
-                _watchVariablePanel.AddVariables(watchVarControls);
-            }
-
-            public override string ToString()
-            {
-                return _text;
-            }
         }
     }
 }

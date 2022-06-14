@@ -12,51 +12,276 @@ using System.ComponentModel;
 
 namespace STROOP.Controls
 {
-    public class WatchVariableFlowLayoutPanel : NoTearFlowLayoutPanel, Managers.IVariableAdder
+    public class WatchVariableFlowLayoutPanel : Panel
     {
+        class WatchVariablePanelRenderer : Control
+        {
+            class OnDemand<T> where T : IDisposable
+            {
+                readonly Func<T> factory;
+                OnDemandCall context, invalidateContext;
+                public OnDemand(OnDemandCall disposeContext, Func<T> factory, OnDemandCall invalidateContext = null)
+                {
+                    this.factory = factory;
+                    this.context = disposeContext;
+                    invalidateContext += InvalidateValue;
+                }
+
+                T _value;
+                bool valueCreated = false;
+
+                public T Value
+                {
+                    get
+                    {
+                        if (!valueCreated)
+                        {
+                            _value = factory();
+                            valueCreated = true;
+                            context += DisposeValue;
+                        }
+                        return _value;
+                    }
+                }
+
+                void InvalidateValue()
+                {
+                    _value?.Dispose();
+                    valueCreated = false;
+                }
+
+                void DisposeValue()
+                {
+                    context -= DisposeValue;
+                    if (invalidateContext != null)
+                        invalidateContext -= InvalidateValue;
+                    _value?.Dispose();
+                }
+
+                public static implicit operator T(OnDemand<T> obj) => obj.Value;
+            }
+
+            delegate void OnDemandCall();
+            OnDemandCall OnDispose, OnInvalidateFonts;
+
+            BufferedGraphics bufferedGraphics = null;
+
+            OnDemand<Font> varNameFont;
+            OnDemand<Pen> cellBorderPen, cellSeparatorPen;
+            OnDemand<StringFormat> rightAlignFormat;
+
+            WatchVariableFlowLayoutPanel target;
+
+            int borderMargin = 2;
+            int elementMarginTopBottom = 2;
+            int elementMarginRight = 2;
+            int elementHeight => Font.Height + 2 * elementMarginTopBottom;
+
+            int elementNameWidth = 120;
+            int elementValueWidth = 80;
+            int elementWidth => elementNameWidth + elementValueWidth;
+
+            public int GetMaxRows() => (target.Height - borderMargin * 2 - SystemInformation.HorizontalScrollBarHeight) / elementHeight;
+
+            public WatchVariablePanelRenderer(WatchVariableFlowLayoutPanel target)
+            {
+                this.target = target;
+                varNameFont = new OnDemand<Font>(OnDispose, () => new Font(DefaultFont, FontStyle.Bold), OnInvalidateFonts);
+                cellBorderPen = new OnDemand<Pen>(OnDispose, () => new Pen(Color.Gray, 2));
+                cellSeparatorPen = new OnDemand<Pen>(OnDispose, () => new Pen(Color.Gray, 1));
+                rightAlignFormat = new OnDemand<StringFormat>(OnDispose, () =>
+                {
+                    var fmt = new StringFormat();
+                    fmt.Alignment = StringAlignment.Far;
+                    return fmt;
+                });
+            }
+
+            protected override void OnPaint(PaintEventArgs e)
+            {
+                base.OnPaint(e);
+                bufferedGraphics.Render(e.Graphics);
+            }
+
+            public void Draw()
+            {
+                int x = 0, y = 0;
+                int iterator = 0;
+                var lastColumn = -1;
+                int maxRows = GetMaxRows();
+
+                var newRect = new Rectangle(0, 0, ((target._shownWatchVarControls.Count - 1) / maxRows + 1) * elementWidth + borderMargin * 2, maxRows * elementHeight + borderMargin * 2);
+                if (bufferedGraphics == null || Bounds.Width != newRect.Width || Bounds.Height != newRect.Height)
+                {
+                    bufferedGraphics?.Dispose();
+                    target.HorizontalScroll.Value = 0;
+
+                    Bounds = newRect;
+                    bufferedGraphics = BufferedGraphicsManager.Current.Allocate(CreateGraphics(), ClientRectangle);
+                    bufferedGraphics.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+                    bufferedGraphics.Graphics.TranslateTransform(borderMargin, borderMargin);
+                }
+
+                var g = bufferedGraphics.Graphics;
+                g.Clear(Color.FromKnownColor(KnownColor.Control));
+
+                if (maxRows == 0)
+                    return;
+
+                void ResetIterators() { iterator = 0; lastColumn = -1; }
+
+                void GetColumn(int offset, int width, bool clip = true)
+                {
+                    y = iterator % maxRows;
+                    x = iterator / maxRows;
+                    if (x > lastColumn)
+                    {
+                        lastColumn = x;
+                        if (clip)
+                            g.Clip = new Region(new Rectangle(x * elementWidth + offset, 0, width, Height));
+                    }
+                    iterator++;
+                }
+
+                g.ResetClip();
+                ResetIterators();
+                foreach (var ctrl in target._shownWatchVarControls)
+                {
+                    GetColumn(0, elementNameWidth, false);
+                    var yCoord = y * elementHeight;
+                    var c = ctrl.IsSelected ? Color.Blue : ctrl.currentColor;
+                    if (c != Color.FromKnownColor(KnownColor.Control))
+                        using (var brush = new SolidBrush(c))
+                            g.FillRectangle(brush, x * elementWidth, yCoord, elementWidth, elementHeight);
+                }
+
+                ResetIterators();
+                foreach (var ctrl in target._shownWatchVarControls)
+                {
+                    GetColumn(0, elementNameWidth);
+                    var yCoord = y * elementHeight;
+                    var txtPoint = new Point(x * elementWidth + elementNameWidth - elementMarginRight, yCoord + elementMarginTopBottom);
+                    g.DrawString(ctrl.VarName, varNameFont, ctrl.IsSelected ? Brushes.White : Brushes.Black, txtPoint, rightAlignFormat);
+                }
+
+                ResetIterators();
+                foreach (var ctrl in target._shownWatchVarControls)
+                {
+                    GetColumn(elementNameWidth, elementValueWidth);
+                    var yCoord = y * elementHeight;
+                    var txtPoint = new Point((x + 1) * elementWidth - elementMarginTopBottom, yCoord + elementMarginTopBottom);
+                    g.DrawString(ctrl.WatchVarWrapper.GetValueText(), Font, ctrl.IsSelected ? Brushes.White : Brushes.Black, txtPoint, rightAlignFormat);
+                }
+
+                g.ResetClip();
+                var numRows = x == 0 ? (y + 1) : maxRows;
+                var maxY = numRows * elementHeight;
+                var maxX = elementWidth * (x + 1);
+
+                for (int dx = 0; dx <= x; dx++)
+                {
+                    var xCoord = dx * elementWidth;
+                    g.DrawLine(cellBorderPen, xCoord, 0, xCoord, maxY);
+                    xCoord += elementNameWidth;
+                    if (dx < x)
+                        g.DrawLine(cellSeparatorPen, xCoord, 0, xCoord, maxY);
+                }
+                if (y != 0)
+                {
+                    var yCoord = (y + 1) * elementHeight;
+                    g.DrawLine(cellBorderPen, maxX, 0, maxX, yCoord);
+                    var xCoord = maxX - elementWidth + elementNameWidth;
+                    g.DrawLine(cellSeparatorPen, xCoord, 0, xCoord, yCoord);
+                }
+
+                for (int dy = 0; dy <= numRows; dy++)
+                {
+                    var yCoord = dy * elementHeight;
+                    g.DrawLine(cellBorderPen, 0, yCoord, dy <= (y + 1) ? maxX : maxX - elementWidth, yCoord);
+                }
+
+                if (Controls.Count == 0)
+                    bufferedGraphics.Render();
+            }
+
+            public Rectangle GetVariableControlBounds(int index)
+            {
+                var maxRows = GetMaxRows();
+                var x = index / maxRows;
+                var y = index % maxRows;
+                return new Rectangle(
+                    borderMargin + x * elementWidth + elementNameWidth,
+                    borderMargin + y * elementHeight,
+                    elementValueWidth,
+                    elementHeight);
+            }
+
+            public (int index, WatchVariableControl ctrl, bool select) GetVariableAt(Point location)
+            {
+                location.X -= borderMargin;
+                location.Y -= borderMargin;
+                var x = location.X / elementWidth;
+                var y = location.Y / elementHeight;
+                int maxRows = (int)((target.Height - borderMargin * 2 - SystemInformation.HorizontalScrollBarHeight) / elementHeight);
+                int index = x * maxRows + y;
+                if (index < target._shownWatchVarControls.Count)
+                    return (index, target._shownWatchVarControls[index], (location.X % elementWidth) < elementNameWidth);
+
+                return (-1, null, false);
+            }
+
+            protected override void Dispose(bool disposing)
+            {
+                if (disposing)
+                    OnDispose?.DynamicInvoke();
+                base.Dispose(disposing);
+            }
+
+            protected override void OnFontChanged(EventArgs e)
+            {
+                base.OnFontChanged(e);
+                OnInvalidateFonts?.DynamicInvoke();
+            }
+        }
+
+        public readonly Func<List<WatchVariableControl>> GetSelectedVars;
+
         public bool initialized = false;
         List<Action> deferredActions = new List<Action>();
 
         private string _varFilePath;
 
-        private readonly Object _objectLock;
-        private List<WatchVariableControl> _watchVarControls;
+        string _dataPath;
+        [Category("Data"), Browsable(true)]
+        public string DataPath { get { return _dataPath; } set { Initialize(_dataPath = value); } }
+
+        private List<WatchVariableControl> _allWatchVarControls;
+        private List<WatchVariableControl> _shownWatchVarControls;
         private List<string> _allGroups;
         private List<string> _initialVisibleGroups;
         private List<string> _visibleGroups;
         private List<ToolStripMenuItem> _filteringDropDownItems;
 
-        private List<WatchVariableControl> _selectedWatchVarControls;
+        private HashSet<WatchVariableControl> _selectedWatchVarControls;
         private List<WatchVariableControl> _reorderingWatchVarControls;
 
         ToolStripMenuItem filterVariablesItem = new ToolStripMenuItem("Filter Variables...");
 
-
-        string _dataPath;
-        [Category("Data"), Browsable(true)]
-        public string DataPath { get { return _dataPath; } set { Initialize(_dataPath = value); } }
+        WatchVariablePanelRenderer renderer;
 
         public WatchVariableFlowLayoutPanel()
         {
             GetSelectedVars = () => new List<WatchVariableControl>(_selectedWatchVarControls);
 
-            _objectLock = new Object();
-            _watchVarControls = new List<WatchVariableControl>();
+            _allWatchVarControls = new List<WatchVariableControl>();
             _allGroups = new List<string>();
             _initialVisibleGroups = new List<string>();
             _visibleGroups = new List<string>();
 
-            ContextMenuStrip = new ContextMenuStrip();
-
-            _selectedWatchVarControls = new List<WatchVariableControl>();
+            _selectedWatchVarControls = new HashSet<WatchVariableControl>();
             _reorderingWatchVarControls = new List<WatchVariableControl>();
 
-            Click += (sender, e) =>
-            {
-                UnselectAllVariables();
-                StopEditing();
-            };
-            ContextMenuStrip.Opening += (sender, e) => UnselectAllVariables();
+            renderer = new WatchVariablePanelRenderer(this);
         }
 
         bool hasGroups = false;
@@ -85,6 +310,9 @@ namespace STROOP.Controls
 
         public void Initialize(string varFilePath = null)
         {
+            AutoScroll = true;
+
+            Controls.Add(renderer);
             _varFilePath = varFilePath;
             if (varFilePath != null && !System.IO.File.Exists(varFilePath))
                 return;
@@ -96,14 +324,83 @@ namespace STROOP.Controls
                     ? new List<WatchVariable>()
                     : XmlConfigParser.OpenWatchVariableControlPrecursors(_varFilePath);
 
-                foreach (var watchVarControl in precursors.ConvertAll(precursor => new WatchVariableControl(precursor)))
-                {
-                    _watchVarControls.Add(watchVarControl);
-                    watchVarControl.SetPanel(this);
-                }
-
+                foreach (var watchVarControl in precursors.ConvertAll(precursor => new WatchVariableControl(this, precursor)))
+                    _allWatchVarControls.Add(watchVarControl);
 
                 MouseDown += (_, __) => { if (__.Button == MouseButtons.Right) ShowContextMenu(); };
+
+                int lastSelectedEntry = -1;
+                int lastClicked = -1;
+                bool clickedName = false;
+                renderer.DoubleClick += (_, __) =>
+                {
+                    foreach (var selected in _selectedWatchVarControls)
+                    {
+                        if (clickedName)
+                            selected.WatchVarWrapper.ShowVarInfo();
+                        else if (lastClicked != -1)
+                            selected.WatchVarWrapper.Edit(renderer, renderer.GetVariableControlBounds(lastClicked));
+                        break;
+                    }
+                };
+                renderer.MouseDown += (_, __) =>
+                {
+                    (int index, var var, var _select) = renderer.GetVariableAt(__.Location);
+                    lastClicked = index;
+
+                    bool ctrlHeld = KeyboardUtilities.IsCtrlHeld();
+                    bool shiftHeld = KeyboardUtilities.IsShiftHeld();
+                    clickedName = _select | shiftHeld;
+
+                    var numSelected = _selectedWatchVarControls.Count;
+                    if (!ctrlHeld && (numSelected == 1 || __.Button != MouseButtons.Right))
+                        UnselectAllVariables();
+
+                    if (shiftHeld)
+                    {
+                        int k = 0;
+                        var low = Math.Min(lastSelectedEntry, index);
+                        var high = Math.Max(lastSelectedEntry, index);
+                        foreach (var ctrl in _shownWatchVarControls)
+                        {
+                            if (k >= low)
+                            {
+                                _selectedWatchVarControls.Add(ctrl);
+                                ctrl.IsSelected = true;
+                            }
+                            if (k >= high)
+                                break;
+                            k++;
+                        }
+                    }
+                    else if (var != null)
+                    {
+                        if (ctrlHeld && var.IsSelected)
+                        {
+                            _selectedWatchVarControls.Remove(var);
+                            var.IsSelected = false;
+                        }
+                        else
+                        {
+                            _selectedWatchVarControls.Add(var);
+                            var.IsSelected = true;
+                        }
+                    }
+
+                    if (__.Button == MouseButtons.Right)
+                    {
+                        if (var != null)
+                            var.ShowContextMenu();
+                        else
+                            ShowContextMenu();
+                    }
+
+                    if (!shiftHeld || _selectedWatchVarControls.Count == 0)
+                        if (var != null && var.IsSelected)
+                            lastSelectedEntry = index;
+
+                    Focus();
+                };
 
                 _allGroups.AddRange(new List<string>(new[] { VariableGroup.Custom }));
                 _initialVisibleGroups.AddRange(new List<string>(new[] { VariableGroup.Custom }));
@@ -135,9 +432,6 @@ namespace STROOP.Controls
             ToolStripMenuItem clearAllButHighlightedItem = new ToolStripMenuItem("Clear All But Highlighted");
             clearAllButHighlightedItem.Click += (sender, e) => ClearAllButHighlightedVariables();
 
-            ToolStripMenuItem fixVerticalScrollItem = new ToolStripMenuItem("Fix Vertical Scroll");
-            fixVerticalScrollItem.Click += (sender, e) => FixVerticalScroll();
-
             ToolStripMenuItem addCustomVariablesItem = new ToolStripMenuItem("Add Custom Variables");
             addCustomVariablesItem.Click += (sender, e) =>
             {
@@ -166,7 +460,6 @@ namespace STROOP.Controls
                         numEntries = parsed;
                     }
 
-                    List<WatchVariableControl> controls = new List<WatchVariableControl>();
                     for (int i = 0; i < numEntries; i++)
                     {
                         int index = SpecialConfig.DummyValues.Count;
@@ -184,9 +477,8 @@ namespace STROOP.Controls
                                 return true;
                             }
                         };
-                        controls.Add(new WatchVariableControl(new WatchVariable(view)));
+                        AddVariable(new WatchVariable(view), view);
                     }
-                    AddVariables(controls);
                 };
             }
 
@@ -221,7 +513,6 @@ namespace STROOP.Controls
             var strip = new ContextMenuStrip();
             strip.Items.Add(resetVariablesItem);
             strip.Items.Add(clearAllButHighlightedItem);
-            strip.Items.Add(fixVerticalScrollItem);
             strip.Items.Add(addCustomVariablesItem);
             strip.Items.Add(addMappingVariablesItem);
             strip.Items.Add(addDummyVariableItem);
@@ -230,10 +521,6 @@ namespace STROOP.Controls
             strip.Items.Add(filterVariablesItem);
             strip.Show(Cursor.Position);
         }
-
-
-        public readonly Func<List<WatchVariableControl>> GetSelectedVars;
-
 
         private ToolStripMenuItem CreateFilterItem(string varGroup)
         {
@@ -270,41 +557,28 @@ namespace STROOP.Controls
 
         private void UpdateControlsBasedOnFilters()
         {
-            lock (_objectLock)
-            {
-                Controls.Clear();
-                _watchVarControls.ForEach(watchVarControl =>
-                {
-                    if (ShouldShow(watchVarControl))
-                        Controls.Add(watchVarControl);
-                });
+            _shownWatchVarControls = _allWatchVarControls.Where(_ => ShouldShow(_)).ToList();
 
-                filterVariablesItem.DropDownItems.Clear();
-                _filteringDropDownItems = _allGroups.ConvertAll(varGroup => CreateFilterItem(varGroup));
-                UpdateFilterItemCheckedStatuses();
-                _filteringDropDownItems.ForEach(item => filterVariablesItem.DropDownItems.Add(item));
-            }
+            filterVariablesItem.DropDownItems.Clear();
+            _filteringDropDownItems = _allGroups.ConvertAll(varGroup => CreateFilterItem(varGroup));
+            UpdateFilterItemCheckedStatuses();
+            _filteringDropDownItems.ForEach(item => filterVariablesItem.DropDownItems.Add(item));
         }
 
-        public void AddVariable(WatchVariableControl watchVarControl)
-        {
-            lock (_objectLock)
-            {
-                AddVariables(new List<WatchVariableControl>() { watchVarControl });
-            }
-        }
+        public void AddVariable(WatchVariable var, WatchVariable.IVariableView view) =>
+            AddVariables(new[] { (var, view) });
 
-        public void AddVariables(List<WatchVariableControl> watchVarControls)
+        public IEnumerable<WatchVariableControl> AddVariables(IEnumerable<(WatchVariable var, WatchVariable.IVariableView view)> watchVarControls)
         {
-            lock (_objectLock)
+            var lst = new List<WatchVariableControl>();
+            foreach (var data in watchVarControls)
             {
-                foreach (WatchVariableControl watchVarControl in watchVarControls)
-                {
-                    _watchVarControls.Add(watchVarControl);
-                    if (ShouldShow(watchVarControl)) Controls.Add(watchVarControl);
-                    watchVarControl.SetPanel(this);
-                }
+                var newControl = new WatchVariableControl(this, data.var, data.view);
+                lst.Add(newControl);
+                _allWatchVarControls.Add(newControl);
+                if (ShouldShow(newControl)) _shownWatchVarControls.Add(newControl);
             }
+            return lst;
         }
 
         public void RemoveVariable(WatchVariableControl watchVarControl)
@@ -313,26 +587,21 @@ namespace STROOP.Controls
             RemoveVariables(new List<WatchVariableControl>() { watchVarControl });
         }
 
-        public void RemoveVariables(List<WatchVariableControl> watchVarControls)
+        public void RemoveVariables(IEnumerable<WatchVariableControl> watchVarControls)
         {
-            lock (_objectLock)
+            foreach (WatchVariableControl watchVarControl in watchVarControls)
             {
-                foreach (WatchVariableControl watchVarControl in watchVarControls)
-                {
-                    if (_reorderingWatchVarControls.Contains(watchVarControl))
-                        _reorderingWatchVarControls.Remove(watchVarControl);
+                _reorderingWatchVarControls.Remove(watchVarControl);
 
-                    _watchVarControls.Remove(watchVarControl);
-                    if (ShouldShow(watchVarControl)) Controls.Remove(watchVarControl);
-                    watchVarControl.SetPanel(null);
-                }
+                _allWatchVarControls.Remove(watchVarControl);
+                _shownWatchVarControls.Remove(watchVarControl);
             }
         }
 
         public void RemoveVariableGroup(string varGroup)
         {
             List<WatchVariableControl> watchVarControls =
-                _watchVarControls.FindAll(
+                _allWatchVarControls.FindAll(
                     watchVarControl => watchVarControl.BelongsToGroup(varGroup));
             RemoveVariables(watchVarControls);
         }
@@ -354,23 +623,16 @@ namespace STROOP.Controls
         public void ClearVariables()
         {
             List<WatchVariableControl> watchVarControlListCopy =
-                new List<WatchVariableControl>(_watchVarControls);
+                new List<WatchVariableControl>(_allWatchVarControls);
             RemoveVariables(watchVarControlListCopy);
         }
 
         public void ClearAllButHighlightedVariables()
         {
             List<WatchVariableControl> nonHighlighted =
-                _watchVarControls.FindAll(control => !control.Highlighted);
+                _allWatchVarControls.FindAll(control => !control.Highlighted);
             RemoveVariables(nonHighlighted);
-            _watchVarControls.ForEach(control => control.Highlighted = false);
-        }
-
-        public void FixVerticalScroll()
-        {
-            List<WatchVariableControl> controls = GetCurrentVariableControls();
-            RemoveVariables(controls);
-            AddVariables(controls);
+            _allWatchVarControls.ForEach(control => control.Highlighted = false);
         }
 
         private void ResetVariables()
@@ -383,29 +645,22 @@ namespace STROOP.Controls
             List<WatchVariable> precursors = _varFilePath == null
                 ? new List<WatchVariable>()
                 : XmlConfigParser.OpenWatchVariableControlPrecursors(_varFilePath);
-            AddVariables(precursors.ConvertAll(precursor => new WatchVariableControl(precursor)));
+            AddVariables(precursors.ConvertAll(precursor => (precursor, precursor.view)));
         }
 
         public void UnselectAllVariables()
         {
-            _selectedWatchVarControls.ForEach(control => control.IsSelected = false);
+            foreach (var control in _selectedWatchVarControls)
+                control.IsSelected = false;
             _selectedWatchVarControls.Clear();
             UnselectText();
         }
 
         public void UnselectText()
         {
-            foreach (WatchVariableControl control in _watchVarControls)
+            foreach (WatchVariableControl control in _allWatchVarControls)
             {
                 control.UnselectText();
-            }
-        }
-
-        public void StopEditing()
-        {
-            foreach (WatchVariableControl control in _watchVarControls)
-            {
-                control.StopEditing();
             }
         }
 
@@ -431,16 +686,18 @@ namespace STROOP.Controls
         {
             List<XElement> elements = DialogUtilities.OpenXmlElements(FileType.StroopVariables);
             if (elements.Count == 0) return;
-            List<WatchVariableControl> controls = elements.ConvertAll(element => WatchVariable.ParseXml(element).CreateWatchVariableControl(element));
             VariablePopOutForm form = new VariablePopOutForm();
-            form.Initialize(controls);
+            form.Initialize(elements.ConvertAll(element => WatchVariable.ParseXml(element)));
             form.ShowForm();
         }
 
         public void OpenVariables(List<XElement> elements)
         {
-            List<WatchVariableControl> controls = elements.ConvertAll(element => WatchVariable.ParseXml(element).CreateWatchVariableControl(element));
-            AddVariables(controls);
+            AddVariables(elements.ConvertAll(element =>
+            {
+                var newVar = WatchVariable.ParseXml(element);
+                return (newVar, (WatchVariable.IVariableView)new WatchVariable.XmlView(newVar, element));
+            }));
         }
 
         public void SaveVariablesInPlace()
@@ -479,17 +736,18 @@ namespace STROOP.Controls
 
         public void NotifyOfReorderingEnd(List<WatchVariableControl> watchVarControls)
         {
-            if (watchVarControls.Count == 0) return;
+            throw new NotImplementedException("What is this even lmao");
+            //if (watchVarControls.Count == 0) return;
 
-            int newIndex = Controls.IndexOf(watchVarControls[0]);
-            _reorderingWatchVarControls.ForEach(control => Controls.Remove(control));
-            _reorderingWatchVarControls.ForEach(control => Controls.Add(control));
-            for (int i = 0; i < _reorderingWatchVarControls.Count; i++)
-            {
-                Controls.SetChildIndex(_reorderingWatchVarControls[i], newIndex + i);
-                _reorderingWatchVarControls[i].FlashColor(WatchVariableControl.REORDER_END_COLOR);
-            }
-            _reorderingWatchVarControls.Clear();
+            //int newIndex = Controls.IndexOf(watchVarControls[0]);
+            //_reorderingWatchVarControls.ForEach(control => Controls.Remove(control));
+            //_reorderingWatchVarControls.ForEach(control => Controls.Add(control));
+            //for (int i = 0; i < _reorderingWatchVarControls.Count; i++)
+            //{
+            //    Controls.SetChildIndex(_reorderingWatchVarControls[i], newIndex + i);
+            //    _reorderingWatchVarControls[i].FlashColor(WatchVariableControl.REORDER_END_COLOR);
+            //}
+            //_reorderingWatchVarControls.Clear();
         }
 
         public void NotifyOfReorderingClear()
@@ -499,58 +757,9 @@ namespace STROOP.Controls
             _reorderingWatchVarControls.Clear();
         }
 
-        public void NotifySelectClick(
-            WatchVariableControl clickedControl, bool ctrlHeld, bool shiftHeld)
-        {
-            List<WatchVariableControl> currentControls = GetCurrentVariableControls();
-
-            if (shiftHeld && _selectedWatchVarControls.Count > 0)
-            {
-                int index1 = currentControls.IndexOf(_selectedWatchVarControls.Last());
-                int index2 = currentControls.IndexOf(clickedControl);
-                int diff = Math.Abs(index2 - index1);
-                int diffSign = index2 > index1 ? 1 : -1;
-                for (int i = 0; i <= diff; i++)
-                {
-                    int index = index1 + diffSign * i;
-                    WatchVariableControl control = currentControls[index];
-                    if (!_selectedWatchVarControls.Contains(control))
-                    {
-                        control.IsSelected = true;
-                        _selectedWatchVarControls.Add(control);
-                    }
-                }
-            }
-            else
-            {
-                bool toggle = ctrlHeld || (_selectedWatchVarControls.Count == 1 && _selectedWatchVarControls[0] == clickedControl);
-                if (!toggle) UnselectAllVariables();
-                if (clickedControl.IsSelected)
-                {
-                    clickedControl.IsSelected = false;
-                    _selectedWatchVarControls.Remove(clickedControl);
-                }
-                else
-                {
-                    clickedControl.IsSelected = true;
-                    _selectedWatchVarControls.Add(clickedControl);
-                }
-            }
-        }
-
-        public List<WatchVariableControl> GetCurrentVariableControls()
-        {
-            List<WatchVariableControl> watchVarControls = new List<WatchVariableControl>();
-            lock (_objectLock)
-            {
-                foreach (Control control in Controls)
-                {
-                    WatchVariableControl watchVarControl = control as WatchVariableControl;
-                    watchVarControls.Add(watchVarControl);
-                }
-            }
-            return watchVarControls;
-        }
+        //TODO: Maybe just enumerate instead of returning a list copy
+        public List<WatchVariableControl> GetCurrentVariableControls() =>
+            new List<WatchVariableControl>(_shownWatchVarControls);
 
         public List<WatchVariable> GetCurrentVariablePrecursors()
         {
@@ -582,11 +791,8 @@ namespace STROOP.Controls
 
         public void UpdatePanel()
         {
-            if (!ContainsFocus)
-            {
-                UnselectAllVariables();
-            }
             GetCurrentVariableControls().ForEach(watchVarControl => watchVarControl.UpdateControl());
+            renderer.Draw();
         }
 
         private bool ShouldShow(WatchVariableControl watchVarControl)
@@ -596,13 +802,13 @@ namespace STROOP.Controls
 
         public override string ToString()
         {
-            List<string> varNames = _watchVarControls.ConvertAll(control => control.VarName);
+            List<string> varNames = _allWatchVarControls.ConvertAll(control => control.VarName);
             return String.Join(",", varNames);
         }
 
         public void ColorVarsUsingFunction(Func<WatchVariableControl, Color> getColor)
         {
-            foreach (WatchVariableControl control in _watchVarControls)
+            foreach (WatchVariableControl control in _allWatchVarControls)
             {
                 control.BaseColor = getColor(control);
             }

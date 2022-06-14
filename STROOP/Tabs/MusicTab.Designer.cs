@@ -76,9 +76,7 @@
             // 
             // watchVariablePanelMusic
             // 
-            this.watchVariablePanelMusic.AutoScroll = true;
             this.watchVariablePanelMusic.DataPath = "Config/MusicData2.xml";
-            this.watchVariablePanelMusic.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelMusic.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelMusic.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelMusic.Name = "watchVariablePanelMusic";

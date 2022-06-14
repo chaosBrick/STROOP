@@ -258,10 +258,8 @@
             // 
             // watchVariablePanelSnow
             // 
-            this.watchVariablePanelSnow.AutoScroll = true;
             this.watchVariablePanelSnow.DataPath = "Config/SnowData.xml";
             this.watchVariablePanelSnow.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.watchVariablePanelSnow.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelSnow.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelSnow.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelSnow.Name = "watchVariablePanelSnow";

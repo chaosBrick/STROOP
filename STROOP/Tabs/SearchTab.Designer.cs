@@ -292,10 +292,8 @@
             // 
             // watchVariablePanelSearch
             // 
-            this.watchVariablePanelSearch.AutoScroll = true;
             this.watchVariablePanelSearch.DataPath = null;
             this.watchVariablePanelSearch.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.watchVariablePanelSearch.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelSearch.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelSearch.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelSearch.Name = "watchVariablePanelSearch";

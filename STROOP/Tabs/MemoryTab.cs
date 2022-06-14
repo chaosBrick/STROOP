@@ -52,12 +52,7 @@ namespace STROOP.Tabs
                 _behavior = value;
                 _objectSpecificPrecursors.Clear();
                 if (_behavior.HasValue)
-                {
-                    List<WatchVariable> precursors =
-                        Config.ObjectAssociations.GetWatchVarControls(_behavior.Value)
-                            .ConvertAll(control => control.WatchVar);
-                    _objectSpecificPrecursors.AddRange(precursors);
-                }
+                    _objectSpecificPrecursors.AddRange(Config.ObjectAssociations.GetWatchVarControls(_behavior.Value));
             }
         }
 
@@ -232,9 +227,10 @@ namespace STROOP.Tabs
                     {
                         precursorLists.ForEach(precursors =>
                         {
-                            List<WatchVariable> overlapped = valueText.GetOverlapped(precursors);
-                            overlapped.ForEach(precursor => watchVariablePanelMemory.AddVariable(
-                                new WatchVariableControl(precursor, precursor.view))); // newVariableGroupList: new List<VariableGroup>() { VariableGroup.Custom })));
+                            foreach (var ctrl in watchVariablePanelMemory.AddVariables(
+                                valueText.GetOverlapped(precursors).ConvertAll(
+                                    precursor => (precursor, precursor.view))))
+                                ctrl.GroupList.Add("Custom");
                         });
                     }
                 });
@@ -246,7 +242,7 @@ namespace STROOP.Tabs
                     if (index >= valueText.StringIndex && index <= valueText.StringIndex + valueText.StringSize)
                     {
                         WatchVariablePrecursor precursor = valueText.CreatePrecursor(useObjAddress, useHex, useObj, useRelativeName);
-                        watchVariablePanelMemory.AddVariable(new WatchVariableControl(precursor.value.var, precursor.value.view));
+                        watchVariablePanelMemory.AddVariable(precursor.value.var, precursor.value.view);
                     }
                 });
             }

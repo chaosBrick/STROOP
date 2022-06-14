@@ -9,7 +9,7 @@ using STROOP.Managers;
 
 namespace STROOP.Tabs
 {
-    public partial class VarHackTab : STROOPTab, IVariableAdder
+    public partial class VarHackTab : STROOPTab
     {
         public VarHackTab()
         {
@@ -163,45 +163,6 @@ namespace STROOP.Tabs
         public void AddVariable(string specialType)
         {
             varHackPanel.AddNewControl(specialType);
-        }
-
-        void IVariableAdder.AddVariable(WatchVariableControl control)
-        {
-            WatchVariableWrapper watchVarWrapper = control.WatchVarWrapper;
-            WatchVariable watchVar = watchVarWrapper.WatchVar;
-
-            if (watchVar.BaseAddressType == BaseAddressType.Triangle)
-            {
-                var trianglePointerAddress = AccessScope<StroopMainForm>.content.GetTab<TrianglesTab>().TrianglePointerAddress;
-                if (trianglePointerAddress.HasValue)
-                {
-                    AddVariable(
-                        control.VarName + " " + VarHackConfig.EscapeChar,
-                        trianglePointerAddress.Value,
-                        watchVar.MemoryType,
-                        watchVarWrapper.DisplayAsHex(),
-                        watchVar.Offset);
-                }
-            }
-            else
-            {
-                List<uint> addressList = watchVar.GetAddressList(control.FixedAddressListGetter());
-                for (int i = 0; i < addressList.Count; i++)
-                {
-                    string indexSuffix = addressList.Count > 1 ? (i + 1).ToString() : "";
-                    AddVariable(
-                        control.VarName + indexSuffix + " " + VarHackConfig.EscapeChar,
-                        addressList[i],
-                        watchVar.MemoryType,
-                        watchVarWrapper.DisplayAsHex(),
-                        null);
-                }
-            }
-        }
-
-        void IVariableAdder.AddVariables(List<WatchVariableControl> controls)
-        {
-            controls.ForEach(control => ((IVariableAdder)this).AddVariable(control));
         }
 
         public override void Update(bool updateView)

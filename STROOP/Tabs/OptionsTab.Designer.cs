@@ -126,10 +126,8 @@
             // 
             // watchVariablePanelOptions
             // 
-            this.watchVariablePanelOptions.AutoScroll = true;
             this.watchVariablePanelOptions.DataPath = "Config/OptionsData.xml";
             this.watchVariablePanelOptions.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.watchVariablePanelOptions.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.watchVariablePanelOptions.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelOptions.Margin = new System.Windows.Forms.Padding(0);
             this.watchVariablePanelOptions.Name = "watchVariablePanelOptions";

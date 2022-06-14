@@ -51,10 +51,8 @@
             // 
             // _watchVariablePanel
             // 
-            this._watchVariablePanel.AutoScroll = true;
             this._watchVariablePanel.Controls.Add(this.groupBoxVar);
             this._watchVariablePanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._watchVariablePanel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this._watchVariablePanel.Location = new System.Drawing.Point(0, 0);
             this._watchVariablePanel.Margin = new System.Windows.Forms.Padding(0);
             this._watchVariablePanel.Name = "_watchVariablePanel";

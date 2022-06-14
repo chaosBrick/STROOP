@@ -207,6 +207,8 @@ namespace STROOP.Controls
             varController.Show();
         }
 
+        public virtual void Edit(Control parentCtrl, System.Drawing.Rectangle bounds) { }
+
         public void ViewInMemoryTab()
         {
             if (WatchVar.IsSpecial) return;
@@ -224,7 +226,7 @@ namespace STROOP.Controls
             _itemHighlight.Checked = _watchVarControl.Highlighted;
             _itemLock.Checked = WatchVar.locked;
             _itemRemoveAllLocks.Visible = WatchVar.locked;
-            _itemDisableAllLocks.Visible = WatchVar.locked  || LockConfig.LockingDisabled;
+            _itemDisableAllLocks.Visible = WatchVar.locked || LockConfig.LockingDisabled;
             _itemDisableAllLocks.Checked = LockConfig.LockingDisabled;
             _itemFixAddress.Checked = _watchVarControl.FixedAddressListGetter() != null;
             UpdateControls();
@@ -313,6 +315,8 @@ namespace STROOP.Controls
                     return (false, "(multiple values)");
             return (true, firstValue);
         }
+
+        public string GetValueText() => CombineValues(WatchVar.GetValues().ConvertAll(_ => ConvertValue(_))).value?.ToString() ?? "<null>";
 
         // Generic methods
 
