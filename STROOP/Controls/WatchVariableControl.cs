@@ -59,11 +59,6 @@ namespace STROOP.Controls
         private Func<List<uint>> _defaultFixedAddressListGetter;
         public Func<List<uint>> FixedAddressListGetter;
 
-        private static readonly Image _lockedImage = Properties.Resources.img_lock;
-        private static readonly Image _someLockedImage = Properties.Resources.img_lock_grey;
-        private static readonly Image _disabledLockImage = Properties.Resources.lock_blue;
-        private static readonly Image _pinnedImage = Properties.Resources.img_pin;
-
         public static readonly int DEFAULT_VARIABLE_NAME_WIDTH = 120;
         public static readonly int DEFAULT_VARIABLE_VALUE_WIDTH = 85;
         public static readonly int DEFAULT_VARIABLE_HEIGHT = 20;
@@ -206,53 +201,7 @@ namespace STROOP.Controls
         public void UpdateControl()
         {
             WatchVarWrapper.UpdateItemCheckStates();
-
             UpdateColor();
-            UpdatePictureBoxes();
-        }
-
-        private void UpdatePictureBoxes()
-        {
-            //avoid this lol
-            //Image currentLockImage = GetImageForCheckState(WatchVar.HasLocks());
-            //bool isLocked = currentLockImage != null;
-            //bool isFixedAddress = FixedAddressListGetter() != null;
-
-            //if (_lockPictureBox.Image == currentLockImage &&
-            //    _lockPictureBox.Visible == isLocked &&
-            //    _pinPictureBox.Visible == isFixedAddress) return;
-
-            //_lockPictureBox.Image = currentLockImage;
-            //_lockPictureBox.Visible = isLocked;
-            //_pinPictureBox.Visible = isFixedAddress;
-
-            //int pinPadding = isLocked ? PIN_INNER_PADDING : PIN_OUTER_PADDING;
-            //_pinPictureBox.Location =
-            //    new Point(
-            //        _variableNameWidth - pinPadding,
-            //        _pinPictureBox.Location.Y);
-        }
-
-        private static Image GetImageForCheckState(CheckState checkState)
-        {
-            Image image;
-            switch (checkState)
-            {
-                case CheckState.Unchecked:
-                    image = null;
-                    break;
-                case CheckState.Checked:
-                    image = _lockedImage;
-                    break;
-                case CheckState.Indeterminate:
-                    image = _someLockedImage;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-            if (LockConfig.LockingDisabled)
-                image = _disabledLockImage;
-            return image;
         }
 
         private void UpdateColor()

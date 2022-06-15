@@ -7,6 +7,8 @@ namespace STROOP.Utilities
     public class Wrapper<T> where T : struct
     {
         public T value;
+        public Wrapper() { }
+        public Wrapper(T value) { this.value = value; }
     }
 
     public static class GeneralUtilities

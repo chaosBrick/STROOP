@@ -273,7 +273,7 @@ namespace STROOP.Controls
         {
             bool result = view._setterFunction(value, address);
             if (result && locks.TryGetValue(address, out var l))
-                l.value = value;
+                l.value.value = value;
             return result;
         }
 
@@ -314,7 +314,8 @@ namespace STROOP.Controls
 
         public bool locked => HasLocks() != System.Windows.Forms.CheckState.Unchecked;
 
-        Dictionary<uint, (SetterFunction setter, object value)> locks = new Dictionary<uint, (SetterFunction, object)>();
+
+        Dictionary<uint, Wrapper<(SetterFunction setter, object value)>> locks = new Dictionary<uint, Wrapper<(SetterFunction, object)>>();
 
         public bool SetLocked(bool locked, List<uint> addresses)
         {
@@ -327,7 +328,7 @@ namespace STROOP.Controls
                 WatchVariableLockManager.AddLocks(this);
                 var setter = view._setterFunction;
                 foreach (var address in addressList)
-                    locks[address] = (setter, view._getterFunction(address));
+                    locks[address] = new Wrapper<(SetterFunction setter, object value)>((setter, view._getterFunction(address)));
             }
             return true;
         }
@@ -339,7 +340,7 @@ namespace STROOP.Controls
             if (locks.Count == 0)
                 return false;
             foreach (var l in locks)
-                l.Value.setter(l.Value.value, l.Key);
+                l.Value.value.setter(l.Value.value.value, l.Key);
             return true;
         }
 

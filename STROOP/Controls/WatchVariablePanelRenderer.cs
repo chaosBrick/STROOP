@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using OpenTK;
+using STROOP.Structs.Configurations;
 
 namespace STROOP.Controls
 {
@@ -60,6 +61,35 @@ namespace STROOP.Controls
                 public Vector2 positionInGrid;
                 public Vector2 positionWhileMoving;
                 public bool moving = false;
+                public float nameTextOffset;
+                public float nameTextLength;
+                public string lastRenderedNameText;
+            }
+
+            private static readonly Image _lockedImage = Properties.Resources.img_lock;
+            private static readonly Image _someLockedImage = Properties.Resources.img_lock_grey;
+            private static readonly Image _disabledLockImage = Properties.Resources.lock_blue;
+            private static readonly Image _pinnedImage = Properties.Resources.img_pin;
+
+            private static Image GetImageForCheckState(CheckState checkState)
+            {
+                Image image;
+                switch (checkState)
+                {
+                    case CheckState.Unchecked:
+                        return null;
+                    case CheckState.Checked:
+                        image = _lockedImage;
+                        break;
+                    case CheckState.Indeterminate:
+                        image = _someLockedImage;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                if (LockConfig.LockingDisabled)
+                    image = _disabledLockImage;
+                return image;
             }
 
             Dictionary<WatchVariableControl, WatchVariableControlRenderData> renderDatas = new Dictionary<WatchVariableControl, WatchVariableControlRenderData>();
@@ -81,10 +111,11 @@ namespace STROOP.Controls
             OnDemand<StringFormat> rightAlignFormat;
 
             WatchVariablePanel target;
+            bool invalidated = false;
 
             int borderMargin = 2;
             int elementMarginTopBottom = 2;
-            int elementMarginRight = 2;
+            int elementMarginLeftRight = 2;
             int elementHeight => Font.Height + 2 * elementMarginTopBottom;
 
             int elementNameWidth = 120;
@@ -96,7 +127,7 @@ namespace STROOP.Controls
             public WatchVariablePanelRenderer(WatchVariablePanel target)
             {
                 this.target = target;
-                varNameFont = new OnDemand<Font>(OnDispose, () => new Font(DefaultFont, FontStyle.Bold), OnInvalidateFonts);
+                varNameFont = new OnDemand<Font>(OnDispose, () => new Font(Font, FontStyle.Bold), OnInvalidateFonts);
                 cellBorderPen = new OnDemand<Pen>(OnDispose, () => new Pen(Color.Gray, 2));
                 cellSeparatorPen = new OnDemand<Pen>(OnDispose, () => new Pen(Color.Gray, 1));
                 insertionMarkerPen = new OnDemand<Pen>(OnDispose, () => new Pen(Color.Blue, 3));
@@ -111,6 +142,10 @@ namespace STROOP.Controls
 
             public void Draw()
             {
+                //Return if not focused to save CPU lol
+                if (FindForm() != Form.ActiveForm)
+                    return;
+
                 int maxRows = GetMaxRows();
                 var newRect = new Rectangle(0, 0, ((target._shownWatchVarControls.Count - 1) / maxRows + 1) * elementWidth + borderMargin * 2, maxRows * elementHeight + borderMargin * 2);
                 if (bufferedGraphics == null || Bounds.Width != newRect.Width || Bounds.Height != newRect.Height)
@@ -125,6 +160,33 @@ namespace STROOP.Controls
                 }
 
                 var g = bufferedGraphics.Graphics;
+
+                void DrawLockAndFixImages(WatchVariableControl ctrl, int baseX, int baseY)
+                {
+                    var lockImg = GetImageForCheckState(ctrl.WatchVar.HasLocks());
+                    var xCoord = baseX + 2;
+                    var iconHeight = elementHeight - elementMarginTopBottom * 2;
+                    if (lockImg != null)
+                    {
+                        var iconWidth = (int)(iconHeight * (lockImg.Width / (float)lockImg.Height));
+                        g.DrawImage(lockImg,
+                            new Rectangle(
+                                xCoord,
+                                baseY + elementMarginTopBottom,
+                                iconWidth,
+                                iconHeight)
+                                );
+                        xCoord += iconWidth + 2;
+                    }
+                    if (ctrl.FixedAddressListGetter() != null)
+                        g.DrawImage(_pinnedImage,
+                            new Rectangle(
+                                xCoord,
+                                baseY + elementMarginTopBottom,
+                                (int)(iconHeight * (_pinnedImage.Width / (float)_pinnedImage.Height)),
+                                iconHeight)
+                                );
+                }
 
                 void DrawGrid()
                 {
@@ -172,8 +234,26 @@ namespace STROOP.Controls
                     {
                         GetColumn(0, elementNameWidth);
                         var yCoord = y * elementHeight;
-                        var txtPoint = new Point(x * elementWidth + elementNameWidth - elementMarginRight, yCoord + elementMarginTopBottom);
-                        g.DrawString(ctrl.VarName, varNameFont, ctrl.IsSelected ? Brushes.White : Brushes.Black, txtPoint, rightAlignFormat);
+                        var txtPoint = new Point(x * elementWidth + elementMarginLeftRight, yCoord + elementMarginTopBottom);
+                        var ctrlData = GetRenderData(ctrl);
+
+                        if (ctrlData.lastRenderedNameText != ctrl.VarName)
+                        {
+                            var falla = g.PageUnit;
+                            g.PageUnit = GraphicsUnit.Pixel;
+                            ctrlData.nameTextLength = g.MeasureString(ctrl.VarName, varNameFont).Width;
+                            g.PageUnit = falla;
+                        }
+
+                        var overEdge = ctrlData.nameTextLength - (elementNameWidth - elementMarginLeftRight * 2);
+                        if (overEdge > 0)
+                        {
+                            ctrlData.nameTextOffset += (float)Config.Stream.lastFrameTime * elementHeight;
+                            if (ctrlData.nameTextOffset > overEdge + elementHeight * 2)
+                                ctrlData.nameTextOffset = 0;
+                            txtPoint.X -= (int)Math.Max(0, Math.Min(overEdge, ctrlData.nameTextOffset - elementHeight));
+                        }
+                        g.DrawString(ctrl.VarName, varNameFont, ctrl.IsSelected ? Brushes.White : Brushes.Black, txtPoint);
                     }
 
                     ResetIterators();
@@ -181,15 +261,19 @@ namespace STROOP.Controls
                     {
                         GetColumn(elementNameWidth, elementValueWidth);
                         var yCoord = y * elementHeight;
-                        var txtPoint = new Point((x + 1) * elementWidth - elementMarginRight, yCoord + elementMarginTopBottom);
+                        var txtPoint = new Point((x + 1) * elementWidth - elementMarginLeftRight, yCoord + elementMarginTopBottom);
                         g.DrawString(ctrl.WatchVarWrapper.GetValueText(), Font, ctrl.IsSelected ? Brushes.White : Brushes.Black, txtPoint, rightAlignFormat);
+                        DrawLockAndFixImages(ctrl, x * elementWidth + elementNameWidth, yCoord);
                     }
 
                     g.ResetClip();
+
                     var numRows = x == 0 ? (y + 1) : maxRows;
                     var maxY = numRows * elementHeight;
                     var maxX = elementWidth * (x + 1);
 
+                    if (y == maxRows - 1)
+                        x++;
                     for (int dx = 0; dx <= x; dx++)
                     {
                         var xCoord = dx * elementWidth;
@@ -198,7 +282,7 @@ namespace STROOP.Controls
                         if (dx < x)
                             g.DrawLine(cellSeparatorPen, xCoord, 0, xCoord, maxY);
                     }
-                    if (y != 0)
+                    if (y != maxRows - 1)
                     {
                         var yCoord = (y + 1) * elementHeight;
                         g.DrawLine(cellBorderPen, maxX, 0, maxX, yCoord);
@@ -221,6 +305,7 @@ namespace STROOP.Controls
                                 g.DrawRectangle(pen, x * elementWidth, y * elementHeight, elementWidth, elementHeight);
                     }
                 }
+
                 void DrawMovingVariables()
                 {
                     if (target._reorderingWatchVarControls.Count == 0)
@@ -246,14 +331,6 @@ namespace STROOP.Controls
 
                         var yCoord = (int)ctrlData.positionWhileMoving.Y + elementMarginTopBottom;
 
-                        g.Clip = new Region(
-                            new Rectangle(
-                                (int)ctrlData.positionWhileMoving.X + elementNameWidth,
-                                (int)ctrlData.positionWhileMoving.Y,
-                                elementValueWidth,
-                                elementHeight));
-                        var txtPoint = new Point((int)ctrlData.positionWhileMoving.X + elementWidth - elementMarginRight, yCoord + elementMarginTopBottom);
-                        g.DrawString(ctrl.WatchVarWrapper.GetValueText(), Font, Brushes.Black, txtPoint, rightAlignFormat);
 
                         g.Clip = new Region(
                             new Rectangle(
@@ -261,8 +338,20 @@ namespace STROOP.Controls
                                 (int)ctrlData.positionWhileMoving.Y,
                                 elementNameWidth,
                                 elementHeight));
-                        txtPoint = new Point((int)ctrlData.positionWhileMoving.X + elementNameWidth - elementMarginRight, yCoord + elementMarginTopBottom);
-                        g.DrawString(ctrl.VarName, varNameFont, Brushes.Black, txtPoint, rightAlignFormat);
+                        var txtPoint = new Point((int)ctrlData.positionWhileMoving.X + elementMarginLeftRight, yCoord + elementMarginTopBottom);
+                        g.DrawString(ctrl.VarName, varNameFont, Brushes.Black, txtPoint);
+
+                        var valueX = (int)ctrlData.positionWhileMoving.X + elementNameWidth;
+                        g.Clip = new Region(
+                            new Rectangle(
+                                valueX,
+                                (int)ctrlData.positionWhileMoving.Y,
+                                elementValueWidth,
+                                elementHeight));
+                        txtPoint = new Point((int)ctrlData.positionWhileMoving.X + elementWidth - elementMarginLeftRight, yCoord + elementMarginTopBottom);
+                        g.DrawString(ctrl.WatchVarWrapper.GetValueText(), Font, Brushes.Black, txtPoint, rightAlignFormat);
+                        DrawLockAndFixImages(ctrl, valueX, yCoord);
+
                         g.ResetClip();
 
                         var xCoord = (int)ctrlData.positionWhileMoving.X + elementNameWidth;

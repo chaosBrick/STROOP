@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FileTab));
             this.splitContainerFile = new STROOP.BetterSplitContainer();
             this.checkBoxInGameCopyPaste = new System.Windows.Forms.CheckBox();
@@ -778,7 +777,7 @@
             this.tableLayoutPanelFile.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanelFile.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanelFile.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanelFile.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 608F));
+            this.tableLayoutPanelFile.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 609F));
             this.tableLayoutPanelFile.Controls.Add(this.textBoxTableRow15Col10, 10, 14);
             this.tableLayoutPanelFile.Controls.Add(this.textBoxTableRow14Col10, 10, 13);
             this.tableLayoutPanelFile.Controls.Add(this.textBoxTableRow13Col10, 10, 12);
@@ -3744,7 +3743,8 @@
             // 
             // watchVariablePanelFile
             // 
-            this.watchVariablePanelFile.DataPath = null;
+            this.watchVariablePanelFile.AutoScroll = true;
+            this.watchVariablePanelFile.DataPath = "Config/FileData.xml";
             this.watchVariablePanelFile.Dock = System.Windows.Forms.DockStyle.Fill;
             this.watchVariablePanelFile.Location = new System.Drawing.Point(2, 2);
             this.watchVariablePanelFile.Margin = new System.Windows.Forms.Padding(0);
@@ -3758,7 +3758,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.splitContainerFile);
             this.Name = "FileTab";
-            this.Size = new System.Drawing.Size(915, 463);
             this.splitContainerFile.Panel1.ResumeLayout(false);
             this.splitContainerFile.Panel1.PerformLayout();
             this.splitContainerFile.Panel2.ResumeLayout(false);

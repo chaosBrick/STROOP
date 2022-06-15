@@ -15,6 +15,20 @@ namespace STROOP.Controls
 {
     public partial class WatchVariablePanel : Panel
     {
+        static float variablePanelSize = 8.5f;
+
+        [InitializeSpecial]
+        static void InitializeSpecial()
+        {
+            var target = WatchVariableSpecialUtilities.dictionary;
+            target.Add("WatchVarPanelSize", ((uint _) => (object)variablePanelSize, (object value, uint __) =>
+            {
+                variablePanelSize = Convert.ToSingle(value);
+                return true;
+            }
+            ));
+        }
+
         public readonly Func<List<WatchVariableControl>> GetSelectedVars;
 
         public bool initialized = false;
@@ -39,6 +53,16 @@ namespace STROOP.Controls
         ToolStripMenuItem filterVariablesItem = new ToolStripMenuItem("Filter Variables...");
 
         WatchVariablePanelRenderer renderer;
+
+        public float FontSize
+        {
+            get { return renderer.Font.Size; }
+            set
+            {
+                if (value != renderer.Font.Size)
+                    renderer.Font = new Font(renderer.Font.FontFamily, value, renderer.Font.Style);
+            }
+        }
 
         public WatchVariablePanel()
         {
@@ -138,6 +162,7 @@ namespace STROOP.Controls
                             else if (index > _shownWatchVarControls.Count)
                                 index = _shownWatchVarControls.Count;
                             _shownWatchVarControls.InsertRange(index, _reorderingWatchVarControls);
+                            lastSelectedEntry = -1;
                         }
                         _reorderingWatchVarControls.Clear();
                         return;
@@ -392,7 +417,7 @@ namespace STROOP.Controls
                         int index = SpecialConfig.DummyValues.Count;
                         Type type = TypeUtilities.StringToType[typeString];
                         SpecialConfig.DummyValues.Add(ParsingUtilities.ParseValueRoundingWrapping(0, type));
-                        var view = new WatchVariable.CustomView(type)
+                        var view = new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
                         {
                             Name = $"Dummy {index} {StringUtilities.Capitalize(typeString)}",
                             _getterFunction = (uint dummy) => SpecialConfig.DummyValues[index],
@@ -679,6 +704,7 @@ namespace STROOP.Controls
 
         public void UpdatePanel()
         {
+            FontSize = variablePanelSize;
             GetCurrentVariableControls().ForEach(watchVarControl => watchVarControl.UpdateControl());
             renderer.Draw();
         }
