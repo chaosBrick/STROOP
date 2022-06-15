@@ -31,7 +31,7 @@
             this.components = new System.ComponentModel.Container();
             this.splitContainerMusic = new STROOP.BetterSplitContainer();
             this.listBoxMusic = new System.Windows.Forms.ListBox();
-            this.watchVariablePanelMusic = new STROOP.Controls.WatchVariableFlowLayoutPanel();
+            this.watchVariablePanelMusic = new STROOP.Controls.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMusic)).BeginInit();
             this.splitContainerMusic.Panel1.SuspendLayout();
             this.splitContainerMusic.Panel2.SuspendLayout();
@@ -102,6 +102,6 @@
 
         private BetterSplitContainer splitContainerMusic;
         private System.Windows.Forms.ListBox listBoxMusic;
-        private Controls.WatchVariableFlowLayoutPanel watchVariablePanelMusic;
+        private Controls.WatchVariablePanel watchVariablePanelMusic;
     }
 }

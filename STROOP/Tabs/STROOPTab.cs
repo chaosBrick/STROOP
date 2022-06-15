@@ -48,9 +48,9 @@ namespace STROOP.Tabs
                 return baseName;
         }
 
-        public static void PerformRecursiveAction(Control c, Action<WatchVariableFlowLayoutPanel> action)
+        public static void PerformRecursiveAction(Control c, Action<WatchVariablePanel> action)
         {
-            if (c is WatchVariableFlowLayoutPanel panel)
+            if (c is WatchVariablePanel panel)
                 action(panel);
             foreach (Control child in c.Controls)
                 PerformRecursiveAction(child, action);

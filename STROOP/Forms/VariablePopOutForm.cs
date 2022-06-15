@@ -11,7 +11,7 @@ namespace STROOP.Forms
         public static int? WIDTH = null;
         public static int? HEIGHT = null;
 
-        public Controls.WatchVariableFlowLayoutPanel panel => _watchVariablePanel;
+        public Controls.WatchVariablePanel panel => _watchVariablePanel;
 
         private bool _borderless = false;
         private bool _isDragging = false;

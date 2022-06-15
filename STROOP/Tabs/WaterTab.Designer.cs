@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.watchVariablePanelWater = new STROOP.Controls.WatchVariableFlowLayoutPanel();
+            this.watchVariablePanelWater = new STROOP.Controls.WatchVariablePanel();
             this.SuspendLayout();
             // 
             // watchVariablePanelWater
@@ -56,6 +56,6 @@
 
         #endregion
 
-        private Controls.WatchVariableFlowLayoutPanel watchVariablePanelWater;
+        private Controls.WatchVariablePanel watchVariablePanelWater;
     }
 }

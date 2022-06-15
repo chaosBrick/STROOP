@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(VariableTripletControllerForm));
-            this._watchVariablePanel = new STROOP.Controls.WatchVariableFlowLayoutPanel();
+            this._watchVariablePanel = new STROOP.Controls.WatchVariablePanel();
             this.groupBoxVar = new System.Windows.Forms.GroupBox();
             this.checkBoxVarRelative = new System.Windows.Forms.CheckBox();
             this.textBoxVarY = new STROOP.BetterTextbox();
@@ -235,7 +235,7 @@
 
         #endregion
 
-        private Controls.WatchVariableFlowLayoutPanel _watchVariablePanel;
+        private Controls.WatchVariablePanel _watchVariablePanel;
         private System.Windows.Forms.GroupBox groupBoxVar;
         private System.Windows.Forms.CheckBox checkBoxVarRelative;
         private BetterTextbox textBoxVarY;

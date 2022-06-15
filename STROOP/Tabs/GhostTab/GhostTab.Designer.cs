@@ -50,7 +50,7 @@
             this.labelHackActiveState = new System.Windows.Forms.Label();
             this.buttonDisableGhostHack = new System.Windows.Forms.Button();
             this.buttonEnableGhostHack = new System.Windows.Forms.Button();
-            this.watchVariablePanelGhost = new STROOP.Controls.WatchVariableFlowLayoutPanel();
+            this.watchVariablePanelGhost = new STROOP.Controls.WatchVariablePanel();
             this.groupBoxVariables = new System.Windows.Forms.GroupBox();
             this.groupBoxHelp = new System.Windows.Forms.GroupBox();
             this.buttonTutorialFileWatch = new System.Windows.Forms.Button();
@@ -409,7 +409,7 @@
         public System.Windows.Forms.Label labelHackActiveState;
         private System.Windows.Forms.TextBox textBoxGhostName;
         public System.Windows.Forms.Label labelName;
-        private Controls.WatchVariableFlowLayoutPanel watchVariablePanelGhost;
+        private Controls.WatchVariablePanel watchVariablePanelGhost;
         private System.Windows.Forms.Button buttonWatchGhostFile;
         private System.Windows.Forms.Button buttonTutorialRecord;
         private System.Windows.Forms.GroupBox groupBoxVariables;

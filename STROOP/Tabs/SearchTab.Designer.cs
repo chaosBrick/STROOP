@@ -49,7 +49,7 @@
             this.dataGridViewSearch = new System.Windows.Forms.DataGridView();
             this.Address = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Value = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.watchVariablePanelSearch = new STROOP.Controls.WatchVariableFlowLayoutPanel();
+            this.watchVariablePanelSearch = new STROOP.Controls.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerSearch)).BeginInit();
             this.splitContainerSearch.Panel1.SuspendLayout();
             this.splitContainerSearch.Panel2.SuspendLayout();
@@ -340,6 +340,6 @@
         private System.Windows.Forms.DataGridView dataGridViewSearch;
         private System.Windows.Forms.DataGridViewTextBoxColumn Address;
         private System.Windows.Forms.DataGridViewTextBoxColumn Value;
-        private Controls.WatchVariableFlowLayoutPanel watchVariablePanelSearch;
+        private Controls.WatchVariablePanel watchVariablePanelSearch;
     }
 }

@@ -33,7 +33,7 @@
             this.splitContainerWarpLeft = new STROOP.BetterSplitContainer();
             this.buttonWarpInstructions = new System.Windows.Forms.Button();
             this.buttonWarpHookUpTeleporters = new System.Windows.Forms.Button();
-            this.watchVariablePanelWarp = new STROOP.Controls.WatchVariableFlowLayoutPanel();
+            this.watchVariablePanelWarp = new STROOP.Controls.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerWarp)).BeginInit();
             this.splitContainerWarp.Panel1.SuspendLayout();
             this.splitContainerWarp.Panel2.SuspendLayout();
@@ -151,6 +151,6 @@
         private BetterSplitContainer splitContainerWarpLeft;
         private System.Windows.Forms.Button buttonWarpInstructions;
         private System.Windows.Forms.Button buttonWarpHookUpTeleporters;
-        private Controls.WatchVariableFlowLayoutPanel watchVariablePanelWarp;
+        private Controls.WatchVariablePanel watchVariablePanelWarp;
     }
 }

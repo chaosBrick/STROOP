@@ -21,7 +21,7 @@ namespace STROOP.Controls
         public WatchVariable.IVariableView view;
 
         // Parent control
-        private readonly WatchVariableFlowLayoutPanel containingPanel;
+        private readonly WatchVariablePanel containingPanel;
 
         public static readonly Color DEFAULT_COLOR = SystemColors.Control;
         public static readonly Color FAILURE_COLOR = Color.Red;
@@ -77,10 +77,10 @@ namespace STROOP.Controls
         public static int VariableTextSize = DEFAULT_VARIABLE_TEXT_SIZE;
         public static int VariableOffset = DEFAULT_VARIABLE_OFFSET;
         
-        public WatchVariableControl(WatchVariableFlowLayoutPanel panel, WatchVariable watchVar)
+        public WatchVariableControl(WatchVariablePanel panel, WatchVariable watchVar)
             : this(panel, watchVar, watchVar.view) { }
 
-        public WatchVariableControl(WatchVariableFlowLayoutPanel panel, WatchVariable watchVar, WatchVariable.IVariableView view)
+        public WatchVariableControl(WatchVariablePanel panel, WatchVariable watchVar, WatchVariable.IVariableView view)
         {
             this.view = view;
             this.containingPanel = panel;
@@ -457,7 +457,7 @@ namespace STROOP.Controls
             containingPanel.ContextMenuStrip.Show(point);
         }
 
-        public WatchVariableControl CreateCopy(WatchVariableFlowLayoutPanel panel)
+        public WatchVariableControl CreateCopy(WatchVariablePanel panel)
         {
             var copy = new WatchVariableControl(panel, WatchVar);
             copy.BaseColor = _baseColor;

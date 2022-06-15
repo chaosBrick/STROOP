@@ -122,7 +122,7 @@
             this.radioButtonMainSaveStructMainSaveSaved = new System.Windows.Forms.RadioButton();
             this.radioButtonMainSaveStructMainSave = new System.Windows.Forms.RadioButton();
             this.buttonMainSaveSave = new System.Windows.Forms.Button();
-            this.watchVariablePanelMainSave = new STROOP.Controls.WatchVariableFlowLayoutPanel();
+            this.watchVariablePanelMainSave = new STROOP.Controls.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMainSave)).BeginInit();
             this.splitContainerMainSave.Panel1.SuspendLayout();
             this.splitContainerMainSave.Panel2.SuspendLayout();
@@ -1637,6 +1637,6 @@
         private System.Windows.Forms.RadioButton radioButtonMainSaveStructMainSaveSaved;
         private System.Windows.Forms.RadioButton radioButtonMainSaveStructMainSave;
         private System.Windows.Forms.Button buttonMainSaveSave;
-        private Controls.WatchVariableFlowLayoutPanel watchVariablePanelMainSave;
+        private Controls.WatchVariablePanel watchVariablePanelMainSave;
     }
 }

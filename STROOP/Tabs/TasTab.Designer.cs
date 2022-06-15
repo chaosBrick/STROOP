@@ -35,7 +35,7 @@
             this.buttonTasTakeAngle = new System.Windows.Forms.Button();
             this.buttonTasTakePosition = new System.Windows.Forms.Button();
             this.buttonTasStorePosition = new System.Windows.Forms.Button();
-            this.watchVariablePanelTas = new STROOP.Controls.WatchVariableFlowLayoutPanel();
+            this.watchVariablePanelTas = new STROOP.Controls.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerTas)).BeginInit();
             this.splitContainerTas.Panel1.SuspendLayout();
             this.splitContainerTas.Panel2.SuspendLayout();
@@ -154,6 +154,6 @@
         private System.Windows.Forms.Button buttonTasTakeAngle;
         private System.Windows.Forms.Button buttonTasTakePosition;
         private System.Windows.Forms.Button buttonTasStorePosition;
-        private Controls.WatchVariableFlowLayoutPanel watchVariablePanelTas;
+        private Controls.WatchVariablePanel watchVariablePanelTas;
     }
 }

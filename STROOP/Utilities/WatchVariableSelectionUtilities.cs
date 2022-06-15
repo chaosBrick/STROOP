@@ -15,7 +15,7 @@ namespace STROOP.Structs
     {
         public static List<ToolStripItem> CreateSelectionToolStripItems(
             List<WatchVariableControl> vars,
-            WatchVariableFlowLayoutPanel panel)
+            WatchVariablePanel panel)
         {
             var itemList = new List<ToolStripItem>();
 

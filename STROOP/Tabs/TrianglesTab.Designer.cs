@@ -85,7 +85,7 @@
             this.buttonGotoV3 = new System.Windows.Forms.Button();
             this.buttonGotoV1 = new System.Windows.Forms.Button();
             this.buttonGotoV2 = new System.Windows.Forms.Button();
-            this.watchVariablePanelTriangles = new STROOP.Controls.WatchVariableFlowLayoutPanel();
+            this.watchVariablePanelTriangles = new STROOP.Controls.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerTriangles)).BeginInit();
             this.splitContainerTriangles.Panel1.SuspendLayout();
             this.splitContainerTriangles.Panel2.SuspendLayout();
@@ -795,6 +795,6 @@
         private System.Windows.Forms.Button buttonGotoV3;
         private System.Windows.Forms.Button buttonGotoV1;
         private System.Windows.Forms.Button buttonGotoV2;
-        private Controls.WatchVariableFlowLayoutPanel watchVariablePanelTriangles;
+        private Controls.WatchVariablePanel watchVariablePanelTriangles;
     }
 }

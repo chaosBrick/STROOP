@@ -80,7 +80,7 @@
             this.buttonVarNameWidthSubtract = new System.Windows.Forms.Button();
             this.buttonVarNameWidthSet = new System.Windows.Forms.Button();
             this.buttonVarNameWidthAdd = new System.Windows.Forms.Button();
-            this.watchVariablePanelCustom = new STROOP.Controls.WatchVariableFlowLayoutPanel();
+            this.watchVariablePanelCustom = new STROOP.Controls.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerCustom)).BeginInit();
             this.splitContainerCustom.Panel1.SuspendLayout();
             this.splitContainerCustom.Panel2.SuspendLayout();
@@ -791,6 +791,6 @@
         private System.Windows.Forms.Button buttonVarNameWidthSubtract;
         private System.Windows.Forms.Button buttonVarNameWidthSet;
         private System.Windows.Forms.Button buttonVarNameWidthAdd;
-        internal Controls.WatchVariableFlowLayoutPanel watchVariablePanelCustom;
+        internal Controls.WatchVariablePanel watchVariablePanelCustom;
     }
 }

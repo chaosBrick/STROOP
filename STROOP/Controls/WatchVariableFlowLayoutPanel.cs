@@ -12,7 +12,7 @@ using System.ComponentModel;
 
 namespace STROOP.Controls
 {
-    public partial class WatchVariableFlowLayoutPanel : Panel
+    public partial class WatchVariablePanel : Panel
     {
         public readonly Func<List<WatchVariableControl>> GetSelectedVars;
 
@@ -39,7 +39,7 @@ namespace STROOP.Controls
 
         WatchVariablePanelRenderer renderer;
 
-        public WatchVariableFlowLayoutPanel()
+        public WatchVariablePanel()
         {
             GetSelectedVars = () => new List<WatchVariableControl>(_selectedWatchVarControls);
 

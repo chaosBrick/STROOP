@@ -36,7 +36,7 @@
             this.buttonScriptRunOnce = new System.Windows.Forms.Button();
             this.buttonScriptInstructions = new System.Windows.Forms.Button();
             this.richTextBoxScript = new STROOP.Controls.RichTextBoxEx();
-            this.watchVariablePanelScript = new STROOP.Controls.WatchVariableFlowLayoutPanel();
+            this.watchVariablePanelScript = new STROOP.Controls.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerScript)).BeginInit();
             this.splitContainerScript.Panel1.SuspendLayout();
             this.splitContainerScript.Panel2.SuspendLayout();
@@ -197,6 +197,6 @@
         private System.Windows.Forms.Button buttonScriptRunOnce;
         private System.Windows.Forms.Button buttonScriptInstructions;
         private Controls.RichTextBoxEx richTextBoxScript;
-        internal Controls.WatchVariableFlowLayoutPanel watchVariablePanelScript;
+        internal Controls.WatchVariablePanel watchVariablePanelScript;
     }
 }

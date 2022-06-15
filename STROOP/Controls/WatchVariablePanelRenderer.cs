@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace STROOP.Controls
 {
-    partial class WatchVariableFlowLayoutPanel
+    partial class WatchVariablePanel
     {
         class WatchVariablePanelRenderer : Control
         {
@@ -62,7 +62,7 @@ namespace STROOP.Controls
             OnDemand<Pen> cellBorderPen, cellSeparatorPen;
             OnDemand<StringFormat> rightAlignFormat;
 
-            WatchVariableFlowLayoutPanel target;
+            WatchVariablePanel target;
 
             int borderMargin = 2;
             int elementMarginTopBottom = 2;
@@ -75,7 +75,7 @@ namespace STROOP.Controls
 
             public int GetMaxRows() => (target.Height - borderMargin * 2 - SystemInformation.HorizontalScrollBarHeight) / elementHeight;
 
-            public WatchVariablePanelRenderer(WatchVariableFlowLayoutPanel target)
+            public WatchVariablePanelRenderer(WatchVariablePanel target)
             {
                 this.target = target;
                 varNameFont = new OnDemand<Font>(OnDispose, () => new Font(DefaultFont, FontStyle.Bold), OnInvalidateFonts);

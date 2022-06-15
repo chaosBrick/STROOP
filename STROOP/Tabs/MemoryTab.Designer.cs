@@ -53,7 +53,7 @@
             this.splitContainerMemoryControlsDisplays = new STROOP.BetterSplitContainer();
             this.richTextBoxMemoryAddresses = new STROOP.Controls.RichTextBoxEx();
             this.richTextBoxMemoryValues = new STROOP.Controls.RichTextBoxEx();
-            this.watchVariablePanelMemory = new STROOP.Controls.WatchVariableFlowLayoutPanel();
+            this.watchVariablePanelMemory = new STROOP.Controls.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMemory)).BeginInit();
             this.splitContainerMemory.Panel1.SuspendLayout();
             this.splitContainerMemory.Panel2.SuspendLayout();
@@ -442,6 +442,6 @@
         private BetterSplitContainer splitContainerMemoryControlsDisplays;
         private Controls.RichTextBoxEx richTextBoxMemoryAddresses;
         private Controls.RichTextBoxEx richTextBoxMemoryValues;
-        private Controls.WatchVariableFlowLayoutPanel watchVariablePanelMemory;
+        private Controls.WatchVariablePanel watchVariablePanelMemory;
     }
 }

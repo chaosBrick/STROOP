@@ -31,7 +31,7 @@
             this.components = new System.ComponentModel.Container();
             this.textBoxAnimationDescription = new STROOP.BetterTextbox();
             this.textBoxActionDescription = new STROOP.BetterTextbox();
-            this.watchVariablePanelActions = new STROOP.Controls.WatchVariableFlowLayoutPanel();
+            this.watchVariablePanelActions = new STROOP.Controls.WatchVariablePanel();
             this.SuspendLayout();
             // 
             // textBoxAnimationDescription
@@ -87,6 +87,6 @@
 
         private BetterTextbox textBoxAnimationDescription;
         private BetterTextbox textBoxActionDescription;
-        private Controls.WatchVariableFlowLayoutPanel watchVariablePanelActions;
+        private Controls.WatchVariablePanel watchVariablePanelActions;
     }
 }

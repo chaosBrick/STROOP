@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.watchVariablePanelQuarterFrame = new STROOP.Controls.WatchVariableFlowLayoutPanel();
+            this.watchVariablePanelQuarterFrame = new STROOP.Controls.WatchVariablePanel();
             this.SuspendLayout();
             // 
             // watchVariablePanelQuarterFrame
@@ -57,6 +57,6 @@
 
         #endregion
 
-        private Controls.WatchVariableFlowLayoutPanel watchVariablePanelQuarterFrame;
+        private Controls.WatchVariablePanel watchVariablePanelQuarterFrame;
     }
 }

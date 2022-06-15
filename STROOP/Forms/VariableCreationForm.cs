@@ -39,7 +39,7 @@ namespace STROOP.Forms
                 });
         }
 
-        public void Initialize(WatchVariableFlowLayoutPanel varPanel)
+        public void Initialize(WatchVariablePanel varPanel)
         {
             buttonAddVariable.Click += (sender, e) =>
             {

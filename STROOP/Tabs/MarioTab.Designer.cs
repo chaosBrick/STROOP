@@ -87,7 +87,7 @@
             this.buttonMarioHOLPGoto = new System.Windows.Forms.Button();
             this.buttonMarioToggleHandsfree = new System.Windows.Forms.Button();
             this.buttonMarioHOLPRetrieve = new System.Windows.Forms.Button();
-            this.watchVariablePanelMario = new STROOP.Controls.WatchVariableFlowLayoutPanel();
+            this.watchVariablePanelMario = new STROOP.Controls.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMario)).BeginInit();
             this.splitContainerMario.Panel1.SuspendLayout();
             this.splitContainerMario.Panel2.SuspendLayout();
@@ -861,6 +861,6 @@
         private System.Windows.Forms.Button buttonMarioHOLPGoto;
         private System.Windows.Forms.Button buttonMarioToggleHandsfree;
         private System.Windows.Forms.Button buttonMarioHOLPRetrieve;
-        private Controls.WatchVariableFlowLayoutPanel watchVariablePanelMario;
+        private Controls.WatchVariablePanel watchVariablePanelMario;
     }
 }
