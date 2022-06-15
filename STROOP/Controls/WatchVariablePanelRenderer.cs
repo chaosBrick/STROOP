@@ -254,62 +254,62 @@ namespace STROOP.Controls
                         g.DrawLine(cellSeparatorPen, xCoord, yCoord, xCoord, yCoord + elementHeight);
                         g.DrawRectangle(cellBorderPen, ctrlData.positionWhileMoving.X, ctrlData.positionWhileMoving.Y, elementWidth, elementHeight);
 
-                var target = cursorPosition;
-                target.Y += elementHeight * i++;
-                ctrlData.positionWhileMoving += (target - ctrlData.positionWhileMoving) * Utilities.MoreMath.EaseIn(10 * (float)Structs.Configurations.Config.Stream.lastFrameTime);
-                if ((ctrlData.positionInGrid - ctrlData.positionWhileMoving).LengthSquared < 1)
-                    ctrlData.moving = false;
-                else
-                    ctrlData.moving = true;
-            }
-        }
+                        var target = cursorPosition;
+                        target.Y += elementHeight * i++;
+                        ctrlData.positionWhileMoving += (target - ctrlData.positionWhileMoving) * Utilities.MoreMath.EaseIn(10 * (float)Structs.Configurations.Config.Stream.lastFrameTime);
+                        if ((ctrlData.positionInGrid - ctrlData.positionWhileMoving).LengthSquared < 1)
+                            ctrlData.moving = false;
+                        else
+                            ctrlData.moving = true;
+                    }
+                }
 
-        g.Clear(Color.FromKnownColor(KnownColor.Control));
+                g.Clear(Color.FromKnownColor(KnownColor.Control));
                 DrawGrid();
-        DrawMovingVariables();
+                DrawMovingVariables();
 
                 if (Controls.Count == 0)
                     bufferedGraphics.Render();
             }
 
-    public Rectangle GetVariableControlBounds(int index)
-    {
-        var maxRows = GetMaxRows();
-        var x = index / maxRows;
-        var y = index % maxRows;
-        return new Rectangle(
-            borderMargin + x * elementWidth + elementNameWidth,
-            borderMargin + y * elementHeight,
-            elementValueWidth,
-            elementHeight);
-    }
+            public Rectangle GetVariableControlBounds(int index)
+            {
+                var maxRows = GetMaxRows();
+                var x = index / maxRows;
+                var y = index % maxRows;
+                return new Rectangle(
+                    borderMargin + x * elementWidth + elementNameWidth,
+                    borderMargin + y * elementHeight,
+                    elementValueWidth,
+                    elementHeight);
+            }
 
-    public (int index, WatchVariableControl ctrl, bool select) GetVariableAt(Point location)
-    {
-        location.X -= borderMargin;
-        location.Y -= borderMargin;
-        var x = location.X / elementWidth;
-        var y = location.Y / elementHeight;
-        int maxRows = (int)((target.Height - borderMargin * 2 - SystemInformation.HorizontalScrollBarHeight) / elementHeight);
-        int index = x * maxRows + y;
-        if (index < target._shownWatchVarControls.Count)
-            return (index, target._shownWatchVarControls[index], (location.X % elementWidth) < elementNameWidth);
+            public (int index, WatchVariableControl ctrl, bool select) GetVariableAt(Point location)
+            {
+                location.X -= borderMargin;
+                location.Y -= borderMargin;
+                var x = location.X / elementWidth;
+                var y = location.Y / elementHeight;
+                int maxRows = (int)((target.Height - borderMargin * 2 - SystemInformation.HorizontalScrollBarHeight) / elementHeight);
+                int index = x * maxRows + y;
+                if (index < target._shownWatchVarControls.Count)
+                    return (index, target._shownWatchVarControls[index], (location.X % elementWidth) < elementNameWidth);
 
-        return (-1, null, false);
-    }
+                return (-1, null, false);
+            }
 
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing)
-            OnDispose?.DynamicInvoke();
-        base.Dispose(disposing);
-    }
+            protected override void Dispose(bool disposing)
+            {
+                if (disposing)
+                    OnDispose?.DynamicInvoke();
+                base.Dispose(disposing);
+            }
 
-    protected override void OnFontChanged(EventArgs e)
-    {
-        base.OnFontChanged(e);
-        OnInvalidateFonts?.DynamicInvoke();
-    }
-}
+            protected override void OnFontChanged(EventArgs e)
+            {
+                base.OnFontChanged(e);
+                OnInvalidateFonts?.DynamicInvoke();
+            }
+        }
     }
 }
