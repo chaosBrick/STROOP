@@ -122,6 +122,24 @@ namespace STROOP.Controls
                     bool shiftHeld = KeyboardUtilities.IsShiftHeld();
                     clickedName = _select | shiftHeld;
 
+                    if (_reorderingWatchVarControls.Count > 0)
+                    {
+                        foreach (var toBeRemoved in _reorderingWatchVarControls)
+                        {
+                            if (_shownWatchVarControls.IndexOf(toBeRemoved) < index)
+                                index--;
+                            _shownWatchVarControls.Remove(toBeRemoved);
+                        }
+                        if (index < 0)
+                            index = _shownWatchVarControls.Count;
+                        else if (index > _shownWatchVarControls.Count)
+                            index = _shownWatchVarControls.Count;
+                        _shownWatchVarControls.InsertRange(index, _reorderingWatchVarControls);
+
+                        _reorderingWatchVarControls.Clear();
+                        return;
+                    }
+
                     var numSelected = _selectedWatchVarControls.Count;
                     if (!ctrlHeld && (numSelected == 1 || __.Button != MouseButtons.Right))
                         UnselectAllVariables();
@@ -297,6 +315,12 @@ namespace STROOP.Controls
             ToolStripMenuItem item = new ToolStripMenuItem(varGroup.ToString());
             item.Click += (sender, e) => ToggleVarGroupVisibility(varGroup);
             return item;
+        }
+
+        public void BeginMoveSelected()
+        {
+            _reorderingWatchVarControls.Clear();
+            _reorderingWatchVarControls.AddRange(_selectedWatchVarControls);
         }
 
         private void ToggleVarGroupVisibility(string varGroup, bool? newVisibilityNullable = null)
@@ -481,50 +505,6 @@ namespace STROOP.Controls
         {
             DialogUtilities.SaveXmlElements(
                 FileType.StroopVariables, "VarData", GetCurrentVarXmlElements(), fileName);
-        }
-
-        public void NotifyOfReordering(WatchVariableControl watchVarControl)
-        {
-            if (_reorderingWatchVarControls.Count == 0)
-            {
-                NotifyOfReorderingStart(new List<WatchVariableControl>() { watchVarControl });
-            }
-            else
-            {
-                NotifyOfReorderingEnd(new List<WatchVariableControl>() { watchVarControl });
-            }
-        }
-
-        public void NotifyOfReorderingStart(List<WatchVariableControl> watchVarControls)
-        {
-            if (watchVarControls.Count == 0) return;
-
-            _reorderingWatchVarControls.Clear();
-            _reorderingWatchVarControls.AddRange(watchVarControls);
-            _reorderingWatchVarControls.ForEach(control => control.FlashColor(WatchVariableControl.REORDER_START_COLOR));
-        }
-
-        public void NotifyOfReorderingEnd(List<WatchVariableControl> watchVarControls)
-        {
-            throw new NotImplementedException("What is this even lmao");
-            //if (watchVarControls.Count == 0) return;
-
-            //int newIndex = Controls.IndexOf(watchVarControls[0]);
-            //_reorderingWatchVarControls.ForEach(control => Controls.Remove(control));
-            //_reorderingWatchVarControls.ForEach(control => Controls.Add(control));
-            //for (int i = 0; i < _reorderingWatchVarControls.Count; i++)
-            //{
-            //    Controls.SetChildIndex(_reorderingWatchVarControls[i], newIndex + i);
-            //    _reorderingWatchVarControls[i].FlashColor(WatchVariableControl.REORDER_END_COLOR);
-            //}
-            //_reorderingWatchVarControls.Clear();
-        }
-
-        public void NotifyOfReorderingClear()
-        {
-            _reorderingWatchVarControls.ForEach(
-                control => control.FlashColor(WatchVariableControl.REORDER_RESET_COLOR));
-            _reorderingWatchVarControls.Clear();
         }
 
         //TODO: Maybe just enumerate instead of returning a list copy

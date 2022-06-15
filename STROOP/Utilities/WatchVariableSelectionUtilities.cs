@@ -312,17 +312,9 @@ namespace STROOP.Structs
             itemList.Add(itemSetCascadingValues);
             itemList.Add(new ToolStripSeparator());
 
-            ToolStripMenuItem itemMove = new ToolStripMenuItem("Move...");
-            ControlUtilities.AddDropDownItems(
-                itemMove,
-                new List<string>() { "Start Move", "End Move", "Clear Move" },
-                new List<Action>()
-                {
-                    () => panel.NotifyOfReorderingStart(vars),
-                    () => panel.NotifyOfReorderingEnd(vars),
-                    () => panel.NotifyOfReorderingClear(),
-                });
-            itemList.Add(itemMove);
+            var itemReorder = new ToolStripMenuItem("Move");
+            itemReorder.Click += (sender, e) => panel.BeginMoveSelected();
+            itemList.Add(itemReorder);
 
             ToolStripMenuItem itemRemove = new ToolStripMenuItem("Remove");
             itemRemove.Click += (sender, e) => panel.RemoveVariables(vars);

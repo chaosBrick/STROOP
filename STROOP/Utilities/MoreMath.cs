@@ -1,17 +1,16 @@
-﻿using OpenTK;
-using STROOP.Structs;
+﻿using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 
 namespace STROOP.Utilities
 {
     public static class MoreMath
     {
+        public static float EaseIn(float f) => 1 - 1 / (float)Math.Exp(f);
+
         public static int Sign(double value)
         {
             if (value == 0 || double.IsNaN(value)) return 0;

@@ -126,8 +126,6 @@ namespace STROOP.Tabs.GhostTab
         float yTargetPosition;
         int lastGlobalTimer;
 
-        static float EaseIn(float f) => 1 - 1 / (float)Math.Exp(f);
-
         bool updateGhostData => ghostHack.Enabled;
 
         public IEnumerable<PositionAngle> GetGhosts()
@@ -216,7 +214,7 @@ namespace STROOP.Tabs.GhostTab
                     if (globalTimer < lastGlobalTimer)
                         yTargetPosition = marioPosition.Y;
                     else
-                        yTargetPosition += (marioPosition.Y + 200 - yTargetPosition) * EaseIn((globalTimer - lastGlobalTimer) / 10.0f);
+                        yTargetPosition += (marioPosition.Y + 200 - yTargetPosition) * MoreMath.EaseIn((globalTimer - lastGlobalTimer) / 10.0f);
 
                     for (int tm = 0; tm < 0x80; tm++)
                     {

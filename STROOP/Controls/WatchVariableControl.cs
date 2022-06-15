@@ -266,11 +266,6 @@ namespace STROOP.Controls
                 containingPanel.UnselectAllVariables();
                 RemoveFromPanel();
             }
-            else if (isXKeyHeld)
-            {
-                containingPanel.UnselectAllVariables();
-                NotifyPanelOfReodering();
-            }
             else if (isBacktickHeld)
             {
                 containingPanel.UnselectAllVariables();
@@ -480,12 +475,7 @@ namespace STROOP.Controls
             //Config.VarHackManager.AddVariable(this);
             FlashColor(ADD_TO_VAR_HACK_TAB_COLOR);
         }
-
-        public void NotifyPanelOfReodering()
-        {
-            containingPanel.NotifyOfReordering(this);
-        }
-
+        
         public void ToggleFixedAddress()
         {
             if (FixedAddressListGetter() == null)
