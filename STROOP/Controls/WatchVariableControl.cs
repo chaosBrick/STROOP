@@ -42,7 +42,6 @@ namespace STROOP.Controls
         }
 
         public Color currentColor { get; private set; }
-        public Color textColor { get; private set; }
 
         private bool _isFlashing;
         private DateTime _flashStartTime;
@@ -50,7 +49,7 @@ namespace STROOP.Controls
 
         public string VarName;
 
-        public Color BorderColor;
+        public Color HighlightColor = Color.Red;
         public bool Highlighted;
 
         public bool RenameMode;
@@ -64,7 +63,7 @@ namespace STROOP.Controls
         private static readonly Image _someLockedImage = Properties.Resources.img_lock_grey;
         private static readonly Image _disabledLockImage = Properties.Resources.lock_blue;
         private static readonly Image _pinnedImage = Properties.Resources.img_pin;
-        
+
         public static readonly int DEFAULT_VARIABLE_NAME_WIDTH = 120;
         public static readonly int DEFAULT_VARIABLE_VALUE_WIDTH = 85;
         public static readonly int DEFAULT_VARIABLE_HEIGHT = 20;
@@ -76,7 +75,7 @@ namespace STROOP.Controls
         public static int VariableHeight = DEFAULT_VARIABLE_HEIGHT;
         public static int VariableTextSize = DEFAULT_VARIABLE_TEXT_SIZE;
         public static int VariableOffset = DEFAULT_VARIABLE_OFFSET;
-        
+
         public WatchVariableControl(WatchVariablePanel panel, WatchVariable watchVar)
             : this(panel, watchVar, watchVar.view) { }
 
@@ -122,7 +121,7 @@ namespace STROOP.Controls
             //_nameTextBox.Click += (sender, e) => OnVariableClick();
             //_nameTextBox.DoubleClick += (sender, e) => OnNameTextBoxDoubleClick();
             //_nameTextBox.KeyDown += (sender, e) => OnNameTextValueKeyDown(e);
-            
+
             //MouseDown += ShowMainContextMenu;
             //_namePanel.MouseDown += ShowMainContextMenu;
 
@@ -171,126 +170,6 @@ namespace STROOP.Controls
                 }
             }
             ctx.Show(System.Windows.Forms.Cursor.Position);
-        }
-
-        private void OnVariableClick()
-        {
-            bool isCtrlKeyHeld = KeyboardUtilities.IsCtrlHeld();
-            bool isShiftKeyHeld = KeyboardUtilities.IsShiftHeld();
-            bool isAltKeyHeld = KeyboardUtilities.IsAltHeld();
-            bool isFKeyHeld = Keyboard.IsKeyDown(Key.F);
-            bool isHKeyHeld = Keyboard.IsKeyDown(Key.H);
-            bool isLKeyHeld = Keyboard.IsKeyDown(Key.L);
-            bool isDKeyHeld = Keyboard.IsKeyDown(Key.D);
-            bool isRKeyHeld = Keyboard.IsKeyDown(Key.R);
-            bool isCKeyHeld = Keyboard.IsKeyDown(Key.C);
-            bool isBKeyHeld = Keyboard.IsKeyDown(Key.B);
-            bool isQKeyHeld = Keyboard.IsKeyDown(Key.Q);
-            bool isOKeyHeld = Keyboard.IsKeyDown(Key.O);
-            bool isTKeyHeld = Keyboard.IsKeyDown(Key.T);
-            bool isMKeyHeld = Keyboard.IsKeyDown(Key.M);
-            bool isNKeyHeld = Keyboard.IsKeyDown(Key.N);
-            bool isPKeyHeld = Keyboard.IsKeyDown(Key.P);
-            bool isXKeyHeld = Keyboard.IsKeyDown(Key.X);
-            bool isSKeyHeld = Keyboard.IsKeyDown(Key.S);
-            bool isDeletishKeyHeld = KeyboardUtilities.IsDeletishKeyHeld();
-            bool isBacktickHeld = Keyboard.IsKeyDown(Key.OemTilde);
-            bool isZHeld = Keyboard.IsKeyDown(Key.Z);
-            bool isMinusHeld = Keyboard.IsKeyDown(Key.OemMinus);
-            bool isPlusHeld = Keyboard.IsKeyDown(Key.OemPlus);
-            bool isNumberHeld = KeyboardUtilities.IsNumberHeld();
-
-            if (isShiftKeyHeld && isNumberHeld)
-            {
-                containingPanel.UnselectAllVariables();
-                BaseColor = ColorUtilities.GetColorForVariable();
-            }
-            //else if (isSKeyHeld)
-            //{
-            //    _watchVariablePanel.UnselectAllVariables();
-            //    AddToTab(Config.CustomManager);
-            //}
-            //else if (isTKeyHeld)
-            //{
-            //    _watchVariablePanel.UnselectAllVariables();
-            //    AddToTab(Config.TasManager);
-            //}
-            //else if (isMKeyHeld)
-            //{
-            //    _watchVariablePanel.UnselectAllVariables();
-            //    AddToTab(Config.MemoryManager);
-            //}
-            else if (isNKeyHeld)
-            {
-                containingPanel.UnselectAllVariables();
-                WatchVarWrapper.ViewInMemoryTab();
-            }
-            else if (isFKeyHeld)
-            {
-                containingPanel.UnselectAllVariables();
-                ToggleFixedAddress();
-            }
-            else if (isHKeyHeld)
-            {
-                containingPanel.UnselectAllVariables();
-                ToggleHighlighted();
-            }
-            else if (isNumberHeld)
-            {
-                containingPanel.UnselectAllVariables();
-                Color? color = ColorUtilities.GetColorForHighlight();
-                ToggleHighlighted(color);
-            }
-            else if (isLKeyHeld)
-            {
-                containingPanel.UnselectAllVariables();
-                WatchVarWrapper.ToggleLocked(null, FixedAddressListGetter());
-            }
-            else if (isDKeyHeld)
-            {
-                containingPanel.UnselectAllVariables();
-                WatchVarWrapper.ToggleDisplayAsHex();
-            }
-            else if (isCKeyHeld)
-            {
-                containingPanel.UnselectAllVariables();
-                WatchVarWrapper.ShowControllerForm();
-            }
-            else if (isBKeyHeld)
-            {
-                containingPanel.UnselectAllVariables();
-                WatchVarWrapper.ShowBitForm();
-            }
-            else if (isDeletishKeyHeld)
-            {
-                containingPanel.UnselectAllVariables();
-                RemoveFromPanel();
-            }
-            else if (isBacktickHeld)
-            {
-                containingPanel.UnselectAllVariables();
-                AddToVarHackTab();
-            }
-            else if (isZHeld)
-            {
-                containingPanel.UnselectAllVariables();
-                SetValue(0);
-            }
-            else if (isQKeyHeld)
-            {
-                containingPanel.UnselectAllVariables();
-                Color? newColor = ColorUtilities.GetColorFromDialog(BaseColor);
-                if (newColor.HasValue)
-                {
-                    BaseColor = newColor.Value;
-                    ColorUtilities.LastCustomColor = newColor.Value;
-                }
-            }
-            else if (isOKeyHeld)
-            {
-                containingPanel.UnselectAllVariables();
-                BaseColor = ColorUtilities.LastCustomColor;
-            }
         }
 
         private void OnNameTextBoxDoubleClick()
@@ -398,8 +277,6 @@ namespace STROOP.Controls
             {
                 currentColor = selectedOrBaseColor;
             }
-
-            textColor = IsSelected ? Color.White : Color.Black;
         }
 
         public void FlashColor(Color color)
@@ -470,12 +347,6 @@ namespace STROOP.Controls
             return AddToTabTypeEnum.Regular;
         }
 
-        public void AddToVarHackTab()
-        {
-            //Config.VarHackManager.AddVariable(this);
-            FlashColor(ADD_TO_VAR_HACK_TAB_COLOR);
-        }
-        
         public void ToggleFixedAddress()
         {
             if (FixedAddressListGetter() == null)
@@ -504,38 +375,9 @@ namespace STROOP.Controls
 
         public void ToggleHighlighted(Color? color = null)
         {
-            throw new NotImplementedException();
-            //if (color.HasValue)
-            //{
-            //    if (_tableLayoutPanel.ShowBorder)
-            //    {
-            //        if (_tableLayoutPanel.BorderColor == color.Value)
-            //        {
-            //            _tableLayoutPanel.ShowBorder = false;
-            //        }
-            //        else
-            //        {
-            //            _tableLayoutPanel.BorderColor = color.Value;
-            //        }
-            //    }
-            //    else
-            //    {
-            //        _tableLayoutPanel.BorderColor = color.Value;
-            //        _tableLayoutPanel.ShowBorder = true;
-            //    }
-            //}
-            //else
-            //{
-            //    if (_tableLayoutPanel.ShowBorder)
-            //    {
-            //        _tableLayoutPanel.ShowBorder = false;
-            //    }
-            //    else
-            //    {
-            //        _tableLayoutPanel.BorderColor = Color.Red;
-            //        _tableLayoutPanel.ShowBorder = true;
-            //    }
-            //}
+            Highlighted = color != null ? true : !Highlighted;
+            if (color != null)
+                HighlightColor = color.Value;
         }
 
         public Type GetMemoryType()

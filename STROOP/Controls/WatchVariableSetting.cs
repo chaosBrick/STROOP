@@ -83,22 +83,22 @@ namespace STROOP.Controls
                     {
                         if (obj is Color newColor)
                         {
-                            ctrl.BorderColor = newColor;
+                            ctrl.HighlightColor = newColor;
                             ctrl.Highlighted = true;
                         }
                         else return false;
                         return true;
                     },
-                    ("Red", () => Color.Red, ctrl => ctrl.BorderColor == Color.Red),
-                    ("Orange", () => Color.Orange, ctrl => ctrl.BorderColor == Color.Orange),
-                    ("Yellow", () => Color.Yellow, ctrl => ctrl.BorderColor == Color.Yellow),
-                    ("Green", () => Color.Green, ctrl => ctrl.BorderColor == Color.Green),
-                    ("Blue", () => Color.Blue, ctrl => ctrl.BorderColor == Color.Blue),
-                    ("Purple", () => Color.Purple, ctrl => ctrl.BorderColor == Color.Purple),
-                    ("Pink", () => Color.Pink, ctrl => ctrl.BorderColor == Color.Pink),
-                    ("Brown", () => Color.Brown, ctrl => ctrl.BorderColor == Color.Brown),
-                    ("Black", () => Color.Black, ctrl => ctrl.BorderColor == Color.Black),
-                    ("White", () => Color.White, ctrl => ctrl.BorderColor == Color.White)
+                    ("Red", () => Color.Red, ctrl => ctrl.HighlightColor == Color.Red),
+                    ("Orange", () => Color.Orange, ctrl => ctrl.HighlightColor == Color.Orange),
+                    ("Yellow", () => Color.Yellow, ctrl => ctrl.HighlightColor == Color.Yellow),
+                    ("Green", () => Color.Green, ctrl => ctrl.HighlightColor == Color.Green),
+                    ("Blue", () => Color.Blue, ctrl => ctrl.HighlightColor == Color.Blue),
+                    ("Purple", () => Color.Purple, ctrl => ctrl.HighlightColor == Color.Purple),
+                    ("Pink", () => Color.Pink, ctrl => ctrl.HighlightColor == Color.Pink),
+                    ("Brown", () => Color.Brown, ctrl => ctrl.HighlightColor == Color.Brown),
+                    ("Black", () => Color.Black, ctrl => ctrl.HighlightColor == Color.Black),
+                    ("White", () => Color.White, ctrl => ctrl.HighlightColor == Color.White)
                     );
 
             public static readonly WatchVariableSetting LockSetting = new WatchVariableSetting(

@@ -72,12 +72,12 @@ namespace STROOP.Controls
             }
 
             delegate void OnDemandCall();
-            OnDemandCall OnDispose, OnInvalidateFonts;
+            OnDemandCall OnDispose = null, OnInvalidateFonts = null;
 
             BufferedGraphics bufferedGraphics = null;
 
             OnDemand<Font> varNameFont;
-            OnDemand<Pen> cellBorderPen, cellSeparatorPen;
+            OnDemand<Pen> cellBorderPen, cellSeparatorPen, insertionMarkerPen;
             OnDemand<StringFormat> rightAlignFormat;
 
             WatchVariablePanel target;
@@ -99,12 +99,8 @@ namespace STROOP.Controls
                 varNameFont = new OnDemand<Font>(OnDispose, () => new Font(DefaultFont, FontStyle.Bold), OnInvalidateFonts);
                 cellBorderPen = new OnDemand<Pen>(OnDispose, () => new Pen(Color.Gray, 2));
                 cellSeparatorPen = new OnDemand<Pen>(OnDispose, () => new Pen(Color.Gray, 1));
-                rightAlignFormat = new OnDemand<StringFormat>(OnDispose, () =>
-                {
-                    var fmt = new StringFormat();
-                    fmt.Alignment = StringAlignment.Far;
-                    return fmt;
-                });
+                insertionMarkerPen = new OnDemand<Pen>(OnDispose, () => new Pen(Color.Blue, 3));
+                rightAlignFormat = new OnDemand<StringFormat>(OnDispose, () => new StringFormat() { Alignment = StringAlignment.Far });
             }
 
             protected override void OnPaint(PaintEventArgs e)
@@ -215,11 +211,30 @@ namespace STROOP.Controls
                         var yCoord = dy * elementHeight;
                         g.DrawLine(cellBorderPen, 0, yCoord, dy <= (y + 1) ? maxX : maxX - elementWidth, yCoord);
                     }
+
+                    ResetIterators();
+                    foreach (var ctrl in target._shownWatchVarControls)
+                    {
+                        GetColumn(elementNameWidth, elementValueWidth, false);
+                        if (ctrl.Highlighted)
+                            using (var pen = new Pen(ctrl.HighlightColor, 3))
+                                g.DrawRectangle(pen, x * elementWidth, y * elementHeight, elementWidth, elementHeight);
+                    }
                 }
                 void DrawMovingVariables()
                 {
+                    if (target._reorderingWatchVarControls.Count == 0)
+                        return;
+
                     var pt = PointToClient(Cursor.Position);
                     var cursorPosition = new Vector2(pt.X, pt.Y);
+                    (var insertionIndex, _, _) = GetVariableAt(pt);
+                    if (insertionIndex < 0)
+                        insertionIndex = target._shownWatchVarControls.Count;
+                    var x = insertionIndex / maxRows;
+                    var y = insertionIndex % maxRows;
+                    g.DrawLine(insertionMarkerPen, x * elementWidth, y * elementHeight, (x + 1) * elementWidth, y * elementHeight);
+
                     int i = 0;
                     foreach (var ctrl in target._reorderingWatchVarControls)
                     {
@@ -292,6 +307,8 @@ namespace STROOP.Controls
                 var y = location.Y / elementHeight;
                 int maxRows = (int)((target.Height - borderMargin * 2 - SystemInformation.HorizontalScrollBarHeight) / elementHeight);
                 int index = x * maxRows + y;
+                if (index < 0)
+                    return (0, null, false);
                 if (index < target._shownWatchVarControls.Count)
                     return (index, target._shownWatchVarControls[index], (location.X % elementWidth) < elementNameWidth);
 

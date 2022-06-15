@@ -9,6 +9,7 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using System.ComponentModel;
+using System.Windows.Input;
 
 namespace STROOP.Controls
 {
@@ -124,18 +125,20 @@ namespace STROOP.Controls
 
                     if (_reorderingWatchVarControls.Count > 0)
                     {
-                        foreach (var toBeRemoved in _reorderingWatchVarControls)
+                        if (__.Button == MouseButtons.Left)
                         {
-                            if (_shownWatchVarControls.IndexOf(toBeRemoved) < index)
-                                index--;
-                            _shownWatchVarControls.Remove(toBeRemoved);
+                            foreach (var toBeRemoved in _reorderingWatchVarControls)
+                            {
+                                if (_shownWatchVarControls.IndexOf(toBeRemoved) < index)
+                                    index--;
+                                _shownWatchVarControls.Remove(toBeRemoved);
+                            }
+                            if (index < 0)
+                                index = _shownWatchVarControls.Count;
+                            else if (index > _shownWatchVarControls.Count)
+                                index = _shownWatchVarControls.Count;
+                            _shownWatchVarControls.InsertRange(index, _reorderingWatchVarControls);
                         }
-                        if (index < 0)
-                            index = _shownWatchVarControls.Count;
-                        else if (index > _shownWatchVarControls.Count)
-                            index = _shownWatchVarControls.Count;
-                        _shownWatchVarControls.InsertRange(index, _reorderingWatchVarControls);
-
                         _reorderingWatchVarControls.Clear();
                         return;
                     }
@@ -174,6 +177,8 @@ namespace STROOP.Controls
                             var.IsSelected = true;
                         }
                     }
+                    if (__.Button == MouseButtons.Left)
+                        OnVariableClick(_selectedWatchVarControls.ToList());
 
                     if (__.Button == MouseButtons.Right)
                     {
@@ -198,6 +203,140 @@ namespace STROOP.Controls
 
                 ResumeLayout();
             });
+        }
+
+        private void OnVariableClick(List<WatchVariableControl> watchVars)
+        {
+            if (watchVars.Count == 0)
+                return;
+
+            bool isCtrlKeyHeld = KeyboardUtilities.IsCtrlHeld();
+            bool isShiftKeyHeld = KeyboardUtilities.IsShiftHeld();
+            bool isAltKeyHeld = KeyboardUtilities.IsAltHeld();
+            bool isFKeyHeld = Keyboard.IsKeyDown(Key.F);
+            bool isHKeyHeld = Keyboard.IsKeyDown(Key.H);
+            bool isLKeyHeld = Keyboard.IsKeyDown(Key.L);
+            bool isDKeyHeld = Keyboard.IsKeyDown(Key.D);
+            bool isRKeyHeld = Keyboard.IsKeyDown(Key.R);
+            bool isCKeyHeld = Keyboard.IsKeyDown(Key.C);
+            bool isBKeyHeld = Keyboard.IsKeyDown(Key.B);
+            bool isQKeyHeld = Keyboard.IsKeyDown(Key.Q);
+            bool isOKeyHeld = Keyboard.IsKeyDown(Key.O);
+            bool isTKeyHeld = Keyboard.IsKeyDown(Key.T);
+            bool isMKeyHeld = Keyboard.IsKeyDown(Key.M);
+            bool isNKeyHeld = Keyboard.IsKeyDown(Key.N);
+            bool isPKeyHeld = Keyboard.IsKeyDown(Key.P);
+            bool isXKeyHeld = Keyboard.IsKeyDown(Key.X);
+            bool isSKeyHeld = Keyboard.IsKeyDown(Key.S);
+            bool isDeletishKeyHeld = KeyboardUtilities.IsDeletishKeyHeld();
+            bool isBacktickHeld = Keyboard.IsKeyDown(Key.OemTilde);
+            bool isZHeld = Keyboard.IsKeyDown(Key.Z);
+            bool isMinusHeld = Keyboard.IsKeyDown(Key.OemMinus);
+            bool isPlusHeld = Keyboard.IsKeyDown(Key.OemPlus);
+            bool isNumberHeld = KeyboardUtilities.IsNumberHeld();
+
+            if (isShiftKeyHeld && isNumberHeld)
+            {
+                UnselectAllVariables();
+                watchVars.ForEach(watchVar => watchVar.BaseColor = ColorUtilities.GetColorForVariable());
+            }
+            //else if (isSKeyHeld)
+            //{
+            //    containingPanel.UnselectAllVariables();
+            //    AddToTab(Config.CustomManager);
+            //}
+            //else if (isTKeyHeld)
+            //{
+            //    containingPanel.UnselectAllVariables();
+            //    AddToTab(Config.TasManager);
+            //}
+            //else if (isMKeyHeld)
+            //{
+            //    containingPanel.UnselectAllVariables();
+            //    AddToTab(Config.MemoryManager);
+            //}
+            else if (isNKeyHeld)
+            {
+                UnselectAllVariables();
+                watchVars.ForEach(watchVar => watchVar.WatchVarWrapper.ViewInMemoryTab());
+            }
+            else if (isFKeyHeld)
+            {
+                UnselectAllVariables();
+                watchVars.ForEach(watchVar => watchVar.ToggleFixedAddress());
+            }
+            else if (isHKeyHeld)
+            {
+                UnselectAllVariables();
+                watchVars.ForEach(watchVar => watchVar.ToggleHighlighted());
+            }
+            else if (isNumberHeld)
+            {
+                UnselectAllVariables();
+                Color? color = ColorUtilities.GetColorForHighlight();
+                watchVars.ForEach(watchVar => watchVar.ToggleHighlighted(color));
+            }
+            else if (isLKeyHeld)
+            {
+                UnselectAllVariables();
+                watchVars.ForEach(watchVar => watchVar.WatchVarWrapper.ToggleLocked(null, watchVar.FixedAddressListGetter()));
+            }
+            else if (isDKeyHeld)
+            {
+                UnselectAllVariables();
+                watchVars.ForEach(watchVar => watchVar.WatchVarWrapper.ToggleDisplayAsHex());
+            }
+            else if (isCKeyHeld)
+            {
+                UnselectAllVariables();
+                watchVars.Last().WatchVarWrapper.ShowControllerForm();
+            }
+            else if (isBKeyHeld)
+            {
+                UnselectAllVariables();
+                watchVars.Last().WatchVarWrapper.ShowBitForm();
+            }
+            else if (isDeletishKeyHeld)
+            {
+                UnselectAllVariables();
+                RemoveVariables(watchVars);
+            }
+            else if (isBacktickHeld)
+            {
+                UnselectAllVariables();
+                AddToVarHackTab(watchVars);
+            }
+            else if (isZHeld)
+            {
+                UnselectAllVariables();
+                watchVars.ForEach(watchVar => watchVar.SetValue(0));
+            }
+            else if (isXKeyHeld)
+            {
+                BeginMoveSelected();
+            }
+            else if (isQKeyHeld)
+            {
+                UnselectAllVariables();
+                Color? newColor = ColorUtilities.GetColorFromDialog(watchVars.First().BaseColor);
+                if (newColor.HasValue)
+                {
+                    watchVars.ForEach(watchVar => watchVar.BaseColor = newColor.Value);
+                    ColorUtilities.LastCustomColor = newColor.Value;
+                }
+            }
+            else if (isOKeyHeld)
+            {
+                UnselectAllVariables();
+                watchVars.ForEach(watchVar => watchVar.BaseColor = ColorUtilities.LastCustomColor);
+            }
+        }
+
+        void AddToVarHackTab(List<WatchVariableControl> watchVars)
+        {
+            foreach (var watchVar in watchVars)
+                watchVar.FlashColor(WatchVariableControl.ADD_TO_VAR_HACK_TAB_COLOR);
+            MessageBox.Show("Not implemented :D");
         }
 
         public void DeferredInitialize()
@@ -307,7 +446,7 @@ namespace STROOP.Controls
             strip.Items.Add(openSaveClearItem);
             strip.Items.Add(doToAllVariablesItem);
             strip.Items.Add(filterVariablesItem);
-            strip.Show(Cursor.Position);
+            strip.Show(System.Windows.Forms.Cursor.Position);
         }
 
         private ToolStripMenuItem CreateFilterItem(string varGroup)
@@ -386,7 +525,6 @@ namespace STROOP.Controls
             foreach (WatchVariableControl watchVarControl in watchVarControls)
             {
                 _reorderingWatchVarControls.Remove(watchVarControl);
-
                 _allWatchVarControls.Remove(watchVarControl);
                 _shownWatchVarControls.Remove(watchVarControl);
             }
