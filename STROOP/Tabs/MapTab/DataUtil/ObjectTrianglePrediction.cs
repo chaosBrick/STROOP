@@ -12,7 +12,7 @@ namespace STROOP.Tabs.MapTab.DataUtil
 {
     public class ObjectTrianglePrediction
     {
-        //each collisionData entry is u16
+        //each collisionData entry is s16
         const uint collisionDataSize = 2;
 
         bool showingPredictions = false;
@@ -22,7 +22,7 @@ namespace STROOP.Tabs.MapTab.DataUtil
         MapObject.PositionAngleProvider positionAngleProvider;
         Predicate<TriangleDataModel> filter = null;
         uint lastGlobalTimer;
-        Dictionary<uint, Dictionary<uint, (int, int, int)>> faceAngles = new Dictionary<uint, Dictionary<uint, (int, int, int)>>();
+        Dictionary<uint, Dictionary<uint, (int, int, int)>> cachedFaceAngles = new Dictionary<uint, Dictionary<uint, (int, int, int)>>();
 
         public ObjectTrianglePrediction(MapObject.PositionAngleProvider positionAngleProvider, Predicate<TriangleDataModel> filter)
         {
@@ -68,7 +68,7 @@ namespace STROOP.Tabs.MapTab.DataUtil
                     }
                 }
                 if (faceAngles.Count > 0)
-                    this.faceAngles[globalTimer] = faceAngles;
+                    this.cachedFaceAngles[globalTimer] = faceAngles;
 
                 var predictions = ComputeNewTriangles(positionAngleProvider, globalTimerMinus1);
 
@@ -109,19 +109,19 @@ namespace STROOP.Tabs.MapTab.DataUtil
 
                 var oFlags = Config.Stream.GetInt32(objAddress + 0x8C);
                 int angleX, angleY, angleZ;
-                if ((oFlags & (1 << 4)) != 0)
-                {//OBJ_FLAG_SET_FACE_ANGLE_TO_MOVE_ANGLE
-                    if (faceAngles.TryGetValue(gTimerMinus1, out var knack) && knack.TryGetValue(objAddress, out var knock))
-                    {
-                        angleX = knock.Item1;
-                        angleY = knock.Item2;
-                        angleZ = knock.Item3;
-                    }
-                    else
-                        return triangleList;
+
+                
+                if ((oFlags & (1 << 4)) != 0 //OBJ_FLAG_SET_FACE_ANGLE_TO_MOVE_ANGLE
+                    && cachedFaceAngles.TryGetValue(gTimerMinus1, out var cacheDictionary)
+                    && cacheDictionary.TryGetValue(objAddress, out var cached))
+                {
+                    angleX = cached.Item1;
+                    angleY = cached.Item2;
+                    angleZ = cached.Item3;
                 }
                 else
                 {
+                    //Still better than nothing if the object isn't moving (awkwardly, e.g. Spindel)
                     angleX = Config.Stream.GetInt32(objAddress + 0xD0);
                     angleY = Config.Stream.GetInt32(objAddress + 0xD4);
                     angleZ = Config.Stream.GetInt32(objAddress + 0xD8);
@@ -217,7 +217,14 @@ namespace STROOP.Tabs.MapTab.DataUtil
             ny *= mag;
             nz *= mag;
 
-            return new TriangleDataModel((x1, y1, z1), (x2, y2, z2), (x3, y3, z3));
+            return new VirtualTriangleDataModel(x1, y1, z1, x2, y2, z2, x3, y3, z3);
+        }
+
+        class VirtualTriangleDataModel : TriangleDataModel
+        {
+            static uint virtualTriangleAddrIndex = 1;
+            public VirtualTriangleDataModel(int x1, int y1, int z1, int x2, int y2, int z2, int x3, int y3, int z3)
+            : base(0xFF000000 | virtualTriangleAddrIndex++, x1, y1, z1, x2, y2, z2, x3, y3, z3) { }
         }
 
         /**

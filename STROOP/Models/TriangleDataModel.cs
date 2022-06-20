@@ -107,6 +107,12 @@ namespace STROOP.Models
             return _cache[triangleAddress];
         }
 
+        protected TriangleDataModel(uint virtualAddress, int x1, int y1, int z1, int x2, int y2, int z2, int x3, int y3, int z3)
+            : this(x1, y1, z1, x2, y2, z2, x3, y3, z3)
+        {
+            Address = virtualAddress;
+        }
+
         private TriangleDataModel(uint triangleAddress)
         {
             Address = triangleAddress;
