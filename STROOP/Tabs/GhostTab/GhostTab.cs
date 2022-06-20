@@ -372,10 +372,13 @@ namespace STROOP.Tabs.GhostTab
             labelNumFrames.Text = $"Number of frames: {numFramesValue ?? "-"}";
             labelGhostPlaybackStart.Text = $"Original playback start: {originalPlaybackStartValue ?? "-"}";
 
+            suspendStartOfPlaybackChanged = true;
             if (uint.TryParse(playbackStartValue, out uint val))
                 numericUpDownStartOfPlayback.Value = val;
-            else if (numericUpDownStartOfPlayback.Controls[1] is TextBox txt)
-                txt.Text = "<Multiple values>";
+
+            if (numericUpDownStartOfPlayback.Controls[1] is TextBox txt)
+                txt.Text = playbackStartValue ?? "<No value>";
+            suspendStartOfPlaybackChanged = false;
 
             suspendNameChanged = true;
             textBoxGhostName.Text = nameValue;
@@ -420,9 +423,11 @@ Are you sure you want to continue?";
             }
         }
 
+        bool suspendStartOfPlaybackChanged;
         private void numericUpDownStartOfPlayback_ValueChanged(object sender, EventArgs e)
         {
-            SetStartOfPlayback((uint)numericUpDownStartOfPlayback.Value);
+            if (!suspendStartOfPlaybackChanged)
+                SetStartOfPlayback((uint)numericUpDownStartOfPlayback.Value);
         }
 
         bool suspendNameChanged;
