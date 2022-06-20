@@ -107,25 +107,7 @@ namespace STROOP.Controls
             currentColor = _baseColor;
             _isFlashing = false;
             _flashStartTime = DateTime.Now;
-
-            //TODO: implement these
-            // Add functions
-            //_namePanel.Click += (sender, e) => OnVariableClick();
-            //_namePanel.DoubleClick += (sender, e) => OnNameTextBoxDoubleClick();
-
-            //_nameTextBox.Click += (sender, e) => OnVariableClick();
-            //_nameTextBox.DoubleClick += (sender, e) => OnNameTextBoxDoubleClick();
-            //_nameTextBox.KeyDown += (sender, e) => OnNameTextValueKeyDown(e);
-
-            //MouseDown += ShowMainContextMenu;
-            //_namePanel.MouseDown += ShowMainContextMenu;
-
-            //_nameTextBox.MouseDown += (sender, e) =>
-            //{
-            //    if (e.Button == MouseButtons.Right)
-            //        ShowContextMenu();
-            //};
-
+            
             AddSetting(DefaultSettings.BackgroundColorSetting);
             AddSetting(DefaultSettings.HighlightColorSetting);
             AddSetting(DefaultSettings.FixAddressSetting);
