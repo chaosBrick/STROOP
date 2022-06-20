@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace STROOP.Utilities
 {
-    public class Wrapper<T> where T : struct
+    public class Wrapper<T>
     {
         public T value;
         public Wrapper() { }

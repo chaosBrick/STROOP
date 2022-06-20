@@ -16,14 +16,28 @@ namespace STROOP.Controls
     public partial class WatchVariablePanel : Panel
     {
         static float variablePanelSize = 8.5f;
+        static int variablePanelNameWidth = 120;
+        static int variablePanelValueWidth = 80;
 
         [InitializeSpecial]
         static void InitializeSpecial()
         {
             var target = WatchVariableSpecialUtilities.dictionary;
-            target.Add("WatchVarPanelSize", ((uint _) => (object)variablePanelSize, (object value, uint __) =>
+            target.Add("WatchVarPanelSize", ((uint _) => variablePanelSize, (object value, uint __) =>
             {
                 variablePanelSize = Convert.ToSingle(value);
+                return true;
+            }
+            ));
+            target.Add("WatchVarPanelNameWidth", ((uint _) => variablePanelNameWidth, (object value, uint __) =>
+            {
+                variablePanelNameWidth = Math.Max(1, (int)Convert.ToSingle(value));
+                return true;
+            }
+            ));
+            target.Add("WatchVarPanelValueWidth", ((uint _) => variablePanelValueWidth, (object value, uint __) =>
+            {
+                variablePanelValueWidth = Math.Max(1, (int)Convert.ToSingle(value));
                 return true;
             }
             ));
@@ -60,7 +74,10 @@ namespace STROOP.Controls
             set
             {
                 if (value != renderer.Font.Size)
+                {
+                    //renderer.Font?.Dispose();
                     renderer.Font = new Font(renderer.Font.FontFamily, value, renderer.Font.Style);
+                }
             }
         }
 

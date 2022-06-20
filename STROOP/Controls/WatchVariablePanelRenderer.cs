@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using OpenTK;
+using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 
 namespace STROOP.Controls
@@ -14,12 +15,14 @@ namespace STROOP.Controls
             class OnDemand<T> where T : IDisposable
             {
                 readonly Func<T> factory;
-                OnDemandCall disposeContext, invalidateContext;
-                public OnDemand(OnDemandCall disposeContext, Func<T> factory, OnDemandCall invalidateContext = null)
+                Wrapper<OnDemandCall> disposeContext, invalidateContext;
+                public OnDemand(Wrapper<OnDemandCall> disposeContext, Func<T> factory, Wrapper<OnDemandCall> invalidateContext = null)
                 {
                     this.factory = factory;
                     this.disposeContext = disposeContext;
-                    invalidateContext += InvalidateValue;
+                    this.invalidateContext = invalidateContext;
+                    if (invalidateContext != null)
+                        invalidateContext.value += InvalidateValue;
                 }
 
                 T _value;
@@ -33,7 +36,7 @@ namespace STROOP.Controls
                         {
                             _value = factory();
                             valueCreated = true;
-                            disposeContext += DisposeValue;
+                            disposeContext.value += DisposeValue;
                         }
                         return _value;
                     }
@@ -47,9 +50,9 @@ namespace STROOP.Controls
 
                 void DisposeValue()
                 {
-                    disposeContext -= DisposeValue;
+                    disposeContext.value -= DisposeValue;
                     if (invalidateContext != null)
-                        invalidateContext -= InvalidateValue;
+                        invalidateContext.value -= InvalidateValue;
                     _value?.Dispose();
                 }
 
@@ -102,7 +105,7 @@ namespace STROOP.Controls
             }
 
             delegate void OnDemandCall();
-            OnDemandCall OnDispose = null, OnInvalidateFonts = null;
+            Wrapper<OnDemandCall> OnDispose = new Wrapper<OnDemandCall>(), OnInvalidateFonts = new Wrapper<OnDemandCall>();
 
             BufferedGraphics bufferedGraphics = null;
 
@@ -111,15 +114,14 @@ namespace STROOP.Controls
             OnDemand<StringFormat> rightAlignFormat;
 
             WatchVariablePanel target;
-            bool invalidated = false;
 
             int borderMargin = 2;
             int elementMarginTopBottom = 2;
             int elementMarginLeftRight = 2;
             int elementHeight => Font.Height + 2 * elementMarginTopBottom;
 
-            int elementNameWidth = 120;
-            int elementValueWidth = 80;
+            int elementNameWidth => variablePanelNameWidth;
+            int elementValueWidth => variablePanelValueWidth;
             int elementWidth => elementNameWidth + elementValueWidth;
 
             public int GetMaxRows() => (target.Height - borderMargin * 2 - SystemInformation.HorizontalScrollBarHeight) / elementHeight;
@@ -196,6 +198,10 @@ namespace STROOP.Controls
                     if (maxRows == 0)
                         return;
 
+                    var cursorPos = PointToClient(Cursor.Position);
+                    cursorPos.X -= borderMargin;
+                    cursorPos.Y -= borderMargin;
+
                     void ResetIterators() { iterator = 0; lastColumn = -1; }
 
                     void GetColumn(int offset, int width, bool clip = true)
@@ -237,22 +243,29 @@ namespace STROOP.Controls
                         var txtPoint = new Point(x * elementWidth + elementMarginLeftRight, yCoord + elementMarginTopBottom);
                         var ctrlData = GetRenderData(ctrl);
 
-                        if (ctrlData.lastRenderedNameText != ctrl.VarName)
+                        if (cursorPos.Y > yCoord && cursorPos.Y < yCoord + elementHeight &&
+                            cursorPos.X > x * elementWidth && cursorPos.X < x * elementWidth + elementNameWidth) //Cursor is hovering over the name field
                         {
-                            var falla = g.PageUnit;
-                            g.PageUnit = GraphicsUnit.Pixel;
-                            ctrlData.nameTextLength = g.MeasureString(ctrl.VarName, varNameFont).Width;
-                            g.PageUnit = falla;
-                        }
+                            if (ctrlData.lastRenderedNameText != ctrl.VarName)
+                            {
+                                var tmp = g.PageUnit;
+                                g.PageUnit = GraphicsUnit.Pixel;
+                                ctrlData.nameTextLength = g.MeasureString(ctrl.VarName, varNameFont).Width;
+                                g.PageUnit = tmp;
+                                ctrlData.lastRenderedNameText = ctrl.VarName;
+                            }
 
-                        var overEdge = ctrlData.nameTextLength - (elementNameWidth - elementMarginLeftRight * 2);
-                        if (overEdge > 0)
-                        {
-                            ctrlData.nameTextOffset += (float)Config.Stream.lastFrameTime * elementHeight;
-                            if (ctrlData.nameTextOffset > overEdge + elementHeight * 2)
-                                ctrlData.nameTextOffset = 0;
-                            txtPoint.X -= (int)Math.Max(0, Math.Min(overEdge, ctrlData.nameTextOffset - elementHeight));
+                            var overEdge = ctrlData.nameTextLength - (elementNameWidth - elementMarginLeftRight * 2);
+                            if (overEdge > 0)
+                            {
+                                ctrlData.nameTextOffset += (float)Config.Stream.lastFrameTime * elementHeight;
+                                if (ctrlData.nameTextOffset > overEdge + elementHeight * 2)
+                                    ctrlData.nameTextOffset = 0;
+                                txtPoint.X -= (int)Math.Max(0, Math.Min(overEdge, ctrlData.nameTextOffset - elementHeight));
+                            }
                         }
+                        else
+                            ctrlData.nameTextOffset = 0;
                         g.DrawString(ctrl.VarName, varNameFont, ctrl.IsSelected ? Brushes.White : Brushes.Black, txtPoint);
                     }
 
@@ -407,14 +420,14 @@ namespace STROOP.Controls
             protected override void Dispose(bool disposing)
             {
                 if (disposing)
-                    OnDispose?.DynamicInvoke();
+                    OnDispose.value?.DynamicInvoke();
                 base.Dispose(disposing);
             }
 
             protected override void OnFontChanged(EventArgs e)
             {
                 base.OnFontChanged(e);
-                OnInvalidateFonts?.DynamicInvoke();
+                OnInvalidateFonts.value?.DynamicInvoke();
             }
         }
     }

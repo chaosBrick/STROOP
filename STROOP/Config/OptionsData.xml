@@ -7,5 +7,7 @@
   <Data base="None" specialType="FramesPerSecond">FPS</Data>
   <Data base="None" specialType="PositionControllerRelativity" subclass="String">Pos Controller Relativity</Data>
   <Data base="None" specialType="CustomReleaseStatus" useHex="true">Custom Release Status</Data>
-  <Data base="None" specialType="WatchVarPanelSize">Variable Panel Size</Data>
+  <Data base="None" specialType="WatchVarPanelSize">Variable Panel Font Size</Data>
+  <Data base="None" specialType="WatchVarPanelNameWidth">Variable Panel Name Width</Data>
+  <Data base="None" specialType="WatchVarPanelValueWidth">Variable Panel Value Width</Data>
 </VarData>
