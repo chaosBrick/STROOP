@@ -162,6 +162,11 @@ namespace STROOP.Controls
                 }
 
                 var g = bufferedGraphics.Graphics;
+                var visibleRegion = new Rectangle(
+                    target.HorizontalScroll.Value - borderMargin,
+                    -borderMargin,
+                    target.ClientRectangle.Width,
+                    target.ClientRectangle.Height);
 
                 void DrawLockAndFixImages(WatchVariableControl ctrl, int baseX, int baseY)
                 {
@@ -229,6 +234,13 @@ namespace STROOP.Controls
                         if (!ctrlData.moving)
                             ctrlData.positionWhileMoving = ctrlData.positionInGrid;
 
+                        //Skip if invisible
+                        if (x * elementWidth > visibleRegion.Right ||
+                            (x + 1) * elementWidth < visibleRegion.Left ||
+                            yCoord > visibleRegion.Bottom ||
+                            yCoord + elementHeight < visibleRegion.Top)
+                            continue;
+
                         var c = ctrl.IsSelected ? Color.Blue : ctrl.currentColor;
                         if (c != Color.FromKnownColor(KnownColor.Control))
                             using (var brush = new SolidBrush(c))
@@ -240,6 +252,14 @@ namespace STROOP.Controls
                     {
                         GetColumn(0, elementNameWidth);
                         var yCoord = y * elementHeight;
+
+                        //Skip if invisible
+                        if (x * elementWidth > visibleRegion.Right ||
+                            x * elementWidth + elementNameWidth < visibleRegion.Left ||
+                            yCoord > visibleRegion.Bottom ||
+                            yCoord + elementHeight < visibleRegion.Top)
+                            continue;
+
                         var txtPoint = new Point(x * elementWidth + elementMarginLeftRight, yCoord + elementMarginTopBottom);
                         var ctrlData = GetRenderData(ctrl);
 
@@ -273,9 +293,27 @@ namespace STROOP.Controls
                     foreach (var ctrl in target._shownWatchVarControls)
                     {
                         GetColumn(elementNameWidth, elementValueWidth);
+
+                        //Skip if invisible
                         var yCoord = y * elementHeight;
-                        var txtPoint = new Point((x + 1) * elementWidth - elementMarginLeftRight, yCoord + elementMarginTopBottom);
-                        g.DrawString(ctrl.WatchVarWrapper.GetValueText(), Font, ctrl.IsSelected ? Brushes.White : Brushes.Black, txtPoint, rightAlignFormat);
+                        if (x * elementWidth + elementNameWidth > visibleRegion.Right ||
+                            (x + 1) * elementWidth < visibleRegion.Left ||
+                            yCoord > visibleRegion.Bottom ||
+                            yCoord + elementHeight < visibleRegion.Top)
+                            continue;
+
+                        if (ctrl.WatchVarWrapper.CustomDrawOperation != null)
+                            ctrl.WatchVarWrapper.CustomDrawOperation(g,
+                                new Rectangle(
+                                    x * elementWidth + elementNameWidth,
+                                    y * elementHeight,
+                                    elementValueWidth,
+                                    elementHeight));
+                        else
+                        {
+                            var txtPoint = new Point((x + 1) * elementWidth - elementMarginLeftRight, yCoord + elementMarginTopBottom);
+                            g.DrawString(ctrl.WatchVarWrapper.GetValueText(), Font, ctrl.IsSelected ? Brushes.White : Brushes.Black, txtPoint, rightAlignFormat);
+                        }
                         DrawLockAndFixImages(ctrl, x * elementWidth + elementNameWidth, yCoord);
                     }
 

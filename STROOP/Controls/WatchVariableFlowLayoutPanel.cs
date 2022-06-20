@@ -19,6 +19,8 @@ namespace STROOP.Controls
         static int variablePanelNameWidth = 120;
         static int variablePanelValueWidth = 80;
 
+        public delegate void CustomDraw(Graphics g, Rectangle rect);
+
         [InitializeSpecial]
         static void InitializeSpecial()
         {
@@ -97,6 +99,12 @@ namespace STROOP.Controls
             _reorderingWatchVarControls = new List<WatchVariableControl>();
 
             renderer = new WatchVariablePanelRenderer(this);
+        }
+
+        protected override void OnScroll(ScrollEventArgs se)
+        {
+            base.OnScroll(se);
+            renderer.Draw();
         }
 
         bool hasGroups = false;

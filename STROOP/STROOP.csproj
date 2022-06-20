@@ -1446,6 +1446,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
+    <None Include="EmbeddedResources\checkbox-checked.png" />
+    <None Include="EmbeddedResources\checkbox-indeterminate.png" />
+    <None Include="EmbeddedResources\checkbox-unchecked.png" />
     <Content Include="icon.ico" />
     <Content Include="Licenses.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

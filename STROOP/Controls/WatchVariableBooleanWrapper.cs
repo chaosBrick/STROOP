@@ -1,10 +1,27 @@
 ﻿using STROOP.Utilities;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace STROOP.Controls
 {
     public class WatchVariableBooleanWrapper : WatchVariableNumberWrapper
     {
+        public static readonly WatchVariableSetting DisplayAsCheckboxSetting = new WatchVariableSetting(
+            "Boolean: Display as Checkbox",
+            CreateBoolWithDefault<WatchVariableBooleanWrapper>((wrapper, val) => wrapper._displayAsCheckbox = val, wrapper => wrapper._displayAsCheckbox),
+            ("Default", () => true, WrapperProperty<WatchVariableBooleanWrapper>(wr => wr._displayAsCheckbox == true)),
+            ("Display as Checkbox", () => true, WrapperProperty<WatchVariableBooleanWrapper>(wr => wr._displayAsCheckbox)),
+            ("Don't display as Checkbox", () => false, WrapperProperty<WatchVariableBooleanWrapper>(wr => !wr._displayAsCheckbox))
+            );
+
+        public static readonly WatchVariableSetting DisplayAsInverted = new WatchVariableSetting(
+            "Boolean: Display as Inverted",
+            CreateBoolWithDefault<WatchVariableBooleanWrapper>((wrapper, val) => wrapper._displayAsInverted = val, wrapper => wrapper._displayAsInverted),
+            ("Default", () => false, WrapperProperty<WatchVariableBooleanWrapper>(wr => wr._displayAsInverted == false)),
+            ("Display as Inverted", () => true, WrapperProperty<WatchVariableBooleanWrapper>(wr => wr._displayAsInverted)),
+            ("Don't display as Inverted", () => false, WrapperProperty<WatchVariableBooleanWrapper>(wr => !wr._displayAsInverted))
+            );
+
         private bool _displayAsCheckbox;
         private bool _displayAsInverted;
 
@@ -22,25 +39,54 @@ namespace STROOP.Controls
 
         private void AddBooleanContextMenuStripItems()
         {
-            ToolStripMenuItem itemDisplayAsCheckbox = new ToolStripMenuItem("Display as Checkbox");
-            itemDisplayAsCheckbox.Click += (sender, e) =>
-            {
-                _displayAsCheckbox = !_displayAsCheckbox;
-                itemDisplayAsCheckbox.Checked = _displayAsCheckbox;
-            };
-            itemDisplayAsCheckbox.Checked = _displayAsCheckbox;
+            _watchVarControl.AddSetting(DisplayAsCheckboxSetting);
+            _watchVarControl.AddSetting(DisplayAsInverted);
+        }
 
-            ToolStripMenuItem itemDisplayAsInverted = new ToolStripMenuItem("Display as Inverted");
-            itemDisplayAsInverted.Click += (sender, e) =>
-            {
-                _displayAsInverted = !_displayAsInverted;
-                itemDisplayAsInverted.Checked = _displayAsInverted;
-            };
-            itemDisplayAsInverted.Checked = _displayAsInverted;
+        public override WatchVariablePanel.CustomDraw CustomDrawOperation => _displayAsCheckbox ? DrawCheckbox : (WatchVariablePanel.CustomDraw)null;
 
-            _contextMenuStrip.AddToBeginningList(new ToolStripSeparator());
-            _contextMenuStrip.AddToBeginningList(itemDisplayAsCheckbox);
-            _contextMenuStrip.AddToBeginningList(itemDisplayAsInverted);
+        public override void Edit(Control parent, Rectangle bounds)
+        {
+            if (_displayAsCheckbox)
+            {
+                var combinedValues = CombineValues(GetValues(false, false));
+                if (!combinedValues.meaningfulValue)
+                    SetValue(0);
+                else if (System.Convert.ToInt32(combinedValues.value) == 0)
+                    SetValue(WatchVar.Mask);
+                else
+                    SetValue(0);
+            }
+            else
+                base.Edit(parent, bounds);
+        }
+
+        void DrawCheckbox(Graphics g, Rectangle rect)
+        {
+            var combinedValues = CombineValues(GetValues(false, false));
+            CheckState state;
+            if (!combinedValues.meaningfulValue)
+                state = CheckState.Indeterminate;
+            else
+                state = System.Convert.ToInt32(combinedValues.value) != 0 ? CheckState.Checked : CheckState.Unchecked;
+
+            Image checkboxImage;
+            switch (state)
+            {
+                case CheckState.Checked:
+                    checkboxImage = Properties.Resources.checkbox_checked;
+                    break;
+                case CheckState.Unchecked:
+                    checkboxImage = Properties.Resources.checkbox_unchecked;
+                    break;
+                default:
+                    checkboxImage = Properties.Resources.checkbox_indeterminate;
+                    break;
+            }
+
+            var margin = 2;
+            var imgHeight = rect.Height - margin * 2;
+            g.DrawImage(checkboxImage, rect.Right - imgHeight - margin * 2, rect.Top + margin, imgHeight, imgHeight);
         }
 
         protected CheckState ConvertValueToCheckState(object value)

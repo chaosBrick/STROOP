@@ -8,38 +8,12 @@ namespace STROOP.Controls
 {
     public class WatchVariableAngleWrapper : WatchVariableNumberWrapper
     {
-        static Func<WatchVariableControl, object, bool> CreateBoolWithDefault(
-            Action<WatchVariableAngleWrapper, bool> setValue,
-            Func<WatchVariableAngleWrapper, bool> getDefault
-            ) =>
-            (ctrl, obj) =>
-            {
-                if (ctrl.WatchVarWrapper is WatchVariableAngleWrapper num)
-                    if (obj is bool b)
-                        setValue(num, b);
-                    else if (obj == null)
-                        setValue(num, getDefault(num));
-                    else
-                        return false;
-                else
-                    return false;
-                return true;
-            };
-
-        static Func<WatchVariableControl, bool> WrapperProperty(Func<WatchVariableAngleWrapper, bool> func) =>
-            (ctrl) =>
-            {
-                if (ctrl.WatchVarWrapper is WatchVariableAngleWrapper wrapper)
-                    return func(wrapper);
-                return false;
-            };
-
         public static readonly WatchVariableSetting DisplaySignedSetting = new WatchVariableSetting(
                 "Angle: Signed",
-                CreateBoolWithDefault((wrapper, val) => wrapper._signed = val, wrapper => wrapper._defaultSigned),
-                ("Default", () => null, WrapperProperty(wr => wr._signed == wr._defaultSigned)),
-                ("Unsigned", () => false, WrapperProperty(wr => !wr._signed)),
-                ("Signed", () => true, WrapperProperty(wr => wr._signed))
+                CreateBoolWithDefault<WatchVariableAngleWrapper>((wrapper, val) => wrapper._signed = val, wrapper => wrapper._defaultSigned),
+                ("Default", () => null, WrapperProperty<WatchVariableAngleWrapper>(wr => wr._signed == wr._defaultSigned)),
+                ("Unsigned", () => false, WrapperProperty<WatchVariableAngleWrapper>(wr => !wr._signed)),
+                ("Signed", () => true, WrapperProperty<WatchVariableAngleWrapper>(wr => wr._signed))
             );
 
         public static readonly WatchVariableSetting AngleUnitTypeSetting = new WatchVariableSetting(
@@ -65,7 +39,7 @@ namespace STROOP.Controls
                         string stringValue = angleUnitType.ToString();
                         if (stringValue == AngleUnitType.InGameUnits.ToString()) stringValue = "In-Game Units";
                         var value = angleUnitType;
-                        lst.Add((stringValue, () => angleUnitType, WrapperProperty(wr => wr._angleUnitType == angleUnitType)));
+                        lst.Add((stringValue, () => angleUnitType, WrapperProperty<WatchVariableAngleWrapper>(wr => wr._angleUnitType == angleUnitType)));
                     }
                     return lst.ToArray();
                 }))()
@@ -73,26 +47,26 @@ namespace STROOP.Controls
 
         public static readonly WatchVariableSetting TruncateToMultipleOf16Setting = new WatchVariableSetting(
             "Angle: Truncate to Multiple of 16",
-            CreateBoolWithDefault((wrapper, val) => wrapper._truncateToMultipleOf16 = val, wrapper => wrapper._defaultTruncateToMultipleOf16),
-            ("Default", () => null, WrapperProperty(wr => wr._truncateToMultipleOf16 == wr._defaultTruncateToMultipleOf16)),
-            ("Truncate to Multiple of 16", () => true, WrapperProperty(wr => wr._truncateToMultipleOf16)),
-            ("Don't Truncate to Multiple of 16", () => false, WrapperProperty(wr => !wr._truncateToMultipleOf16))
+            CreateBoolWithDefault<WatchVariableAngleWrapper>((wrapper, val) => wrapper._truncateToMultipleOf16 = val, wrapper => wrapper._defaultTruncateToMultipleOf16),
+            ("Default", () => null, WrapperProperty<WatchVariableAngleWrapper>(wr => wr._truncateToMultipleOf16 == wr._defaultTruncateToMultipleOf16)),
+            ("Truncate to Multiple of 16", () => true, WrapperProperty<WatchVariableAngleWrapper>(wr => wr._truncateToMultipleOf16)),
+            ("Don't Truncate to Multiple of 16", () => false, WrapperProperty<WatchVariableAngleWrapper>(wr => !wr._truncateToMultipleOf16))
             );
 
         public static readonly WatchVariableSetting ConstrainToOneRevolutionSetting = new WatchVariableSetting(
             "Angle: Constrain to One Revolution",
-            CreateBoolWithDefault((wrapper, val) => wrapper._constrainToOneRevolution = val, wrapper => wrapper._defaultConstrainToOneRevolution),
-            ("Default", () => null, WrapperProperty(wr => wr._constrainToOneRevolution == wr._defaultConstrainToOneRevolution)),
-            ("Constrain to One Revolution", () => true, WrapperProperty(wr => wr._constrainToOneRevolution)),
-            ("Don't Constrain to One Revolution", () => false, WrapperProperty(wr => !wr._constrainToOneRevolution))
+            CreateBoolWithDefault<WatchVariableAngleWrapper>((wrapper, val) => wrapper._constrainToOneRevolution = val, wrapper => wrapper._defaultConstrainToOneRevolution),
+            ("Default", () => null, WrapperProperty<WatchVariableAngleWrapper>(wr => wr._constrainToOneRevolution == wr._defaultConstrainToOneRevolution)),
+            ("Constrain to One Revolution", () => true, WrapperProperty<WatchVariableAngleWrapper>(wr => wr._constrainToOneRevolution)),
+            ("Don't Constrain to One Revolution", () => false, WrapperProperty<WatchVariableAngleWrapper>(wr => !wr._constrainToOneRevolution))
             );
 
         public static readonly WatchVariableSetting ReverseSetting = new WatchVariableSetting(
             "Angle: Reverse",
-            CreateBoolWithDefault((wrapper, val) => wrapper._reverse = val, wrapper => wrapper._defaultReverse),
-            ("Default", () => null, WrapperProperty(wr => wr._reverse == wr._defaultReverse)),
-            ("Reverse", () => true, WrapperProperty(wr => wr._reverse)),
-            ("Don't Reverse", () => false, WrapperProperty(wr => !wr._reverse))
+            CreateBoolWithDefault<WatchVariableAngleWrapper>((wrapper, val) => wrapper._reverse = val, wrapper => wrapper._defaultReverse),
+            ("Default", () => null, WrapperProperty<WatchVariableAngleWrapper>(wr => wr._reverse == wr._defaultReverse)),
+            ("Reverse", () => true, WrapperProperty<WatchVariableAngleWrapper>(wr => wr._reverse)),
+            ("Don't Reverse", () => false, WrapperProperty<WatchVariableAngleWrapper>(wr => !wr._reverse))
             );
 
         private readonly bool _defaultSigned;

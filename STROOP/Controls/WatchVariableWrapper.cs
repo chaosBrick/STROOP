@@ -1,7 +1,6 @@
 ﻿using STROOP.Forms;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
-using STROOP.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
@@ -10,6 +9,32 @@ namespace STROOP.Controls
 {
     public abstract class WatchVariableWrapper
     {
+        protected static Func<WatchVariableControl, object, bool> CreateBoolWithDefault<T>(
+            Action<T, bool> setValue,
+            Func<T, bool> getDefault
+            ) where T : WatchVariableWrapper =>
+            (ctrl, obj) =>
+            {
+                if (ctrl.WatchVarWrapper is T num)
+                    if (obj is bool b)
+                        setValue(num, b);
+                    else if (obj == null)
+                        setValue(num, getDefault(num));
+                    else
+                        return false;
+                else
+                    return false;
+                return true;
+            };
+
+        protected static Func<WatchVariableControl, bool> WrapperProperty<T>(Func<T, bool> func) where T : WatchVariableWrapper =>
+            (ctrl) =>
+            {
+                if (ctrl.WatchVarWrapper is T wrapper)
+                    return func(wrapper);
+                return false;
+            };
+
         static Dictionary<string, Type> wrapperTypes = new Dictionary<string, Type>();
         static WatchVariableWrapper()
         {
@@ -45,6 +70,8 @@ namespace STROOP.Controls
         private ToolStripMenuItem _itemFixAddress;
         private ToolStripMenuItem _itemRename;
         private ToolStripMenuItem _itemRemove;
+
+        public virtual WatchVariablePanel.CustomDraw CustomDrawOperation => null;
 
         protected WatchVariableWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl)
         {
