@@ -67,15 +67,18 @@ namespace STROOP.Controls
         ToolStripMenuItem filterVariablesItem = new ToolStripMenuItem("Filter Variables...");
 
         WatchVariablePanelRenderer renderer;
+        bool fontCreated = false;
 
         public float FontSize
         {
             get { return renderer.Font.Size; }
             set
             {
-                if (value != renderer.Font.Size)
+                if (!fontCreated || value != renderer.Font.Size)
                 {
-                    //renderer.Font?.Dispose();
+                    if (fontCreated)
+                        renderer.Font.Dispose();
+                    fontCreated = true;
                     renderer.Font = new Font(renderer.Font.FontFamily, value, renderer.Font.Style);
                 }
             }
