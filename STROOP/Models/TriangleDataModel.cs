@@ -208,6 +208,7 @@ namespace STROOP.Models
             YMaxPlus5 = (short)(MoreMath.Max(y1, y2, y3) + 5);
 
             XProjection = NormX < -0.707 || NormX > 0.707;
+            Classification = TriangleUtilities.CalculateClassification(NormY);
         }
 
         public bool Intersect(Vector3 rayOrigin, Vector3 rayDirection, out Vector3 intersection, out Vector3 normal)

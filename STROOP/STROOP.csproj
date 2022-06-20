@@ -422,6 +422,7 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Tabs\MapTab\DataUtil\CollisionStructure.cs" />
+    <Compile Include="Tabs\MapTab\DataUtil\ObjectTrianglePrediction.cs" />
     <Compile Include="Tabs\MapTab\GraphicsUtil.cs" />
     <Compile Include="Tabs\MapTab\IHoverData.cs" />
     <Compile Include="Tabs\MapTab\MapAssociations.cs" />
@@ -432,6 +433,7 @@
     <Compile Include="Tabs\MapTab\MapObjects\MapAllObjectFloorObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapAllObjectWallObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapCustomCameraPath.cs" />
+    <Compile Include="Tabs\MapTab\MapObjects\MapObjectTrianglePrediction.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapTapeMeasureObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapNearbyFloorUnits.cs" />
     <Compile Include="Tabs\MapTab\MapView.cs" />

@@ -42,5 +42,20 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 itemEnableQuarterFrameLandings,
             };
         }
+
+        protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
+        {
+            if (_contextMenuStrip == null)
+            {
+                _contextMenuStrip = new ContextMenuStrip();
+                GetFloorToolStripMenuItems().ForEach(item => _contextMenuStrip.Items.Add(item));
+                _contextMenuStrip.Items.Add(new ToolStripSeparator());
+                GetHorizontalTriangleToolStripMenuItems(targetTracker).ForEach(item => _contextMenuStrip.Items.Add(item));
+                _contextMenuStrip.Items.Add(new ToolStripSeparator());
+                GetTriangleToolStripMenuItems().ForEach(item => _contextMenuStrip.Items.Add(item));
+            }
+
+            return _contextMenuStrip;
+        }
     }
 }
