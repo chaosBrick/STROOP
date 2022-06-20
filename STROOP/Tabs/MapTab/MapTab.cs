@@ -508,36 +508,43 @@ namespace STROOP.Tabs.MapTab
             };
         }
 
+        public void UpdateHover()
+        {
+            using (new AccessScope<MapTab>(this))
+            {
+                if (Form.ActiveForm != null && glControlMap2D.ClientRectangle.Contains(glControlMap2D.PointToClient(Cursor.Position)))
+                    graphics.UpdateFlyingControls(Config.Stream.lastFrameTime);
+                if (!graphics.IsMouseDown(0))
+                {
+                    var newCursor = graphics.mapCursorPosition;
+                    hoverData.Clear();
+                    foreach (var tracker in flowLayoutPanelMapTrackers.EnumerateTrackers())
+                        if (tracker.IsVisible)
+                        {
+                            var newHover = tracker.mapObject.GetHoverData(graphics, ref newCursor);
+                            if (graphics.fixCursorPlane)
+                            {
+                                graphics.cursorViewPlaneDist = Vector3.Dot(graphics.view.ComputeViewDirection(), (newCursor - graphics.view.position));
+                                graphics.UpdateCursor();
+                            }
+
+                            if (newHover != null)
+                                hoverData.Add(newHover);
+                        }
+                }
+            }
+        }
+
         public override void Update(bool active)
         {
             if (!_isLoaded2D) return;
 
+            graphics.UpdateCursor();
+
+            if (!IsContextMenuOpen())
+                UpdateHover();
             using (new AccessScope<MapTab>(this))
             {
-                if (!IsContextMenuOpen())
-                {
-                    if (Form.ActiveForm != null && glControlMap2D.ClientRectangle.Contains(glControlMap2D.PointToClient(Cursor.Position)))
-                        graphics.UpdateFlyingControls(Config.Stream.lastFrameTime);
-                    if (!graphics.IsMouseDown(0))
-                    {
-                        var newCursor = graphics.mapCursorPosition;
-                        hoverData.Clear();
-                        foreach (var tracker in flowLayoutPanelMapTrackers.EnumerateTrackers())
-                            if (tracker.IsVisible)
-                            {
-                                var newHover = tracker.mapObject.GetHoverData(graphics, ref newCursor);
-                                if (graphics.fixCursorPlane)
-                                {
-                                    graphics.cursorViewPlaneDist = Vector3.Dot(graphics.view.ComputeViewDirection(), (newCursor - graphics.view.position));
-                                    graphics.Update3DCursor();
-                                }
-
-                                if (newHover != null)
-                                    hoverData.Add(newHover);
-                            }
-                    }
-                }
-
                 flowLayoutPanelMapTrackers.UpdateControl();
 
                 if (active)

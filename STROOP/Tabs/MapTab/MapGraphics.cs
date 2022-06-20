@@ -430,12 +430,12 @@ namespace STROOP.Tabs.MapTab
                     mat.Row3 = new Vector4(0, 0, 0, 1);
                     BillboardMatrix = mat;
                     ViewMatrix *= Matrix4.CreatePerspectiveFieldOfView(1, glControl.Width / (float)glControl.Height, nearClip, farClip);
-                    Update3DCursor();
 
                     break;
             }
 
             pixelsPerUnit = new Vector2(scale * glControl.Height, scale * glControl.Height) * 0.5f;
+            UpdateCursor();
         }
 
         bool FindClosestIntersection(Vector3 rayOrigin, Vector3 rayDirection, out Vector3 intersection, out Models.TriangleDataModel triangle)
@@ -456,26 +456,34 @@ namespace STROOP.Tabs.MapTab
             return (closestDistance < float.PositiveInfinity);
         }
 
-        public void Update3DCursor()
+        public void UpdateCursor()
         {
-            if (levelTrianglesFor3DMap != null)
+            if (view.mode != MapView.ViewMode.ThreeDimensional)
             {
-                var glControlCursorPos = glControl.PointToClient(Cursor.Position);
-                float tan = 2 * (float)Math.Tan(.5f);
-                var dx = tan * (glControlCursorPos.X - glControl.Width / 2.0f) / glControl.Height;
-                var dy = -tan * (glControlCursorPos.Y - glControl.Height / 2.0f) / glControl.Height;
-                var dir = BillboardMatrix.Row0.Xyz * dx + BillboardMatrix.Row1.Xyz * dy - BillboardMatrix.Row2.Xyz;
-                if (float.IsNaN(dir.X)) dir = new Vector3(0, 0, 1);
-
-                if (!fixCursorPlane
-                    && (cursorOnMap = FindClosestIntersection(view.position + dir, dir, out Vector3 closestIntersection, out hoverTriangle)))
+                var e = glControl.PointToClient(Cursor.Position);
+                mapCursorPosition = Vector3.TransformPosition(new Vector3(2.0f * e.X / glControl.Width - 1, 1 - 2.0f * e.Y / glControl.Height, 0), Matrix4.Invert(ViewMatrix));
+            }
+            else
+            {
+                if (levelTrianglesFor3DMap != null)
                 {
-                    normalAtCursor = new Vector3(hoverTriangle.NormX, hoverTriangle.NormY, hoverTriangle.NormZ);
-                    mapCursorPosition = closestIntersection;
-                    cursorViewPlaneDist = Vector3.Dot(mapCursorPosition - view.position, -BillboardMatrix.Row2.Xyz);
+                    var glControlCursorPos = glControl.PointToClient(Cursor.Position);
+                    float tan = 2 * (float)Math.Tan(.5f);
+                    var dx = tan * (glControlCursorPos.X - glControl.Width / 2.0f) / glControl.Height;
+                    var dy = -tan * (glControlCursorPos.Y - glControl.Height / 2.0f) / glControl.Height;
+                    var dir = BillboardMatrix.Row0.Xyz * dx + BillboardMatrix.Row1.Xyz * dy - BillboardMatrix.Row2.Xyz;
+                    if (float.IsNaN(dir.X)) dir = new Vector3(0, 0, 1);
+
+                    if (!fixCursorPlane
+                        && (cursorOnMap = FindClosestIntersection(view.position + dir, dir, out Vector3 closestIntersection, out hoverTriangle)))
+                    {
+                        normalAtCursor = new Vector3(hoverTriangle.NormX, hoverTriangle.NormY, hoverTriangle.NormZ);
+                        mapCursorPosition = closestIntersection;
+                        cursorViewPlaneDist = Vector3.Dot(mapCursorPosition - view.position, -BillboardMatrix.Row2.Xyz);
+                    }
+                    else
+                        mapCursorPosition = view.position + dir * cursorViewPlaneDist;
                 }
-                else
-                    mapCursorPosition = view.position + dir * cursorViewPlaneDist;
             }
         }
 
@@ -766,6 +774,7 @@ namespace STROOP.Tabs.MapTab
 
             using (new AccessScope<MapTab>(mapTab))
             {
+                mapTab.UpdateHover();
                 foreach (var data in mapTab.hoverData)
                     if (e.Button == MouseButtons.Left)
                         data.LeftClick(mapCursorPosition);
@@ -932,10 +941,10 @@ namespace STROOP.Tabs.MapTab
                         view.movementSpeed = diff.Length * 0.5f;
                     view.position += Vector3.Normalize(mapCursorPosition - view.position) * delta * view.movementSpeed / 5;
                 }
-                Update3DCursor();
             }
             else
                 ChangeScale2(delta, SpecialConfig.Map2DScrollSpeed);
+            UpdateCursor();
         }
 
         public void UpdateFlyingControls(double frameTime)
