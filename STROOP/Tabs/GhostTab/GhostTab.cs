@@ -19,7 +19,7 @@ namespace STROOP.Tabs.GhostTab
             new Vector4(1, 1, 0, 1),
             new Vector4(0, 1, 0, 1),
             new Vector4(0, 1, 1, 1),
-            new Vector4(0, 0, 1, 0),
+            new Vector4(0, 0, 1, 1),
             new Vector4(1, 1, 1, 1),
             new Vector4(0.2f, 0.2f, 0.2f, 1),
         };
