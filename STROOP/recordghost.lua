@@ -27,7 +27,7 @@ function main()
 		lastGlobalTimer = _globalTimer
 		table.insert(recordedFrames,
 		{
-			globalTimer = _globalTimer,
+			globalTimer = (_globalTimer - 1),
 			
 			pitch = memory.readword(marioObjRef + OBJ_PITCH_OFFSET),
 			yaw = memory.readword(marioObjRef + OBJ_YAW_OFFSET),
