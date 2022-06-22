@@ -74,7 +74,7 @@ namespace STROOP.Controls
             private static readonly Image _disabledLockImage = Properties.Resources.lock_blue;
             private static readonly Image _pinnedImage = Properties.Resources.img_pin;
 
-            private static Image GetImageForCheckState(CheckState checkState)
+            private static Image GetLockImageForCheckState(CheckState checkState)
             {
                 Image image;
                 switch (checkState)
@@ -103,6 +103,9 @@ namespace STROOP.Controls
                     renderDatas[ctrl] = result = new WatchVariableControlRenderData();
                 return result;
             }
+
+            static int idleRefreshMilliseconds = 250;
+            DateTime lastRefreshed;
 
             delegate void OnDemandCall();
             Wrapper<OnDemandCall> OnDispose = new Wrapper<OnDemandCall>(), OnInvalidateFonts = new Wrapper<OnDemandCall>();
@@ -144,9 +147,11 @@ namespace STROOP.Controls
 
             public void Draw()
             {
-                //Return if not focused to save CPU lol
-                if (FindForm() != Form.ActiveForm)
+                //Return if not focused and recently enough refreshed to save CPU
+                if (FindForm() != Form.ActiveForm && (DateTime.Now - lastRefreshed).TotalMilliseconds < idleRefreshMilliseconds)
                     return;
+
+                lastRefreshed = DateTime.Now;
 
                 int maxRows = GetMaxRows();
                 var newRect = new Rectangle(0, 0, ((target._shownWatchVarControls.Count - 1) / maxRows + 1) * elementWidth + borderMargin * 2, maxRows * elementHeight + borderMargin * 2);
@@ -170,7 +175,7 @@ namespace STROOP.Controls
 
                 void DrawLockAndFixImages(WatchVariableControl ctrl, int baseX, int baseY)
                 {
-                    var lockImg = GetImageForCheckState(ctrl.WatchVar.HasLocks());
+                    var lockImg = GetLockImageForCheckState(ctrl.WatchVar.HasLocks());
                     var xCoord = baseX + 2;
                     var iconHeight = elementHeight - elementMarginTopBottom * 2;
                     if (lockImg != null)
