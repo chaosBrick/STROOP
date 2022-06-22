@@ -52,7 +52,7 @@ namespace STROOP.Controls
                 var combinedValues = CombineValues(GetValues(false, false));
                 if (!combinedValues.meaningfulValue)
                     SetValue(0);
-                else if (System.Convert.ToInt32(combinedValues.value) == 0)
+                else if (System.Convert.ToDecimal(combinedValues.value) == 0)
                     SetValue(WatchVar.Mask);
                 else
                     SetValue(0);
@@ -68,7 +68,7 @@ namespace STROOP.Controls
             if (!combinedValues.meaningfulValue)
                 state = CheckState.Indeterminate;
             else
-                state = System.Convert.ToInt32(combinedValues.value) != 0 ? CheckState.Checked : CheckState.Unchecked;
+                state = System.Convert.ToDecimal(combinedValues.value) != 0 ? CheckState.Checked : CheckState.Unchecked;
 
             Image checkboxImage;
             switch (state)
