@@ -17,6 +17,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
         {
             public bool Equals(PositionAngle x, PositionAngle y)
             {
+                if (x == y)
+                    return true;
                 if (!x.CompareType(y))
                     return false;
                 if (x.IsObject() && x.GetObjAddress() == y.GetObjAddress() && x.GetMapName() == y.GetMapName())
