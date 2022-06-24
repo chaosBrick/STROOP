@@ -44,48 +44,52 @@ namespace STROOP.Tabs.MapTab.DataUtil
             if (globalTimer != lastGlobalTimer || bufferedTris == null || showingPredictions != itemIncludePrediction.Checked)
             {
                 showingPredictions = itemIncludePrediction.Checked;
-
-                lastGlobalTimer = globalTimer;
-                uint globalTimerMinus1 = (uint)(globalTimer - 1);
-
-                var loadedObjTriangles = new List<TriangleDataModel>();
-                var faceAngles = new Dictionary<uint, (int, int, int)>();
-                foreach (var obj in positionAngleProvider())
+                try
                 {
-                    var objAddress = obj.GetObjAddress();
-                    if (objAddress == 0)
-                        continue;
-                    loadedObjTriangles.AddRange(TriangleUtilities.GetObjectTrianglesForObject(objAddress).Where(t => filter(t)));
+                    uint globalTimerMinus1 = (uint)(globalTimer - 1);
 
+                    var loadedObjTriangles = new List<TriangleDataModel>();
+                    var faceAngles = new Dictionary<uint, (int, int, int)>();
+                    foreach (var obj in positionAngleProvider())
+                    {
+                        var objAddress = obj.GetObjAddress();
+                        if (objAddress == 0)
+                            continue;
+                        loadedObjTriangles.AddRange(TriangleUtilities.GetObjectTrianglesForObject(objAddress).Where(t => filter(t)));
+
+                        if (showingPredictions)
+                        {
+                            var oFlags = Config.Stream.GetInt32(objAddress + 0x8C);
+                            if ((oFlags & (1 << 4)) != 0) //OBJ_FLAG_SET_FACE_ANGLE_TO_MOVE_ANGLE
+                                faceAngles[objAddress] = (
+                                    Config.Stream.GetInt32(objAddress + 0xD0),
+                                    Config.Stream.GetInt32(objAddress + 0xD4),
+                                    Config.Stream.GetInt32(objAddress + 0xD8));
+                        }
+                    }
+                    if (faceAngles.Count > 0)
+                        this.cachedFaceAngles[globalTimer] = faceAngles;
+
+                    var predictions = ComputeNewTriangles(positionAngleProvider, globalTimerMinus1);
+
+                    bufferedTris = new List<TriangleDataModel>(loadedObjTriangles);
                     if (showingPredictions)
-                    {
-                        var oFlags = Config.Stream.GetInt32(objAddress + 0x8C);
-                        if ((oFlags & (1 << 4)) != 0) //OBJ_FLAG_SET_FACE_ANGLE_TO_MOVE_ANGLE
-                            faceAngles[objAddress] = (
-                                Config.Stream.GetInt32(objAddress + 0xD0),
-                                Config.Stream.GetInt32(objAddress + 0xD4),
-                                Config.Stream.GetInt32(objAddress + 0xD8));
-                    }
+                        foreach (var tri in predictions)
+                        {
+                            if (filter != null && !filter(tri))
+                                continue;
+                            if (loadedObjTriangles.Any(loaded =>
+                                loaded.p1 == tri.p1 &&
+                                loaded.p2 == tri.p2 &&
+                                loaded.p3 == tri.p3
+                            ))
+                                continue;
+                            bufferedTris.Add(tri);
+                        }
+
+                    lastGlobalTimer = globalTimer;
                 }
-                if (faceAngles.Count > 0)
-                    this.cachedFaceAngles[globalTimer] = faceAngles;
-
-                var predictions = ComputeNewTriangles(positionAngleProvider, globalTimerMinus1);
-
-                bufferedTris = new List<TriangleDataModel>(loadedObjTriangles);
-                if (showingPredictions)
-                    foreach (var tri in predictions)
-                    {
-                        if (filter != null && !filter(tri))
-                            continue;
-                        if (loadedObjTriangles.Any(loaded =>
-                            loaded.p1 == tri.p1 &&
-                            loaded.p2 == tri.p2 &&
-                            loaded.p3 == tri.p3
-                        ))
-                            continue;
-                        bufferedTris.Add(tri);
-                    }
+                catch { /*inconsistent game states can fail to read predictions*/ }
             }
         }
         public List<TriangleDataModel> GetTrianlges() => bufferedTris;
@@ -110,7 +114,7 @@ namespace STROOP.Tabs.MapTab.DataUtil
                 var oFlags = Config.Stream.GetInt32(objAddress + 0x8C);
                 int angleX, angleY, angleZ;
 
-                
+
                 if ((oFlags & (1 << 4)) != 0 //OBJ_FLAG_SET_FACE_ANGLE_TO_MOVE_ANGLE
                     && cachedFaceAngles.TryGetValue(gTimerMinus1, out var cacheDictionary)
                     && cacheDictionary.TryGetValue(objAddress, out var cached))
