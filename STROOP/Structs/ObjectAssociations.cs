@@ -83,10 +83,7 @@ namespace STROOP.Structs
         public uint SegmentTableSH = 0x8031DC58;
         public uint SegmentTableEU = 0x803096C8;
         public uint BehaviorBankStart;
-
-        Dictionary<Image, Image> _cachedBufferedObjectImages = new Dictionary<Image, Image>();
-        object _cachedBufferedObjectImageLocker = new object();
-
+        
         public HashSet<ObjectBehaviorAssociation> BehaviorAssociations => _objAssoc;
 
         public List<SpawnHack> SpawnHacks => _spawnHacks;
@@ -207,34 +204,6 @@ namespace STROOP.Structs
             return assoc.Name;
         }
 
-        public Image GetCachedBufferedObjectImage(Image objectImage, Size size)
-        {
-            lock (_cachedBufferedObjectImageLocker)
-            {
-                if (!_cachedBufferedObjectImages.ContainsKey(objectImage))
-                    return null;
-
-                // Make sure cached size matches
-                var _bufferedImage = _cachedBufferedObjectImages[objectImage];
-                if (size != _bufferedImage.Size)
-                    return null;
-
-                return _bufferedImage;
-            }
-        }
-
-        public void CreateCachedBufferedObjectImage(Image objectImage, Image bufferedObjectImage)
-        {
-            // Dispose of previous image
-            lock (_cachedBufferedObjectImageLocker)
-            {
-                if (_cachedBufferedObjectImages.ContainsKey(objectImage))
-                    _cachedBufferedObjectImages[objectImage]?.Dispose();
-
-                _cachedBufferedObjectImages[objectImage] = bufferedObjectImage;
-            }
-        }
-
         public IEnumerable<WatchVariable> GetWatchVarControls(BehaviorCriteria behaviorCriteria)
         {
             var assoc = FindObjectAssociation(behaviorCriteria);
@@ -258,14 +227,6 @@ namespace STROOP.Structs
 
         ~ObjectAssociations()
         {
-            lock (_cachedBufferedObjectImageLocker)
-            {
-                foreach (var img in _cachedBufferedObjectImages)
-                {
-                    img.Value?.Dispose();
-                }
-            }
-
             // Unload and dispose of all images
             foreach (var obj in _objAssoc)
             {

@@ -124,7 +124,7 @@ namespace STROOP
 
                 lst.Add(new Overlay("TrackedAndShown", GetAddressExpression(shownOnMap)));
                 lst.Add(new Overlay("Model", GetAddressExpression(shownOnModel)));
-                lst.Add(new Overlay("Selected", GetAddressExpression((obj, address) => 
+                lst.Add(new Overlay("Selected", GetAddressExpression((obj, address) =>
                     !shownOnMap(obj, address) && !shownOnModel(obj, address) && obj._manager.SelectedSlotsAddresses.Contains(address))));
 
                 overlays = lst.ToArray();
@@ -448,47 +448,6 @@ namespace STROOP
             ContextMenuStrip.Items.Add(itemPasteObject);
         }
 
-        private void RebufferObjectImage()
-        {
-            return; //TODO: No.
-
-            // Remove last image reference
-            _bufferedObjectImage = null;
-
-            // Make sure object needs a new image
-            if (_objectImage == null)
-                return;
-
-            // Calculate new rectangle to draw image
-            var objectImageRec = (new Rectangle(BorderSize, BorderSize + 1,
-            Width - BorderSize * 2, _textLocation.Y - 1 - BorderSize))
-            .Zoom(_objectImage.Size);
-            _objectImageLocation = objectImageRec.Location;
-
-            // If the image is too small, we don't need to draw it
-            if (objectImageRec.Height <= 0 || objectImageRec.Width <= 0)
-            {
-                _bufferedObjectImage = new Bitmap(1, 1);
-                return;
-            }
-
-            // Look for cached image and use it if it exists
-            _bufferedObjectImage = Config.ObjectAssociations.GetCachedBufferedObjectImage(_objectImage, objectImageRec.Size);
-            if (_bufferedObjectImage != null)
-                return;
-
-            // Otherwise create new image and add it to cache
-            _bufferedObjectImage = new Bitmap(objectImageRec.Width, objectImageRec.Height);
-            objectImageRec.Location = new Point();
-            using (var graphics = Graphics.FromImage(_bufferedObjectImage))
-            {
-                graphics.InterpolationMode = InterpolationMode.High;
-                graphics.DrawImage(_objectImage, objectImageRec);
-            }
-
-            Config.ObjectAssociations.CreateCachedBufferedObjectImage(_objectImage, _bufferedObjectImage);
-        }
-
         public bool UpdateColors()
         {
             var oldBorderColor = _borderColor;
@@ -514,10 +473,7 @@ namespace STROOP
             if (_objectImage != newImage)
             {
                 lock (_gfxLock)
-                {
                     _objectImage = newImage;
-                    RebufferObjectImage();
-                }
                 imageUpdated = true;
             }
 
@@ -560,34 +516,21 @@ namespace STROOP
 
                 // Background
                 e.Graphics.FillRectangle(_backBrush, new Rectangle(BorderSize, BorderSize, Width - BorderSize * 2, Height - BorderSize * 2));
-                
+
                 // Draw Text
                 e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixel;
                 var textLocation = new Point(Width + 1, Height - BorderSize - (int)_manager._fontHeight + 1);
                 TextRenderer.DrawText(e.Graphics, _text, _manager.Font, textLocation, _textColor, TextFormatFlags.HorizontalCenter | TextFormatFlags.Top);
                 if (textLocation != _textLocation)
-                {
                     _textLocation = textLocation;
-                    RebufferObjectImage();
-                }
 
                 // Draw Object Image
                 if (_objectImage != null)
                 {
-                    try
-                    {
-                        var objectImageRec = (new Rectangle(BorderSize, BorderSize + 1,
-                        Width - BorderSize * 2, _textLocation.Y - 1 - BorderSize))
-                        .Zoom(_objectImage.Size);
-                        e.Graphics.DrawImage(_objectImage,  objectImageRec);
-                    }
-                    catch (ObjectDisposedException)
-                    {
-                        // The buffered image may have gotten disposed
-                        RebufferObjectImage();
-                        Invalidate();
-                        return;
-                    }
+                    var objectImageRec = (new Rectangle(BorderSize, BorderSize + 1,
+                    Width - BorderSize * 2, _textLocation.Y - 1 - BorderSize))
+                    .Zoom(_objectImage.Size);
+                    e.Graphics.DrawImage(_objectImage, objectImageRec);
                 }
             }
 
