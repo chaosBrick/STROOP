@@ -75,114 +75,44 @@
     <MapImage path="Camera.png"/>
   </Camera>
   <Overlays>
-    <Selected>
-      <OverlayImage path="Selected.png"/>
-    </Selected>
-    <TrackedAndShown>
-      <OverlayImage path="TrackedAndShown.png"/>
-    </TrackedAndShown>
-    <TrackedNotShown>
-      <OverlayImage path="TrackedNotShown.png"/>
-    </TrackedNotShown>
-    <StoodOn>
-      <OverlayImage path="StoodOn.png"/>
-    </StoodOn>
-    <Ridden>
-      <OverlayImage path="Ridden.png"/>
-    </Ridden>
-    <Held>
-      <OverlayImage path="Held.png"/>
-    </Held>
-    <Interaction>
-      <OverlayImage path="Interaction.png"/>
-    </Interaction>
-    <Used>
-      <OverlayImage path="Used.png"/>
-    </Used>
-    <Closest>
-      <OverlayImage path="Closest.png"/>
-    </Closest>
-    <Camera>
-      <OverlayImage path="Camera.png"/>
-    </Camera>
-    <CameraHack>
-      <OverlayImage path="CameraHack.png"/>
-    </CameraHack>
-    <Model>
-      <OverlayImage path="Model.png"/>
-    </Model>
-    <Floor>
-      <OverlayImage path="Floor.png"/>
-    </Floor>
-    <Wall>
-      <OverlayImage path="Wall.png"/>
-    </Wall>
-    <Ceiling>
-      <OverlayImage path="Ceiling.png"/>
-    </Ceiling>
-    <Parent>
-      <OverlayImage path="Parent.png"/>
-    </Parent>
-    <ParentUnused>
-      <OverlayImage path="ParentUnused.png"/>
-    </ParentUnused>
-    <ParentNone>
-      <OverlayImage path="ParentNone.png"/>
-    </ParentNone>
-    <Child>
-      <OverlayImage path="Child.png"/>
-    </Child>
-    <Collision1>
-      <OverlayImage path="Collision1.png"/>
-    </Collision1>
-    <Collision2>
-      <OverlayImage path="Collision2.png"/>
-    </Collision2>
-    <Collision3>
-      <OverlayImage path="Collision3.png"/>
-    </Collision3>
-    <Collision4>
-      <OverlayImage path="Collision4.png"/>
-    </Collision4>
-    <MarkedRed>
-      <OverlayImage path="MarkedRed.png"/>
-    </MarkedRed>
-    <MarkedOrange>
-      <OverlayImage path="MarkedOrange.png"/>
-    </MarkedOrange>
-    <MarkedYellow>
-      <OverlayImage path="MarkedYellow.png"/>
-    </MarkedYellow>
-    <MarkedGreen>
-      <OverlayImage path="MarkedGreen.png"/>
-    </MarkedGreen>
-    <MarkedLightBlue>
-      <OverlayImage path="MarkedLightBlue.png"/>
-    </MarkedLightBlue>
-    <MarkedBlue>
-      <OverlayImage path="MarkedBlue.png"/>
-    </MarkedBlue>
-    <MarkedPurple>
-      <OverlayImage path="MarkedPurple.png"/>
-    </MarkedPurple>
-    <MarkedPink>
-      <OverlayImage path="MarkedPink.png"/>
-    </MarkedPink>
-    <MarkedGrey>
-      <OverlayImage path="MarkedGrey.png"/>
-    </MarkedGrey>
-    <MarkedWhite>
-      <OverlayImage path="MarkedWhite.png"/>
-    </MarkedWhite>
-    <MarkedBlack>
-      <OverlayImage path="MarkedBlack.png"/>
-    </MarkedBlack>
-    <Locked>
-      <OverlayImage path="Locked.png"/>
-    </Locked>
-    <LockDisabled>
-      <OverlayImage path="LockDisabled.png"/>
-    </LockDisabled>
+    <OverlayImage name="Selected" path="Selected.png"/>
+    <OverlayImage name="TrackedAndShown" path="TrackedAndShown.png"/>
+    <OverlayImage name="TrackedNotShown" path="TrackedNotShown.png"/>
+    <OverlayImage name="StoodOn" path="StoodOn.png"/>
+    <OverlayImage name="Ridden" path="Ridden.png"/>
+    <OverlayImage name="Held" path="Held.png"/>
+    <OverlayImage name="Interaction" path="Interaction.png"/>
+    <OverlayImage name="Used" path="Used.png"/>
+    <OverlayImage name="Closest" path="Closest.png"/>
+    <OverlayImage name="Camera" path="Camera.png"/>
+    <OverlayImage name="CameraHack" path="CameraHack.png"/>
+    <OverlayImage name="Model" path="Model.png"/>
+    <OverlayImage name="Floor" path="Floor.png"/>
+    <OverlayImage name="Wall" path="Wall.png"/>
+    <OverlayImage name="Ceiling" path="Ceiling.png"/>
+    <OverlayImage name="Parent" path="Parent.png"/>
+    <OverlayImage name="ParentUnused" path="ParentUnused.png"/>
+    <OverlayImage name="ParentNone" path="ParentNone.png"/>
+    <OverlayImage name="Child" path="Child.png"/>
+    <OverlayImage name="Collision1" path="Collision1.png"/>
+    <OverlayImage name="Collision2" path="Collision2.png"/>
+    <OverlayImage name="Collision3" path="Collision3.png"/>
+    <OverlayImage name="Collision4" path="Collision4.png"/>
+    <OverlayImage name="HitboxOverlap" path="HitboxOverlap.png"/>
+    <OverlayImage name="MarkedRed" path="MarkedRed.png"/>
+    <OverlayImage name="MarkedOrange" path="MarkedOrange.png"/>
+    <OverlayImage name="MarkedYellow" path="MarkedYellow.png"/>
+    <OverlayImage name="MarkedGreen" path="MarkedGreen.png"/>
+    <OverlayImage name="MarkedLightBlue" path="MarkedLightBlue.png"/>
+    <OverlayImage name="MarkedBlue" path="MarkedBlue.png"/>
+    <OverlayImage name="MarkedPurple" path="MarkedPurple.png"/>
+    <OverlayImage name="MarkedPink" path="MarkedPink.png"/>
+    <OverlayImage name="MarkedGrey" path="MarkedGrey.png"/>
+    <OverlayImage name="MarkedWhite" path="MarkedWhite.png"/>
+    <OverlayImage name="MarkedBlack" path="MarkedBlack.png"/>
+    <OverlayImage name="Locked" path="Locked.png"/>
+    <OverlayImage name="LockDisabled" path="LockDisabled.png"/>
+    <OverlayImage name="LockReadOnly" path="LockReadOnly.png"/>
   </Overlays>
   <Object behaviorScriptAddress="0x13000000" name="Star Door">
     <SpawnCode gfxId="0xD5"/>

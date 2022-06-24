@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using STROOP.Structs;
 using STROOP.Utilities;
 using System.Drawing;
-using STROOP.Extensions;
 using STROOP.Structs.Configurations;
-using STROOP.Controls;
 using STROOP.Models;
 using System.Collections.ObjectModel;
-using System.Windows.Input;
 
 namespace STROOP.Managers
 {
@@ -53,6 +48,10 @@ namespace STROOP.Managers
 
         public readonly StroopMainForm mainForm;
 
+        int slotSize = -1;
+        public float _fontHeight { get; private set; }
+        public Font Font { get; private set; }
+
         public ObjectSlotsManager(StroopMainForm mainForm, TabControl tabControlMain)
         {
             this.mainForm = mainForm;
@@ -75,10 +74,19 @@ namespace STROOP.Managers
             };
 
             SlotLabelsForObjects = new ReadOnlyDictionary<ObjectDataModel, string>(_slotLabels);
+            ChangeSlotSize(DefaultSlotSize);
         }
 
         public void ChangeSlotSize(int newSize)
         {
+            if (newSize != slotSize)
+            {
+                slotSize = newSize;
+                Font?.Dispose();
+                Font = new Font(FontFamily.GenericSansSerif, Math.Max(6, 6 / 40.0f * slotSize));
+                _fontHeight = Font.GetHeight(mainForm.CreateGraphics().DpiY);
+            }
+
             foreach (var objSlot in ObjectSlots)
                 objSlot.Size = new Size(newSize, newSize);
         }

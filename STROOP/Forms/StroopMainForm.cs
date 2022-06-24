@@ -495,7 +495,7 @@ namespace STROOP
 
         private async void ChangeObjectSlotSize(int size)
         {
-            _resizeObjSlotTime = 500;
+            _resizeObjSlotTime = 100;
             if (_objSlotResizing)
                 return;
 
@@ -510,9 +510,9 @@ namespace STROOP
                 }
             });
 
-            WatchVariablePanelObjects.Visible = false;
+            WatchVariablePanelObjects.SuspendLayout();
             ObjectSlotsManager.ChangeSlotSize(size);
-            WatchVariablePanelObjects.Visible = true;
+            WatchVariablePanelObjects.ResumeLayout();
             _objSlotResizing = false;
         }
 

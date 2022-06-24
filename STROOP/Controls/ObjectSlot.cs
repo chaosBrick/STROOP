@@ -8,19 +8,182 @@ using System.Drawing;
 using STROOP.Managers;
 using STROOP.Utilities;
 using STROOP.Structs;
-using STROOP.Controls;
 using STROOP.Extensions;
 using System.Drawing.Drawing2D;
 using STROOP.Structs.Configurations;
 using STROOP.Models;
 using static STROOP.Managers.ObjectSlotsManager;
 using System.Windows.Input;
+using System.Xml.Linq;
 
 namespace STROOP
 {
     public class ObjectSlot : Panel
     {
+        public class Overlay
+        {
+            static Dictionary<string, Image> nameToImage = new Dictionary<string, Image>();
+            public delegate bool OverlayExpression(ObjectSlot slot);
+            static readonly Overlay[] overlays;
+
+            static Overlay()
+            {
+                OverlayExpression GetAddressExpression(Func<ObjectSlot, uint, bool> addressExpression) => obj =>
+                {
+                    uint? address = obj.CurrentObject?.Address ?? null;
+                    if (address.HasValue) return addressExpression(obj, address.Value);
+                    return false;
+                };
+
+                //Initialize overlay expressions
+                var lst = new List<Overlay>();
+
+                lst.Add(new Overlay("StoodOn", GetAddressExpression((obj, address) =>
+                    OverlayConfig.ShowOverlayStoodOnObject && address == DataModels.Mario.StoodOnObject)));
+
+                lst.Add(new Overlay("Ridden", GetAddressExpression((obj, address) =>
+                    OverlayConfig.ShowOverlayRiddenObject && address == DataModels.Mario.RiddenObject)));
+
+                lst.Add(new Overlay("Interaction", GetAddressExpression((obj, address) =>
+                    OverlayConfig.ShowOverlayInteractionObject && address == DataModels.Mario.InteractionObject)));
+
+                lst.Add(new Overlay("Held", GetAddressExpression((obj, address) =>
+                    OverlayConfig.ShowOverlayHeldObject && address == DataModels.Mario.HeldObject)));
+
+                lst.Add(new Overlay("Used", GetAddressExpression((obj, address) =>
+                    OverlayConfig.ShowOverlayUsedObject && address == DataModels.Mario.UsedObject)));
+
+                lst.Add(new Overlay("Closest", GetAddressExpression((obj, address) =>
+                    OverlayConfig.ShowOverlayClosestObject && address == DataModels.Mario.ClosestObject)));
+
+                lst.Add(new Overlay("Camera", GetAddressExpression((obj, address) =>
+                    OverlayConfig.ShowOverlayCameraObject && address == DataModels.Camera.SecondaryObject)));
+
+                lst.Add(new Overlay("CameraHack", GetAddressExpression((obj, address) =>
+                    OverlayConfig.ShowOverlayCameraHackObject && address == DataModels.Camera.HackObject)));
+
+                lst.Add(new Overlay("Model", GetAddressExpression((obj, address) =>
+                    address == AccessScope<StroopMainForm>.content.GetTab<Tabs.ModelTab>().ModelObjectAddress)));
+
+                lst.Add(new Overlay("Wall", GetAddressExpression((obj, address) =>
+                    OverlayConfig.ShowOverlayWallObject && address == DataModels.Mario.WallTriangle?.AssociatedObject)));
+
+                lst.Add(new Overlay("Floor", GetAddressExpression((obj, address) =>
+                    OverlayConfig.ShowOverlayFloorObject && address == DataModels.Mario.FloorTriangle?.AssociatedObject)));
+
+                lst.Add(new Overlay("Ceiling", GetAddressExpression((obj, address) =>
+                    OverlayConfig.ShowOverlayCeilingObject && address == DataModels.Mario.CeilingTriangle?.AssociatedObject)));
+
+
+                OverlayExpression GetHoveredExpression(Func<ObjectSlot, uint, ObjectDataModel, bool> hoverExpression) => obj =>
+                {
+                    uint? hoveredAddress = Config.ObjectSlotsManager.HoveredObjectAddress;
+                    uint? address = obj.CurrentObject?.Address ?? null;
+                    if (address.HasValue && hoveredAddress.HasValue) return hoverExpression(obj, address.Value, new ObjectDataModel(hoveredAddress.Value));
+                    return false;
+                };
+
+                lst.Add(new Overlay("Parent", GetHoveredExpression((obj, address, hoveredObject) =>
+                    (OverlayConfig.ShowOverlayParentObject || Keyboard.IsKeyDown(Key.P)) && address == hoveredObject.Parent)));
+
+                lst.Add(new Overlay("ParentNone", GetHoveredExpression((obj, address, hoveredObject) =>
+                    (OverlayConfig.ShowOverlayParentObject || Keyboard.IsKeyDown(Key.P)) && address == hoveredObject.Address
+                    && hoveredObject.Parent == 0)));
+
+                lst.Add(new Overlay("ParentUnused", GetHoveredExpression((obj, address, hoveredObject) =>
+                    (OverlayConfig.ShowOverlayParentObject || Keyboard.IsKeyDown(Key.P)) && address == hoveredObject.Address
+                    && hoveredObject.Parent == ObjectSlotsConfig.UnusedSlotAddress)));
+
+                lst.Add(new Overlay("Child", GetHoveredExpression((obj, address, hoveredObject) =>
+                    (OverlayConfig.ShowOverlayChildObject || Keyboard.IsKeyDown(Key.P)) && obj.CurrentObject?.Parent == hoveredObject.Address)));
+
+                for (int i = 1; i <= 4; i++)
+                {
+                    int capture = i;
+                    lst.Add(new Overlay($"Collision{capture}", GetAddressExpression((obj, address) =>
+                    {
+                        uint? hoveredAddress = Config.ObjectSlotsManager.HoveredObjectAddress;
+                        uint collisionObjAddress = hoveredAddress.HasValue && Keyboard.IsKeyDown(Key.C)
+                            ? hoveredAddress.Value : Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
+                        return OverlayConfig.ShowOverlayCollisionObject && address == ObjectUtilities.GetCollisionObject(collisionObjAddress, capture);
+                    })));
+                }
+
+                lst.Add(new Overlay("Locked", GetAddressExpression((obj, address) =>
+                    !LockConfig.LockingDisabled && WatchVariableLockManager.ContainsAnyLocksForObject(address))));
+
+                lst.Add(new Overlay("LockDisabled", GetAddressExpression((obj, address) =>
+                    LockConfig.LockingDisabled && WatchVariableLockManager.ContainsAnyLocksForObject(address))));
+
+                //TODO: Figure out what "LockReadOnly" is supposed to be
+                Func<ObjectSlot, uint, bool> shownOnMap = (obj, address) =>
+                    obj._manager.ActiveTab == TabType.Map && Config.ObjectSlotsManager.SelectedOnMapSlotsAddresses.Contains(address);
+
+                Func<ObjectSlot, uint, bool> shownOnModel = (obj, address) =>
+                    obj._manager.ActiveTab == TabType.Model && address == AccessScope<StroopMainForm>.content.GetTab<Tabs.ModelTab>().ModelObjectAddress;
+
+                lst.Add(new Overlay("TrackedAndShown", GetAddressExpression(shownOnMap)));
+                lst.Add(new Overlay("Model", GetAddressExpression(shownOnModel)));
+                lst.Add(new Overlay("Selected", GetAddressExpression((obj, address) => 
+                    !shownOnMap(obj, address) && !shownOnModel(obj, address) && obj._manager.SelectedSlotsAddresses.Contains(address))));
+
+                overlays = lst.ToArray();
+            }
+
+            public static Dictionary<Overlay, Wrapper<bool>> NewObjectSlot()
+            {
+                var result = new Dictionary<Overlay, Wrapper<bool>>();
+                foreach (var it in overlays)
+                    result[it] = new Wrapper<bool>(false);
+                return result;
+            }
+
+            public static void ParseXElement(string basePath, XElement element)
+            {
+                if (element.Name.ToString() == "OverlayImage")
+                {
+                    var name = element.Attribute(XName.Get("name")).Value;
+                    var path = element.Attribute(XName.Get("path")).Value;
+                    nameToImage[name] = Image.FromFile(basePath + path);
+                }
+            }
+
+            public readonly OverlayExpression expression;
+            public readonly string name;
+
+            private Overlay(string xElementName, OverlayExpression expression)
+            {
+                this.name = xElementName;
+                this.expression = expression;
+            }
+
+            public Image GetImage() => nameToImage[name];
+        }
+
         const int BorderSize = 2;
+
+        const float markedPenRelativeWidth = 0.16f;
+
+        static Pen MakeMarkedPen(Color color)
+        {
+            var p = new Pen(color, 1);
+            p.Alignment = PenAlignment.Inset;
+            return p;
+        }
+
+        static Pen[] markPens = new[] {
+               MakeMarkedPen(Color.Red),
+               MakeMarkedPen(Color.Orange),
+               MakeMarkedPen(Color.Yellow),
+               MakeMarkedPen(Color.Green),
+               MakeMarkedPen(Color.LightBlue),
+               MakeMarkedPen(Color.Blue),
+               MakeMarkedPen(Color.Purple),
+               MakeMarkedPen(Color.Pink),
+               MakeMarkedPen(Color.Gray),
+               MakeMarkedPen(Color.White),
+               MakeMarkedPen(Color.Black),
+                };
 
         ObjectSlotsManager _manager;
 
@@ -36,29 +199,18 @@ namespace STROOP
         Point _textLocation = new Point();
         Point _objectImageLocation = new Point();
         string _text;
-        int _fontHeight;
         #endregion
 
         public new bool Show = false;
 
-        enum SelectionType { NOT_SELECTED, NORMAL_SELECTION, MAP_SELECTION, MODEL_SELECTION };
-        SelectionType _selectionType = SelectionType.NOT_SELECTED;
-
-        int prevHeight;
         object _gfxLock = new object();
 
-        public enum MouseStateType {None, Over, Down};
+        public enum MouseStateType { None, Over, Down };
         private MouseStateType _mouseState;
         private MouseStateType _mouseEnteredState;
 
         private BehaviorCriteria _behavior;
-        public BehaviorCriteria Behavior
-        {
-            get
-            {
-                return _behavior;
-            }
-        }
+        public BehaviorCriteria Behavior => _behavior;
 
         bool _isActive = false;
 
@@ -71,13 +223,8 @@ namespace STROOP
             set { lock (_gfxLock) { _textBrush.Color = value; } }
         }
 
-        bool _drawSelectedOverlay, _drawStoodOnOverlay, _drawRiddenOverlay, _drawHeldOverlay, _drawInteractionOverlay, _drawUsedOverlay,
-            _drawClosestOverlay, _drawCameraOverlay, _drawCameraHackOverlay, _drawModelOverlay,
-            _drawFloorOverlay, _drawWallOverlay, _drawCeilingOverlay,
-            _drawParentOverlay, _drawParentUnusedOverlay, _drawParentNoneOverlay, _drawChildOverlay,
-            _drawCollision1Overlay, _drawCollision2Overlay, _drawCollision3Overlay, _drawCollision4Overlay,
-            _drawLockedOverlay, _drawLockDisabledOverlay;
-        int? _drawMarkedOverlay;
+        Dictionary<Overlay, Wrapper<bool>> overlayValues = Overlay.NewObjectSlot();
+        int? markValue = null;
 
         public ObjectSlot(ObjectSlotsManager manager, int index, Size size)
         {
@@ -303,6 +450,8 @@ namespace STROOP
 
         private void RebufferObjectImage()
         {
+            return; //TODO: No.
+
             // Remove last image reference
             _bufferedObjectImage = null;
 
@@ -400,37 +549,6 @@ namespace STROOP
             UpdateColors();
         }
 
-        private List<object> GetCurrentOverlayValues()
-        {
-            return new List<object>()
-            {
-                _drawSelectedOverlay,
-                _drawStoodOnOverlay,
-                _drawRiddenOverlay,
-                _drawInteractionOverlay,
-                _drawHeldOverlay,
-                _drawUsedOverlay,
-                _drawClosestOverlay,
-                _drawCameraOverlay,
-                _drawCameraHackOverlay,
-                _drawModelOverlay,
-                _drawWallOverlay,
-                _drawFloorOverlay,
-                _drawCeilingOverlay,
-                _drawParentOverlay,
-                _drawParentUnusedOverlay,
-                _drawParentNoneOverlay,
-                _drawChildOverlay,
-                _drawCollision1Overlay,
-                _drawCollision2Overlay,
-                _drawCollision3Overlay,
-                _drawCollision4Overlay,
-                _drawMarkedOverlay,
-                _drawLockedOverlay,
-                _drawLockDisabledOverlay,
-            };
-        }
-
         protected override void OnPaint(PaintEventArgs e)
         {
             e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
@@ -442,22 +560,11 @@ namespace STROOP
 
                 // Background
                 e.Graphics.FillRectangle(_backBrush, new Rectangle(BorderSize, BorderSize, Width - BorderSize * 2, Height - BorderSize * 2));
-
-                // Change font size
-                if (Height != prevHeight)
-                {
-                    prevHeight = Height;
-                    Font?.Dispose();
-                    Font = new Font(FontFamily.GenericSansSerif, Math.Max(6, 6 / 40.0f * Height));
-
-                    // Font.Height doesn't work for some reason that probably makes sense, but don't really want to look into right now
-                    _fontHeight = TextRenderer.MeasureText(e.Graphics, "ABCDEF", Font).Height;
-                }
-
+                
                 // Draw Text
                 e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixel;
-                var textLocation = new Point(Width + 1, Height - BorderSize - _fontHeight + 1);
-                TextRenderer.DrawText(e.Graphics, _text, Font, textLocation, _textColor, TextFormatFlags.HorizontalCenter | TextFormatFlags.Top);
+                var textLocation = new Point(Width + 1, Height - BorderSize - (int)_manager._fontHeight + 1);
+                TextRenderer.DrawText(e.Graphics, _text, _manager.Font, textLocation, _textColor, TextFormatFlags.HorizontalCenter | TextFormatFlags.Top);
                 if (textLocation != _textLocation)
                 {
                     _textLocation = textLocation;
@@ -469,7 +576,10 @@ namespace STROOP
                 {
                     try
                     {
-                        e.Graphics.DrawImageUnscaled(_bufferedObjectImage, _objectImageLocation);
+                        var objectImageRec = (new Rectangle(BorderSize, BorderSize + 1,
+                        Width - BorderSize * 2, _textLocation.Y - 1 - BorderSize))
+                        .Zoom(_objectImage.Size);
+                        e.Graphics.DrawImage(_objectImage,  objectImageRec);
                     }
                     catch (ObjectDisposedException)
                     {
@@ -481,112 +591,17 @@ namespace STROOP
                 }
             }
 
-            // TODO reorder object slots overlays
             // Draw Overlays
-            if (_drawMarkedOverlay.HasValue)
+            if (markValue.HasValue)
             {
-                switch (_drawMarkedOverlay.Value)
-                {
-                    case 1:
-                        e.Graphics.DrawImage(ObjectSlotManagerGui.MarkedRedObjectOverlayImage, new Rectangle(new Point(), Size));
-                        break;
-                    case 2:
-                        e.Graphics.DrawImage(ObjectSlotManagerGui.MarkedOrangeObjectOverlayImage, new Rectangle(new Point(), Size));
-                        break;
-                    case 3:
-                        e.Graphics.DrawImage(ObjectSlotManagerGui.MarkedYellowObjectOverlayImage, new Rectangle(new Point(), Size));
-                        break;
-                    case 4:
-                        e.Graphics.DrawImage(ObjectSlotManagerGui.MarkedGreenObjectOverlayImage, new Rectangle(new Point(), Size));
-                        break;
-                    case 5:
-                        e.Graphics.DrawImage(ObjectSlotManagerGui.MarkedLightBlueObjectOverlayImage, new Rectangle(new Point(), Size));
-                        break;
-                    case 6:
-                        e.Graphics.DrawImage(ObjectSlotManagerGui.MarkedBlueObjectOverlayImage, new Rectangle(new Point(), Size));
-                        break;
-                    case 7:
-                        e.Graphics.DrawImage(ObjectSlotManagerGui.MarkedPurpleObjectOverlayImage, new Rectangle(new Point(), Size));
-                        break;
-                    case 8:
-                        e.Graphics.DrawImage(ObjectSlotManagerGui.MarkedPinkObjectOverlayImage, new Rectangle(new Point(), Size));
-                        break;
-                    case 9:
-                        e.Graphics.DrawImage(ObjectSlotManagerGui.MarkedGreyObjectOverlayImage, new Rectangle(new Point(), Size));
-                        break;
-                    case 0:
-                        e.Graphics.DrawImage(ObjectSlotManagerGui.MarkedWhiteObjectOverlayImage, new Rectangle(new Point(), Size));
-                        break;
-                    case 10:
-                        e.Graphics.DrawImage(ObjectSlotManagerGui.MarkedBlackObjectOverlayImage, new Rectangle(new Point(), Size));
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                var pen = markPens[markValue.Value - 1];
+                pen.Width = markedPenRelativeWidth * Size.Width;
+                e.Graphics.DrawRectangle(pen, new Rectangle(new Point(), Size));
             }
-            switch (_selectionType)
-            {
-                case SelectionType.NORMAL_SELECTION:
-                    e.Graphics.DrawImage(ObjectSlotManagerGui.SelectedObjectOverlayImage, new Rectangle(new Point(), Size));
-                    break;
 
-                case SelectionType.MODEL_SELECTION:
-                    e.Graphics.DrawImage(ObjectSlotManagerGui.ModelObjectOverlayImage, new Rectangle(new Point(), Size));
-                    break;
-
-                case SelectionType.MAP_SELECTION:
-                    e.Graphics.DrawImage(ObjectSlotManagerGui.TrackedAndShownObjectOverlayImage, new Rectangle(new Point(), Size));
-                    break;
-
-                case SelectionType.NOT_SELECTED:
-                    // do nothing
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-            if (_drawWallOverlay)
-                e.Graphics.DrawImage(ObjectSlotManagerGui.WallObjectOverlayImage, new Rectangle(new Point(), Size));
-            if (_drawFloorOverlay)
-                e.Graphics.DrawImage(ObjectSlotManagerGui.FloorObjectOverlayImage, new Rectangle(new Point(), Size));
-            if (_drawCeilingOverlay)
-                e.Graphics.DrawImage(ObjectSlotManagerGui.CeilingObjectOverlayImage, new Rectangle(new Point(), Size));
-            if (_drawInteractionOverlay)
-                e.Graphics.DrawImage(ObjectSlotManagerGui.InteractionObjectOverlayImage, new Rectangle(new Point(), Size));
-            if (_drawHeldOverlay)
-                e.Graphics.DrawImage(ObjectSlotManagerGui.HeldObjectOverlayImage, new Rectangle(new Point(), Size));
-            if (_drawStoodOnOverlay)
-                e.Graphics.DrawImage(ObjectSlotManagerGui.StoodOnObjectOverlayImage, new Rectangle(new Point(), Size));
-            if (_drawRiddenOverlay)
-                e.Graphics.DrawImage(ObjectSlotManagerGui.RiddenObjectOverlayImage, new Rectangle(new Point(), Size));
-            if (_drawUsedOverlay)
-                e.Graphics.DrawImage(ObjectSlotManagerGui.UsedObjectOverlayImage, new Rectangle(new Point(), Size));
-            if (_drawClosestOverlay)
-                e.Graphics.DrawImage(ObjectSlotManagerGui.ClosestObjectOverlayImage, new Rectangle(new Point(), Size));
-            if (_drawCameraOverlay)
-                e.Graphics.DrawImage(ObjectSlotManagerGui.CameraObjectOverlayImage, new Rectangle(new Point(), Size));
-            if (_drawCameraHackOverlay)
-                e.Graphics.DrawImage(ObjectSlotManagerGui.CameraHackObjectOverlayImage, new Rectangle(new Point(), Size));
-            if (_drawParentOverlay)
-                e.Graphics.DrawImage(ObjectSlotManagerGui.ParentObjectOverlayImage, new Rectangle(new Point(), Size));
-            if (_drawParentUnusedOverlay)
-                e.Graphics.DrawImage(ObjectSlotManagerGui.ParentUnusedObjectOverlayImage, new Rectangle(new Point(), Size));
-            if (_drawParentNoneOverlay)
-                e.Graphics.DrawImage(ObjectSlotManagerGui.ParentNoneObjectOverlayImage, new Rectangle(new Point(), Size));
-            if (_drawChildOverlay)
-                e.Graphics.DrawImage(ObjectSlotManagerGui.ChildObjectOverlayImage, new Rectangle(new Point(), Size));
-            if (_drawCollision1Overlay)
-                e.Graphics.DrawImage(ObjectSlotManagerGui.Collision1OverlayImage, new Rectangle(new Point(), Size));
-            if (_drawCollision2Overlay)
-                e.Graphics.DrawImage(ObjectSlotManagerGui.Collision2OverlayImage, new Rectangle(new Point(), Size));
-            if (_drawCollision3Overlay)
-                e.Graphics.DrawImage(ObjectSlotManagerGui.Collision3OverlayImage, new Rectangle(new Point(), Size));
-            if (_drawCollision4Overlay)
-                e.Graphics.DrawImage(ObjectSlotManagerGui.Collision4OverlayImage, new Rectangle(new Point(), Size));
-            if (_drawLockedOverlay)
-                e.Graphics.DrawImage(ObjectSlotManagerGui.LockedOverlayImage, new Rectangle(new Point(), Size));
-            if (_drawLockDisabledOverlay)
-                e.Graphics.DrawImage(ObjectSlotManagerGui.LockDisabledOverlayImage, new Rectangle(new Point(), Size));
+            foreach (var overlay in overlayValues)
+                if (overlay.Value.value)
+                    e.Graphics.DrawImage(overlay.Key.GetImage(), new Rectangle(new Point(), Size));
         }
 
         public void Update(ObjectDataModel obj)
@@ -594,134 +609,49 @@ namespace STROOP
             CurrentObject = obj;
 
             uint? address = CurrentObject?.Address;
+            bool redraw = false;
 
             // Update Overlays
-            List<object> prevOverlays = GetCurrentOverlayValues();
-            if (address.HasValue)
+            foreach (var overlay in overlayValues)
             {
-                _drawSelectedOverlay = _manager.SelectedSlotsAddresses.Contains(address.Value);
-                _drawStoodOnOverlay = OverlayConfig.ShowOverlayStoodOnObject && address == DataModels.Mario.StoodOnObject;
-                _drawRiddenOverlay = OverlayConfig.ShowOverlayRiddenObject && address == DataModels.Mario.RiddenObject;
-                _drawInteractionOverlay = OverlayConfig.ShowOverlayInteractionObject && address == DataModels.Mario.InteractionObject;
-                _drawHeldOverlay = OverlayConfig.ShowOverlayHeldObject && address == DataModels.Mario.HeldObject;
-                _drawUsedOverlay = OverlayConfig.ShowOverlayUsedObject && address == DataModels.Mario.UsedObject;
-                _drawClosestOverlay = OverlayConfig.ShowOverlayClosestObject && address == DataModels.Mario.ClosestObject;
-                _drawCameraOverlay = OverlayConfig.ShowOverlayCameraObject && address == DataModels.Camera.SecondaryObject;
-                _drawCameraHackOverlay = OverlayConfig.ShowOverlayCameraHackObject && address == DataModels.Camera.HackObject;
-                _drawModelOverlay = address == AccessScope<StroopMainForm>.content.GetTab<Tabs.ModelTab>().ModelObjectAddress;
-                _drawWallOverlay = OverlayConfig.ShowOverlayWallObject && address == DataModels.Mario.WallTriangle?.AssociatedObject;
-                _drawFloorOverlay = OverlayConfig.ShowOverlayFloorObject && address == DataModels.Mario.FloorTriangle?.AssociatedObject;
-                _drawCeilingOverlay = OverlayConfig.ShowOverlayCeilingObject && address == DataModels.Mario.CeilingTriangle?.AssociatedObject;
-
-                uint? hoveredAddress = Config.ObjectSlotsManager.HoveredObjectAddress;
-                if (hoveredAddress.HasValue)
-                {
-                    ObjectDataModel hoveredObject = new ObjectDataModel(hoveredAddress.Value);
-
-                    _drawParentOverlay = (OverlayConfig.ShowOverlayParentObject || Keyboard.IsKeyDown(Key.P)) &&
-                        address == hoveredObject.Parent;
-                    _drawParentNoneOverlay = (OverlayConfig.ShowOverlayParentObject || Keyboard.IsKeyDown(Key.P)) &&
-                        address == hoveredObject.Address &&
-                        hoveredObject.Parent == 0;
-                    _drawParentUnusedOverlay = (OverlayConfig.ShowOverlayParentObject || Keyboard.IsKeyDown(Key.P)) &&
-                        address == hoveredObject.Address &&
-                        hoveredObject.Parent == ObjectSlotsConfig.UnusedSlotAddress;
-                    _drawChildOverlay = (OverlayConfig.ShowOverlayChildObject || Keyboard.IsKeyDown(Key.P)) &&
-                        CurrentObject?.Parent == hoveredObject.Address;
-                }
-                else
-                {
-                    _drawParentOverlay = false;
-                    _drawParentNoneOverlay = false;
-                    _drawParentUnusedOverlay = false;
-                    _drawChildOverlay = false;
-                }
-
-                uint collisionObjAddress = hoveredAddress.HasValue && Keyboard.IsKeyDown(Key.C)
-                    ? hoveredAddress.Value : Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
-                _drawCollision1Overlay = OverlayConfig.ShowOverlayCollisionObject &&
-                    address == ObjectUtilities.GetCollisionObject(collisionObjAddress, 1);
-                _drawCollision2Overlay = OverlayConfig.ShowOverlayCollisionObject && 
-                    address == ObjectUtilities.GetCollisionObject(collisionObjAddress, 2);
-                _drawCollision3Overlay = OverlayConfig.ShowOverlayCollisionObject && 
-                    address == ObjectUtilities.GetCollisionObject(collisionObjAddress, 3);
-                _drawCollision4Overlay = OverlayConfig.ShowOverlayCollisionObject && 
-                    address == ObjectUtilities.GetCollisionObject(collisionObjAddress, 4);
-
-                _drawMarkedOverlay = _manager.MarkedSlotsAddressesDictionary.ContainsKey(address.Value) ?
-                    _manager.MarkedSlotsAddressesDictionary[address.Value] : (int?)null;
-
-                if (WatchVariableLockManager.ContainsAnyLocksForObject(address.Value))
-                {
-                    if (LockConfig.LockingDisabled)
-                    {
-                        _drawLockedOverlay = false;
-                        _drawLockDisabledOverlay = true;
-                    }
-                    else
-                    {
-                        _drawLockedOverlay = true;
-                        _drawLockDisabledOverlay = false;
-                    }
-                }
-                else
-                {
-                    _drawLockedOverlay = false;
-                    _drawLockDisabledOverlay = false;
-                }
+                var newValue = overlay.Key.expression(this);
+                if (newValue != overlay.Value.value)
+                    redraw = true;
+                overlay.Value.value = newValue;
             }
-            else
+
+            var newMarkValue = _manager.MarkedSlotsAddressesDictionary.ContainsKey(address.Value)
+                ? _manager.MarkedSlotsAddressesDictionary[address.Value]
+                : (int?)null;
+
+            if (newMarkValue != markValue)
             {
-                _drawSelectedOverlay = false;
-                _drawStoodOnOverlay = false;
-                _drawRiddenOverlay = false;
-                _drawInteractionOverlay = false;
-                _drawHeldOverlay = false;
-                _drawUsedOverlay = false;
-                _drawClosestOverlay = false;
-                _drawCameraOverlay = false;
-                _drawCameraHackOverlay = false;
-                _drawModelOverlay = false;
-                _drawWallOverlay = false;
-                _drawFloorOverlay = false;
-                _drawCeilingOverlay = false;
-                _drawParentOverlay = false;
-                _drawParentUnusedOverlay = false;
-                _drawParentNoneOverlay = false;
-                _drawChildOverlay = false;
-                _drawCollision1Overlay = false;
-                _drawCollision2Overlay = false;
-                _drawCollision3Overlay = false;
-                _drawCollision4Overlay = false;
-                _drawMarkedOverlay = null;
-                _drawLockedOverlay = false;
-                _drawLockDisabledOverlay = false;
+                redraw = true;
+                markValue = newMarkValue;
             }
-            List<object> overlays = GetCurrentOverlayValues();
 
-            SelectionType selectionType;
-            switch (_manager.ActiveTab)
-            {
-                case TabType.Map:
-                    selectionType = address.HasValue && Config.ObjectSlotsManager.SelectedOnMapSlotsAddresses.Contains(address.Value)
-                        ? SelectionType.MAP_SELECTION
-                        : SelectionType.NOT_SELECTED;
-                    break;
+            //switch (_manager.ActiveTab)
+            //{
+            //    case TabType.Map:
+            //        selectionType = address.HasValue && Config.ObjectSlotsManager.SelectedOnMapSlotsAddresses.Contains(address.Value)
+            //            ? SelectionType.MAP_SELECTION
+            //            : SelectionType.NOT_SELECTED;
+            //        break;
 
-                case TabType.Model:
-                    selectionType = CurrentObject?.Address == AccessScope<StroopMainForm>.content.GetTab<Tabs.ModelTab>().ModelObjectAddress
-                        ? SelectionType.MODEL_SELECTION : SelectionType.NOT_SELECTED;
-                    break;
+            //    case TabType.Model:
+            //        selectionType = CurrentObject?.Address == AccessScope<StroopMainForm>.content.GetTab<Tabs.ModelTab>().ModelObjectAddress
+            //            ? SelectionType.MODEL_SELECTION : SelectionType.NOT_SELECTED;
+            //        break;
 
-                case TabType.CamHack:
-                    selectionType = SelectionType.NOT_SELECTED;
-                    break;
+            //    case TabType.CamHack:
+            //        selectionType = SelectionType.NOT_SELECTED;
+            //        break;
 
-                default:
-                    selectionType = CurrentObject != null && _manager.SelectedSlotsAddresses.Contains(CurrentObject.Address)
-                        ? SelectionType.NORMAL_SELECTION : SelectionType.NOT_SELECTED;
-                    break;
-            }
+            //    default:
+            //        selectionType = CurrentObject != null && _manager.SelectedSlotsAddresses.Contains(CurrentObject.Address)
+            //            ? SelectionType.NORMAL_SELECTION : SelectionType.NOT_SELECTED;
+            //        break;
+            //}
 
             Color mainColor =
                 (SlotLabelType)AccessScope<StroopMainForm>.content.comboBoxLabelMethod.SelectedItem == SlotLabelType.RngUsage ?
@@ -733,7 +663,6 @@ namespace STROOP
             // Update UI element
 
             bool updateColors = false;
-            bool redraw = false;
 
             if (text != _text)
             {
@@ -751,12 +680,6 @@ namespace STROOP
                 updateColors = true;
             }
 
-            if (_selectionType != selectionType)
-            {
-                _selectionType = selectionType;
-                redraw = true;
-            }
-
             if (_behavior != (CurrentObject?.BehaviorCriteria ?? default(BehaviorCriteria)))
             {
                 _behavior = CurrentObject?.BehaviorCriteria ?? default(BehaviorCriteria);
@@ -766,9 +689,7 @@ namespace STROOP
             {
                 _isActive = CurrentObject?.IsActive ?? false;
                 updateColors = true;
-            }         
-            if (!overlays.SequenceEqual(prevOverlays))
-                redraw = true;
+            }
 
             if (updateColors)
             {
