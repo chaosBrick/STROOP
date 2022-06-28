@@ -112,25 +112,32 @@ namespace STROOP.Utilities
             if (!_emulator.AllowAutoDetect)
                 return;
 
-            const int COMPARISON_READ_OFFSET = 0x2462b4; // Address of create_thread
-
-            var autoDetectPattern = System.IO.File.ReadAllBytes("Resources/AutoDetectFile.bin");
-            var comparisonBuffer = new byte[autoDetectPattern.Length];
-
-            var processScanner = new SigScanSharp(Process.Handle);
-            if (processScanner.SelectModule(Process.MainModule))
+            // Address of create_thread
+            foreach ((string name, uint offset) x in new[] { ("US", 0x246338), ("JP", 0x246338) })
             {
-                var foundPatternAddress = processScanner.FindPattern(autoDetectPattern, out var t);
-                if (foundPatternAddress == 0)
-                    messageLogBuilder.AppendLine("Unable to verify or correct RAM start.");
-                else
+                var path = $"Resources/AutoDetectFile {x.name}.bin";
+                if (!System.IO.File.Exists(path))
+                    continue;
+
+                var autoDetectPattern = System.IO.File.ReadAllBytes(path);
+                var comparisonBuffer = new byte[autoDetectPattern.Length];
+
+                var processScanner = new SigScanSharp(Process.Handle);
+                if (processScanner.SelectModule(Process.MainModule))
                 {
-                    var newBaseOffset = (UIntPtr)(foundPatternAddress - COMPARISON_READ_OFFSET);
-                    if (newBaseOffset != _baseOffset)
+                    var foundPatternAddress = processScanner.FindPattern(autoDetectPattern, out var t);
+                    if (foundPatternAddress != 0)
+                    {
+                        var newBaseOffset = (UIntPtr)(foundPatternAddress - x.offset);
                         _baseOffset = newBaseOffset;
+                        goto verified;
+                    }
                 }
             }
+            messageLogBuilder.AppendLine("Unable to verify or correct RAM start.");
+            verified:;
         }
+
         public override bool Suspend()
         {
             SuspendProcess(_process);
