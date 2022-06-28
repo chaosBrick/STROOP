@@ -563,7 +563,7 @@ namespace STROOP
                 overlay.Value.value = newValue;
             }
 
-            var newMarkValue = _manager.MarkedSlotsAddressesDictionary.ContainsKey(address.Value)
+            var newMarkValue = address.HasValue && _manager.MarkedSlotsAddressesDictionary.ContainsKey(address.Value)
                 ? _manager.MarkedSlotsAddressesDictionary[address.Value]
                 : (int?)null;
 
@@ -572,29 +572,6 @@ namespace STROOP
                 redraw = true;
                 markValue = newMarkValue;
             }
-
-            //switch (_manager.ActiveTab)
-            //{
-            //    case TabType.Map:
-            //        selectionType = address.HasValue && Config.ObjectSlotsManager.SelectedOnMapSlotsAddresses.Contains(address.Value)
-            //            ? SelectionType.MAP_SELECTION
-            //            : SelectionType.NOT_SELECTED;
-            //        break;
-
-            //    case TabType.Model:
-            //        selectionType = CurrentObject?.Address == AccessScope<StroopMainForm>.content.GetTab<Tabs.ModelTab>().ModelObjectAddress
-            //            ? SelectionType.MODEL_SELECTION : SelectionType.NOT_SELECTED;
-            //        break;
-
-            //    case TabType.CamHack:
-            //        selectionType = SelectionType.NOT_SELECTED;
-            //        break;
-
-            //    default:
-            //        selectionType = CurrentObject != null && _manager.SelectedSlotsAddresses.Contains(CurrentObject.Address)
-            //            ? SelectionType.NORMAL_SELECTION : SelectionType.NOT_SELECTED;
-            //        break;
-            //}
 
             Color mainColor =
                 (SlotLabelType)AccessScope<StroopMainForm>.content.comboBoxLabelMethod.SelectedItem == SlotLabelType.RngUsage ?
