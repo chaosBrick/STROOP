@@ -99,17 +99,6 @@
     <OverlayImage name="Collision3" path="Collision3.png"/>
     <OverlayImage name="Collision4" path="Collision4.png"/>
     <OverlayImage name="HitboxOverlap" path="HitboxOverlap.png"/>
-    <OverlayImage name="MarkedRed" path="MarkedRed.png"/>
-    <OverlayImage name="MarkedOrange" path="MarkedOrange.png"/>
-    <OverlayImage name="MarkedYellow" path="MarkedYellow.png"/>
-    <OverlayImage name="MarkedGreen" path="MarkedGreen.png"/>
-    <OverlayImage name="MarkedLightBlue" path="MarkedLightBlue.png"/>
-    <OverlayImage name="MarkedBlue" path="MarkedBlue.png"/>
-    <OverlayImage name="MarkedPurple" path="MarkedPurple.png"/>
-    <OverlayImage name="MarkedPink" path="MarkedPink.png"/>
-    <OverlayImage name="MarkedGrey" path="MarkedGrey.png"/>
-    <OverlayImage name="MarkedWhite" path="MarkedWhite.png"/>
-    <OverlayImage name="MarkedBlack" path="MarkedBlack.png"/>
     <OverlayImage name="Locked" path="Locked.png"/>
     <OverlayImage name="LockDisabled" path="LockDisabled.png"/>
     <OverlayImage name="LockReadOnly" path="LockReadOnly.png"/>
