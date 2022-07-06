@@ -135,31 +135,11 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ICSharpCode.AvalonEdit, Version=6.1.1.20, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
-      <HintPath>..\packages\AvalonEdit.6.1.1\lib\net45\ICSharpCode.AvalonEdit.dll</HintPath>
-      <Private>True</Private>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ICSharpCode.SharpZipLib, Version=1.0.0.999, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpZipLib.1.0.0\lib\net45\ICSharpCode.SharpZipLib.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenTK.1.1.1589.5942\lib\NET40\OpenTK.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenTK.GLControl, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenTK.GLControl.1.1.1589.5942\lib\NET40\OpenTK.GLControl.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing.Design" />
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -645,6 +625,7 @@
     <Compile Include="Tabs\MapTab\Renderers\LineRenderer.cs" />
     <Compile Include="Tabs\MapTab\Renderers\Renderer.cs" />
     <Compile Include="Tabs\MapTab\Renderers\SpriteRenderer.cs" />
+    <Compile Include="Tabs\MapTab\Renderers\TextRenderer.cs" />
     <Compile Include="Tabs\MapTab\Renderers\TransparencyRenderer.cs" />
     <Compile Include="Tabs\MapTab\Renderers\TriangleRenderer.cs" />
     <Compile Include="Tabs\MarioTab.cs">
@@ -1319,7 +1300,6 @@
     <EmbeddedResource Include="Forms\VariableViewerForm.resx">
       <DependentUpon>VariableViewerForm.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -1456,7 +1436,35 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <PackageReference Include="AvalonEdit">
+      <Version>6.1.1</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>9.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="OpenTK">
+      <Version>3.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="OpenTK.GLControl">
+      <Version>3.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="QuickFont.Desktop">
+      <Version>4.5.7053.25687</Version>
+    </PackageReference>
+    <PackageReference Include="SharpFont">
+      <Version>4.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="SharpFont.Dependencies">
+      <Version>2.6.0</Version>
+    </PackageReference>
+    <PackageReference Include="SharpZipLib">
+      <Version>1.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.ValueTuple">
+      <Version>4.5.0</Version>
+    </PackageReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>del "$(TargetDir)OpenTK.dll.config"
@@ -1467,7 +1475,9 @@ del "$(TargetDir)OpenTK.xml"
 del "$(TargetDir)ICSharpCode.SharpZipLib.xml"
 del "$(TargetDir)ICSharpCode.AvalonEdit.xml"
 del "$(TargetDir)Newtonsoft.Json.xml"
-del "$(TargetDir)System.ValueTuple.xml"</PostBuildEvent>
+del "$(TargetDir)System.ValueTuple.xml"
+
+xcopy /E /Y /I "$(SolutionDir)dep/x64" "$(TargetDir)" /D</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>xcopy /E /Y /I "$(ProjectDir)Resources" "$(TargetDir)Resources" /D
