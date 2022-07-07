@@ -44,14 +44,21 @@ public class SigScanSharp
         g_dictStringPatterns = new Dictionary<string, string>();
     }
 
+    [System.Runtime.ExceptionServices.HandleProcessCorruptedStateExceptions]
     public bool SelectModule(ProcessModule targetModule)
     {
         g_lpModuleBase = (ulong)targetModule.BaseAddress;
         g_arrModuleBuffer = new byte[targetModule.ModuleMemorySize];
 
         g_dictStringPatterns.Clear();
-
-        return Win32.ReadProcessMemory(g_hProcess, g_lpModuleBase, g_arrModuleBuffer, targetModule.ModuleMemorySize);
+        try
+        {
+            return Win32.ReadProcessMemory(g_hProcess, g_lpModuleBase, g_arrModuleBuffer, targetModule.ModuleMemorySize);
+        }
+        catch (AccessViolationException)
+        {
+            return false;
+        }
     }
 
     public void AddPattern(string szPatternName, string szPattern)
