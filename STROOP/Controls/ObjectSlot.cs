@@ -195,9 +195,7 @@ namespace STROOP
         SolidBrush _borderBrush = new SolidBrush(Color.White), _backBrush = new SolidBrush(Color.White);
         SolidBrush _textBrush = new SolidBrush(Color.Black);
         Image _objectImage;
-        Image _bufferedObjectImage;
         Point _textLocation = new Point();
-        Point _objectImageLocation = new Point();
         string _text;
         #endregion
 

@@ -221,11 +221,8 @@
     <Compile Include="Forms\ImageForm.Designer.cs">
       <DependentUpon>ImageForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\TabPopoutForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\TabPopoutForm.Designer.cs">
-      <DependentUpon>TabPopoutForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\TriangleListForm.cs">
       <SubType>Form</SubType>
