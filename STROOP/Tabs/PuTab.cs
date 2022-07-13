@@ -13,6 +13,7 @@ namespace STROOP.Tabs
                 VariableGroup.Basic,
                 VariableGroup.Intermediate,
                 VariableGroup.Advanced,
+                VariableGroup.Custom,
             };
 
         private static readonly List<string> VISIBLE_VAR_GROUPS =
@@ -21,6 +22,7 @@ namespace STROOP.Tabs
                 VariableGroup.Basic,
                 VariableGroup.Intermediate,
                 VariableGroup.Advanced,
+                VariableGroup.Custom,
             };
 
         public PuTab()

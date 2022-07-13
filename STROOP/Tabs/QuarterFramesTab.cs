@@ -21,12 +21,14 @@ namespace STROOP.Tabs
             {
                 VariableGroup.QuarterFrameHack,
                 VariableGroup.GhostHack,
+                VariableGroup.Custom,
             };
 
         private static readonly List<string> VISIBLE_VAR_GROUPS =
             new List<string>()
             {
                 VariableGroup.QuarterFrameHack,
+                VariableGroup.Custom,
             };
         public QuarterFramesTab()
         {

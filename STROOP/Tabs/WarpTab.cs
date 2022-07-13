@@ -17,6 +17,7 @@ namespace STROOP.Tabs
             {
                 VariableGroup.Basic,
                 VariableGroup.WarpNode,
+                VariableGroup.Custom,
             };
 
         private static readonly List<string> VISIBLE_VAR_GROUPS =
@@ -24,6 +25,7 @@ namespace STROOP.Tabs
             {
                 VariableGroup.Basic,
                 VariableGroup.WarpNode,
+                VariableGroup.Custom,
             };
 
         public WarpTab()

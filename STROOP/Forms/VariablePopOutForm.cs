@@ -44,8 +44,8 @@ namespace STROOP.Forms
         {
             // initialize panel
             _watchVariablePanel.Initialize();
-            _watchVariablePanel.AddVariables(vars.ConvertAll(_ => (_, _.view)));
             _watchVariablePanel.DeferredInitialize();
+            _watchVariablePanel.AddVariables(vars.ConvertAll(_ => (_, _.view)));
 
             // add borderless item to panel
             ToolStripMenuItem itemBorderless = new ToolStripMenuItem("Borderless");
@@ -56,7 +56,7 @@ namespace STROOP.Forms
                 FormBorderStyle = _borderless ? FormBorderStyle.None : FormBorderStyle.Sizable;
             };
             itemBorderless.Checked = _borderless;
-            _watchVariablePanel.ContextMenuStrip.Items.Insert(0, itemBorderless);
+            _watchVariablePanel.customContextMenuItems.Add(itemBorderless);
 
             // add always on top item to panel
             ToolStripMenuItem itemAlwaysOnTop = new ToolStripMenuItem("Always On Top");
@@ -67,12 +67,12 @@ namespace STROOP.Forms
                 TopMost = _alwaysOnTop;
             };
             itemBorderless.Checked = _alwaysOnTop;
-            _watchVariablePanel.ContextMenuStrip.Items.Insert(1, itemAlwaysOnTop);
+            _watchVariablePanel.customContextMenuItems.Add(itemAlwaysOnTop);
 
             // add close item to panel
             ToolStripMenuItem itemClose = new ToolStripMenuItem("Close");
             itemClose.Click += (sender, e) => Close();
-            _watchVariablePanel.ContextMenuStrip.Items.Insert(2, itemClose);
+            _watchVariablePanel.customContextMenuItems.Add(itemClose);
 
             // make panel draggable when borderless
             _watchVariablePanel.MouseDown += (sender, e) =>

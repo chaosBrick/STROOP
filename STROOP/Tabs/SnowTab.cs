@@ -18,6 +18,7 @@ namespace STROOP.Tabs
                 VariableGroup.Intermediate,
                 VariableGroup.Advanced,
                 VariableGroup.Snow,
+                VariableGroup.Custom,
             };
 
         private static readonly List<string> VISIBLE_VAR_GROUPS =
@@ -27,6 +28,7 @@ namespace STROOP.Tabs
                 VariableGroup.Intermediate,
                 VariableGroup.Advanced,
                 VariableGroup.Snow,
+                VariableGroup.Custom,
             };
 
         private short _numSnowParticles;

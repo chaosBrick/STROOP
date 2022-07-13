@@ -46,6 +46,7 @@ namespace STROOP.Controls
         }
 
         public readonly Func<List<WatchVariableControl>> GetSelectedVars;
+        public List<ToolStripItem> customContextMenuItems = new List<ToolStripItem>();
 
         public bool initialized = false;
         List<Action> deferredActions = new List<Action>();
@@ -86,6 +87,24 @@ namespace STROOP.Controls
             }
         }
 
+        public new event System.Windows.Forms.MouseEventHandler MouseDown
+        {
+            add { renderer.MouseDown += value; }
+            remove { renderer.MouseDown -= value; }
+        }
+
+        public new event System.Windows.Forms.MouseEventHandler MouseUp
+        {
+            add { renderer.MouseUp += value; }
+            remove { renderer.MouseUp -= value; }
+        }
+
+        public new event System.Windows.Forms.MouseEventHandler MouseMove
+        {
+            add { renderer.MouseMove += value; }
+            remove { renderer.MouseMove -= value; }
+        }
+
         public WatchVariablePanel()
         {
             GetSelectedVars = () => new List<WatchVariableControl>(_selectedWatchVarControls);
@@ -119,12 +138,8 @@ namespace STROOP.Controls
             DeferActionToUpdate(nameof(SetGroups), () =>
             {
                 _allGroups = allVariableGroupsNullable != null ? new List<string>(allVariableGroupsNullable) : new List<string>();
-                if (_allGroups.Contains(VariableGroup.Custom)) throw new ArgumentOutOfRangeException();
-                _allGroups.Add(VariableGroup.Custom);
 
                 _visibleGroups = visibleVariableGroupsNullable != null ? new List<string>(visibleVariableGroupsNullable) : new List<string>();
-                if (_visibleGroups.Contains(VariableGroup.Custom)) throw new ArgumentOutOfRangeException();
-                _visibleGroups.Add(VariableGroup.Custom);
 
                 _initialVisibleGroups.AddRange(_visibleGroups);
                 UpdateControlsBasedOnFilters();
@@ -499,6 +514,12 @@ namespace STROOP.Controls
             strip.Items.Add(openSaveClearItem);
             strip.Items.Add(doToAllVariablesItem);
             strip.Items.Add(filterVariablesItem);
+            if (customContextMenuItems.Count > 0)
+            {
+                strip.Items.Add(new ToolStripSeparator());
+                foreach (var item in customContextMenuItems)
+                    strip.Items.Add(item);
+            }
             strip.Show(System.Windows.Forms.Cursor.Position);
         }
 
@@ -739,6 +760,8 @@ namespace STROOP.Controls
 
         private bool ShouldShow(WatchVariableControl watchVarControl)
         {
+            if (!hasGroups)
+                return true;
             return watchVarControl.BelongsToAnyGroupOrHasNoGroup(_visibleGroups);
         }
 

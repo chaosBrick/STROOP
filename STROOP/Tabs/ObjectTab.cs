@@ -134,6 +134,7 @@ namespace STROOP.Tabs
                 VariableGroup.Transformation,
                 VariableGroup.Coordinate,
                 VariableGroup.Rng,
+                VariableGroup.Custom,
             };
 
         private static readonly List<string> VISIBLE_VAR_GROUPS =
@@ -142,6 +143,7 @@ namespace STROOP.Tabs
                 VariableGroup.Basic,
                 VariableGroup.Intermediate,
                 VariableGroup.ObjectSpecific,
+                VariableGroup.Custom,
             };
 
         public ObjectTab()

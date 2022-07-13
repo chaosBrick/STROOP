@@ -19,6 +19,7 @@ namespace STROOP.Tabs
                 VariableGroup.TAS,
                 VariableGroup.Point,
                 VariableGroup.Scheduler,
+                VariableGroup.Custom,
             };
 
         private static readonly List<string> VISIBLE_VAR_GROUPS =
@@ -28,6 +29,7 @@ namespace STROOP.Tabs
                 VariableGroup.Advanced,
                 VariableGroup.Point,
                 VariableGroup.Scheduler,
+                VariableGroup.Custom,
             };
 
         public TasTab()

@@ -299,6 +299,7 @@ namespace STROOP.Tabs
                 VariableGroup.Advanced,
                 VariableGroup.Self,
                 VariableGroup.ExtendedLevelBoundaries,
+                VariableGroup.Custom,
             };
 
         private static readonly List<string> VISIBLE_VAR_GROUPS =
@@ -307,6 +308,7 @@ namespace STROOP.Tabs
                 VariableGroup.Basic,
                 VariableGroup.Intermediate,
                 VariableGroup.Advanced,
+                VariableGroup.Custom,
             };
 
         public void GoToClosestVertex()

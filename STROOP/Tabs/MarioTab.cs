@@ -40,6 +40,7 @@ namespace STROOP.Tabs
                 VariableGroup.HolpPoint,
                 VariableGroup.Trajectory,
                 VariableGroup.Hacks,
+                VariableGroup.Custom,
             };
 
         private static readonly List<string> VISIBLE_VAR_GROUPS =
@@ -47,6 +48,7 @@ namespace STROOP.Tabs
             {
                 VariableGroup.Basic,
                 VariableGroup.Intermediate,
+                VariableGroup.Custom,
             };
 
         public MarioTab()

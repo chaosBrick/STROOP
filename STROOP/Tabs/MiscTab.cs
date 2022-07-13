@@ -31,6 +31,7 @@ namespace STROOP.Tabs
                 VariableGroup.Intermediate,
                 VariableGroup.Advanced,
                 VariableGroup.Coin,
+                VariableGroup.Custom,
             };
 
         private static readonly List<string> VISIBLE_VAR_GROUPS =
@@ -38,6 +39,7 @@ namespace STROOP.Tabs
             {
                 VariableGroup.Basic,
                 VariableGroup.Intermediate,
+                VariableGroup.Custom,
             };
 
         public MiscTab()
