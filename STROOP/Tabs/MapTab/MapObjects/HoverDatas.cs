@@ -1,6 +1,8 @@
 ﻿using OpenTK;
 using STROOP.Utilities;
+using System;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {
@@ -81,7 +83,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             }
         }
 
-        protected class MapObjectHoverData : PointHoverData
+        protected class MapObjectHoverData : PointHoverData, IPositionCalculatorProvider
         {
             public PositionAngle currentPositionAngle;
             public MapObjectHoverData(MapObject parent) : base(parent) { }
@@ -104,6 +106,12 @@ namespace STROOP.Tabs.MapTab.MapObjects
             }
 
             public override string ToString() => currentPositionAngle.ToString();
+
+            IEnumerable<(string name, Func<Vector3> func)> IPositionCalculatorProvider.GetPositionCalculators()
+            {
+                var capture = currentPositionAngle;
+                yield return (capture.GetMapName(), () => capture.position);
+            }
         }
     }
 }

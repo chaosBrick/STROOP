@@ -25,6 +25,30 @@ namespace STROOP.Tabs.MapTab
             Overlay,
         }
 
+        static Vector3 ProjectOnLineSegment(Vector3 p, Vector3 A, Vector3 B)
+        {
+            Vector3 d = B - A;
+            float distThing = Vector3.Dot(p - A, d) / Vector3.Dot(d, d);
+            return A + d * Math.Max(0, Math.Min(1, distThing));
+        }
+
+        public bool HoverTopDown(Vector3 position, float radius) =>
+            (position.Xz - mapCursorPosition.Xz).LengthSquared < radius * radius;
+
+        public bool HoverOrthogonal(Vector3 position, float radius)
+        {
+            var projectedPos = Vector3.TransformPosition(position, ViewMatrix);
+            projectedPos.X = (1 + projectedPos.X) * glControl.Width / 2;
+            projectedPos.Y = (1 - projectedPos.Y) * glControl.Height / 2;
+            return (projectedPos.Xy - mousePosition2D).LengthSquared < (radius * radius);
+        }
+        public bool Hover3D(Vector3 position, float radius)
+        {
+            var lineEnd = cursorOnMap ? mapCursorPosition
+                : view.position + Vector3.Normalize(mapCursorPosition - view.position) * 10000;
+            return ((ProjectOnLineSegment(position, view.position, lineEnd) - position).Length < radius);
+        }
+
         public readonly List<Action>[] drawLayers;
 
         bool needsRecreateObjectMipmaps = false;
