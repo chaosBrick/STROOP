@@ -62,5 +62,23 @@ namespace STROOP.Utilities
             foreach (var obj in lstIn)
                 yield return converter(obj);
         }
+
+
+        public static T GetMeaningfulValue<T>(Func<IEnumerable<T>> values, T fail, T @default)
+        {
+            T result = @default;
+            foreach (var value in values())
+                GetMeaningfulValue(ref result, value, fail);
+            return result;
+        }
+
+        public static void GetMeaningfulValue<T>(ref T result, T input, T fail)
+        {
+            if (!(result?.Equals(fail) ?? fail == null))
+                if (result == null)
+                    result = input;
+                else if (!(input?.Equals(result) ?? result == null))
+                    result = fail;
+        }
     }
 }

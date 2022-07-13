@@ -350,16 +350,6 @@ namespace STROOP.Tabs.GhostTab
                 buttonGhostColor.Enabled = true;
             }
 
-
-            void GetMeaningfulValue<T>(ref T result, T input, T failString)
-            {
-                if (!(result?.Equals(failString) ?? failString == null))
-                    if (result == null)
-                        result = input;
-                    else if (!(input?.Equals(result) ?? result == null))
-                        result = failString;
-            }
-
             string fileValue = null;
             string numFramesValue = null;
             string originalPlaybackStartValue = null;
@@ -369,12 +359,12 @@ namespace STROOP.Tabs.GhostTab
 
             foreach (var g in GetSelectedGhosts())
             {
-                GetMeaningfulValue(ref fileValue, g.fileName, "<Multiple Files>");
-                GetMeaningfulValue(ref numFramesValue, g.numFrames.ToString(), "<Multiple values>");
-                GetMeaningfulValue(ref originalPlaybackStartValue, g.originalPlaybackBaseFrame.ToString(), "<Multiple values>");
-                GetMeaningfulValue(ref playbackStartValue, g.playbackBaseFrame.ToString(), "<Multiple values>");
-                GetMeaningfulValue(ref nameValue, g.name, "<Multiple Names>");
-                GetMeaningfulValue<CheckState?>(ref transparentValue, g.transparent ? CheckState.Checked : CheckState.Unchecked, CheckState.Indeterminate);
+                GeneralUtilities.GetMeaningfulValue(ref fileValue, g.fileName, "<Multiple Files>");
+                GeneralUtilities.GetMeaningfulValue(ref numFramesValue, g.numFrames.ToString(), "<Multiple values>");
+                GeneralUtilities.GetMeaningfulValue(ref originalPlaybackStartValue, g.originalPlaybackBaseFrame.ToString(), "<Multiple values>");
+                GeneralUtilities.GetMeaningfulValue(ref playbackStartValue, g.playbackBaseFrame.ToString(), "<Multiple values>");
+                GeneralUtilities.GetMeaningfulValue(ref nameValue, g.name, "<Multiple Names>");
+                GeneralUtilities.GetMeaningfulValue(ref transparentValue, g.transparent ? CheckState.Checked : CheckState.Unchecked, CheckState.Indeterminate);
             }
 
             labelGhostFile.Text = $"File: {fileValue ?? "-"}";
