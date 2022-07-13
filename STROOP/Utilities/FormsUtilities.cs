@@ -31,5 +31,21 @@ namespace STROOP.Utilities
             strip.Add(item);
             return item;
         }
+
+        public static void PreventClosingMenuStrip(this ToolStripMenuItem item)
+        {
+            var parentStrip = item.GetCurrentParent() as ContextMenuStrip;
+            if (parentStrip != null)
+            {
+                ToolStripDropDownClosingEventHandler closeOnce = null;
+                closeOnce = (___, args) =>
+                {
+                    parentStrip.Closing -= closeOnce;
+                    if (args.CloseReason == ToolStripDropDownCloseReason.ItemClicked)
+                        args.Cancel = true;
+                };
+                parentStrip.Closing += closeOnce;
+            }
+        }
     }
 }

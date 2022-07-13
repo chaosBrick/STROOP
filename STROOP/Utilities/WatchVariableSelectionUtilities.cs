@@ -19,6 +19,21 @@ namespace STROOP.Structs
         {
             var itemList = new List<ToolStripItem>();
 
+            ToolStripMenuItem itemShowAlways = new ToolStripMenuItem("Always visible");
+            itemShowAlways.CheckState = GeneralUtilities.GetMeaningfulValue(
+                () => vars.ConvertAll(v => (CheckState?)(v.alwaysVisible ? CheckState.Checked : CheckState.Unchecked)),
+                CheckState.Indeterminate,
+                null) ?? CheckState.Indeterminate;
+            itemShowAlways.MouseDown += (_, __) =>
+            {
+                itemShowAlways.Checked = !itemShowAlways.Checked;
+                foreach (var v in vars)
+                    v.alwaysVisible = itemShowAlways.Checked;
+                itemShowAlways.PreventClosingMenuStrip();
+            };
+            itemList.Add(itemShowAlways);
+            itemList.Add(new ToolStripSeparator());
+
             ToolStripMenuItem itemCopy = new ToolStripMenuItem("Copy...");
             CopyUtilities.AddDropDownItems(itemCopy, () => vars);
             itemList.Add(itemCopy);

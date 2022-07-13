@@ -33,13 +33,22 @@ namespace STROOP
         int _resizeObjSlotTime = 0;
         readonly bool isMainForm;
 
+        public readonly SearchVariableDialog searchVariableDialog;
+
         public StroopMainForm(bool isMainForm)
         {
+            this.searchVariableDialog = new SearchVariableDialog(this);
             this.isMainForm = isMainForm;
             InitializeComponent();
             InitTabs();
             ObjectSlotsManager = new ObjectSlotsManager(this, tabControlMain);
             GetTab<Tabs.OptionsTab>().AddCogContextMenu(pictureBoxCog);
+        }
+
+        public void ShowSearchDialog()
+        {
+            searchVariableDialog.Show();
+            searchVariableDialog.Activate();
         }
 
         private bool AttachToProcess(Process process)

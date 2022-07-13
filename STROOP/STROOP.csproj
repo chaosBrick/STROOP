@@ -221,8 +221,11 @@
     <Compile Include="Forms\ImageForm.Designer.cs">
       <DependentUpon>ImageForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\SearchVariableDialog.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\SearchVariableDialog.Designer.cs">
+      <DependentUpon>SearchVariableDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\TriangleListForm.cs">
       <SubType>Form</SubType>
@@ -954,6 +957,9 @@
     <Compile Include="Forms\VariableViewerForm.Designer.cs">
       <DependentUpon>VariableViewerForm.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Forms\SearchVariableDialog.resx">
+      <DependentUpon>SearchVariableDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Tabs\ActionsTab.resx">
       <DependentUpon>ActionsTab.cs</DependentUpon>
     </EmbeddedResource>

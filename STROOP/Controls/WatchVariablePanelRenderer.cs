@@ -148,13 +148,18 @@ namespace STROOP.Controls
             public void Draw()
             {
                 //Return if not focused and recently enough refreshed to save CPU
-                if (FindForm() != Form.ActiveForm && (DateTime.Now - lastRefreshed).TotalMilliseconds < idleRefreshMilliseconds)
+                var form = FindForm();
+                if (form != Form.ActiveForm && (DateTime.Now - lastRefreshed).TotalMilliseconds < idleRefreshMilliseconds)
                     return;
 
+                var displayedWatchVars = target.GetCurrentVariableControls();
+
                 lastRefreshed = DateTime.Now;
+                var searchForm = (form as StroopMainForm)?.searchVariableDialog;
+                bool SearchHighlight(string text) => searchForm?.IsMatch(text) ?? false;
 
                 int maxRows = GetMaxRows();
-                var newRect = new Rectangle(0, 0, ((target._shownWatchVarControls.Count - 1) / maxRows + 1) * elementWidth + borderMargin * 2, maxRows * elementHeight + borderMargin * 2);
+                var newRect = new Rectangle(0, 0, ((displayedWatchVars.Count - 1) / maxRows + 1) * elementWidth + borderMargin * 2, maxRows * elementHeight + borderMargin * 2);
                 if (bufferedGraphics == null || Bounds.Width != newRect.Width || Bounds.Height != newRect.Height)
                 {
                     bufferedGraphics?.Dispose();
@@ -229,7 +234,7 @@ namespace STROOP.Controls
 
                     g.ResetClip();
                     ResetIterators();
-                    foreach (var ctrl in target._shownWatchVarControls)
+                    foreach (var ctrl in displayedWatchVars)
                     {
                         var ctrlData = GetRenderData(ctrl);
 
@@ -253,7 +258,7 @@ namespace STROOP.Controls
                     }
 
                     ResetIterators();
-                    foreach (var ctrl in target._shownWatchVarControls)
+                    foreach (var ctrl in displayedWatchVars)
                     {
                         GetColumn(0, elementNameWidth);
                         var yCoord = y * elementHeight;
@@ -295,7 +300,7 @@ namespace STROOP.Controls
                     }
 
                     ResetIterators();
-                    foreach (var ctrl in target._shownWatchVarControls)
+                    foreach (var ctrl in displayedWatchVars)
                     {
                         GetColumn(elementNameWidth, elementValueWidth);
 
@@ -353,12 +358,17 @@ namespace STROOP.Controls
                     }
 
                     ResetIterators();
-                    foreach (var ctrl in target._shownWatchVarControls)
+                    using (var highlightBrush = new SolidBrush(Color.FromArgb(0x40, Color.Blue)))
                     {
-                        GetColumn(elementNameWidth, elementValueWidth, false);
-                        if (ctrl.Highlighted)
-                            using (var pen = new Pen(ctrl.HighlightColor, 3))
-                                g.DrawRectangle(pen, x * elementWidth, y * elementHeight, elementWidth, elementHeight);
+                        foreach (var ctrl in displayedWatchVars)
+                        {
+                            GetColumn(elementNameWidth, elementValueWidth, false);
+                            if (ctrl.Highlighted)
+                                using (var pen = new Pen(ctrl.HighlightColor, 3))
+                                    g.DrawRectangle(pen, x * elementWidth, y * elementHeight, elementWidth, elementHeight);
+                            if (SearchHighlight(ctrl.VarName))
+                                g.FillRectangle(highlightBrush, x * elementWidth + 2, y * elementHeight + 2, elementWidth - 4, elementHeight - 4);
+                        }
                     }
                 }
 
@@ -371,7 +381,7 @@ namespace STROOP.Controls
                     var cursorPosition = new Vector2(pt.X, pt.Y);
                     (var insertionIndex, _, _) = GetVariableAt(pt);
                     if (insertionIndex < 0)
-                        insertionIndex = target._shownWatchVarControls.Count;
+                        insertionIndex = displayedWatchVars.Count;
                     var x = insertionIndex / maxRows;
                     var y = insertionIndex % maxRows;
                     g.DrawLine(insertionMarkerPen, x * elementWidth, y * elementHeight, (x + 1) * elementWidth, y * elementHeight);
@@ -454,8 +464,9 @@ namespace STROOP.Controls
                 int index = x * maxRows + y;
                 if (index < 0)
                     return (0, null, false);
-                if (index < target._shownWatchVarControls.Count)
-                    return (index, target._shownWatchVarControls[index], (location.X % elementWidth) < elementNameWidth);
+                var displayedWatchVars = target.GetCurrentVariableControls();
+                if (index < displayedWatchVars.Count)
+                    return (index, displayedWatchVars[index], (location.X % elementWidth) < elementNameWidth);
 
                 return (-1, null, false);
             }

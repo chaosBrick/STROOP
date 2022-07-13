@@ -54,6 +54,8 @@ namespace STROOP.Controls
 
         public bool RenameMode;
 
+        public bool alwaysVisible;
+
         public bool IsSelected { get; set; }
 
         private Func<List<uint>> _defaultFixedAddressListGetter;

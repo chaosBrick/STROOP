@@ -59,6 +59,7 @@ namespace STROOP.Controls
 
         private List<WatchVariableControl> _allWatchVarControls;
         private List<WatchVariableControl> _shownWatchVarControls;
+        private List<WatchVariableControl> _hiddenSearchResults = new List<WatchVariableControl>();
         private List<string> _allGroups;
         private List<string> _initialVisibleGroups;
         private List<string> _visibleGroups;
@@ -118,6 +119,11 @@ namespace STROOP.Controls
             _reorderingWatchVarControls = new List<WatchVariableControl>();
 
             renderer = new WatchVariablePanelRenderer(this);
+            KeyDown += (_, args) =>
+            {
+                if (KeyboardUtilities.IsCtrlHeld() && args.KeyCode == Keys.F)
+                    (FindForm() as StroopMainForm)?.ShowSearchDialog();
+            };
         }
 
         protected override void OnScroll(ScrollEventArgs se)
@@ -505,6 +511,9 @@ namespace STROOP.Controls
                             filterVariablesItem.DropDown.Close();
                         };
 
+            ToolStripItem searchVariablesItem = new ToolStripMenuItem("Search variables...");
+            searchVariablesItem.Click += (_, __) => (FindForm() as StroopMainForm)?.ShowSearchDialog();
+
             var strip = new ContextMenuStrip();
             strip.Items.Add(resetVariablesItem);
             strip.Items.Add(clearAllButHighlightedItem);
@@ -514,6 +523,7 @@ namespace STROOP.Controls
             strip.Items.Add(openSaveClearItem);
             strip.Items.Add(doToAllVariablesItem);
             strip.Items.Add(filterVariablesItem);
+            strip.Items.Add(searchVariablesItem);
             if (customContextMenuItems.Count > 0)
             {
                 strip.Items.Add(new ToolStripSeparator());
@@ -533,7 +543,7 @@ namespace STROOP.Controls
         public void BeginMoveSelected()
         {
             _reorderingWatchVarControls.Clear();
-            _reorderingWatchVarControls.AddRange(_selectedWatchVarControls);
+            _reorderingWatchVarControls.AddRange(_selectedWatchVarControls.Where(v => !_hiddenSearchResults.Contains(v)));
         }
 
         private void ToggleVarGroupVisibility(string varGroup, bool? newVisibilityNullable = null)
@@ -588,11 +598,8 @@ namespace STROOP.Controls
             return lst;
         }
 
-        public void RemoveVariable(WatchVariableControl watchVarControl)
-        {
-            // No need to lock, since this calls into a method that locks
+        public void RemoveVariable(WatchVariableControl watchVarControl) =>
             RemoveVariables(new List<WatchVariableControl>() { watchVarControl });
-        }
 
         public void RemoveVariables(IEnumerable<WatchVariableControl> watchVarControls)
         {
@@ -670,13 +677,6 @@ namespace STROOP.Controls
             }
         }
 
-        private void AddAllVariablesToCustomTab()
-        {
-            throw new Exception("What");
-            //GetCurrentVariableControls().ForEach(varControl =>
-            //    varControl.AddToTab(AccessScope<StroopMainForm>.content.GetTab<Tabs.CustomTab>().watchVariablePanelCustom));
-        }
-
         private List<XElement> GetCurrentVarXmlElements(bool useCurrentState = true)
         {
             return GetCurrentVariableControls().ConvertAll(control => control.ToXml(useCurrentState));
@@ -719,9 +719,12 @@ namespace STROOP.Controls
                 FileType.StroopVariables, "VarData", GetCurrentVarXmlElements(), fileName);
         }
 
-        //TODO: Maybe just enumerate instead of returning a list copy
-        public List<WatchVariableControl> GetCurrentVariableControls() =>
-            new List<WatchVariableControl>(_shownWatchVarControls);
+        public List<WatchVariableControl> GetCurrentVariableControls()
+        {
+            var lst = new List<WatchVariableControl>(_shownWatchVarControls);
+            lst.AddRange(_hiddenSearchResults);
+            return lst;
+        }
 
         public List<WatchVariable> GetCurrentVariablePrecursors()
         {
@@ -754,13 +757,31 @@ namespace STROOP.Controls
         public void UpdatePanel()
         {
             FontSize = variablePanelSize;
+            var searchForm = (FindForm() as StroopMainForm)?.searchVariableDialog ?? null;
+            _hiddenSearchResults.Clear();
+            var shownVars = new HashSet<WatchVariableControl>(_shownWatchVarControls);
+            var removeLater = new List<WatchVariableControl>();
+            foreach (var v in _allWatchVarControls)
+            {
+                if (!shownVars.Contains(v))
+                {
+                    if (ShouldShow(v))
+                        _shownWatchVarControls.Add(v);
+                    else if (searchForm != null && searchForm.searchHidden && searchForm.IsMatch(v.VarName))
+                        _hiddenSearchResults.Add(v);
+                }
+                else if (!ShouldShow(v))
+                    removeLater.Add(v);
+            }
+            foreach (var r in removeLater)
+                _shownWatchVarControls.Remove(r);
             GetCurrentVariableControls().ForEach(watchVarControl => watchVarControl.UpdateControl());
             renderer.Draw();
         }
 
         private bool ShouldShow(WatchVariableControl watchVarControl)
         {
-            if (!hasGroups)
+            if (!hasGroups || watchVarControl.alwaysVisible)
                 return true;
             return watchVarControl.BelongsToAnyGroupOrHasNoGroup(_visibleGroups);
         }
