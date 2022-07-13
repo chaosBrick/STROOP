@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.groupBoxGhosts = new System.Windows.Forms.GroupBox();
             this.listBoxGhosts = new System.Windows.Forms.ListBox();
             this.buttonMarioColor = new System.Windows.Forms.Button();
@@ -162,6 +161,7 @@
             this.checkTransparentGhosts.TabIndex = 6;
             this.checkTransparentGhosts.Text = "Transparent Ghosts";
             this.checkTransparentGhosts.UseVisualStyleBackColor = true;
+            this.checkTransparentGhosts.CheckedChanged += new System.EventHandler(this.checkTransparentGhosts_CheckedChanged);
             // 
             // buttonGhostColor
             // 
@@ -307,7 +307,9 @@
             this.watchVariablePanelGhost.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.watchVariablePanelGhost.AutoScroll = true;
             this.watchVariablePanelGhost.DataPath = "Config/GhostData.xml";
+            this.watchVariablePanelGhost.FontSize = 8.25F;
             this.watchVariablePanelGhost.Location = new System.Drawing.Point(6, 19);
             this.watchVariablePanelGhost.Name = "watchVariablePanelGhost";
             this.watchVariablePanelGhost.Size = new System.Drawing.Size(209, 432);

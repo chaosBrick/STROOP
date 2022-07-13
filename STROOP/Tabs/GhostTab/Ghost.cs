@@ -49,6 +49,7 @@ namespace STROOP.Tabs.GhostTab
         public string name, fileName = "-";
         public Vector4 hatColor = new Vector4(0, 1, 0, 1);
         public GhostPositionAngle positionAngle { get; private set; }
+        public bool transparent = true;
 
         public Ghost()
         {

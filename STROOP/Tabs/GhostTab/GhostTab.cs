@@ -95,8 +95,12 @@ namespace STROOP.Tabs.GhostTab
             UpdateFileWatchers();
         }
 
-        IEnumerable<Ghost> GetSelectedGhosts() => listBoxGhosts.SelectedItems.ConvertAndRemoveNull(_ => _ as Ghost);
-
+        IEnumerable<Ghost> GetSelectedGhosts()
+        {
+            var lst = listBoxGhosts.SelectedItems.ConvertAndRemoveNull(_ => _ as Ghost);
+            lst.Sort((a, b) => a.transparent && !b.transparent ? 1 : (a.transparent == b.transparent ? 0 : -1));
+            return lst;
+        }
         public override string GetDisplayName() => "Ghost";
 
         void AddGhost(string name, Ghost newGhost)
@@ -168,7 +172,6 @@ namespace STROOP.Tabs.GhostTab
             if (updateGhostData)
             {
                 Config.Stream.SetValue((byte)numGhosts, 0x80407FFF);
-                Config.Stream.SetValue((byte)(checkTransparentGhosts.Checked ? 1 : 0), 0x80407FFE);
                 Config.Stream.WriteRam(ColorToLights(marioHatColor), (UIntPtr)(COLORED_HATS_LIGHTS_ADDR), EndiannessType.Big);
                 //Disable low poly Mario
                 Config.Stream.SetValue(0x02587fff, 0x800f470c);
@@ -177,9 +180,11 @@ namespace STROOP.Tabs.GhostTab
 
             for (int ghostIndex = 0; ghostIndex < numGhosts; ghostIndex++)
             {
+                bool ghostTransparent = true;
                 if (ghostArr.Length > ghostIndex)
                 {
                     var ghost = ghostArr[ghostIndex];
+                    ghostTransparent = ghost.transparent;
                     for (int tm = 0; tm < 0x80; tm++)
                     {
                         int i = (tm + globalTimer) & 0x7F;
@@ -248,6 +253,8 @@ namespace STROOP.Tabs.GhostTab
                     var color = ghostIndex < ghostArr.Length ? ghostArr[ghostIndex].hatColor : new Vector4(0.8f, 0.8f, 0.8f, 1.0f);
 
                     Config.Stream.WriteRam(ColorToLights(color), (UIntPtr)(COLORED_HATS_LIGHTS_ADDR + (ghostIndex + 1) * 0x20), EndiannessType.Big);
+                    var ptr = Config.Stream.GetUInt32((uint)(0x80407ff8 - ghostIndex * 0x68));
+                    Config.Stream.SetValue((byte)(ghostTransparent ? 1 : 0), ptr + 0x61);
                     lastGlobalTimer = globalTimer;
                 }
             }
@@ -344,12 +351,12 @@ namespace STROOP.Tabs.GhostTab
             }
 
 
-            void GetMeaningfulValue(ref string result, string input, string failString)
+            void GetMeaningfulValue<T>(ref T result, T input, T failString)
             {
-                if (result != failString)
+                if (!(result?.Equals(failString) ?? failString == null))
                     if (result == null)
                         result = input;
-                    else if (input != result)
+                    else if (!(input?.Equals(result) ?? result == null))
                         result = failString;
             }
 
@@ -358,6 +365,7 @@ namespace STROOP.Tabs.GhostTab
             string originalPlaybackStartValue = null;
             string playbackStartValue = null;
             string nameValue = null;
+            CheckState? transparentValue = null;
 
             foreach (var g in GetSelectedGhosts())
             {
@@ -366,19 +374,22 @@ namespace STROOP.Tabs.GhostTab
                 GetMeaningfulValue(ref originalPlaybackStartValue, g.originalPlaybackBaseFrame.ToString(), "<Multiple values>");
                 GetMeaningfulValue(ref playbackStartValue, g.playbackBaseFrame.ToString(), "<Multiple values>");
                 GetMeaningfulValue(ref nameValue, g.name, "<Multiple Names>");
+                GetMeaningfulValue<CheckState?>(ref transparentValue, g.transparent ? CheckState.Checked : CheckState.Unchecked, CheckState.Indeterminate);
             }
 
             labelGhostFile.Text = $"File: {fileValue ?? "-"}";
             labelNumFrames.Text = $"Number of frames: {numFramesValue ?? "-"}";
             labelGhostPlaybackStart.Text = $"Original playback start: {originalPlaybackStartValue ?? "-"}";
 
-            suspendStartOfPlaybackChanged = true;
+            suspendHandlers = true;
             if (uint.TryParse(playbackStartValue, out uint val))
                 numericUpDownStartOfPlayback.Value = val;
 
             if (numericUpDownStartOfPlayback.Controls[1] is TextBox txt)
                 txt.Text = playbackStartValue ?? "<No value>";
-            suspendStartOfPlaybackChanged = false;
+
+            checkTransparentGhosts.CheckState = transparentValue.HasValue ? transparentValue.Value : CheckState.Indeterminate;
+            suspendHandlers = false;
 
             suspendNameChanged = true;
             textBoxGhostName.Text = nameValue;
@@ -423,10 +434,10 @@ Are you sure you want to continue?";
             }
         }
 
-        bool suspendStartOfPlaybackChanged;
+        bool suspendHandlers;
         private void numericUpDownStartOfPlayback_ValueChanged(object sender, EventArgs e)
         {
-            if (!suspendStartOfPlaybackChanged)
+            if (!suspendHandlers)
                 SetStartOfPlayback((uint)numericUpDownStartOfPlayback.Value);
         }
 
@@ -476,6 +487,14 @@ Are you sure you want to continue?";
                     buttonGhostColor.BackColor = dlg.Color;
                 }
             }
+        }
+
+        private void checkTransparentGhosts_CheckedChanged(object sender, EventArgs e)
+        {
+            if (suspendHandlers)
+                return;
+            foreach (var g in GetSelectedGhosts())
+                g.transparent = checkTransparentGhosts.Checked;
         }
     }
 }
