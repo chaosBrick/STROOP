@@ -1,0 +1,25 @@
+DejaVu Markup 1.00
+Based on: DejaVu Sans Mono 2.35 Copyright (c) 2004-2015 DejaVu fonts team
+------------------------------------------------
+
+DejaVu Markup is a slightly modified version of DejaVu Sans Mono with minor
+changes to improve the distinction between various similar-looking glyphs.
+
+DejaVu Sans Mono already distinguishes between many similar similar-looking
+characters, such as between zero 0 and the capital O, for example.
+A text-document markup language (such as LaTeX, AsciiDoc, or markdown)
+has additional requirements, especially when marking up classical documents.
+The ability to distinguish between the various
+kinds of quote marks and dashes becomes important.  Most mono-spaced fonts
+do not clearly distinguish between each of these look-alike characters:
+a•b a·b a-b a–b a—b ±−4 x⨯X “"″” lI1| O0 {()}
+
+
+
+DejaVu Markup changes:
+
+V1.00 — 2016/01/03 — Brian Dunn — www.BDTechConcepts.com
+* Slightly modified from DejaVu Sans Mono 2.35
+* Shorter endash to distinguish from hyphen and emdash.
+* Lower minus to distinguish from endash.
+

@@ -34,6 +34,7 @@ namespace STROOP.Tabs.MapTab
         public Renderers.LineRenderer lineRenderer;
         public Renderers.ShapeRenderer circleRenderer;
         public Renderers.GeometryRenderer cylinderRenderer, sphereRenderer;
+        public Renderers.TextRenderer textRenderer;
         public Renderers.TransparencyRenderer transparencyRenderer;
         public Vector2 pixelsPerUnit { get; private set; }
 
@@ -223,6 +224,7 @@ namespace STROOP.Tabs.MapTab
             renderers.Add(circleRenderer = new Renderers.ShapeRenderer(DrawLayers.Overlay));
             renderers.Add(cylinderRenderer = new Renderers.GeometryRenderer(Renderers.GeometryRenderer.GeometryData.Cylinder()));
             renderers.Add(sphereRenderer = new Renderers.GeometryRenderer(Renderers.GeometryRenderer.GeometryData.Sphere(128, 64)));
+            renderers.Add(textRenderer = new Renderers.TextRenderer());
 
             transparencyRenderer = new Renderers.TransparencyRenderer(16, () => mainDepthBuffer, glControl.Width, glControl.Height);
             transparencyRenderer.transparents.Add(objectRenderer.transparent);
