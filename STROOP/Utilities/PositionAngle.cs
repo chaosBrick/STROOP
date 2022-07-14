@@ -68,6 +68,7 @@ namespace STROOP.Utilities
                 bool success = Config.Stream.SetValue((float)value, MarioConfig.StructAddress + structOffset);
                 if (KeyboardUtilities.IsAltHeld())
                     success &= Config.Stream.SetValue((float)value, MarioConfig.StructAddress + objOffset);
+                Config.Stream.Resume();
                 return success;
             }
             public override bool SetX(double value) => SetCoordinateComponent(value, MarioConfig.XOffset, ObjectConfig.XOffset);
