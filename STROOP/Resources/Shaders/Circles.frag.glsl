@@ -14,10 +14,9 @@ void main()
 	
 	if (fs_texCoord.z == 1.0) {
 		f = max(
-				max(fs_texCoord.x - 0.5, 0.5 - fs_texCoord.x), 
-				max(fs_texCoord.y - 0.5, 0.5 - fs_texCoord.y)
-			) * 2;
-		outline *= 2;
+				abs(fs_texCoord.x), 
+				abs(fs_texCoord.y)
+			);
 	}
 	else {
 		f = length(fs_texCoord);
