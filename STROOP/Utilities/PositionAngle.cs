@@ -1,4 +1,4 @@
-﻿/* TODO: Implement like this? idk
+﻿/* TODO: Implement accordingly (maybe)
  * 
  * old ToString of PositionAngle
 public override string ToString()
@@ -58,7 +58,7 @@ namespace STROOP.Utilities
         public class MarioPositionAngle : MemoryPositionAngle, IHoldsObjectAddress
         {
             public MarioPositionAngle()
-                : base(() => MarioConfig.StructAddress, MarioConfig.XOffset, MarioConfig.YOffset, MarioConfig.ZOffset, MarioConfig.FacingYawOffset)
+                : base(() => MarioConfig.StructAddress, MarioConfig.XOffset, MarioConfig.YOffset, MarioConfig.ZOffset, MarioConfig.FacingYawOffset, "Mario")
             { }
 
             bool SetCoordinateComponent(double value, uint structOffset, uint objOffset)
@@ -98,6 +98,7 @@ namespace STROOP.Utilities
                 var addr = baseGetter();
                 return addr.HasValue ? GetMapNameForObject(addr.Value) : "(None)";
             }
+            public override string ToString() => GetMapName();
         }
 
         public class ObjectHomePositionAngle : MemoryPositionAngle
@@ -122,7 +123,7 @@ namespace STROOP.Utilities
                 short numSnowParticles = Config.Stream.GetInt16(SnowConfig.CounterAddress);
                 if (index < 0 || index >= numSnowParticles) return false;
                 uint snowStart = Config.Stream.GetUInt32(SnowConfig.SnowArrayPointerAddress);
-                uint structOffset = (uint)index * SnowConfig.ParticleStructSize;
+                uint structOffset = index * SnowConfig.ParticleStructSize;
                 address = snowStart + structOffset;
                 return true;
             }
@@ -210,16 +211,18 @@ namespace STROOP.Utilities
             uint? xOffset, yOffset, zOffset, angleOffset;
             protected readonly Func<uint?> baseGetter;
             Func<double> angleGetter;
-            public MemoryPositionAngle(Func<uint?> baseGetter, uint? xOffset, uint? yOffset, uint? zOffset, uint? angleOffset = null)
+            readonly string name;
+            public MemoryPositionAngle(Func<uint?> baseGetter, uint? xOffset, uint? yOffset, uint? zOffset, uint? angleOffset = null, string name = null)
             {
                 this.baseGetter = baseGetter;
                 this.xOffset = xOffset;
                 this.yOffset = yOffset;
                 this.zOffset = zOffset;
                 this.angleOffset = angleOffset;
+                this.name = name;
             }
-            public MemoryPositionAngle(Func<uint?> baseGetter, uint? xOffset, uint? yOffset, uint? zOffset, Func<double> angleGetter)
-                : this(baseGetter, xOffset, yOffset, zOffset, (uint?)null)
+            public MemoryPositionAngle(Func<uint?> baseGetter, uint? xOffset, uint? yOffset, uint? zOffset, Func<double> angleGetter, string name = null)
+                : this(baseGetter, xOffset, yOffset, zOffset, (uint?)null, name)
             {
                 this.angleGetter = angleGetter;
             }
@@ -256,6 +259,8 @@ namespace STROOP.Utilities
             public override bool SetY(double value) => Set(typeof(float), (float)value, yOffset);
             public override bool SetZ(double value) => Set(typeof(float), (float)value, zOffset);
             public override bool SetAngle(double value) => Set(typeof(ushort), (ushort)value, angleOffset);
+
+            public override string ToString() => name ?? GetType().Name;
         }
 
         public class TrianglePositionAngle : PositionAngle
@@ -389,25 +394,23 @@ namespace STROOP.Utilities
 
     public abstract partial class PositionAngle
     {
-        public static PositionAngle Mario = new MemoryPositionAngle(
-            () => MarioConfig.StructAddress,
-            MarioConfig.XOffset,
-            MarioConfig.YOffset,
-            MarioConfig.ZOffset,
-            MarioConfig.FacingYawOffset);
+        public static PositionAngle Mario = new MarioPositionAngle();
 
         public static PositionAngle Holp = new MemoryPositionAngle(
             () => MarioConfig.StructAddress,
             MarioConfig.HolpXOffset,
             MarioConfig.HolpYOffset,
-            MarioConfig.HolpZOffset);
+            MarioConfig.HolpZOffset,
+            (uint?)null,
+            "Holp");
 
         public static PositionAngle Camera = new MemoryPositionAngle(
             () => CameraConfig.StructAddress,
             CameraConfig.XOffset,
             CameraConfig.YOffset,
             CameraConfig.ZOffset,
-            CameraConfig.FacingYawOffset
+            CameraConfig.FacingYawOffset,
+            "Camera"
             );
 
         public static PositionAngle CameraFocus = new MemoryPositionAngle(
@@ -415,7 +418,8 @@ namespace STROOP.Utilities
             CameraConfig.FocusXOffset,
             CameraConfig.FocusYOffset,
             CameraConfig.FocusZOffset,
-            CameraConfig.FacingYawOffset
+            CameraConfig.FacingYawOffset,
+            "CameraFocus"
             );
 
         public static PositionAngle CamHackCamera = new MemoryPositionAngle(
@@ -423,7 +427,8 @@ namespace STROOP.Utilities
             CamHackConfig.CameraXOffset,
             CamHackConfig.CameraYOffset,
             CamHackConfig.CameraZOffset,
-            () => CamHackUtilities.GetCamHackYawFacing()
+            () => CamHackUtilities.GetCamHackYawFacing(),
+            "CamHack Camera"
             );
 
         public static PositionAngle CamHackFocus = new MemoryPositionAngle(
@@ -431,7 +436,8 @@ namespace STROOP.Utilities
             CamHackConfig.FocusXOffset,
             CamHackConfig.FocusYOffset,
             CamHackConfig.FocusZOffset,
-            () => CamHackUtilities.GetCamHackYawFacing()
+            () => CamHackUtilities.GetCamHackYawFacing(),
+            "CamHck Focus"
             );
 
         public virtual Vector4 GetArrowColor(Vector4 baseColor) => baseColor;
@@ -473,10 +479,22 @@ namespace STROOP.Utilities
         public static PositionAngle MarioObj() => Obj(Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress));
 
         public static PositionAngle ObjGfx(uint address) =>
-            new MemoryPositionAngle(() => address, ObjectConfig.GraphicsXOffset, ObjectConfig.GraphicsYOffset, ObjectConfig.GraphicsZOffset, ObjectConfig.GraphicsYawOffset);
+            new MemoryPositionAngle(
+                () => address, 
+                ObjectConfig.GraphicsXOffset, 
+                ObjectConfig.GraphicsYOffset, 
+                ObjectConfig.GraphicsZOffset, 
+                ObjectConfig.GraphicsYawOffset,
+                $"[{address.ToString("X8")}] Object Graphics");
 
         public static PositionAngle ObjScale(uint address) =>
-            new MemoryPositionAngle(() => address, ObjectConfig.ScaleWidthOffset, ObjectConfig.ScaleHeightOffset, ObjectConfig.ScaleDepthOffset);
+            new MemoryPositionAngle(
+                () => address, 
+                ObjectConfig.ScaleWidthOffset, 
+                ObjectConfig.ScaleHeightOffset, 
+                ObjectConfig.ScaleDepthOffset,
+                (uint?)null,
+                $"[{address.ToString("X8")}] Object Scale");
 
         static Func<uint?> GetFirstOrLast(string name, bool first) => () =>
         {
@@ -490,26 +508,32 @@ namespace STROOP.Utilities
             ObjectConfig.XOffset,
             ObjectConfig.YOffset,
             ObjectConfig.ZOffset,
-            ObjectConfig.YawFacingOffset);
+            ObjectConfig.YawFacingOffset,
+            $"First {text}");
 
         public static PositionAngle Last(string text) => new MemoryPositionAngle(
             GetFirstOrLast(text, false),
             ObjectConfig.XOffset,
             ObjectConfig.YOffset,
             ObjectConfig.ZOffset,
-            ObjectConfig.YawFacingOffset);
+            ObjectConfig.YawFacingOffset,
+            $"Last {text}");
 
         public static PositionAngle FirstHome(string text) => new MemoryPositionAngle(
             GetFirstOrLast(text, true),
             ObjectConfig.HomeXOffset,
             ObjectConfig.HomeYOffset,
-            ObjectConfig.HomeZOffset);
+            ObjectConfig.HomeZOffset,
+            (uint?)null,
+            $"First {text}");
 
         public static PositionAngle LastHome(string text) => new MemoryPositionAngle(
             GetFirstOrLast(text, false),
             ObjectConfig.HomeXOffset,
             ObjectConfig.HomeYOffset,
-            ObjectConfig.HomeZOffset);
+            ObjectConfig.HomeZOffset,
+            (uint?)null,
+            $"Last home of {text}");
 
         public static PositionAngle GoombaProjection(uint address) => new GoombaProjectionPositionAngle(address);
         public static PositionAngle Tri(uint address, uint index) => new TrianglePositionAngle(() => address, index);
