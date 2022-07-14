@@ -163,26 +163,36 @@ namespace STROOP.Tabs.MapTab.MapObjects
                     new Vector3(1, float.NaN, float.NaN),
                     new Vector3(1, float.NaN, 1),
                 });
+                Color[] colors = new[] { Color.FromArgb(255, 100, 100), Color.LightGreen, Color.Yellow, Color.LightBlue, Color.Pink, Color.Cyan, Color.LightGray };
 
                 foreach (var end in ends)
                 {
                     string nameString = "";
                     var p1 = _a;
                     var p2 = _b;
+                    int colorIndex = 0;
                     if (!float.IsNaN(end.X))
                         p1.X = p2.X = end.X == 0 ? p1.X : p2.X;
                     else
+                    {
                         nameString += "x";
+                        colorIndex |= 1;
+                    }
                     if (!float.IsNaN(end.Y))
                         p1.Y = p2.Y = end.Y == 0 ? p1.Y : p2.Y;
-                    else
+                    else { 
                         nameString += "y";
+                        colorIndex |= 2;
+                    }
                     if (!float.IsNaN(end.Z))
                         p1.Z = p2.Z = end.Z == 0 ? p1.Z : p2.Z;
-                    else
+                    else { 
                         nameString += "z";
+                        colorIndex |= 4;
+                    }
 
-                    graphics.lineRenderer.Add(p1, p2, ColorUtilities.ColorToVec4(OutlineColor), OutlineWidth);
+                    var lineColor = colors[colorIndex - 1];
+                    graphics.lineRenderer.Add(p1, p2, ColorUtilities.ColorToVec4(lineColor), OutlineWidth);
 
                     Vector3 middlePoint = (p1 + p2) * 0.5f;
                     var ssp = Vector4.Transform(new Vector4(middlePoint.X, middlePoint.Y, middlePoint.Z, 1), graphics.ViewMatrix);
@@ -192,7 +202,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                         continue;
                     graphics.textRenderer.AddText(
                         new[] { ($"{nameString}: {(p1 - p2).Length}", Vector3.Zero) },
-                        Color,
+                        lineColor,
                         Matrix4.CreateTranslation(-16, 8, 0) * Matrix4.CreateScale(1.0f / graphics.glControl.Height) * Matrix4.CreateTranslation(screenspacePoint),
                         screenSpace: true,
                         align: QuickFont.QFontAlignment.Right);
