@@ -7,10 +7,9 @@ using System.Windows.Forms;
 namespace STROOP.Tabs.MapTab.MapObjects
 {
     [ObjectDescription("Mario", "Objects")]
-    public class MapMarioObject : MapObjectObject
+    public class MapMarioObject : MapIconPointObject
     {
-        public MapMarioObject()
-            : base(() => new[] { new Models.ObjectDataModel(Config.Stream.GetUInt32(Structs.MarioObjectConfig.PointerAddress)) })
+        public MapMarioObject() : base(null)
         {
             InternalRotates = true;
             positionAngleProvider = () => new System.Collections.Generic.List<PositionAngle>(new[] { PositionAngle.Mario });
@@ -21,6 +20,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         public override void InitSubTrackerContextMenuStrip(MapTab mapTab, ContextMenuStrip targetStrip)
         {
             base.InitSubTrackerContextMenuStrip(mapTab, targetStrip);
+            MapObjectObject.AddObjectSubTrackers(tracker, GetName(), targetStrip, positionAngleProvider);
 
             var anglesItem = targetStrip.Items.GetSubItem("Angles");
 
