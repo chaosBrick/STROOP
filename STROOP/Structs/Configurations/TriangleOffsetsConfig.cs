@@ -36,6 +36,14 @@ namespace STROOP.Structs.Configurations
         public static readonly byte NoCamCollisionMask = 0x02;
         public static readonly byte XProjectionMask = 0x08;
 
+        public static short GetXIndex(uint triAddress, uint index) => (short)(SavedSettingsConfig.TriangleVertexMultiplier * Config.Stream.GetInt16(triAddress + X1 + 0x6 * index));
+        public static short GetYIndex(uint triAddress, uint index) => (short)(SavedSettingsConfig.TriangleVertexMultiplier * Config.Stream.GetInt16(triAddress + Y1 + 0x6 * index));
+        public static short GetZIndex(uint triAddress, uint index) => (short)(SavedSettingsConfig.TriangleVertexMultiplier * Config.Stream.GetInt16(triAddress + Z1 + 0x6 * index));
+
+        public static bool SetXIndex(short value, uint triAddress, uint index) => Config.Stream.SetValue((short)(value / SavedSettingsConfig.TriangleVertexMultiplier), triAddress + X1 + 0x6 * index);
+        public static bool SetYIndex(short value, uint triAddress, uint index) => Config.Stream.SetValue((short)(value / SavedSettingsConfig.TriangleVertexMultiplier), triAddress + Y1 + 0x6 * index);
+        public static bool SetZIndex(short value, uint triAddress, uint index) => Config.Stream.SetValue((short)(value / SavedSettingsConfig.TriangleVertexMultiplier), triAddress + Z1 + 0x6 * index);
+
         public static short GetX1(uint triAddress) => (short)(SavedSettingsConfig.TriangleVertexMultiplier * Config.Stream.GetInt16(triAddress + X1));
         public static short GetY1(uint triAddress) => (short)(SavedSettingsConfig.TriangleVertexMultiplier * Config.Stream.GetInt16(triAddress + Y1));
         public static short GetZ1(uint triAddress) => (short)(SavedSettingsConfig.TriangleVertexMultiplier * Config.Stream.GetInt16(triAddress + Z1));

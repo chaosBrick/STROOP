@@ -69,7 +69,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 _objMapImage;
         }
 
-        public override string GetName() => PositionAngle.NameOfMultiple(positionAngleProvider(), objName);
+        public override string GetName() => PositionAngle.NameOfMultiple(positionAngleProvider(), $"All {objName}");
 
         protected override void DrawTopDown(MapGraphics graphics)
         {
@@ -89,7 +89,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                     (obj.X, obj.Y, obj.Z,
                     (float)obj.FacingYaw,
                     Config.ObjectAssociations.GetObjectMapImage(obj.BehaviorCriteria),
-                    hoverData.currentPositionAngle != null && obj.Address == hoverData.currentPositionAngle.GetObjAddress() ? ObjectUtilities.HoverAlpha() : 1
+                    hoverData.currentPositionAngle != null && obj.Address == PositionAngle.GetObjectAddress(hoverData.currentPositionAngle) ? ObjectUtilities.HoverAlpha() : 1
                     ));
         }
 

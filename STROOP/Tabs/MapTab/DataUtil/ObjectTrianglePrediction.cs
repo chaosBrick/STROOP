@@ -52,7 +52,7 @@ namespace STROOP.Tabs.MapTab.DataUtil
                     var faceAngles = new Dictionary<uint, (int, int, int)>();
                     foreach (var obj in positionAngleProvider())
                     {
-                        var objAddress = obj.GetObjAddress();
+                        var objAddress = PositionAngle.GetObjectAddress(obj);
                         if (objAddress == 0)
                             continue;
                         loadedObjTriangles.AddRange(TriangleUtilities.GetObjectTrianglesForObject(objAddress).Where(t => filter(t)));
@@ -101,7 +101,7 @@ namespace STROOP.Tabs.MapTab.DataUtil
 
             foreach (var pa in positionAngleProvider())
             {
-                var objAddress = pa.GetObjAddress();
+                var objAddress = PositionAngle.GetObjectAddress(pa);
 
                 var objCollisionPointerOffset = 0x218u;
                 var collisionPointer = Config.Stream.GetInt32(objAddress + objCollisionPointerOffset);

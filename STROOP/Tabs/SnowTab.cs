@@ -55,7 +55,7 @@ namespace STROOP.Tabs
                 if (!snowIndexNullable.HasValue) return;
                 int snowIndex = snowIndexNullable.Value;
                 if (snowIndex < 0 || snowIndex > _numSnowParticles) return;
-                ButtonUtilities.RetrieveSnow(snowIndex);
+                ButtonUtilities.RetrieveSnow((uint)snowIndex);
             };
 
             ControlUtilities.InitializeThreeDimensionController(
@@ -70,7 +70,7 @@ namespace STROOP.Tabs
                     int snowIndex = snowIndexNullable.Value;
                     if (snowIndex < 0 || snowIndex > _numSnowParticles) return;
                     ButtonUtilities.TranslateSnow(
-                        snowIndex,
+                        (uint)snowIndex,
                         hOffset,
                         nOffset,
                         -1 * vOffset,

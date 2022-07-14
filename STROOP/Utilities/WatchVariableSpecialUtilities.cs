@@ -242,20 +242,6 @@ namespace STROOP.Structs
             }
         }
 
-
-        public static string AddSchedulerEntry(int index)
-        {
-            string specialType = "Scheduler" + index;
-            dictionary.Add(specialType,
-                ((uint dummy) =>
-                {
-                    return PositionAngle.Scheduler.GetAdditionalValue(index);
-                }
-            ,
-                DEFAULT_SETTER));
-            return specialType;
-        }
-
         public static void AddPanEntriesToDictionary()
         {
             List<(string, Func<double>, Action<double>)> entries =
@@ -4647,7 +4633,6 @@ namespace STROOP.Structs
             ,
                 (PositionAngle posAngle, uint dummy) =>
                 {
-                    if (posAngle.DependsOnSelf()) return false;
                     SpecialConfig.SelfPosPA = posAngle;
                     return true;
                 }
@@ -4697,7 +4682,6 @@ namespace STROOP.Structs
             ,
                 (PositionAngle posAngle, uint dummy) =>
                 {
-                    if (posAngle.DependsOnSelf()) return false;
                     SpecialConfig.SelfAnglePA = posAngle;
                     return true;
                 }

@@ -39,14 +39,14 @@ namespace STROOP.Tabs.MapTab.MapObjects
         {
             public static GetDimensions Tangibility = posAngle =>
             {
-                uint objAddress = posAngle.GetObjAddress();
+                uint objAddress = PositionAngle.GetObjectAddress(posAngle);
                 float tangibleDist = Config.Stream.GetSingle(objAddress + ObjectConfig.TangibleDistOffset);
                 return ((float)posAngle.X, (float)posAngle.Y, (float)posAngle.Z, tangibleDist);
             };
 
             public static GetDimensions DrawDistance = posAngle =>
             {
-                uint objAddress = posAngle.GetObjAddress();
+                uint objAddress = PositionAngle.GetObjectAddress(posAngle);
                 float drawDist = Config.Stream.GetSingle(objAddress + ObjectConfig.DrawDistOffset);
                 return ((float)posAngle.X, (float)posAngle.Y, (float)posAngle.Z, drawDist);
             };

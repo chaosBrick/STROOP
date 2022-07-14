@@ -22,7 +22,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             List<Vector3> vertices = new List<Vector3>();
             foreach (var posAngle in positionAngleProvider())
             {
-                var address = posAngle.GetObjAddress();
+                var address = PositionAngle.GetObjectAddress(posAngle);
                 var _objPosAngle = PositionAngle.Obj(address);
                 var _homePosAngle = PositionAngle.ObjHome(address);
                 vertices.Add(new Vector3((float)_homePosAngle.X, (float)_homePosAngle.Y, (float)_homePosAngle.Z));

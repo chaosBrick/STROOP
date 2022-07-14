@@ -190,7 +190,6 @@ namespace STROOP.Managers
         {
             if (isMarking) return null;
             if (ActiveTab == TabType.Other) return mainForm.GetTab<Tabs.ObjectTab>().Tab;
-            if (ActiveTab == TabType.TAS && !SpecialConfig.IsSelectedPA) return mainForm.GetTab<Tabs.ObjectTab>().Tab;
             return null;
         }
 

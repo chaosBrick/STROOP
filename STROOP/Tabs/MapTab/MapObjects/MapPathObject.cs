@@ -21,7 +21,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                     return true;
                 if (!x.CompareType(y))
                     return false;
-                if (x.IsObject() && x.GetObjAddress() == y.GetObjAddress() && x.GetMapName() == y.GetMapName())
+                if (x is PositionAngle.ObjectPositionAngle && PositionAngle.GetObjectAddress(x) == PositionAngle.GetObjectAddress(y) && x.GetMapName() == y.GetMapName())
                     return true;
                 return false;
             }

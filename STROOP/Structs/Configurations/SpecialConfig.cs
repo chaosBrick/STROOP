@@ -37,10 +37,6 @@ namespace STROOP.Structs.Configurations
             get => SelfPA.Angle;
         }
 
-        // - Functions
-
-        public static bool IsSelectedPA => SelfPosPA.IsSelected || SelfAnglePA.IsSelected;
-
         // Cam Hack vars
 
         private static double _numPans = 0;

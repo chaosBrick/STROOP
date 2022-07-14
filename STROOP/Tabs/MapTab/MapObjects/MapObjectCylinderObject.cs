@@ -38,7 +38,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         {
             public static GetDimensions HitBox = posAngle =>
             {
-                uint objAddress = posAngle.GetObjAddress();
+                uint objAddress = PositionAngle.GetObjectAddress(posAngle);
                 float objY = Config.Stream.GetSingle(objAddress + ObjectConfig.YOffset);
                 float hitboxRadius = Config.Stream.GetSingle(objAddress + ObjectConfig.HitboxRadiusOffset);
                 float hitboxHeight = Config.Stream.GetSingle(objAddress + ObjectConfig.HitboxHeightOffset);
@@ -50,7 +50,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
             public static GetDimensions EffectiveHitBox = posAngle =>
             {
-                uint objAddress = posAngle.GetObjAddress();
+                uint objAddress = PositionAngle.GetObjectAddress(posAngle);
                 float objY = Config.Stream.GetSingle(objAddress + ObjectConfig.YOffset);
                 float hitboxRadius = Config.Stream.GetSingle(objAddress + ObjectConfig.HitboxRadiusOffset);
                 float hitboxHeight = Config.Stream.GetSingle(objAddress + ObjectConfig.HitboxHeightOffset);
@@ -69,7 +69,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
             public static GetDimensions HurtBox = posAngle =>
             {
-                uint objAddress = posAngle.GetObjAddress();
+                uint objAddress = PositionAngle.GetObjectAddress(posAngle);
                 float objY = Config.Stream.GetSingle(objAddress + ObjectConfig.YOffset);
                 float hurtboxRadius = Config.Stream.GetSingle(objAddress + ObjectConfig.HurtboxRadiusOffset);
                 float hurtboxHeight = Config.Stream.GetSingle(objAddress + ObjectConfig.HurtboxHeightOffset);
@@ -81,7 +81,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
             public static GetDimensions EffectiveHurtBox = posAngle =>
             {
-                uint objAddress = posAngle.GetObjAddress();
+                uint objAddress = PositionAngle.GetObjectAddress(posAngle);
                 float objY = Config.Stream.GetSingle(objAddress + ObjectConfig.YOffset);
                 float hurtboxRadius = Config.Stream.GetSingle(objAddress + ObjectConfig.HurtboxRadiusOffset);
                 float hurtboxHeight = Config.Stream.GetSingle(objAddress + ObjectConfig.HurtboxHeightOffset);

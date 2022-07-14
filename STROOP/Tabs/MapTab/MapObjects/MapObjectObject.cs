@@ -56,7 +56,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 _ =>
                 {
                     var customCylinderObject = new MapObjectCylinderObject(
-                            () => positionAngleProvider().ConvertAndRemoveNull(obj => PositionAngle.ObjHome(obj.GetObjAddress())),
+                            () => positionAngleProvider().ConvertAndRemoveNull(obj => PositionAngle.ObjHome(PositionAngle.GetObjectAddress(obj))),
                             null,
                             "Custom Cylinders");
                     customCylinderObject.getDimensions = MapObjectCylinderObject.Dimensions.CustomSize(() => (customCylinderObject.Size, 0, 100));
@@ -95,7 +95,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                     tracker.MakeCreateTrackerHandler(mapTab, "CustomSpheres", _ =>
                     {
                         var customSpheresObject = new MapObjectSphereObject(
-                                () => positionAngleProvider().ConvertAndRemoveNull(obj => PositionAngle.ObjHome(obj.GetObjAddress())),
+                                () => positionAngleProvider().ConvertAndRemoveNull(obj => PositionAngle.ObjHome(PositionAngle.GetObjectAddress(obj))),
                                 null,
                                 "Custom Spheres");
                         customSpheresObject.getDimensions = MapObjectSphereObject.Dimensions.CustomSize(() => customSpheresObject.Size);

@@ -96,7 +96,7 @@ namespace STROOP.Utilities
             }
             else
             {
-                if (!PositionControllerRelativityConfig.RelativityPA.IsNone())
+                if (PositionControllerRelativityConfig.RelativityPA != null)
                 {
                     relativeAngle = PositionControllerRelativityConfig.RelativityPA.Angle;
                 }
@@ -719,7 +719,7 @@ namespace STROOP.Utilities
             return ChangeValues(posAngles, xOffset, yOffset, zOffset, Change.ADD, useRelative);
         }
 
-        public static bool RetrieveSnow(int index)
+        public static bool RetrieveSnow(uint index)
         {
             List<PositionAngle> posAngles = new List<PositionAngle>() { PositionAngle.Snow(index) };
 
@@ -732,7 +732,7 @@ namespace STROOP.Utilities
             return ChangeValues(posAngles, xDestination, yDestination, zDestination, Change.SET);
         }
 
-        public static bool TranslateSnow(int index, float xOffset, float yOffset, float zOffset, bool useRelative)
+        public static bool TranslateSnow(uint index, float xOffset, float yOffset, float zOffset, bool useRelative)
         {
             List<PositionAngle> posAngles = new List<PositionAngle>() { PositionAngle.Snow(index) };
             return ChangeValues(posAngles, xOffset, yOffset, zOffset, Change.ADD, useRelative);

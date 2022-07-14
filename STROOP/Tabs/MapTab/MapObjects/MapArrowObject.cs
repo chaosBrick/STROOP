@@ -104,10 +104,10 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         public class ArrowSource
         {
-            public static GetYaw ObjectFacingYaw = posAngle => Config.Stream.GetUInt16(posAngle.GetObjAddress() + ObjectConfig.YawFacingOffset);
-            public static GetYaw ObjectGraphicsYaw = posAngle => Config.Stream.GetUInt16(posAngle.GetObjAddress() + ObjectConfig.GraphicsYawOffset);
-            public static GetYaw ObjectMovingYaw = posAngle => Config.Stream.GetUInt16(posAngle.GetObjAddress() + ObjectConfig.YawMovingOffset);
-            public static GetYaw ObjectAngleToMario = posAngle => Config.Stream.GetUInt16(posAngle.GetObjAddress() + ObjectConfig.AngleToMarioOffset);
+            public static GetYaw ObjectFacingYaw = posAngle => Config.Stream.GetUInt16(PositionAngle.GetObjectAddress(posAngle) + ObjectConfig.YawFacingOffset);
+            public static GetYaw ObjectGraphicsYaw = posAngle => Config.Stream.GetUInt16(PositionAngle.GetObjectAddress(posAngle) + ObjectConfig.GraphicsYawOffset);
+            public static GetYaw ObjectMovingYaw = posAngle => Config.Stream.GetUInt16(PositionAngle.GetObjectAddress(posAngle) + ObjectConfig.YawMovingOffset);
+            public static GetYaw ObjectAngleToMario = posAngle => Config.Stream.GetUInt16(PositionAngle.GetObjectAddress(posAngle) + ObjectConfig.AngleToMarioOffset);
 
             public static GetYaw MarioFacingYaw = posAngle => Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
             public static GetYaw MarioIndendedYaw = posAngle => Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.IntendedYawOffset);
@@ -116,8 +116,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
             public static GetYaw MarioTwirlingYaw = posAngle => Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.TwirlYawOffset);
 
 
-            public static GetRecommendedSize ObjectHSpeed = posAngle => Config.Stream.GetSingle(posAngle.GetObjAddress() + ObjectConfig.HSpeedOffset);
-            public static GetRecommendedSize ObjectDistanceToMario = posAngle => Config.Stream.GetSingle(posAngle.GetObjAddress() + ObjectConfig.DistanceToMarioOffset);
+            public static GetRecommendedSize ObjectHSpeed = posAngle => Config.Stream.GetSingle(PositionAngle.GetObjectAddress(posAngle) + ObjectConfig.HSpeedOffset);
+            public static GetRecommendedSize ObjectDistanceToMario = posAngle => Config.Stream.GetSingle(PositionAngle.GetObjectAddress(posAngle) + ObjectConfig.DistanceToMarioOffset);
 
 
             public static GetRecommendedSize MarioHSpeed = posAngle => Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.HSpeedOffset);

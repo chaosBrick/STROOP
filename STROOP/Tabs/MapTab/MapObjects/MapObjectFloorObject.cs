@@ -20,7 +20,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             var lst = new List<TriangleDataModel>();
             foreach (var posAngle in positionAngleProvider())
             {
-                var obj = posAngle.GetObjAddress();
+                var obj = PositionAngle.GetObjectAddress(posAngle);
                 foreach (var tri in TriangleUtilities.GetObjectTrianglesForObject(obj))
                     if (tri.IsFloor())
                         lst.Add(tri);
