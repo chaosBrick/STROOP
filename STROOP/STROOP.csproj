@@ -416,6 +416,12 @@
     <Compile Include="Tabs\MapTab\MapObjects\MapObjectTrianglePrediction.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapTapeMeasureObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapNearbyFloorUnits.cs" />
+    <Compile Include="Tabs\MapTab\MapPopout.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Tabs\MapTab\MapPopout.Designer.cs">
+      <DependentUpon>MapPopout.cs</DependentUpon>
+    </Compile>
     <Compile Include="Tabs\MapTab\MapView.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapWatersObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapCustomSpherePointsObject.cs" />
@@ -624,6 +630,7 @@
     <Compile Include="Tabs\MapTab\Renderers\InstanceRenderer.cs" />
     <Compile Include="Tabs\MapTab\Renderers\LineRenderer.cs" />
     <Compile Include="Tabs\MapTab\Renderers\Renderer.cs" />
+    <Compile Include="Tabs\MapTab\Renderers\RendererCollection.cs" />
     <Compile Include="Tabs\MapTab\Renderers\SpriteRenderer.cs" />
     <Compile Include="Tabs\MapTab\Renderers\TextRenderer.cs" />
     <Compile Include="Tabs\MapTab\Renderers\TransparencyRenderer.cs" />
@@ -1378,6 +1385,7 @@
     <EmbeddedResource Include="Schemas\TriangleInfoTableSchema.xsd">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <Compile Include="Tabs\MapTab\MapGraphics.LegacyControlScheme.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">

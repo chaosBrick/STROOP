@@ -121,6 +121,13 @@ namespace STROOP.Tabs.MapTab.Renderers
                     return;
 
                 BeginDraw(graphics);
+
+                for (int i = 0; i <= 5; i++)
+                {
+                    GL.EnableVertexAttribArray(i);
+                    GL.VertexAttribDivisor(i, 1);
+                }
+
                 GL.ActiveTexture(TextureUnit.Texture0);
                 GL.BindTexture(TextureTarget.Texture2DArray, texture);
                 GL.Uniform1(uniform_sampler, (int)0);

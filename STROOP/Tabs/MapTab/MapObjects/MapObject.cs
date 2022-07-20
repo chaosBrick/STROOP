@@ -183,7 +183,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 * graphics.BillboardMatrix
                 * Matrix4.CreateTranslation(x, y, z);
 
-            var textureIndex = graphics.GetObjectTextureLayer(image);
+            var textureIndex = graphics.rendererCollection.GetObjectTextureLayer(image);
             if (sortTransparent)
                 graphics.objectRenderer.AddTransparentInstance(transform, textureIndex, color);
             else

@@ -75,8 +75,8 @@ namespace STROOP.Tabs.MapTab
             glControlMap2D.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
             glControlMap2D.Location = new Point(0, 0);
             parentControl.Controls.Add(glControlMap2D);
-            graphics = new MapGraphics(this, glControlMap2D);
-            graphics.Load();
+            graphics = new MapGraphics(this, glControlMap2D, glControlMap2D.Context);
+            graphics.Load(() => new Renderers.RendererCollection());
             _isLoaded2D = true;
 
             InitializeControls();
@@ -374,6 +374,11 @@ namespace STROOP.Tabs.MapTab
             foreach (var a in hoverData)
                 a.AddContextMenuItems(this, contextMenu);
 
+            contextMenu.Items.Add(new ToolStripSeparator());
+            var openPopoutItem = new ToolStripMenuItem("Open Popout");
+            openPopoutItem.Click += (e, args) => (new MapPopout(this) { Owner = FindForm() }).Show();
+            contextMenu.Items.Add(openPopoutItem);
+
             contextMenu.Show(Cursor.Position);
         }
 
@@ -554,7 +559,12 @@ namespace STROOP.Tabs.MapTab
                     UpdateDataTab();
 
                     if (!PauseMapUpdating)
+                    {
                         glControlMap2D.Invalidate();
+                        foreach (var frm in FindForm().OwnedForms)
+                            if (frm is MapPopout coolio)
+                                coolio.Redraw();
+                    }
                 }
 
                 if (graphics.view.mode == MapView.ViewMode.ThreeDimensional && makeInGameCameraFollow)

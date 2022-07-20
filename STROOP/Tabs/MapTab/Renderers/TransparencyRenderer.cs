@@ -116,6 +116,16 @@ namespace STROOP.Tabs.MapTab.Renderers
             }
         }
 
+        public void CleanUp()
+        {
+            GL.DeleteTextures(maskTexture.Length, maskTexture);
+            GL.DeleteRenderbuffer(stencilBuffer);
+            GL.DeleteTexture(colorBuffer);
+            GL.DeleteTexture(renderTexture);
+            GL.DeleteFramebuffer(maskFBO);
+            GL.DeleteFramebuffer(renderFBO);
+        }
+
         int currentMaskLayer = -1;
         int solidDepthBuffer;
         public int GetReferenceDepthBuffer() => currentMaskLayer == 0 ? 0 : maskTexture[currentMaskLayer - 1];
@@ -155,9 +165,8 @@ namespace STROOP.Tabs.MapTab.Renderers
                 t.Prepare(this);
 
             int[] prevViewport = new int[4];
-            int prevFramebuffer;
             GL.GetInteger(GetPName.Viewport, prevViewport);
-            GL.GetInteger(GetPName.FramebufferBinding, out prevFramebuffer);
+            GL.GetInteger(GetPName.FramebufferBinding, out int prevFramebuffer);
             GL.Viewport(0, 0, width, height);
 
             GL.ClearDepth(1);
@@ -208,15 +217,6 @@ namespace STROOP.Tabs.MapTab.Renderers
 
             solidDepthBuffer = 0;
             graphics = null;
-        }
-
-        void DisposeBuffers()
-        {
-            GL.DeleteTextures(maskTexture.Length, maskTexture);
-            GL.DeleteTexture(renderTexture);
-            GL.DeleteRenderbuffer(stencilBuffer);
-            GL.DeleteFramebuffer(renderFBO);
-            GL.DeleteFramebuffer(maskFBO);
         }
     }
 }

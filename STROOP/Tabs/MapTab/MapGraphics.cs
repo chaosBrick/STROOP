@@ -11,7 +11,7 @@ using STROOP.Utilities;
 
 namespace STROOP.Tabs.MapTab
 {
-    public class MapGraphics
+    public partial class MapGraphics
     {
         public enum DrawLayers
         {
@@ -51,14 +51,15 @@ namespace STROOP.Tabs.MapTab
 
         public readonly List<Action>[] drawLayers;
 
-        bool needsRecreateObjectMipmaps = false;
-        List<Renderers.Renderer> renderers = new List<Renderers.Renderer>();
-        public Renderers.SpriteRenderer objectRenderer;
-        public Renderers.TriangleRenderer triangleRenderer, triangleOverlayRenderer;
-        public Renderers.LineRenderer lineRenderer;
-        public Renderers.ShapeRenderer circleRenderer;
-        public Renderers.GeometryRenderer cylinderRenderer, sphereRenderer;
-        public Renderers.TextRenderer textRenderer;
+        public Renderers.RendererCollection rendererCollection { get; private set; }
+        public Renderers.SpriteRenderer objectRenderer => rendererCollection.objectRenderer;
+        public Renderers.TriangleRenderer triangleRenderer => rendererCollection.triangleRenderer;
+        public Renderers.TriangleRenderer triangleOverlayRenderer => rendererCollection.triangleOverlayRenderer;
+        public Renderers.LineRenderer lineRenderer => rendererCollection.lineRenderer;
+        public Renderers.ShapeRenderer circleRenderer => rendererCollection.circleRenderer;
+        public Renderers.GeometryRenderer cylinderRenderer => rendererCollection.cylinderRenderer;
+        public Renderers.GeometryRenderer sphereRenderer => rendererCollection.sphereRenderer;
+        public Renderers.TextRenderer textRenderer => rendererCollection.textRenderer;
         public Renderers.TransparencyRenderer transparencyRenderer;
         public Vector2 pixelsPerUnit { get; private set; }
 
@@ -95,27 +96,7 @@ namespace STROOP.Tabs.MapTab
 
         public readonly CachedCollisionStructure floors = new CachedCollisionStructure(_ => _.Classification == TriangleClassification.Floor);
         public readonly CachedCollisionStructure ceilings = new CachedCollisionStructure(_ => _.Classification == TriangleClassification.Ceiling);
-
-
-        const int OBJECTS_TEXTURE_SIZE = 256;
-        const int OBJECTS_TEXTURE_LAYERS = 256;
-
-        int objectLayer = 0;
-        Dictionary<Image, int> knownIcons = new Dictionary<Image, int>();
-        public int GetObjectTextureLayer(Image image)
-        {
-            if (knownIcons.TryGetValue(image, out var known))
-                return known;
-            var imageData = GraphicsUtil.GetPixelData(image, OBJECTS_TEXTURE_SIZE, OBJECTS_TEXTURE_SIZE);
-            var result = objectLayer++;
-            GL.BindTexture(TextureTarget.Texture2DArray, objectRenderer.texture);
-            GL.TexSubImage3D(TextureTarget.Texture2DArray, 0, 0, 0, result, OBJECTS_TEXTURE_SIZE, OBJECTS_TEXTURE_SIZE, 1, PixelFormat.Rgba, PixelType.UnsignedByte, imageData);
-            GL.BindTexture(TextureTarget.Texture2DArray, 0);
-            needsRecreateObjectMipmaps = true;
-            knownIcons[image] = result;
-            return result;
-        }
-
+        
         private enum MapScale { CourseDefault, MaxCourseSize, Custom };
         private enum MapCenter { BestFit, Origin, Mario, Custom };
         private enum MapAngle { Angle0, Angle16384, Angle32768, Angle49152, Mario, Camera, Centripetal, Custom };
@@ -136,6 +117,7 @@ namespace STROOP.Tabs.MapTab
         public bool MapViewCenterChangeByPixels = true;
 
         public readonly GLControl glControl;
+        public readonly OpenTK.Graphics.IGraphicsContext context;
         public readonly MapTab mapTab;
         public readonly MapView view;
 
@@ -180,10 +162,11 @@ namespace STROOP.Tabs.MapTab
         public bool IsMouseDown(int button) => mouseDown[button];
 
 
-        public MapGraphics(MapTab mapTab, GLControl glControl)
+        public MapGraphics(MapTab mapTab, GLControl glControl, OpenTK.Graphics.IGraphicsContext context)
         {
             this.mapTab = mapTab;
             this.glControl = glControl;
+            this.context = context;
             view = new MapView();
             drawLayers = new List<Action>[Enum.GetNames(typeof(DrawLayers)).Length];
             for (int i = 0; i < drawLayers.Length; i++)
@@ -204,10 +187,10 @@ namespace STROOP.Tabs.MapTab
             return root.ActiveControl;
         }
 
-        public void Load()
+        public void Load(Func<Renderers.RendererCollection> getRenderers)
         {
-            glControl.MakeCurrent();
-            glControl.Context.LoadAll();
+            context.MakeCurrent(glControl.WindowInfo);
+            context.LoadAll();
 
             glControl.Paint += (sender, e) => OnPaint();
 
@@ -230,6 +213,7 @@ namespace STROOP.Tabs.MapTab
             glControl.Resize += (_, __) =>
             {
                 DeleteMainSurfaces();
+                transparencyRenderer.SetDimensions(glControl.Width, glControl.Height);
                 InitMainSurfaces();
             };
 
@@ -240,15 +224,7 @@ namespace STROOP.Tabs.MapTab
             GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
 
             InitMainSurfaces();
-
-            CreateObjectsRenderer();
-            renderers.Add(triangleRenderer = new Renderers.TriangleRenderer(0x10000));
-            renderers.Add(triangleOverlayRenderer = new Renderers.TriangleRenderer(0x10000) { drawlayer = DrawLayers.GeometryOverlay });
-            renderers.Add(lineRenderer = new Renderers.LineRenderer());
-            renderers.Add(circleRenderer = new Renderers.ShapeRenderer(DrawLayers.Overlay));
-            renderers.Add(cylinderRenderer = new Renderers.GeometryRenderer(Renderers.GeometryRenderer.GeometryData.Cylinder()));
-            renderers.Add(sphereRenderer = new Renderers.GeometryRenderer(Renderers.GeometryRenderer.GeometryData.Sphere(128, 64)));
-            renderers.Add(textRenderer = new Renderers.TextRenderer());
+            rendererCollection = getRenderers();
 
             transparencyRenderer = new Renderers.TransparencyRenderer(16, () => mainDepthBuffer, glControl.Width, glControl.Height);
             transparencyRenderer.transparents.Add(objectRenderer.transparent);
@@ -256,14 +232,12 @@ namespace STROOP.Tabs.MapTab
             transparencyRenderer.transparents.Add(circleRenderer.transparent);
             transparencyRenderer.transparents.Add(cylinderRenderer);
             transparencyRenderer.transparents.Add(sphereRenderer);
-            renderers.Add(transparencyRenderer);
         }
 
         void DeleteMainSurfaces()
         {
             GL.DeleteTextures(2, new int[] { mainColorBuffer, mainDepthBuffer });
             GL.DeleteFramebuffer(mainFrameBuffer);
-            transparencyRenderer.SetDimensions(glControl.Width, glControl.Height);
         }
 
         void InitMainSurfaces()
@@ -293,24 +267,10 @@ namespace STROOP.Tabs.MapTab
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }
 
-        void CreateObjectsRenderer()
+        public void CleanUp()
         {
-            renderers.Add(objectRenderer = new Renderers.SpriteRenderer(DrawLayers.Objects, 256));
-            objectRenderer.texture = GL.GenTexture();
-            GL.BindTexture(TextureTarget.Texture2DArray, objectRenderer.texture);
-
-            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.LinearMipmapNearest);
-            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, (int)TextureMagFilter.Linear);
-            GL.TexImage3D(TextureTarget.Texture2DArray,
-                    0,
-                    PixelInternalFormat.Rgba8,
-                    OBJECTS_TEXTURE_SIZE,
-                    OBJECTS_TEXTURE_SIZE,
-                    OBJECTS_TEXTURE_LAYERS,
-                    0,
-                    PixelFormat.Rgba,
-                    PixelType.UnsignedByte,
-                    IntPtr.Zero);
+            transparencyRenderer.CleanUp();
+            DeleteMainSurfaces();
         }
 
         private void OnPaint()
@@ -325,7 +285,7 @@ namespace STROOP.Tabs.MapTab
                 if (glControl.Cursor != cursor)
                     glControl.Cursor = cursor;
 
-                glControl.MakeCurrent();
+                context.MakeCurrent(glControl.WindowInfo);
                 UpdateMapView();
 
                 GL.BindFramebuffer(FramebufferTarget.Framebuffer, mainFrameBuffer);
@@ -335,18 +295,11 @@ namespace STROOP.Tabs.MapTab
                 for (int i = 0; i < drawLayers.Length; i++)
                     drawLayers[i].Clear();
 
-                foreach (var renderer in renderers)
+                foreach (var renderer in rendererCollection.renderers)
                     renderer.SetDrawCalls(this);
+                transparencyRenderer.SetDrawCalls(this);
                 mapTab.flowLayoutPanelMapTrackers.DrawOn2DControl(this);
-                drawLayers[(int)DrawLayers.Objects].Insert(0, () =>
-                {
-                    if (needsRecreateObjectMipmaps)
-                    {
-                        GL.BindTexture(TextureTarget.Texture2DArray, objectRenderer.texture);
-                        GL.GenerateMipmap(GenerateMipmapTarget.Texture2DArray);
-                        needsRecreateObjectMipmaps = false;
-                    }
-                });
+                drawLayers[(int)DrawLayers.Objects].Insert(0, rendererCollection.UpdateObjectMap);
 
                 if (levelTrianglesFor3DMap == null || mapTab.NeedsGeometryRefresh())
                     levelTrianglesFor3DMap = TriangleUtilities.GetLevelTriangles();
@@ -513,250 +466,6 @@ namespace STROOP.Tabs.MapTab
             }
         }
 
-        private void UpdateScale()
-        {
-            if (mapTab.radioButtonMapControllersScaleCourseDefault.Checked)
-                MapViewScale = MapScale.CourseDefault;
-            else if (mapTab.radioButtonMapControllersScaleMaxCourseSize.Checked)
-                MapViewScale = MapScale.MaxCourseSize;
-            else
-                MapViewScale = MapScale.Custom;
-
-            if (MapViewScale == MapScale.CourseDefault) MapViewScaleWasCourseDefault = true;
-            if (MapViewScale == MapScale.MaxCourseSize) MapViewScaleWasCourseDefault = false;
-
-            switch (MapViewScale)
-            {
-                case MapScale.CourseDefault:
-                case MapScale.MaxCourseSize:
-                    RectangleF rectangle = MapViewScale == MapScale.CourseDefault ?
-                        mapTab.GetMapLayout().Coordinates : MAX_COURSE_SIZE;
-                    List<(float, float)> coordinates = new List<(float, float)>()
-                    {
-                        (rectangle.Left, rectangle.Top),
-                        (rectangle.Right, rectangle.Top),
-                        (rectangle.Left, rectangle.Bottom),
-                        (rectangle.Right, rectangle.Bottom),
-                    };
-                    List<(float, float)> rotatedCoordinates = coordinates.ConvertAll(coord =>
-                    {
-                        (float x, float z) = coord;
-                        (double rotatedX, double rotatedZ) = MoreMath.RotatePointAboutPointAnAngularDistance(
-                            x, z, 0, 0, 32768 - MapViewAngleValue);
-                        return ((float)rotatedX, (float)rotatedZ);
-                    });
-                    float rotatedXMax = rotatedCoordinates.Max(coord => coord.Item1);
-                    float rotatedXMin = rotatedCoordinates.Min(coord => coord.Item1);
-                    float rotatedZMax = rotatedCoordinates.Max(coord => coord.Item2);
-                    float rotatedZMin = rotatedCoordinates.Min(coord => coord.Item2);
-                    float rotatedWidth = rotatedXMax - rotatedXMin;
-                    float rotatedHeight = rotatedZMax - rotatedZMin;
-                    MapViewScaleValue = Math.Min(
-                        glControl.Width / rotatedWidth, glControl.Height / rotatedHeight);
-                    break;
-                case MapScale.Custom:
-                    MapViewScaleValue = ParsingUtilities.ParseFloatNullable(
-                        mapTab.textBoxMapControllersScaleCustom.LastSubmittedText)
-                        ?? DEFAULT_MAP_VIEW_SCALE_VALUE;
-                    break;
-            }
-
-            if (MapViewScale != MapScale.Custom)
-            {
-                mapTab.textBoxMapControllersScaleCustom.SubmitTextLoosely(MapViewScaleValue.ToString());
-            }
-        }
-
-        private void UpdateCenter()
-        {
-            if (view.mode == MapView.ViewMode.ThreeDimensional)
-                return;
-
-            if (mapTab.radioButtonMapControllersCenterBestFit.Checked)
-                MapViewCenter = MapCenter.BestFit;
-            else if (mapTab.radioButtonMapControllersCenterOrigin.Checked)
-                MapViewCenter = MapCenter.Origin;
-            else if (mapTab.radioButtonMapControllersCenterMario.Checked)
-                MapViewCenter = MapCenter.Mario;
-            else
-                MapViewCenter = MapCenter.Custom;
-
-            switch (MapViewCenter)
-            {
-                case MapCenter.BestFit:
-                    RectangleF rectangle = MapViewScaleWasCourseDefault ?
-                        mapTab.GetMapLayout().Coordinates : MAX_COURSE_SIZE;
-                    view.position.X = rectangle.X + rectangle.Width / 2;
-                    view.position.Z = rectangle.Y + rectangle.Height / 2;
-                    break;
-                case MapCenter.Origin:
-                    view.position = new Vector3(0.5f);
-                    break;
-                case MapCenter.Mario:
-                    view.position = new Vector3(Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.XOffset),
-                        Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset),
-                        Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.ZOffset));
-                    break;
-                case MapCenter.Custom:
-                    PositionAngle posAngle = PositionAngle.FromString(
-                        mapTab.textBoxMapControllersCenterCustom.LastSubmittedText);
-                    if (posAngle != null)
-                    {
-                        view.position = posAngle.position;
-                        break;
-                    }
-                    List<string> stringValues = ParsingUtilities.ParseStringList(
-                        mapTab.textBoxMapControllersCenterCustom.LastSubmittedText, replaceComma: false);
-                    if (stringValues.Count >= 3)
-                    {
-                        view.position.X = ParsingUtilities.ParseFloatNullable(stringValues[0]) ?? 0;
-                        view.position.Y = ParsingUtilities.ParseFloatNullable(stringValues[1]) ?? 0;
-                        view.position.Z = ParsingUtilities.ParseFloatNullable(stringValues[2]) ?? 0;
-                    }
-                    else if (stringValues.Count >= 2)
-                    {
-                        view.position.X = ParsingUtilities.ParseFloatNullable(stringValues[0]) ?? 0;
-                        view.position.Z = ParsingUtilities.ParseFloatNullable(stringValues[1]) ?? 0;
-                    }
-                    else if (stringValues.Count == 1)
-                    {
-                        view.position = new Vector3(ParsingUtilities.ParseFloatNullable(stringValues[0]) ?? 0);
-                    }
-                    else
-                        view.position = new Vector3();
-                    break;
-            }
-
-            if (MapViewCenter != MapCenter.Custom)
-            {
-                mapTab.textBoxMapControllersCenterCustom.SubmitTextLoosely($"{view.position.X}; {view.position.Y}; {view.position.Z}");
-            }
-        }
-
-        private void UpdateAngle()
-        {
-            if (mapTab.radioButtonMapControllersAngle0.Checked)
-                MapViewAngle = MapAngle.Angle0;
-            else if (mapTab.radioButtonMapControllersAngle16384.Checked)
-                MapViewAngle = MapAngle.Angle16384;
-            else if (mapTab.radioButtonMapControllersAngle32768.Checked)
-                MapViewAngle = MapAngle.Angle32768;
-            else if (mapTab.radioButtonMapControllersAngle49152.Checked)
-                MapViewAngle = MapAngle.Angle49152;
-            else if (mapTab.radioButtonMapControllersAngleMario.Checked)
-                MapViewAngle = MapAngle.Mario;
-            else if (mapTab.radioButtonMapControllersAngleCamera.Checked)
-                MapViewAngle = MapAngle.Camera;
-            else if (mapTab.radioButtonMapControllersAngleCentripetal.Checked)
-                MapViewAngle = MapAngle.Centripetal;
-            else
-                MapViewAngle = MapAngle.Custom;
-
-            switch (MapViewAngle)
-            {
-                case MapAngle.Angle0:
-                    MapViewAngleValue = 0;
-                    break;
-                case MapAngle.Angle16384:
-                    MapViewAngleValue = 16384;
-                    break;
-                case MapAngle.Angle32768:
-                    MapViewAngleValue = 32768;
-                    break;
-                case MapAngle.Angle49152:
-                    MapViewAngleValue = 49152;
-                    break;
-                case MapAngle.Mario:
-                    MapViewAngleValue = Config.Stream.GetUInt16(MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
-                    break;
-                case MapAngle.Camera:
-                    MapViewAngleValue = Config.Stream.GetUInt16(CameraConfig.StructAddress + CameraConfig.FacingYawOffset);
-                    break;
-                case MapAngle.Centripetal:
-                    MapViewAngleValue = (float)MoreMath.ReverseAngle(
-                        Config.Stream.GetUInt16(CameraConfig.StructAddress + CameraConfig.CentripetalAngleOffset));
-                    break;
-                case MapAngle.Custom:
-                    PositionAngle posAngle = PositionAngle.FromString(
-                        mapTab.textBoxMapControllersAngleCustom.LastSubmittedText);
-                    if (posAngle != null)
-                    {
-                        MapViewAngleValue = (float)posAngle.Angle;
-                        break;
-                    }
-                    MapViewAngleValue = ParsingUtilities.ParseFloatNullable(
-                        mapTab.textBoxMapControllersAngleCustom.LastSubmittedText)
-                        ?? DEFAULT_MAP_VIEW_ANGLE_VALUE;
-                    break;
-            }
-
-            if (MapViewAngle != MapAngle.Custom)
-            {
-                mapTab.textBoxMapControllersAngleCustom.SubmitTextLoosely(MapViewAngleValue.ToString());
-            }
-        }
-
-        public void ChangeScale(int sign, object value)
-        {
-            float? parsed = ParsingUtilities.ParseFloatNullable(value);
-            if (!parsed.HasValue) return;
-            mapTab.radioButtonMapControllersScaleCustom.Checked = true;
-            float newScaleValue = MapViewScaleValue + sign * parsed.Value;
-            mapTab.textBoxMapControllersScaleCustom.SubmitText(newScaleValue.ToString());
-        }
-
-        public void ChangeScale2(int power, object value)
-        {
-            float? parsed = ParsingUtilities.ParseFloatNullable(value);
-            if (!parsed.HasValue) return;
-            mapTab.radioButtonMapControllersScaleCustom.Checked = true;
-            float newScaleValue = MapViewScaleValue * (float)Math.Pow(parsed.Value, power);
-            mapTab.textBoxMapControllersScaleCustom.SubmitText(newScaleValue.ToString());
-        }
-
-        public void ChangeCenter(int xSign, int zSign, object value)
-        {
-            float? parsed = ParsingUtilities.ParseFloatNullable(value);
-            if (!parsed.HasValue) return;
-            mapTab.radioButtonMapControllersCenterCustom.Checked = true;
-            float xOffset = xSign * parsed.Value;
-            float zOffset = zSign * parsed.Value;
-            (float xOffsetRotated, float zOffsetRotated) = ((float, float))MoreMath.RotatePointAboutPointAnAngularDistance(
-                xOffset, zOffset, 0, 0, MapViewAngleValue);
-            float multiplier = MapViewCenterChangeByPixels ? 1 / MapViewScaleValue : 1;
-            float newCenterXValue = view.position.X + xOffsetRotated * multiplier;
-            float newCenterZValue = view.position.Z + zOffsetRotated * multiplier;
-            mapTab.textBoxMapControllersCenterCustom.SubmitText($"{newCenterXValue}; {view.position.Y}; {newCenterZValue}");
-        }
-
-        public void ChangeAngle(int sign, object value)
-        {
-            float? parsed = ParsingUtilities.ParseFloatNullable(value);
-            if (!parsed.HasValue) return;
-            mapTab.radioButtonMapControllersAngleCustom.Checked = true;
-            float newAngleValue = MapViewAngleValue + sign * parsed.Value;
-            newAngleValue = (float)MoreMath.NormalizeAngleDouble(newAngleValue);
-            mapTab.textBoxMapControllersAngleCustom.SubmitText(newAngleValue.ToString());
-        }
-
-        public void SetCustomScale(object value)
-        {
-            mapTab.radioButtonMapControllersScaleCustom.Checked = true;
-            mapTab.textBoxMapControllersScaleCustom.SubmitText(value.ToString());
-        }
-
-        public void SetCustomCenter(object value)
-        {
-            mapTab.radioButtonMapControllersCenterCustom.Checked = true;
-            mapTab.textBoxMapControllersCenterCustom.SubmitText(value.ToString());
-        }
-
-        public void SetCustomAngle(object value)
-        {
-            mapTab.radioButtonMapControllersAngleCustom.Checked = true;
-            mapTab.textBoxMapControllersAngleCustom.SubmitText(value.ToString());
-        }
-
         private int _dragStartMouseX = 0;
         private int _dragStartMouseY = 0;
         private Vector3 _translateStartCenter = new Vector3(0);
@@ -884,9 +593,9 @@ namespace STROOP.Tabs.MapTab
                                 (float rotatedX, float rotatedY) = ((float, float))
                                     MoreMath.RotatePointAboutPointAnAngularDistance(
                                         unitDiffX, unitDiffY, 0, 0, MapViewAngleValue);
-                                float newCenterX = _translateStartCenter.X - rotatedX;
-                                float newCenterZ = _translateStartCenter.Z - rotatedY;
-                                SetCustomCenter($"{newCenterX}; {view.position.Y}; {newCenterZ}");
+                                view.position.X = _translateStartCenter.X - rotatedX;
+                                view.position.Z = _translateStartCenter.Z - rotatedY;
+                                SetCustomCenter($"{view.position.X}; {view.position.Y}; {view.position.Z}");
                                 break;
                             }
                         case MapView.ViewMode.Orthogonal:
@@ -923,8 +632,8 @@ namespace STROOP.Tabs.MapTab
                                 double oldAngle = Math.Atan2(glControl.Height / 2 - _dragStartMouseY, _dragStartMouseX - glControl.Width / 2);
                                 double thingAngle = Math.Atan2(glControl.Height / 2 - e.Y, e.X - glControl.Width / 2);
                                 float angleToMouse = (float)MoreMath.RadiansToAngleUnits(thingAngle - oldAngle) * mapTab.MaybeReverse(-1);
-                                float newAngle = _rotateStartAngle + angleToMouse;
-                                SetCustomAngle(newAngle);
+                                MapViewAngleValue = _rotateStartAngle + angleToMouse;
+                                SetCustomAngle(MapViewAngleValue);
                                 break;
                             }
                         case MapView.ViewMode.Orthogonal:
@@ -937,7 +646,8 @@ namespace STROOP.Tabs.MapTab
                                 for (var snapValue = 0; snapValue <= 0x10000; snapValue += increment)
                                     if (Math.Abs(newAngle - snapValue) < snapMargin)
                                         newAngle = snapValue;
-                                SetCustomAngle(newAngle);
+                                MapViewAngleValue = newAngle;
+                                SetCustomAngle(MapViewAngleValue);
                                 break;
                             }
                         case MapView.ViewMode.ThreeDimensional:

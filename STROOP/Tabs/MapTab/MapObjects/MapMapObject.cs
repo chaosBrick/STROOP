@@ -33,13 +33,13 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 return;
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
             {
-            renderer.texture = GraphicsUtil.TextureFromImage(img.Value);
+                renderer.texture = GraphicsUtil.TextureFromImage(img.Value);
                 foreach (var dim in GetDimensions(graphics))
                     renderer.AddInstance(
                         graphics.BillboardMatrix
                         * Matrix4.CreateScale(dim.size.Width, 1, dim.size.Height)
                         * Matrix4.CreateTranslation(dim.loc.X, 0, dim.loc.Y),
-                        graphics.GetObjectTextureLayer(GetInternalImage().Value),
+                        graphics.rendererCollection.GetObjectTextureLayer(GetInternalImage().Value),
                         new Vector4(1)
                     );
             });
