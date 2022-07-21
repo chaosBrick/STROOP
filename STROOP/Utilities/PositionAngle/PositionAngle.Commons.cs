@@ -1,0 +1,272 @@
+﻿using STROOP.Models;
+using STROOP.Structs;
+using STROOP.Structs.Configurations;
+using System;
+using OpenTK;
+
+namespace STROOP.Utilities
+{
+    partial class PositionAngle
+    {
+
+        public class CustomPositionAngle : PositionAngle
+        {
+            Vector3 customPos;
+            ushort customAngle;
+            public CustomPositionAngle(Vector3 pos, ushort angle = 0) { this.customPos = pos; this.customAngle = angle; }
+
+            public override double X => customPos.X;
+            public override double Y => customPos.Y;
+            public override double Z => customPos.Z;
+            public override double Angle => double.NaN;
+            public override bool SetX(double value) { customPos.X = (float)value; return true; }
+            public override bool SetY(double value) { customPos.Y = (float)value; return true; }
+            public override bool SetZ(double value) { customPos.Z = (float)value; return true; }
+            public override bool SetAngle(double value) { customAngle = (ushort)value; return true; }
+        }
+
+        public class MarioPositionAngle : MemoryPositionAngle, IHoldsObjectAddress
+        {
+            public MarioPositionAngle()
+                : base(() => MarioConfig.StructAddress, MarioConfig.XOffset, MarioConfig.YOffset, MarioConfig.ZOffset, MarioConfig.FacingYawOffset, "Mario")
+            { }
+
+            bool SetCoordinateComponent(double value, uint structOffset, uint objOffset)
+            {
+                bool streamAlreadySuspended = Config.Stream.IsSuspended;
+                if (!streamAlreadySuspended) Config.Stream.Suspend();
+                bool success = Config.Stream.SetValue((float)value, MarioConfig.StructAddress + structOffset);
+                if (KeyboardUtilities.IsAltHeld())
+                    success &= Config.Stream.SetValue((float)value, MarioConfig.StructAddress + objOffset);
+                Config.Stream.Resume();
+                return success;
+            }
+            public override bool SetX(double value) => SetCoordinateComponent(value, MarioConfig.XOffset, ObjectConfig.XOffset);
+            public override bool SetY(double value) => SetCoordinateComponent(value, MarioConfig.YOffset, ObjectConfig.YOffset);
+            public override bool SetZ(double value) => SetCoordinateComponent(value, MarioConfig.ZOffset, ObjectConfig.ZOffset);
+
+            uint IHoldsObjectAddress.GetAddress() => Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
+        }
+
+        public class ObjectPositionAngle : MemoryPositionAngle, IHoldsObjectAddress
+        {
+            public ObjectPositionAngle(Func<uint?> baseGetter)
+                : base(baseGetter, ObjectConfig.XOffset, ObjectConfig.YOffset, ObjectConfig.ZOffset, ObjectConfig.YawFacingOffset)
+            { }
+            public override bool SetAngle(double value)
+            {
+                uint? objAddress = baseGetter();
+                if (!objAddress.HasValue) return false;
+                bool success = true;
+                success &= Config.Stream.SetValue(MoreMath.NormalizeAngleUshort(value), objAddress.Value + ObjectConfig.YawFacingOffset);
+                success &= Config.Stream.SetValue(MoreMath.NormalizeAngleUshort(value), objAddress.Value + ObjectConfig.YawMovingOffset);
+                return success;
+            }
+            uint IHoldsObjectAddress.GetAddress() => baseGetter().Value;
+
+            public override string GetMapName()
+            {
+                var addr = baseGetter();
+                return addr.HasValue ? GetMapNameForObject(addr.Value) : "(None)";
+            }
+            public override string ToString() => GetMapName();
+        }
+
+        public class ObjectHomePositionAngle : MemoryPositionAngle
+        {
+            public ObjectHomePositionAngle(Func<uint?> baseGetter)
+                : base(baseGetter, ObjectConfig.HomeXOffset, ObjectConfig.HomeYOffset, ObjectConfig.HomeZOffset)
+            { }
+            public override string GetMapName()
+            {
+                var addr = baseGetter();
+                return "Home for " + (addr.HasValue ? GetMapNameForObject(addr.Value) : "(None)");
+            }
+        }
+
+        public class MemoryPositionAngle : PositionAngle
+        {
+            uint? xOffset, yOffset, zOffset, angleOffset;
+            protected readonly Func<uint?> baseGetter;
+            Func<double> angleGetter;
+            readonly string name;
+            public MemoryPositionAngle(Func<uint?> baseGetter, uint? xOffset, uint? yOffset, uint? zOffset, uint? angleOffset = null, string name = null)
+            {
+                this.baseGetter = baseGetter;
+                this.xOffset = xOffset;
+                this.yOffset = yOffset;
+                this.zOffset = zOffset;
+                this.angleOffset = angleOffset;
+                this.name = name;
+            }
+            public MemoryPositionAngle(Func<uint?> baseGetter, uint? xOffset, uint? yOffset, uint? zOffset, Func<double> angleGetter, string name = null)
+                : this(baseGetter, xOffset, yOffset, zOffset, (uint?)null, name)
+            {
+                this.angleGetter = angleGetter;
+            }
+
+            double Get(uint? offset)
+            {
+                if (offset == null) return double.NaN;
+                var b = baseGetter();
+                return b.HasValue ? Config.Stream.GetSingle(b.Value + offset.Value) : double.NaN;
+            }
+
+            public override double X => Get(xOffset);
+            public override double Y => Get(yOffset);
+            public override double Z => Get(zOffset);
+            public override double Angle
+            {
+                get
+                {
+                    if (angleGetter != null)
+                        return angleGetter();
+                    var b = baseGetter();
+                    return b.HasValue && angleOffset.HasValue ? Config.Stream.GetUInt16(b.Value + angleOffset.Value) : double.NaN;
+                }
+            }
+
+            bool Set(Type type, object value, uint? offset)
+            {
+                if (offset == null) return false;
+                var b = baseGetter();
+                return b.HasValue ? Config.Stream.SetValue(type, value, b.Value + offset.Value) : false;
+            }
+
+            public override bool SetX(double value) => Set(typeof(float), (float)value, xOffset);
+            public override bool SetY(double value) => Set(typeof(float), (float)value, yOffset);
+            public override bool SetZ(double value) => Set(typeof(float), (float)value, zOffset);
+            public override bool SetAngle(double value) => Set(typeof(ushort), (ushort)value, angleOffset);
+
+            public override string ToString() => name ?? GetType().Name;
+        }
+
+        public class TrianglePositionAngle : PositionAngle
+        {
+            readonly Func<uint?> addressGetter;
+            readonly uint index;
+            public TrianglePositionAngle(Func<uint?> addressGetter, uint index)
+            {
+                this.addressGetter = addressGetter;
+                this.index = index;
+            }
+            public override double X
+            {
+                get
+                {
+                    uint? address = addressGetter();
+                    if (address == null) return double.NaN;
+                    switch (index)
+                    {
+                        case 1:
+                        case 2:
+                        case 3:
+                            return TriangleOffsetsConfig.GetXIndex(address.Value, index - 1);
+                        case 4:
+                            int closestVertexToMario = TriangleDataModel.Create(address.Value).GetClosestVertex(
+                                Mario.X, Mario.Y, Mario.Z);
+                            return TriangleOffsetsConfig.GetXIndex(address.Value, (uint)closestVertexToMario);
+                        case 5:
+                            int closestVertexToSelf = TriangleDataModel.Create(address.Value).GetClosestVertex(
+                                SpecialConfig.SelfX, SpecialConfig.SelfY, SpecialConfig.SelfZ);
+                            return TriangleOffsetsConfig.GetXIndex(address.Value, (uint)closestVertexToSelf);
+                        case 6:
+                            return Mario.X;
+                        case 7:
+                            return SpecialConfig.SelfX;
+                        default:
+                            throw new ArgumentOutOfRangeException("Invalid index");
+                    }
+                }
+            }
+
+            public override double Y
+            {
+                get
+                {
+                    uint? address = addressGetter();
+                    if (address == null) return double.NaN;
+                    switch (index)
+                    {
+                        case 1:
+                        case 2:
+                        case 3:
+                            return TriangleOffsetsConfig.GetXIndex(address.Value, index - 1);
+                        case 4:
+                            int closestVertexToMario = TriangleDataModel.Create(address.Value).GetClosestVertex(
+                                Mario.X, Mario.Y, Mario.Z);
+                            return TriangleOffsetsConfig.GetXIndex(address.Value, (uint)closestVertexToMario);
+                        case 5:
+                            int closestVertexToSelf = TriangleDataModel.Create(address.Value).GetClosestVertex(
+                                SpecialConfig.SelfX, SpecialConfig.SelfY, SpecialConfig.SelfZ);
+                            return TriangleOffsetsConfig.GetXIndex(address.Value, (uint)closestVertexToSelf);
+                        case 6:
+                            return Mario.Z;
+                        case 7:
+                            return SpecialConfig.SelfZ;
+                        default:
+                            throw new ArgumentOutOfRangeException("Invalid index");
+                    }
+                }
+            }
+
+            public override double Z
+            {
+                get
+                {
+                    uint? address = addressGetter();
+                    if (address == null) return double.NaN;
+                    switch (index)
+                    {
+                        case 1:
+                        case 2:
+                        case 3:
+                            return TriangleOffsetsConfig.GetXIndex(address.Value, index - 1);
+                        case 4:
+                            int closestVertexToMario = TriangleDataModel.Create(address.Value).GetClosestVertex(
+                                Mario.X, Mario.Y, Mario.Z);
+                            return TriangleOffsetsConfig.GetXIndex(address.Value, (uint)closestVertexToMario);
+                        case 5:
+                            int closestVertexToSelf = TriangleDataModel.Create(address.Value).GetClosestVertex(
+                                SpecialConfig.SelfX, SpecialConfig.SelfY, SpecialConfig.SelfZ);
+                            return TriangleOffsetsConfig.GetXIndex(address.Value, (uint)closestVertexToSelf);
+                        case 6:
+                            return TriangleDataModel.Create(address.Value).GetHeightOnTriangle(Mario.X, Mario.Z);
+                        case 7:
+                            return TriangleDataModel.Create(address.Value).GetHeightOnTriangle(SpecialConfig.SelfX, SpecialConfig.SelfZ);
+                        default:
+                            throw new ArgumentOutOfRangeException("Invalid index");
+                    }
+                }
+            }
+            public override double Angle => Double.NaN;
+
+            public override bool SetX(double value)
+            {
+                uint? address = addressGetter();
+                if (address == null) return false;
+                if (index <= 3)
+                    return TriangleOffsetsConfig.SetXIndex((short)value, address.Value, index - 1);
+                return false;
+            }
+
+            public override bool SetY(double value)
+            {
+                uint? address = addressGetter();
+                if (address == null) return false;
+                if (index <= 3)
+                    return TriangleOffsetsConfig.SetYIndex((short)value, address.Value, index - 1);
+                return false;
+            }
+
+            public override bool SetZ(double value)
+            {
+                uint? address = addressGetter();
+                if (address == null) return false;
+                if (index <= 3)
+                    return TriangleOffsetsConfig.SetZIndex((short)value, address.Value, index - 1);
+                return false;
+            }
+        }
+    }
+}

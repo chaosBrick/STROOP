@@ -869,6 +869,8 @@
     <Compile Include="Utilities\MouseUtility.cs" />
     <Compile Include="Utilities\ObjectRngUtilities.cs" />
     <Compile Include="Utilities\PlushUtilities.cs" />
+    <Compile Include="Utilities\PositionAngle\PositionAngle.Commons.cs" />
+    <Compile Include="Utilities\PositionAngle\PositionAngle.Misc.cs" />
     <Compile Include="Utilities\SegmentationUtilities.cs" />
     <Compile Include="Utilities\BoolUtilities.cs" />
     <Compile Include="Utilities\CamHackUtilities.cs" />
@@ -880,7 +882,7 @@
     <Compile Include="Utilities\ObjectUtilities.cs" />
     <Compile Include="Utilities\ObjectSnapshot.cs" />
     <Compile Include="Utilities\ObjectOrderingUtilities.cs" />
-    <Compile Include="Utilities\PositionAngle.cs" />
+    <Compile Include="Utilities\PositionAngle\PositionAngle.cs" />
     <Compile Include="Utilities\EndiannessUtilities.cs" />
     <Compile Include="Utilities\EndianUtilities.cs" />
     <Compile Include="Utilities\CogUtilities.cs" />
@@ -1386,6 +1388,7 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <Compile Include="Tabs\MapTab\MapGraphics.LegacyControlScheme.cs" />
+    <Compile Include="Utilities\PositionAngle\PositionAngle.Derivatives.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
