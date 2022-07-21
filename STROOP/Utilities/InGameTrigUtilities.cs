@@ -100,12 +100,12 @@ namespace STROOP.Utilities
                         returnValue = 0x4000 - InGameATanLookup(xComp, yComp);
                 else
                     if (-xComp < yComp)
-                    returnValue = 0x4000 + InGameATanLookup(-xComp, yComp);
-                else
-                    returnValue = 0x8000 - InGameATanLookup(yComp, -xComp);
+                        returnValue = 0x4000 + InGameATanLookup(-xComp, yComp);
+                    else
+                        returnValue = 0x8000 - InGameATanLookup(yComp, -xComp);
             else
                 if (xComp < 0)
-                    if (-yComp < -xComp)
+                if (-yComp < -xComp)
                         returnValue = 0x8000 + InGameATanLookup(-yComp, -xComp);
                     else
                         returnValue = 0xC000 - InGameATanLookup(-xComp, -yComp);
@@ -137,4 +137,4 @@ namespace STROOP.Utilities
             //return arcSineData[index];
         }
     }
-} 
+}
