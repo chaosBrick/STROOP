@@ -68,7 +68,7 @@ namespace STROOP.Controls
             if (!combinedValues.meaningfulValue)
                 state = CheckState.Indeterminate;
             else
-                state = System.Convert.ToDecimal(combinedValues.value) != 0 ? CheckState.Checked : CheckState.Unchecked;
+                state = (System.Convert.ToDecimal(combinedValues.value) != 0 ^ _displayAsInverted) ? CheckState.Checked : CheckState.Unchecked;
 
             Image checkboxImage;
             switch (state)
