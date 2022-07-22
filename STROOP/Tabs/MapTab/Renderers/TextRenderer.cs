@@ -20,7 +20,7 @@ namespace STROOP.Tabs.MapTab.Renderers
 
         public TextRenderer()
         {
-            drawing = new QFontDrawing(true, null);
+            drawing = new QFontDrawing(false, null);
             var config = new QuickFont.Configuration.QFontBuilderConfiguration();
             defaultFont = new QFont("Resources/Fonts/dejavu-markup/DejaVuMarkup.ttf", 16, config, FontStyle.Regular);
         }
