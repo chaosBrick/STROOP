@@ -1491,7 +1491,7 @@ del "$(TargetDir)ICSharpCode.AvalonEdit.xml"
 del "$(TargetDir)Newtonsoft.Json.xml"
 del "$(TargetDir)System.ValueTuple.xml"
 
-xcopy /E /Y /I "$(SolutionDir)dep/x64" "$(TargetDir)" /D</PostBuildEvent>
+xcopy /E /Y /I "$(SolutionDir)dep/dep_x64" "$(TargetDir)" /D</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>xcopy /E /Y /I "$(ProjectDir)Resources" "$(TargetDir)Resources" /D
