@@ -127,7 +127,19 @@ namespace STROOP.Controls
             int elementValueWidth => variablePanelValueWidth;
             int elementWidth => elementNameWidth + elementValueWidth;
 
-            public int GetMaxRows() => (target.Height - borderMargin * 2 - SystemInformation.HorizontalScrollBarHeight) / elementHeight;
+            public int GetMaxRows()
+            {
+                var effectiveHeight = target.Height - borderMargin * 2;
+                var dsjakl = target.GetCurrentVariableControls().Count;
+                var knolz = effectiveHeight / elementHeight;
+                var numColumnsWithoutScrollbar =  dsjakl / knolz;
+                if (dsjakl % knolz > 0)
+                    numColumnsWithoutScrollbar++;
+                if (numColumnsWithoutScrollbar * (variablePanelNameWidth + variablePanelValueWidth) >
+                    target.ClientRectangle.Width - 2 * borderMargin)
+                    effectiveHeight -= SystemInformation.HorizontalScrollBarHeight;
+                return effectiveHeight / elementHeight;
+            }
 
             public WatchVariablePanelRenderer(WatchVariablePanel target)
             {
