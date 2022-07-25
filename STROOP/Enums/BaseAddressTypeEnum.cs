@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace STROOP.Structs
 {
-    // TODO add new offset types
     public static class BaseAddressType
     {
         static BaseAddressType() => Utilities.StringUtilities.InitializeDeclaredStrings(typeof(BaseAddressType));
