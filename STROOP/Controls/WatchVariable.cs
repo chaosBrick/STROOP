@@ -5,8 +5,9 @@ using STROOP.Utilities;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using System.Xml.Linq;
+using STROOP.Controls;
 
-namespace STROOP.Controls
+namespace STROOP
 {
     public struct WatchVariablePrecursor
     {
@@ -27,12 +28,14 @@ namespace STROOP.Controls
                 invertBool = nameof(invertBool),
                 specialType = nameof(specialType),
                 roundingLimit = nameof(roundingLimit),
-                display = nameof(display)
+                display = nameof(display),
+                color = nameof(color)
                 ;
         }
 
         public interface IVariableView
         {
+            Action OnDelete { get; set; }
             string Name { get; }
             GetterFunction _getterFunction { get; }
             SetterFunction _setterFunction { get; }
@@ -43,9 +46,13 @@ namespace STROOP.Controls
 
         public class CustomView : IVariableView
         {
+            public Action OnDelete { get; set; }
             public string Name { get; set; }
             public GetterFunction _getterFunction { get; set; }
             public SetterFunction _setterFunction { get; set; }
+            public string Color { set { SetValueByKey(ViewProperties.color, value); } }
+            public string Display { set { SetValueByKey(ViewProperties.display, value); } }
+
             Dictionary<string, string> keyedValues = new Dictionary<string, string>();
             public CustomView(Type wrapperType) { this.wrapperType = wrapperType; }
             public virtual string GetValueByKey(string key)
@@ -65,6 +72,7 @@ namespace STROOP.Controls
 
         public class XmlView : IVariableView
         {
+            public Action OnDelete { get; set; }
             readonly WatchVariable watchVariable;
             readonly string wrapper;
             readonly XElement xElement;

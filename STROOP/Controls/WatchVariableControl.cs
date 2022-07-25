@@ -81,6 +81,7 @@ namespace STROOP.Controls
             this.view = view;
             this.containingPanel = panel;
             WatchVarWrapper = (WatchVariableWrapper)Activator.CreateInstance(view.GetWrapperType(), watchVar, this);
+            view.OnDelete += () => containingPanel.RemoveVariable(this);
 
             // Initialize main fields
             VarName = view.Name;

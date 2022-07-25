@@ -39,6 +39,8 @@ namespace STROOP.Utilities
             uint GetAddress();
         }
 
+        public static PositionAngle NaN = new CustomPositionAngle(double.NaN, double.NaN, double.NaN, double.NaN);
+
         public static PositionAngle Mario = new MarioPositionAngle();
 
         public static PositionAngle Holp = new MemoryPositionAngle(
@@ -114,7 +116,6 @@ namespace STROOP.Utilities
             ObjectConfig.YawFacingOffset
             );
 
-        public static PositionAngle Self = new HybridPositionAngle(() => SpecialConfig.SelfPosPA, () => SpecialConfig.SelfAnglePA);
         public static PositionAngle Custom(Vector3 position, ushort angle = 0) => new CustomPositionAngle(position, angle);
 
         public static PositionAngle Obj(uint address) => new ObjectPositionAngle(() => address);
@@ -125,18 +126,18 @@ namespace STROOP.Utilities
 
         public static PositionAngle ObjGfx(uint address) =>
             new MemoryPositionAngle(
-                () => address, 
-                ObjectConfig.GraphicsXOffset, 
-                ObjectConfig.GraphicsYOffset, 
-                ObjectConfig.GraphicsZOffset, 
+                () => address,
+                ObjectConfig.GraphicsXOffset,
+                ObjectConfig.GraphicsYOffset,
+                ObjectConfig.GraphicsZOffset,
                 ObjectConfig.GraphicsYawOffset,
                 $"[{address.ToString("X8")}] Object Graphics");
 
         public static PositionAngle ObjScale(uint address) =>
             new MemoryPositionAngle(
-                () => address, 
-                ObjectConfig.ScaleWidthOffset, 
-                ObjectConfig.ScaleHeightOffset, 
+                () => address,
+                ObjectConfig.ScaleWidthOffset,
+                ObjectConfig.ScaleHeightOffset,
                 ObjectConfig.ScaleDepthOffset,
                 (uint?)null,
                 $"[{address.ToString("X8")}] Object Scale");
@@ -282,14 +283,7 @@ namespace STROOP.Utilities
                 uint? address = ParsingUtilities.ParseHexNullable(parts[1]);
                 if (!address.HasValue) return null;
                 uint? index = ParsingUtilities.ParseUIntNullable(parts[2]);
-                if (!index.HasValue || index.Value < 1 || index.Value > 7) return null;
-                // 1 = vertex 1
-                // 2 = vertex 2
-                // 3 = vertex 3
-                // 4 = vertex closest to Mario
-                // 5 = vertex closest to Self
-                // 6 = point on triangle under Mario
-                // 7 = point on triangle under Self
+                if (!index.HasValue || index.Value < 1 || index.Value > 3) return null;
                 return Tri(address.Value, index.Value);
             }
             else if (parts.Count == 4 && parts[0] == "objtri")
@@ -332,9 +326,9 @@ namespace STROOP.Utilities
                 if (posAngle == null) return null;
                 return Trunc(posAngle);
             }
-            else if (parts.Count == 1 && parts[0] == "self")
+            else if (parts.Count == 1 && parts[0] == "custom")
             {
-                return Self;
+                return Custom(new Vector3(0));
             }
             else if (parts.Count >= 1 && (parts[0] == "pos" || parts[0] == "position"))
             {
@@ -342,12 +336,19 @@ namespace STROOP.Utilities
                 double y = parts.Count >= 3 ? ParsingUtilities.ParseDoubleNullable(parts[2]) ?? double.NaN : double.NaN;
                 double z = parts.Count >= 4 ? ParsingUtilities.ParseDoubleNullable(parts[3]) ?? double.NaN : double.NaN;
                 double angle = parts.Count >= 5 ? ParsingUtilities.ParseDoubleNullable(parts[4]) ?? double.NaN : double.NaN;
-                return Custom(new Vector3((float)x, (float)y, (float)z), (ushort)angle);
+                return new CustomPositionAngle(x, y, z, angle);
             }
             else if (parts.Count == 2 && (parts[0] == "ang" || parts[0] == "angle"))
             {
                 double angle = ParsingUtilities.ParseDoubleNullable(parts[1]) ?? double.NaN;
-                return Custom(new Vector3(float.NaN), (ushort)angle);
+                return new CustomPositionAngle(double.NaN, double.NaN, double.NaN, angle);
+            }
+            else if (parts.Count == 1)
+            {
+                foreach (var p in HybridPositionAngle.pointPAs)
+                    if (p.name.ToLower() == parts[0])
+                        return p;
+                return null;
             }
 
             return null;
@@ -527,10 +528,9 @@ namespace STROOP.Utilities
             return KeyboardUtilities.IsCtrlHeld();
         }
 
-        public static bool SetDistance(PositionAngle p1, PositionAngle p2, double distance, bool? toggleNullable = null)
+        public static bool SetDistance(PositionAngle p1, PositionAngle p2, double distance)
         {
-            bool toggle = toggleNullable ?? GetToggle();
-            if (!toggle)
+            if (GetToggle())
             {
                 (double x, double y, double z) = MoreMath.ExtrapolateLine3D(p1.X, p1.Y, p1.Z, p2.X, p2.Y, p2.Z, distance);
                 return p2.SetValues(x: x, y: y, z: z);
@@ -542,10 +542,9 @@ namespace STROOP.Utilities
             }
         }
 
-        public static bool SetHDistance(PositionAngle p1, PositionAngle p2, double distance, bool? toggleNullable = null)
+        public static bool SetHDistance(PositionAngle p1, PositionAngle p2, double distance)
         {
-            bool toggle = toggleNullable ?? GetToggle();
-            if (!toggle)
+            if (GetToggle())
             {
                 (double x, double z) = MoreMath.ExtrapolateLine2D(p1.X, p1.Z, p2.X, p2.Z, distance);
                 return p2.SetValues(x: x, z: z);
@@ -557,10 +556,9 @@ namespace STROOP.Utilities
             }
         }
 
-        public static bool SetXDistance(PositionAngle p1, PositionAngle p2, double distance, bool? toggleNullable = null)
+        public static bool SetXDistance(PositionAngle p1, PositionAngle p2, double distance)
         {
-            bool toggle = toggleNullable ?? GetToggle();
-            if (!toggle)
+            if (GetToggle())
             {
                 double x = p1.X + distance;
                 return p2.SetValues(x: x);
@@ -572,10 +570,9 @@ namespace STROOP.Utilities
             }
         }
 
-        public static bool SetYDistance(PositionAngle p1, PositionAngle p2, double distance, bool? toggleNullable = null)
+        public static bool SetYDistance(PositionAngle p1, PositionAngle p2, double distance)
         {
-            bool toggle = toggleNullable ?? GetToggle();
-            if (!toggle)
+            if (GetToggle())
             {
                 double y = p1.Y + distance;
                 return p2.SetValues(y: y);
@@ -587,10 +584,9 @@ namespace STROOP.Utilities
             }
         }
 
-        public static bool SetZDistance(PositionAngle p1, PositionAngle p2, double distance, bool? toggleNullable = null)
+        public static bool SetZDistance(PositionAngle p1, PositionAngle p2, double distance)
         {
-            bool toggle = toggleNullable ?? GetToggle();
-            if (!toggle)
+            if (GetToggle())
             {
                 double z = p1.Z + distance;
                 return p2.SetValues(z: z);
@@ -602,10 +598,9 @@ namespace STROOP.Utilities
             }
         }
 
-        public static bool SetFDistance(PositionAngle p1, PositionAngle p2, double distance, bool? toggleNullable = null)
+        public static bool SetFDistance(PositionAngle p1, PositionAngle p2, double distance)
         {
-            bool toggle = toggleNullable ?? GetToggle();
-            if (!toggle)
+            if (GetToggle())
             {
                 (double x, double z) =
                     MoreMath.GetRelativelyOffsettedPosition(
@@ -621,10 +616,9 @@ namespace STROOP.Utilities
             }
         }
 
-        public static bool SetSDistance(PositionAngle p1, PositionAngle p2, double distance, bool? toggleNullable = null)
+        public static bool SetSDistance(PositionAngle p1, PositionAngle p2, double distance)
         {
-            bool toggle = toggleNullable ?? GetToggle();
-            if (!toggle)
+            if (GetToggle())
             {
                 (double x, double z) =
                     MoreMath.GetRelativelyOffsettedPosition(
@@ -640,10 +634,9 @@ namespace STROOP.Utilities
             }
         }
 
-        public static bool SetAngleTo(PositionAngle p1, PositionAngle p2, double angle, bool? toggleNullable = null)
+        public static bool SetAngleTo(PositionAngle p1, PositionAngle p2, double angle)
         {
-            bool toggle = toggleNullable ?? GetToggle();
-            if (!toggle)
+            if (GetToggle())
             {
                 (double x, double z) =
                     MoreMath.RotatePointAboutPointToAngle(
@@ -659,10 +652,9 @@ namespace STROOP.Utilities
             }
         }
 
-        public static bool SetDAngleTo(PositionAngle p1, PositionAngle p2, double angleDiff, bool? toggleNullable = null)
+        public static bool SetDAngleTo(PositionAngle p1, PositionAngle p2, double angleDiff)
         {
-            bool toggle = toggleNullable ?? GetToggle();
-            if (!toggle)
+            if (GetToggle())
             {
                 double currentAngle = MoreMath.AngleTo_AngleUnits(p1.X, p1.Z, p2.X, p2.Z);
                 double newAngle = currentAngle + angleDiff;
@@ -678,10 +670,9 @@ namespace STROOP.Utilities
             }
         }
 
-        public static bool SetAngleDifference(PositionAngle p1, PositionAngle p2, double angleDiff, bool? toggleNullable = null)
+        public static bool SetAngleDifference(PositionAngle p1, PositionAngle p2, double angleDiff)
         {
-            bool toggle = toggleNullable ?? GetToggle();
-            if (!toggle)
+            if (GetToggle())
             {
                 double newAngle = p2.Angle + angleDiff;
                 return p1.SetValues(angle: newAngle);

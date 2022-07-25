@@ -32,10 +32,18 @@ namespace STROOP.Tabs
                 VariableGroup.Custom,
             };
 
+        static IEnumerable<(string, WatchVariablePanel.SpecialFuncWatchVariables)> GetRelations()
+        {
+            yield return PositionAngle.HybridPositionAngle.GenerateBaseVariables;
+            foreach (var relation in PositionAngle.HybridPositionAngle.pointPAs)
+                yield return PositionAngle.HybridPositionAngle.GenerateRelations(relation);
+        }
+
         public TasTab()
         {
             InitializeComponent();
             watchVariablePanelTas.SetGroups(ALL_VAR_GROUPS, VISIBLE_VAR_GROUPS);
+            watchVariablePanelTas.getSpecialFuncWatchVariables = GetRelations;
         }
 
         public override string GetDisplayName() => "TAS";
@@ -43,6 +51,14 @@ namespace STROOP.Tabs
         public override void InitializeTab()
         {
             base.InitializeTab();
+            var vars = new List<WatchVariable>();
+            vars.AddRange(PositionAngle.HybridPositionAngle.GenerateBaseVariables.Item2(PositionAngle.HybridPositionAngle.pointPAs[0]));
+            vars.AddRange(PositionAngle.HybridPositionAngle.GenerateBaseVariables.Item2(PositionAngle.HybridPositionAngle.pointPAs[1]));
+            vars.AddRange(PositionAngle.HybridPositionAngle.GenerateRelations(PositionAngle.HybridPositionAngle.pointPAs[1])
+                .Item2(PositionAngle.HybridPositionAngle.pointPAs[0]));
+
+            watchVariablePanelTas.AddVariables(vars.ConvertAll(_ => (_, _.view)));
+
             buttonTasStorePosition.Click += (sender, e) => StoreInfo(x: true, y: true, z: true);
             ControlUtilities.AddContextMenuStripFunctions(
                 buttonTasStorePosition,

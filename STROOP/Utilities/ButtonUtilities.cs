@@ -288,7 +288,7 @@ namespace STROOP.Utilities
                 PositionAngle mario = PositionAngle.Mario;
                 double angleObjToMario = PositionAngle.GetAngleTo(obj, mario, null, false);
                 double newAngleObjToMario = angleObjToMario + yawOffset;
-                success &= PositionAngle.SetAngleTo(obj, mario, newAngleObjToMario, false);
+                success &= PositionAngle.SetAngleTo(obj, mario, newAngleObjToMario);
                 success &= mario.SetAngle(mario.Angle + yawOffset);
             }
 

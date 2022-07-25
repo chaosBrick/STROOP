@@ -8,34 +8,6 @@ namespace STROOP.Structs.Configurations
     public static class SpecialConfig
     {
         public static float ExtBoundariesScale => SavedSettingsConfig.UseExtendedLevelBoundaries ? 4 : 1;
-        // - Self pos
-
-        public static PositionAngle SelfPosPA = PositionAngle.Mario;
-        public static PositionAngle SelfAnglePA = PositionAngle.Mario;
-        public static PositionAngle SelfPA
-        {
-            get => PositionAngle.Hybrid(SelfPosPA, SelfAnglePA);
-        }
-
-        public static double SelfX
-        {
-            get => SelfPA.X;
-        }
-
-        public static double SelfY
-        {
-            get => SelfPA.Y;
-        }
-
-        public static double SelfZ
-        {
-            get => SelfPA.Z;
-        }
-
-        public static double SelfAngle
-        {
-            get => SelfPA.Angle;
-        }
 
         // Cam Hack vars
 

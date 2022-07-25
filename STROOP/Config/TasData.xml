@@ -59,43 +59,5 @@
   <Data groupList="TAS" type="short" offset="0x2C" base="Mario" subclass="Angle" color="Pink">Pitch</Data>
   <Data groupList="TAS" type="short" offset="0x32" base="Mario" subclass="Angle" color="Pink">Pitch Velocity</Data>
   <Data groupList="TAS" base="None" specialType="MupenLag" color="Grey">Lag</Data>
-
-  <Data groupList="Point" base="None" specialType="SelfPosType" subclass="String" color="Blue">Self Pos Type</Data>
-  <Data groupList="Point" base="None" specialType="SelfX" color="Blue" coord="X">Self X</Data>
-  <Data groupList="Point" base="None" specialType="SelfY" color="Blue" coord="Y">Self Y</Data>
-  <Data groupList="Point" base="None" specialType="SelfZ" color="Blue" coord="Z">Self Z</Data>
-
-  <Data groupList="Point" base="None" specialType="SelfAngleType" subclass="String" color="Blue">Self Angle Type</Data>
-  <Data groupList="Point" base="None" specialType="SelfAngle" subclass="Angle" display="ushort" yaw="true" color="Blue">Self Angle</Data>
   
-  <Data groupList="Point" base="None" specialType="PointPosType" subclass="String" color="Blue">Point Pos Type</Data>
-  <Data groupList="Point" base="None" specialType="PointX" color="Blue" coord="X">Point X</Data>
-  <Data groupList="Point" base="None" specialType="PointY" color="Blue" coord="Y">Point Y</Data>
-  <Data groupList="Point" base="None" specialType="PointZ" color="Blue" coord="Z">Point Z</Data>
-
-  <Data groupList="Point" base="None" specialType="PointAngleType" subclass="String" color="Blue">Point Angle Type</Data>
-  <Data groupList="Point" base="None" specialType="PointAngle" subclass="Angle" display="ushort" yaw="true" color="Blue">Point Angle</Data>
-
-  <Data groupList="Point" base="None" specialType="XDistPointToSelf" color="LightBlue" coord="X">XDist Point to Self</Data>
-  <Data groupList="Point" base="None" specialType="YDistPointToSelf" color="LightBlue" coord="Y">YDist Point to Self</Data>
-  <Data groupList="Point" base="None" specialType="ZDistPointToSelf" color="LightBlue" coord="Z">ZDist Point to Self</Data>
-  <Data groupList="Point" base="None" specialType="HDistPointToSelf" color="LightBlue">HDist Point to Self</Data>
-  <Data groupList="Point" base="None" specialType="DistPointToSelf" color="LightBlue">Dist Point to Self</Data>
-
-  <Data groupList="Point" base="None" specialType="AnglePointToSelf" subclass="Angle" display="ushort" yaw="true" color="LightBlue">Angle Point to Self</Data>
-  <Data groupList="Point" base="None" specialType="DAnglePointToSelf" subclass="Angle" display="short" color="LightBlue">DAngle Point to Self</Data>
-  <Data groupList="Point" base="None" specialType="AngleSelfToPoint" subclass="Angle" display="ushort" yaw="true" color="LightBlue">Angle Self to Point</Data>
-  <Data groupList="Point" base="None" specialType="DAngleSelfToPoint" subclass="Angle" display="short" color="LightBlue">DAngle Self to Point</Data>
-
-  <Data groupList="Point" base="None" specialType="AngleDiffSelfToPoint" subclass="Angle" display="short" color="LightBlue">DAngle Self to Angle</Data>
-
-  <Data groupList="Point" base="None" specialType="FDistPointToSelf" color="LightBlue">FDist Point to Self</Data>
-  <Data groupList="Point" base="None" specialType="SDistPointToSelf" color="LightBlue">SDist Point to Self</Data>
-  <Data groupList="Point" base="None" specialType="FSDistPointToSelf" subclass="String" color="LightBlue">FSDist Point to Self</Data>
-
-  <Data groupList="Point" base="None" specialType="PitchSelfToPoint" subclass="Angle" display="short" color="Pink">Pitch Self to Point</Data>
-  <Data groupList="Point" base="None" specialType="WalkingDistance" color="Pink">Walking Distance</Data>
-  <Data groupList="Point" base="None" specialType="WalkingDistanceDifferenceMarioToPoint" color="Pink">Walking Distance Diff</Data>
-  <Data groupList="Point" base="None" specialType="ScheduleOffset" color="Pink">Schedule Offset</Data>
-
 </VarData>

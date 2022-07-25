@@ -33,6 +33,200 @@ namespace STROOP.Tabs
                        });
         }
 
+        static (string, WatchVariablePanel.SpecialFuncWatchVariables) GenerateTriangleRelations =
+            ("Triangle projections",
+           (PositionAngle.HybridPositionAngle pa) =>
+            {
+                var vars = new List<WatchVariable>();
+                vars.Add(new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                {
+                    Color = "LightBlue",
+                    Name = $"{pa.name} Normal Dist Away",
+                    _getterFunction = (uint triAddress) =>
+                    {
+                        TriangleDataModel triStruct = TriangleDataModel.Create(triAddress);
+                        double normalDistAway =
+                            pa.X * triStruct.NormX +
+                            pa.Y * triStruct.NormY +
+                            pa.Z * triStruct.NormZ +
+                            triStruct.NormOffset;
+                        return normalDistAway;
+                    },
+                    _setterFunction = (object distAwayObj, uint triAddress) =>
+                   {
+                       double distAway = Convert.ToDouble(distAwayObj);
+                       TriangleDataModel triStruct = TriangleDataModel.Create(triAddress);
+
+                       double missingDist = distAway -
+                           pa.X * triStruct.NormX -
+                           pa.Y * triStruct.NormY -
+                           pa.Z * triStruct.NormZ -
+                           triStruct.NormOffset;
+
+                       double xDiff = missingDist * triStruct.NormX;
+                       double yDiff = missingDist * triStruct.NormY;
+                       double zDiff = missingDist * triStruct.NormZ;
+
+                       double newSelfX = pa.X + xDiff;
+                       double newSelfY = pa.Y + yDiff;
+                       double newSelfZ = pa.Z + zDiff;
+
+                       return pa.SetValues(x: newSelfX, y: newSelfY, z: newSelfZ);
+                   }
+                }, "Triangle"));
+
+                vars.Add(new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                {
+                    Color = "LightBlue",
+                    Name = $"{pa.name} Vertical Dist Away",
+                    _getterFunction = (uint triAddress) =>
+                     {
+                         TriangleDataModel triStruct = TriangleDataModel.Create(triAddress);
+                         double verticalDistAway =
+                             pa.Y + (pa.X * triStruct.NormX + pa.Z * triStruct.NormZ + triStruct.NormOffset) / triStruct.NormY;
+                         return verticalDistAway;
+                     },
+                    _setterFunction = (object distAboveObj, uint triAddress) =>
+                    {
+                        double distAbove = Convert.ToDouble(distAboveObj);
+                        TriangleDataModel triStruct = TriangleDataModel.Create(triAddress);
+                        double newSelfY = distAbove - (pa.X * triStruct.NormX + pa.Z * triStruct.NormZ + triStruct.NormOffset) / triStruct.NormY;
+                        pa.SetY(newSelfY);
+                        return true;
+                    }
+                }, "Triangle"));
+
+
+                vars.Add(new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                {
+                    Color = "LightBlue",
+                    Name = $"{pa.name} Height On Triangle",
+                    _getterFunction = (uint triAddress) =>
+                     {
+                         TriangleDataModel triStruct = TriangleDataModel.Create(triAddress);
+                         double heightOnTriangle = triStruct.GetHeightOnTriangle(pa.X, pa.Z);
+                         return heightOnTriangle;
+                     },
+                    _setterFunction = WatchVariableSpecialUtilities.DEFAULT_SETTER
+                }, "Triangle"));
+
+                vars.Add(new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                {
+                    Color = "LightBlue",
+                    Name = $"{pa.name} Distance To Line 12",
+                    _getterFunction = (uint triAddress) =>
+                    {
+                        TriangleDataModel triStruct = TriangleDataModel.Create(triAddress);
+                        double signedDistToLine12 = MoreMath.GetSignedDistanceFromPointToLine(
+                            pa.X, pa.Z,
+                            triStruct.X1, triStruct.Z1,
+                            triStruct.X2, triStruct.Z2,
+                            triStruct.X3, triStruct.Z3, 1, 2,
+                            TriangleDataModel.Create(triAddress).Classification);
+                        return signedDistToLine12;
+                    },
+                    _setterFunction = (object distObj, uint triAddress) =>
+                    {
+                        double dist = Convert.ToDouble(distObj);
+                        TriangleDataModel triStruct = TriangleDataModel.Create(triAddress);
+                        double signedDistToLine12 = MoreMath.GetSignedDistanceFromPointToLine(
+                            pa.X, pa.Z,
+                            triStruct.X1, triStruct.Z1,
+                            triStruct.X2, triStruct.Z2,
+                            triStruct.X3, triStruct.Z3, 1, 2,
+                            TriangleDataModel.Create(triAddress).Classification);
+
+                        double missingDist = dist - signedDistToLine12;
+                        double lineAngle = MoreMath.AngleTo_AngleUnits(triStruct.X1, triStruct.Z1, triStruct.X2, triStruct.Z2);
+                        bool floorTri = MoreMath.IsPointLeftOfLine(triStruct.X3, triStruct.Z3, triStruct.X1, triStruct.Z1, triStruct.X2, triStruct.Z2);
+                        double inwardAngle = floorTri ? MoreMath.RotateAngleCCW(lineAngle, 16384) : MoreMath.RotateAngleCW(lineAngle, 16384);
+
+                        (double xDiff, double zDiff) = MoreMath.GetComponentsFromVector(missingDist, inwardAngle);
+                        double newSelfX = pa.X + xDiff;
+                        double newSelfZ = pa.Z + zDiff;
+                        return pa.SetValues(x: newSelfX, z: newSelfZ);
+                    }
+                }, "Triangle"));
+
+                vars.Add(new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                {
+                    Color = "LightBlue",
+                    Name = $"{pa.name} Distance To Line 23",
+                    _getterFunction = (uint triAddress) =>
+                    {
+                        TriangleDataModel triStruct = TriangleDataModel.Create(triAddress);
+                        double signedDistToLine23 = MoreMath.GetSignedDistanceFromPointToLine(
+                            pa.X, pa.Z,
+                            triStruct.X1, triStruct.Z1,
+                            triStruct.X2, triStruct.Z2,
+                            triStruct.X3, triStruct.Z3, 2, 3,
+                            TriangleDataModel.Create(triAddress).Classification);
+                        return signedDistToLine23;
+                    },
+                    _setterFunction = (object distObj, uint triAddress) =>
+                    {
+                        double dist = Convert.ToDouble(distObj);
+                        TriangleDataModel triStruct = TriangleDataModel.Create(triAddress);
+                        double signedDistToLine23 = MoreMath.GetSignedDistanceFromPointToLine(
+                            pa.X, pa.Z,
+                            triStruct.X1, triStruct.Z1,
+                            triStruct.X2, triStruct.Z2,
+                            triStruct.X3, triStruct.Z3, 2, 3,
+                            TriangleDataModel.Create(triAddress).Classification);
+
+                        double missingDist = dist - signedDistToLine23;
+                        double lineAngle = MoreMath.AngleTo_AngleUnits(triStruct.X2, triStruct.Z2, triStruct.X3, triStruct.Z3);
+                        bool floorTri = MoreMath.IsPointLeftOfLine(triStruct.X3, triStruct.Z3, triStruct.X1, triStruct.Z1, triStruct.X2, triStruct.Z2);
+                        double inwardAngle = floorTri ? MoreMath.RotateAngleCCW(lineAngle, 16384) : MoreMath.RotateAngleCW(lineAngle, 16384);
+
+                        (double xDiff, double zDiff) = MoreMath.GetComponentsFromVector(missingDist, inwardAngle);
+                        double newSelfX = pa.X + xDiff;
+                        double newSelfZ = pa.Z + zDiff;
+                        return pa.SetValues(x: newSelfX, z: newSelfZ);
+                    }
+                }, "Triangle"));
+
+                vars.Add(new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                {
+                    Color = "LightBlue",
+                    Name = $"{pa.name} Distance To Line 31",
+                    _getterFunction = (uint triAddress) =>
+                    {
+                        TriangleDataModel triStruct = TriangleDataModel.Create(triAddress);
+                        double signedDistToLine31 = MoreMath.GetSignedDistanceFromPointToLine(
+                            pa.X, pa.Z,
+                            triStruct.X1, triStruct.Z1,
+                            triStruct.X2, triStruct.Z2,
+                            triStruct.X3, triStruct.Z3, 3, 1,
+                            TriangleDataModel.Create(triAddress).Classification);
+                        return signedDistToLine31;
+                    }                ,
+                    _setterFunction = (object distObj, uint triAddress) =>
+                    {
+                        double dist = Convert.ToDouble(distObj);
+                        TriangleDataModel triStruct = TriangleDataModel.Create(triAddress);
+                        double signedDistToLine31 = MoreMath.GetSignedDistanceFromPointToLine(
+                            pa.X, pa.Z,
+                            triStruct.X1, triStruct.Z1,
+                            triStruct.X2, triStruct.Z2,
+                            triStruct.X3, triStruct.Z3, 3, 1,
+                            TriangleDataModel.Create(triAddress).Classification);
+
+                        double missingDist = dist - signedDistToLine31;
+                        double lineAngle = MoreMath.AngleTo_AngleUnits(triStruct.X3, triStruct.Z3, triStruct.X1, triStruct.Z1);
+                        bool floorTri = MoreMath.IsPointLeftOfLine(triStruct.X3, triStruct.Z3, triStruct.X1, triStruct.Z1, triStruct.X2, triStruct.Z2);
+                        double inwardAngle = floorTri ? MoreMath.RotateAngleCCW(lineAngle, 16384) : MoreMath.RotateAngleCW(lineAngle, 16384);
+
+                        (double xDiff, double zDiff) = MoreMath.GetComponentsFromVector(missingDist, inwardAngle);
+                        double newSelfX = pa.X + xDiff;
+                        double newSelfZ = pa.Z + zDiff;
+                        return pa.SetValues(x: newSelfX, z: newSelfZ);
+                    }
+                }, "Triangle"));
+                return vars;
+            }
+        );
+
         public enum TriangleMode { Floor, Wall, Ceiling, Custom };
         public TriangleMode Mode = TriangleMode.Floor;
 
@@ -47,6 +241,7 @@ namespace STROOP.Tabs
         {
             InitializeComponent();
             watchVariablePanelTriangles.SetGroups(ALL_VAR_GROUPS, VISIBLE_VAR_GROUPS);
+            watchVariablePanelTriangles.getSpecialFuncWatchVariables = () => new[] { GenerateTriangleRelations };
         }
 
         public override string GetDisplayName() => "Triangles";
@@ -256,7 +451,7 @@ namespace STROOP.Tabs
                 TriangleUtilities.ConvertSurfaceTypes(classification, fromType.Value, toType.Value);
             };
         }
-        
+
         public void SetTriangleAddresses(uint triangleAddress)
         {
             SetTriangleAddresses(new List<uint> { triangleAddress });

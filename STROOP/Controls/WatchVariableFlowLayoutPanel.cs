@@ -48,6 +48,10 @@ namespace STROOP.Controls
         public readonly Func<List<WatchVariableControl>> GetSelectedVars;
         public List<ToolStripItem> customContextMenuItems = new List<ToolStripItem>();
 
+
+        public delegate IEnumerable<WatchVariable> SpecialFuncWatchVariables(PositionAngle.HybridPositionAngle input);
+        public Func<IEnumerable<(string name, SpecialFuncWatchVariables generateVariables)>> getSpecialFuncWatchVariables = null;
+
         public bool initialized = false;
         List<Action> deferredActions = new List<Action>();
 
@@ -124,6 +128,7 @@ namespace STROOP.Controls
                 if (KeyboardUtilities.IsCtrlHeld() && args.KeyCode == Keys.F)
                     (FindForm() as StroopMainForm)?.ShowSearchDialog();
             };
+            getSpecialFuncWatchVariables = () => new[] { PositionAngle.HybridPositionAngle.GenerateBaseVariables };
         }
 
         protected override void OnScroll(ScrollEventArgs se)
@@ -410,7 +415,7 @@ namespace STROOP.Controls
         {
             foreach (var watchVar in watchVars)
                 watchVar.FlashColor(WatchVariableControl.ADD_TO_VAR_HACK_TAB_COLOR);
-            MessageBox.Show("Not implemented :D");
+            MessageBox.Show("This feature is currently not implemented :(");
         }
 
         public void DeferredInitialize()
@@ -483,6 +488,63 @@ namespace STROOP.Controls
                 };
             }
 
+
+            ToolStripMenuItem addRelativeVariablesItem = null, removePointVariableItem = null;
+            var getSpecialFuncVars = getSpecialFuncWatchVariables?.Invoke() ?? null;
+            var specificsCount = getSpecialFuncVars?.Count() ?? 0;
+            if (PositionAngle.HybridPositionAngle.pointPAs.Count > 0)
+            {
+                if (getSpecialFuncVars != null && specificsCount > 0)
+                {
+                    void BindHandler(ToolStripMenuItem menuItem, PositionAngle.HybridPositionAngle targetPA, SpecialFuncWatchVariables generator) =>
+                    menuItem.Click += (_, __) => AddVariables(generator(targetPA).ConvertAll(v => (v, v.view)));
+
+                    addRelativeVariablesItem = new ToolStripMenuItem("Add relative variables for...");
+                    if (specificsCount == 1)
+                        addRelativeVariablesItem.Text = $"Add {getSpecialFuncVars.First().name} for...";
+                    foreach (var pa in PositionAngle.HybridPositionAngle.pointPAs)
+                    {
+                        var paItem = new ToolStripMenuItem(pa.name);
+                        if (specificsCount == 1)
+                            BindHandler(paItem, pa, getSpecialFuncVars.First().generateVariables);
+                        else
+                            foreach (var specialFunc in getSpecialFuncVars)
+                            {
+                                var specificsItem = new ToolStripMenuItem(specialFunc.name);
+                                BindHandler(specificsItem, pa, specialFunc.generateVariables);
+                                paItem.DropDownItems.Add(specificsItem);
+                            }
+                        addRelativeVariablesItem.DropDownItems.Add(paItem);
+                    }
+                }
+                removePointVariableItem = new ToolStripMenuItem("Remove custom point ...");
+                foreach (var customPA in PositionAngle.HybridPositionAngle.pointPAs)
+                {
+                    var capture = customPA;
+                    var subElement = new ToolStripMenuItem(customPA.name);
+                    subElement.Click += (_, __) =>
+                    {
+                        capture.first = () => PositionAngle.NaN;
+                        capture.second = () => PositionAngle.NaN;
+                        capture.OnDelete();
+                        PositionAngle.HybridPositionAngle.pointPAs.Remove(capture);
+                    };
+                    removePointVariableItem.DropDownItems.Add(subElement);
+                }
+            }
+
+            var addPointVariableItem = new ToolStripMenuItem("Add custom point...");
+            addPointVariableItem.Click += (_, __) =>
+            {
+                var ptCount = 1;
+                while (PositionAngle.HybridPositionAngle.pointPAs.Any(pa => pa.name.ToLower() == $"point{ptCount}"))
+                    ptCount++;
+                var newName = DialogUtilities.GetStringFromDialog($"Point{ptCount}", "Enter name of new custom point", "Add custom point");
+                if (newName.Trim() != null)
+                    PositionAngle.HybridPositionAngle.pointPAs.Add(
+                        new PositionAngle.HybridPositionAngle(() => PositionAngle.Mario, () => PositionAngle.Mario, newName));
+            };
+
             ToolStripMenuItem openSaveClearItem = new ToolStripMenuItem("Open / Save / Clear ...");
             ControlUtilities.AddDropDownItems(
                 openSaveClearItem,
@@ -517,9 +579,15 @@ namespace STROOP.Controls
             var strip = new ContextMenuStrip();
             strip.Items.Add(resetVariablesItem);
             strip.Items.Add(clearAllButHighlightedItem);
+            strip.Items.Add(new ToolStripSeparator());
+            if (addRelativeVariablesItem != null)
+                strip.Items.Add(addRelativeVariablesItem);
+            strip.Items.Add(addPointVariableItem);
+            strip.Items.Add(removePointVariableItem);
             strip.Items.Add(addCustomVariablesItem);
             strip.Items.Add(addMappingVariablesItem);
             strip.Items.Add(addDummyVariableItem);
+            strip.Items.Add(new ToolStripSeparator());
             strip.Items.Add(openSaveClearItem);
             strip.Items.Add(doToAllVariablesItem);
             strip.Items.Add(filterVariablesItem);

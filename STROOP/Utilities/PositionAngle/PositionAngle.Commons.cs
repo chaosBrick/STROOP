@@ -11,18 +11,32 @@ namespace STROOP.Utilities
 
         public class CustomPositionAngle : PositionAngle
         {
-            Vector3 customPos;
-            ushort customAngle;
-            public CustomPositionAngle(Vector3 pos, ushort angle = 0) { this.customPos = pos; this.customAngle = angle; }
+            double customX, customY, customZ, customAngle;
+            public CustomPositionAngle(Vector3 pos, ushort angle = 0)
+            {
+                customX = pos.X;
+                customY = pos.Y;
+                customZ = pos.Z;
+                customAngle = angle;
+            }
+            public CustomPositionAngle(double x, double y, double z, double ang)
+            {
+                customX = x;
+                customY = y;
+                customZ = z;
+                customAngle= ang;
+            }
 
-            public override double X => customPos.X;
-            public override double Y => customPos.Y;
-            public override double Z => customPos.Z;
-            public override double Angle => double.NaN;
-            public override bool SetX(double value) { customPos.X = (float)value; return true; }
-            public override bool SetY(double value) { customPos.Y = (float)value; return true; }
-            public override bool SetZ(double value) { customPos.Z = (float)value; return true; }
-            public override bool SetAngle(double value) { customAngle = (ushort)value; return true; }
+            public override double X => customX;
+            public override double Y => customY;
+            public override double Z => customZ;
+            public override double Angle => customAngle;
+            public override bool SetX(double value) { customX = value; return true; }
+            public override bool SetY(double value) { customY = value; return true; }
+            public override bool SetZ(double value) { customZ = value; return true; }
+            public override bool SetAngle(double value) { customAngle = value; return true; }
+
+            public override string ToString() => "Custom";
         }
 
         public class MarioPositionAngle : MemoryPositionAngle, IHoldsObjectAddress
@@ -156,27 +170,7 @@ namespace STROOP.Utilities
                 {
                     uint? address = addressGetter();
                     if (address == null) return double.NaN;
-                    switch (index)
-                    {
-                        case 1:
-                        case 2:
-                        case 3:
-                            return TriangleOffsetsConfig.GetXIndex(address.Value, index - 1);
-                        case 4:
-                            int closestVertexToMario = TriangleDataModel.Create(address.Value).GetClosestVertex(
-                                Mario.X, Mario.Y, Mario.Z);
-                            return TriangleOffsetsConfig.GetXIndex(address.Value, (uint)closestVertexToMario);
-                        case 5:
-                            int closestVertexToSelf = TriangleDataModel.Create(address.Value).GetClosestVertex(
-                                SpecialConfig.SelfX, SpecialConfig.SelfY, SpecialConfig.SelfZ);
-                            return TriangleOffsetsConfig.GetXIndex(address.Value, (uint)closestVertexToSelf);
-                        case 6:
-                            return Mario.X;
-                        case 7:
-                            return SpecialConfig.SelfX;
-                        default:
-                            throw new ArgumentOutOfRangeException("Invalid index");
-                    }
+                    return TriangleOffsetsConfig.GetXIndex(address.Value, index - 1);
                 }
             }
 
@@ -186,27 +180,7 @@ namespace STROOP.Utilities
                 {
                     uint? address = addressGetter();
                     if (address == null) return double.NaN;
-                    switch (index)
-                    {
-                        case 1:
-                        case 2:
-                        case 3:
-                            return TriangleOffsetsConfig.GetXIndex(address.Value, index - 1);
-                        case 4:
-                            int closestVertexToMario = TriangleDataModel.Create(address.Value).GetClosestVertex(
-                                Mario.X, Mario.Y, Mario.Z);
-                            return TriangleOffsetsConfig.GetXIndex(address.Value, (uint)closestVertexToMario);
-                        case 5:
-                            int closestVertexToSelf = TriangleDataModel.Create(address.Value).GetClosestVertex(
-                                SpecialConfig.SelfX, SpecialConfig.SelfY, SpecialConfig.SelfZ);
-                            return TriangleOffsetsConfig.GetXIndex(address.Value, (uint)closestVertexToSelf);
-                        case 6:
-                            return Mario.Z;
-                        case 7:
-                            return SpecialConfig.SelfZ;
-                        default:
-                            throw new ArgumentOutOfRangeException("Invalid index");
-                    }
+                    return TriangleOffsetsConfig.GetXIndex(address.Value, index - 1);
                 }
             }
 
@@ -216,27 +190,7 @@ namespace STROOP.Utilities
                 {
                     uint? address = addressGetter();
                     if (address == null) return double.NaN;
-                    switch (index)
-                    {
-                        case 1:
-                        case 2:
-                        case 3:
-                            return TriangleOffsetsConfig.GetXIndex(address.Value, index - 1);
-                        case 4:
-                            int closestVertexToMario = TriangleDataModel.Create(address.Value).GetClosestVertex(
-                                Mario.X, Mario.Y, Mario.Z);
-                            return TriangleOffsetsConfig.GetXIndex(address.Value, (uint)closestVertexToMario);
-                        case 5:
-                            int closestVertexToSelf = TriangleDataModel.Create(address.Value).GetClosestVertex(
-                                SpecialConfig.SelfX, SpecialConfig.SelfY, SpecialConfig.SelfZ);
-                            return TriangleOffsetsConfig.GetXIndex(address.Value, (uint)closestVertexToSelf);
-                        case 6:
-                            return TriangleDataModel.Create(address.Value).GetHeightOnTriangle(Mario.X, Mario.Z);
-                        case 7:
-                            return TriangleDataModel.Create(address.Value).GetHeightOnTriangle(SpecialConfig.SelfX, SpecialConfig.SelfZ);
-                        default:
-                            throw new ArgumentOutOfRangeException("Invalid index");
-                    }
+                    return TriangleOffsetsConfig.GetXIndex(address.Value, index - 1);
                 }
             }
             public override double Angle => Double.NaN;
