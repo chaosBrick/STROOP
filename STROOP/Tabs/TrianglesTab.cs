@@ -200,7 +200,7 @@ namespace STROOP.Tabs
                             triStruct.X3, triStruct.Z3, 3, 1,
                             TriangleDataModel.Create(triAddress).Classification);
                         return signedDistToLine31;
-                    }                ,
+                    },
                     _setterFunction = (object distObj, uint triAddress) =>
                     {
                         double dist = Convert.ToDouble(distObj);
@@ -223,6 +223,55 @@ namespace STROOP.Tabs
                         return pa.SetValues(x: newSelfX, z: newSelfZ);
                     }
                 }, "Triangle"));
+
+                foreach ((string name, Func<uint, PositionAngle> func) vertex_it in new(string, Func<uint, PositionAngle>)[]
+                {
+                    ("TriV1", address => PositionAngle.Tri(address, 1)),
+                    ("TriV2", address => PositionAngle.Tri(address, 2)),
+                    ("TriV3", address => PositionAngle.Tri(address, 3)),
+                })
+                {
+                    var vertex = vertex_it;
+                    foreach (var distFunc in WatchVariableSpecialUtilities.distFuncs)
+                    {
+                        var getter = distFunc.getter;
+                        var setter = distFunc.setter;
+                        vars.Add(new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                        {
+                            Color = "LightBlue",
+                            Name = $"{distFunc.type}Dist {pa.name} To {vertex.name}",
+                            _getterFunction = (uint address) => getter(pa, vertex.func(address)),
+                            _setterFunction = (object distObj, uint address) => setter(pa, vertex.func(address), Convert.ToDouble(distObj))
+                        }));
+                    }
+
+                    vars.Add(new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableAngleWrapper))
+                    {
+                        Color = "LightBlue",
+                        Display = "short",
+                        Name = $"Angle {pa.name} To {vertex.name}",
+                        _getterFunction = (uint address) => PositionAngle.GetAngleTo(pa, vertex.func(address), null, false),
+                        _setterFunction = (object angle, uint address) => PositionAngle.SetAngleTo(pa, vertex.func(address), Convert.ToDouble(angle))
+                    }));
+
+                    vars.Add(new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableAngleWrapper))
+                    {
+                        Color = "LightBlue",
+                        Display = "short",
+                        Name = $"DAngle {pa.name} To {vertex.name}",
+                        _getterFunction = (uint address) => PositionAngle.GetDAngleTo(pa, vertex.func(address), null, false),
+                        _setterFunction = (object angleDiff, uint address) => PositionAngle.SetDAngleTo(pa, vertex.func(address), Convert.ToDouble(angleDiff))
+                    }));
+
+                    vars.Add(new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableAngleWrapper))
+                    {
+                        Color = "LightBlue",
+                        Display = "short",
+                        Name = $"AngleDiff {pa.name} To {vertex.name}",
+                        _getterFunction = (uint address) => PositionAngle.GetAngleDifference(pa, vertex.func(address), false),
+                        _setterFunction = (object angleDiff, uint address) => PositionAngle.SetAngleDifference(pa, vertex.func(address), Convert.ToDouble(angleDiff))
+                    }));
+                }
                 return vars;
             }
         );

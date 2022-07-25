@@ -21,6 +21,7 @@ namespace STROOP.Structs
         {
             dictionary = new WatchVariableSpecialDictionary();
             AddLiteralEntriesToDictionary();
+            AddGeneratedEntriesToDictionary();
             AddPanEntriesToDictionary();
             GeneralUtilities.ExecuteInitializers<InitializeSpecialAttribute>();
         }
@@ -82,6 +83,93 @@ namespace STROOP.Structs
                     };
                 default:
                     throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        public static readonly (
+            string type, 
+            Func<PositionAngle, PositionAngle, double> getter, 
+            Func<PositionAngle, PositionAngle, double, bool> setter
+            )[] distFuncs =
+                        new(
+            string type,
+            Func<PositionAngle, PositionAngle, double> getter,
+            Func<PositionAngle, PositionAngle, double, bool> setter
+            )[]
+                        {
+                            ("X", PositionAngle.GetXDistance, PositionAngle.SetXDistance),
+                            ("Y", PositionAngle.GetYDistance, PositionAngle.SetYDistance),
+                            ("Z", PositionAngle.GetZDistance, PositionAngle.SetZDistance),
+                            ("H", PositionAngle.GetHDistance, PositionAngle.SetHDistance),
+                            ("", PositionAngle.GetDistance, PositionAngle.SetDistance),
+                            ("F", PositionAngle.GetFDistance, PositionAngle.SetFDistance),
+                            ("S", PositionAngle.GetSDistance, PositionAngle.SetSDistance),
+                        };
+
+        public static void AddGeneratedEntriesToDictionary()
+        {
+            List<Func<uint, PositionAngle>> posAngleFuncs =
+                new List<Func<uint, PositionAngle>>()
+                {
+                    (uint address) => PositionAngle.Mario,
+                    (uint address) => PositionAngle.Holp,
+                    (uint address) => PositionAngle.Camera,
+                    (uint address) => PositionAngle.Obj(address),
+                    (uint address) => PositionAngle.ObjHome(address),
+                    (uint address) => PositionAngle.Tri(address, 1),
+                    (uint address) => PositionAngle.Tri(address, 2),
+                    (uint address) => PositionAngle.Tri(address, 3),
+                };
+
+            List<string> posAngleStrings =
+                new List<string>()
+                {
+                    "Mario",
+                    "Holp",
+                    "Camera",
+                    "Obj",
+                    "ObjHome",
+                    "TriV1",
+                    "TriV2",
+                    "TriV3",
+                };
+
+            for (int i = 0; i < posAngleFuncs.Count; i++)
+            {
+                Func<uint, PositionAngle> func1 = posAngleFuncs[i];
+                string string1 = posAngleStrings[i];
+
+                for (int j = 0; j < posAngleFuncs.Count; j++)
+                {
+                    if (j == i) continue;
+                    Func<uint, PositionAngle> func2 = posAngleFuncs[j];
+                    string string2 = posAngleStrings[j];
+
+                    for (int k = 0; k < distFuncs.Length; k++)
+                    {
+                        var getter = distFuncs[k].getter;
+                        var setter = distFuncs[k].setter;
+                        dictionary.Add($"{distFuncs[k].type}Dist{string1}To{string2}",
+                            ((uint address) => getter(func1(address), func2(address)),
+                            (double dist, uint address) => setter(func1(address), func2(address), dist)
+                        ));
+                    }
+
+                    dictionary.Add($"Angle{string1}To{string2}",
+                        ((uint address) => PositionAngle.GetAngleTo(func1(address), func2(address), null, false),
+                        (double angle, uint address) => PositionAngle.SetAngleTo(func1(address), func2(address), angle)
+                    ));
+
+                    dictionary.Add($"DAngle{string1}To{string2}",
+                        ((uint address) => PositionAngle.GetDAngleTo(func1(address), func2(address), null, false),
+                        (double angleDiff, uint address) => PositionAngle.SetDAngleTo(func1(address), func2(address), angleDiff)
+                    ));
+
+                    dictionary.Add($"AngleDiff{string1}To{string2}",
+                        ((uint address) => PositionAngle.GetAngleDifference(func1(address), func2(address), false),
+                        (double angleDiff, uint address) => PositionAngle.SetAngleDifference(func1(address), func2(address), angleDiff)
+                    ));
+                }
             }
         }
 
@@ -2516,7 +2604,7 @@ namespace STROOP.Structs
                 }
             ,
                 DEFAULT_SETTER));
-            
+
             dictionary.Add("MaxHSpeedUphill",
                 ((uint triAddress) =>
                 {
