@@ -58,20 +58,23 @@ namespace STROOP.Tabs.GhostTab
         {
             uint jumpinOffset = 0xe0;
 
-            var krasserScheiss = new[] {
+            var gfxNodesPerAnimationState = new[] { // Addresses at which Mario's hat gfx nodes are stored
                 new [] { 0xF0A74, 0xF12F0, 0xF2990, 0xF320C, 0xF4898, 0xF5114},
                 new [] { 0xF0A8C, 0xF1308, 0xF29A8, 0xF3224, 0xF48B0, 0xF512C},
                 new [] { 0xf0aa4, 0xf1320, 0xf29c0, 0xf323c, 0xf48c8, 0xf5144},
                 new [] { 0xf0b1c, 0xf1398, 0xf2a38, 0xf32b4, 0xf4940, 0xf51bc},
             };
-            foreach (var scheiss in krasserScheiss)
-                foreach (var addr in scheiss)
+            var bank0x04Location = Config.Stream.GetInt32(0x8033b410);
+            var bank0x04Offset = bank0x04Location - 0x0007EC20; // 0x0007EC20 is the offset of bank 4 in vanilla Mario 64
+            foreach (var gfxNodeLst in gfxNodesPerAnimationState)
+                foreach (var originalAddr in gfxNodeLst)
                 {
+                    var addr = originalAddr + bank0x04Offset;
                     Config.Stream.SetValue((COLORED_HATS_CODE_TARGET_ADDR + jumpinOffset), (uint)addr);
                     Config.Stream.SetValue((ushort)0x12A, (uint)(addr - 0x14));
                 }
 
-            uint jumpOutOfHeadAddr = 0x90580 + 0x8;
+            uint jumpOutOfHeadAddr = (uint)(0x90580 + bank0x04Offset) + 0x8;
             Config.Stream.WriteRam(new byte[] { 0xB8, 0, 0, 0, 0, 0, 0, 0 }, jumpOutOfHeadAddr, EndiannessType.Big);
         }
 
@@ -168,7 +171,6 @@ namespace STROOP.Tabs.GhostTab
             var globalTimer = Config.Stream.GetInt32(MiscConfig.GlobalTimerAddress);
             var ghostArr = GetSelectedGhosts().ToArray();
             int numGhosts = Math.Max(1, ghostArr.Length);
-
             if (updateGhostData)
             {
                 Config.Stream.SetValue((byte)numGhosts, 0x80407FFF);
