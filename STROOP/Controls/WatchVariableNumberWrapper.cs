@@ -164,12 +164,13 @@ namespace STROOP.Controls
                 int stringCount = stringList.Count;
                 if (stringCount != 2 && stringCount != 3) return;
 
-                Config.Stream.Suspend();
-                coordinateVarList[0]._watchVarControl.SetValue(stringList[0]);
-                if (coordinateCount == 3 && stringCount == 3)
-                    coordinateVarList[1]._watchVarControl.SetValue(stringList[1]);
-                coordinateVarList[coordinateCount - 1]._watchVarControl.SetValue(stringList[stringCount - 1]);
-                Config.Stream.Resume();
+                using (Config.Stream.Suspend())
+                {
+                    coordinateVarList[0]._watchVarControl.SetValue(stringList[0]);
+                    if (coordinateCount == 3 && stringCount == 3)
+                        coordinateVarList[1]._watchVarControl.SetValue(stringList[1]);
+                    coordinateVarList[coordinateCount - 1]._watchVarControl.SetValue(stringList[stringCount - 1]);
+                }
             };
 
             _separatorCoordinates.Visible = true;

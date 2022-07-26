@@ -24,7 +24,7 @@ namespace STROOP.Utilities
                 customX = x;
                 customY = y;
                 customZ = z;
-                customAngle= ang;
+                customAngle = ang;
             }
 
             public override double X => customX;
@@ -47,13 +47,13 @@ namespace STROOP.Utilities
 
             bool SetCoordinateComponent(double value, uint structOffset, uint objOffset)
             {
-                bool streamAlreadySuspended = Config.Stream.IsSuspended;
-                if (!streamAlreadySuspended) Config.Stream.Suspend();
-                bool success = Config.Stream.SetValue((float)value, MarioConfig.StructAddress + structOffset);
-                if (KeyboardUtilities.IsAltHeld())
-                    success &= Config.Stream.SetValue((float)value, MarioConfig.StructAddress + objOffset);
-                Config.Stream.Resume();
-                return success;
+                using (Config.Stream.Suspend())
+                {
+                    bool success = Config.Stream.SetValue((float)value, MarioConfig.StructAddress + structOffset);
+                    if (KeyboardUtilities.IsAltHeld())
+                        success &= Config.Stream.SetValue((float)value, MarioConfig.StructAddress + objOffset);
+                    return success;
+                }
             }
             public override bool SetX(double value) => SetCoordinateComponent(value, MarioConfig.XOffset, ObjectConfig.XOffset);
             public override bool SetY(double value) => SetCoordinateComponent(value, MarioConfig.YOffset, ObjectConfig.YOffset);

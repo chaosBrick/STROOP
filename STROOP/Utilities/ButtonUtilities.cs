@@ -20,61 +20,59 @@ namespace STROOP.Utilities
                 return false;
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            foreach (var posAngle in posAngles)
+            using (Config.Stream.Suspend())
             {
-                float currentXValue = xValue;
-                float currentYValue = yValue;
-                float currentZValue = zValue;
-
-                bool ignoreX = false;
-                bool ignoreY = false;
-                bool ignoreZ = false;
-
-                if (change == Change.ADD)
+                foreach (var posAngle in posAngles)
                 {
-                    if (handleScaling) HandleScaling(ref currentXValue, ref currentZValue);
-                    HandleRelativeAngle(ref currentXValue, ref currentZValue, useRelative, posAngle.Angle);
+                    float currentXValue = xValue;
+                    float currentYValue = yValue;
+                    float currentZValue = zValue;
 
-                    if (currentXValue == 0) ignoreX = true;
-                    if (currentYValue == 0) ignoreY = true;
-                    if (currentZValue == 0) ignoreZ = true;
+                    bool ignoreX = false;
+                    bool ignoreY = false;
+                    bool ignoreZ = false;
 
-                    currentXValue += (float)posAngle.X;
-                    currentYValue += (float)posAngle.Y;
-                    currentZValue += (float)posAngle.Z;
-                }
+                    if (change == Change.ADD)
+                    {
+                        if (handleScaling) HandleScaling(ref currentXValue, ref currentZValue);
+                        HandleRelativeAngle(ref currentXValue, ref currentZValue, useRelative, posAngle.Angle);
 
-                if (change == Change.MULTIPLY)
-                {
-                    if (currentXValue == 1) ignoreX = true;
-                    if (currentYValue == 1) ignoreY = true;
-                    if (currentZValue == 1) ignoreZ = true;
+                        if (currentXValue == 0) ignoreX = true;
+                        if (currentYValue == 0) ignoreY = true;
+                        if (currentZValue == 0) ignoreZ = true;
 
-                    currentXValue *= (float)posAngle.X;
-                    currentYValue *= (float)posAngle.Y;
-                    currentZValue *= (float)posAngle.Z;
-                }
+                        currentXValue += (float)posAngle.X;
+                        currentYValue += (float)posAngle.Y;
+                        currentZValue += (float)posAngle.Z;
+                    }
 
-                if ((!affects.HasValue || affects.Value.affectX) && !ignoreX)
-                {
-                    success &= posAngle.SetX(currentXValue);
-                }
+                    if (change == Change.MULTIPLY)
+                    {
+                        if (currentXValue == 1) ignoreX = true;
+                        if (currentYValue == 1) ignoreY = true;
+                        if (currentZValue == 1) ignoreZ = true;
 
-                if ((!affects.HasValue || affects.Value.affectY) && !ignoreY)
-                {
-                    success &= posAngle.SetY(currentYValue);
-                }
+                        currentXValue *= (float)posAngle.X;
+                        currentYValue *= (float)posAngle.Y;
+                        currentZValue *= (float)posAngle.Z;
+                    }
 
-                if ((!affects.HasValue || affects.Value.affectZ) && !ignoreZ)
-                {
-                    success &= posAngle.SetZ(currentZValue);
+                    if ((!affects.HasValue || affects.Value.affectX) && !ignoreX)
+                    {
+                        success &= posAngle.SetX(currentXValue);
+                    }
+
+                    if ((!affects.HasValue || affects.Value.affectY) && !ignoreY)
+                    {
+                        success &= posAngle.SetY(currentYValue);
+                    }
+
+                    if ((!affects.HasValue || affects.Value.affectZ) && !ignoreZ)
+                    {
+                        success &= posAngle.SetZ(currentZValue);
+                    }
                 }
             }
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
             return success;
         }
 
@@ -239,60 +237,59 @@ namespace STROOP.Utilities
                 return false;
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
 
-            foreach (ObjectDataModel obj in objects)
+            using (Config.Stream.Suspend())
             {
-                ushort yawFacing, pitchFacing, rollFacing, yawMoving, pitchMoving, rollMoving;
-                yawFacing = Config.Stream.GetUInt16(obj.Address + ObjectConfig.YawFacingOffset);
-                pitchFacing = Config.Stream.GetUInt16(obj.Address + ObjectConfig.PitchFacingOffset);
-                rollFacing = Config.Stream.GetUInt16(obj.Address + ObjectConfig.RollFacingOffset);
-                yawMoving = Config.Stream.GetUInt16(obj.Address + ObjectConfig.YawMovingOffset);
-                pitchMoving = Config.Stream.GetUInt16(obj.Address + ObjectConfig.PitchMovingOffset);
-                rollMoving = Config.Stream.GetUInt16(obj.Address + ObjectConfig.RollMovingOffset);
-
-                yawFacing += (ushort)yawOffset;
-                pitchFacing += (ushort)pitchOffset;
-                rollFacing += (ushort)rollOffset;
-                yawMoving += (ushort)yawOffset;
-                pitchMoving += (ushort)pitchOffset;
-                rollMoving += (ushort)rollOffset;
-
-                success &= Config.Stream.SetValue(yawFacing, obj.Address + ObjectConfig.YawFacingOffset);
-                success &= Config.Stream.SetValue(pitchFacing, obj.Address + ObjectConfig.PitchFacingOffset);
-                success &= Config.Stream.SetValue(rollFacing, obj.Address + ObjectConfig.RollFacingOffset);
-                success &= Config.Stream.SetValue(yawMoving, obj.Address + ObjectConfig.YawMovingOffset);
-                success &= Config.Stream.SetValue(pitchMoving, obj.Address + ObjectConfig.PitchMovingOffset);
-                success &= Config.Stream.SetValue(rollMoving, obj.Address + ObjectConfig.RollMovingOffset);
-            }
-
-            if (rotateAroundCenter && yawOffset != 0)
-            {
-                float centerX = objects.Average(obj => obj.X);
-                float centerZ = objects.Average(obj => obj.Z);
-
                 foreach (ObjectDataModel obj in objects)
                 {
-                    (double newX, double newZ) =
-                        MoreMath.RotatePointAboutPointAnAngularDistance(
-                            obj.X, obj.Z, centerX, centerZ, yawOffset);
-                    success &= Config.Stream.SetValue((float)newX, obj.Address + ObjectConfig.XOffset);
-                    success &= Config.Stream.SetValue((float)newZ, obj.Address + ObjectConfig.ZOffset);
+                    ushort yawFacing, pitchFacing, rollFacing, yawMoving, pitchMoving, rollMoving;
+                    yawFacing = Config.Stream.GetUInt16(obj.Address + ObjectConfig.YawFacingOffset);
+                    pitchFacing = Config.Stream.GetUInt16(obj.Address + ObjectConfig.PitchFacingOffset);
+                    rollFacing = Config.Stream.GetUInt16(obj.Address + ObjectConfig.RollFacingOffset);
+                    yawMoving = Config.Stream.GetUInt16(obj.Address + ObjectConfig.YawMovingOffset);
+                    pitchMoving = Config.Stream.GetUInt16(obj.Address + ObjectConfig.PitchMovingOffset);
+                    rollMoving = Config.Stream.GetUInt16(obj.Address + ObjectConfig.RollMovingOffset);
+
+                    yawFacing += (ushort)yawOffset;
+                    pitchFacing += (ushort)pitchOffset;
+                    rollFacing += (ushort)rollOffset;
+                    yawMoving += (ushort)yawOffset;
+                    pitchMoving += (ushort)pitchOffset;
+                    rollMoving += (ushort)rollOffset;
+
+                    success &= Config.Stream.SetValue(yawFacing, obj.Address + ObjectConfig.YawFacingOffset);
+                    success &= Config.Stream.SetValue(pitchFacing, obj.Address + ObjectConfig.PitchFacingOffset);
+                    success &= Config.Stream.SetValue(rollFacing, obj.Address + ObjectConfig.RollFacingOffset);
+                    success &= Config.Stream.SetValue(yawMoving, obj.Address + ObjectConfig.YawMovingOffset);
+                    success &= Config.Stream.SetValue(pitchMoving, obj.Address + ObjectConfig.PitchMovingOffset);
+                    success &= Config.Stream.SetValue(rollMoving, obj.Address + ObjectConfig.RollMovingOffset);
+                }
+
+                if (rotateAroundCenter && yawOffset != 0)
+                {
+                    float centerX = objects.Average(obj => obj.X);
+                    float centerZ = objects.Average(obj => obj.Z);
+
+                    foreach (ObjectDataModel obj in objects)
+                    {
+                        (double newX, double newZ) =
+                            MoreMath.RotatePointAboutPointAnAngularDistance(
+                                obj.X, obj.Z, centerX, centerZ, yawOffset);
+                        success &= Config.Stream.SetValue((float)newX, obj.Address + ObjectConfig.XOffset);
+                        success &= Config.Stream.SetValue((float)newZ, obj.Address + ObjectConfig.ZOffset);
+                    }
+                }
+
+                if (includeMario && yawOffset != 0)
+                {
+                    PositionAngle obj = PositionAngle.Obj(objects[0].Address);
+                    PositionAngle mario = PositionAngle.Mario;
+                    double angleObjToMario = PositionAngle.GetAngleTo(obj, mario, null, false);
+                    double newAngleObjToMario = angleObjToMario + yawOffset;
+                    success &= PositionAngle.SetAngleTo(obj, mario, newAngleObjToMario);
+                    success &= mario.SetAngle(mario.Angle + yawOffset);
                 }
             }
-
-            if (includeMario && yawOffset != 0)
-            {
-                PositionAngle obj = PositionAngle.Obj(objects[0].Address);
-                PositionAngle mario = PositionAngle.Mario;
-                double angleObjToMario = PositionAngle.GetAngleTo(obj, mario, null, false);
-                double newAngleObjToMario = angleObjToMario + yawOffset;
-                success &= PositionAngle.SetAngleTo(obj, mario, newAngleObjToMario);
-                success &= mario.SetAngle(mario.Angle + yawOffset);
-            }
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
             return success;
         }
 
@@ -390,45 +387,42 @@ namespace STROOP.Utilities
                 return false;
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            // Update action if going from not holding to holding
-            if (updateAction && DataModels.Mario.HeldObject == 0)
+            using (Config.Stream.Suspend())
             {
-                DataModels.Mario.Action = TableConfig.MarioActions.GetAfterCloneValue(DataModels.Mario.Action);
+
+                // Update action if going from not holding to holding
+                if (updateAction && DataModels.Mario.HeldObject == 0)
+                {
+                    DataModels.Mario.Action = TableConfig.MarioActions.GetAfterCloneValue(DataModels.Mario.Action);
+                }
+
+                // Update HOLP type if it's 0
+                if (SavedSettingsConfig.CloningUpdatesHolpType)
+                {
+                    success &= Config.Stream.SetValue((byte)1, MarioConfig.StructAddress + MarioConfig.HolpTypeOffset);
+                }
+
+                // Update held value
+                success &= Config.Stream.SetValue(obj.Address, MarioConfig.StructAddress + MarioConfig.HeldObjectPointerOffset);
             }
-
-            // Update HOLP type if it's 0
-            if (SavedSettingsConfig.CloningUpdatesHolpType)
-            {
-                success &= Config.Stream.SetValue((byte)1, MarioConfig.StructAddress + MarioConfig.HolpTypeOffset);
-            }
-
-            // Update held value
-            success &= Config.Stream.SetValue(obj.Address, MarioConfig.StructAddress + MarioConfig.HeldObjectPointerOffset);
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
             return success;
         }
 
         public static bool UnCloneObject(bool updateAction = true)
         {
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            // Set mario's next action
-            if (updateAction)
+            using (Config.Stream.Suspend())
             {
-                uint nextAction = TableConfig.MarioActions.GetAfterUncloneValue(DataModels.Mario.Action);
-                DataModels.Mario.Action = nextAction;
+                // Set mario's next action
+                if (updateAction)
+                {
+                    uint nextAction = TableConfig.MarioActions.GetAfterUncloneValue(DataModels.Mario.Action);
+                    DataModels.Mario.Action = nextAction;
+                }
+
+                // Clear mario's held object
+                success &= Config.Stream.SetValue(0x00000000U, MarioConfig.StructAddress + MarioConfig.HeldObjectPointerOffset);
             }
-
-            // Clear mario's held object
-            success &= Config.Stream.SetValue(0x00000000U, MarioConfig.StructAddress + MarioConfig.HeldObjectPointerOffset);
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
             return success;
         }
 
@@ -438,34 +432,30 @@ namespace STROOP.Utilities
                 return false;
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            if (updateAction)
+            using (Config.Stream.Suspend())
             {
-                DataModels.Mario.Action = MarioConfig.RidingShellAction;
+                if (updateAction)
+                {
+                    DataModels.Mario.Action = MarioConfig.RidingShellAction;
+                }
+
+                success &= Config.Stream.SetValue(obj.Address, MarioConfig.StructAddress + MarioConfig.RiddenObjectPointerOffset);
             }
-
-            success &= Config.Stream.SetValue(obj.Address, MarioConfig.StructAddress + MarioConfig.RiddenObjectPointerOffset);
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
             return success;
         }
 
         public static bool UnRideObject(bool updateAction = true)
         {
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            if (updateAction)
+            using (Config.Stream.Suspend())
             {
-                DataModels.Mario.Action = MarioConfig.IdleAction;
+                if (updateAction)
+                {
+                    DataModels.Mario.Action = MarioConfig.IdleAction;
+                }
+
+                success &= Config.Stream.SetValue(0, MarioConfig.StructAddress + MarioConfig.RiddenObjectPointerOffset);
             }
-
-            success &= Config.Stream.SetValue(0, MarioConfig.StructAddress + MarioConfig.RiddenObjectPointerOffset);
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
             return success;
         }
         public static bool UkikipediaObject(ObjectDataModel obj)
@@ -483,13 +473,11 @@ namespace STROOP.Utilities
                 return false;
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            foreach (var obj in objects)
-                obj.IsActive = false;
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+            using (Config.Stream.Suspend())
+            {
+                foreach (var obj in objects)
+                    obj.IsActive = false;
+            }
             return success;
         }
 
@@ -499,61 +487,59 @@ namespace STROOP.Utilities
                 return false;
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            foreach (var obj in objects)
+            using (Config.Stream.Suspend())
             {
-                byte? processGroup = obj.BehaviorProcessGroup;
-                // Find process group
-                if (!processGroup.HasValue)
+                foreach (var obj in objects)
                 {
-                    success = false;
-                    break;
-                }
-
-                // Read first object in group
-                uint groupAddress = ObjectSlotsConfig.ProcessGroupsStartAddress + processGroup.Value * ObjectSlotsConfig.ProcessGroupStructSize;
-
-                // Loop through and find last object in group
-                uint lastGroupObj = groupAddress;
-                while (Config.Stream.GetUInt32(lastGroupObj + ObjectConfig.ProcessedNextLinkOffset) != groupAddress)
-                    lastGroupObj = Config.Stream.GetUInt32(lastGroupObj + ObjectConfig.ProcessedNextLinkOffset);
-
-                // Remove object from current group
-                uint nextObj = Config.Stream.GetUInt32(obj.Address + ObjectConfig.ProcessedNextLinkOffset);
-                uint prevObj = Config.Stream.GetUInt32(ObjectSlotsConfig.VacantSlotsNodeAddress + ObjectConfig.ProcessedNextLinkOffset);
-                if (prevObj == obj.Address)
-                {
-                    // Set new vacant pointer
-                    success &= Config.Stream.SetValue(nextObj, ObjectSlotsConfig.VacantSlotsNodeAddress + ObjectConfig.ProcessedNextLinkOffset);
-                }
-                else
-                {
-                    for (int i = 0; i < ObjectSlotsConfig.MaxSlots; i++)
+                    byte? processGroup = obj.BehaviorProcessGroup;
+                    // Find process group
+                    if (!processGroup.HasValue)
                     {
-                        uint curObj = Config.Stream.GetUInt32(prevObj + ObjectConfig.ProcessedNextLinkOffset);
-                        if (curObj == obj.Address)
-                            break;
-                        prevObj = curObj;
+                        success = false;
+                        break;
                     }
-                    success &= Config.Stream.SetValue(nextObj, prevObj + ObjectConfig.ProcessedNextLinkOffset);
+
+                    // Read first object in group
+                    uint groupAddress = ObjectSlotsConfig.ProcessGroupsStartAddress + processGroup.Value * ObjectSlotsConfig.ProcessGroupStructSize;
+
+                    // Loop through and find last object in group
+                    uint lastGroupObj = groupAddress;
+                    while (Config.Stream.GetUInt32(lastGroupObj + ObjectConfig.ProcessedNextLinkOffset) != groupAddress)
+                        lastGroupObj = Config.Stream.GetUInt32(lastGroupObj + ObjectConfig.ProcessedNextLinkOffset);
+
+                    // Remove object from current group
+                    uint nextObj = Config.Stream.GetUInt32(obj.Address + ObjectConfig.ProcessedNextLinkOffset);
+                    uint prevObj = Config.Stream.GetUInt32(ObjectSlotsConfig.VacantSlotsNodeAddress + ObjectConfig.ProcessedNextLinkOffset);
+                    if (prevObj == obj.Address)
+                    {
+                        // Set new vacant pointer
+                        success &= Config.Stream.SetValue(nextObj, ObjectSlotsConfig.VacantSlotsNodeAddress + ObjectConfig.ProcessedNextLinkOffset);
+                    }
+                    else
+                    {
+                        for (int i = 0; i < ObjectSlotsConfig.MaxSlots; i++)
+                        {
+                            uint curObj = Config.Stream.GetUInt32(prevObj + ObjectConfig.ProcessedNextLinkOffset);
+                            if (curObj == obj.Address)
+                                break;
+                            prevObj = curObj;
+                        }
+                        success &= Config.Stream.SetValue(nextObj, prevObj + ObjectConfig.ProcessedNextLinkOffset);
+                    }
+
+                    // Insert object in new group
+                    nextObj = Config.Stream.GetUInt32(lastGroupObj + ObjectConfig.ProcessedNextLinkOffset);
+                    success &= Config.Stream.SetValue(obj.Address, nextObj + ObjectConfig.ProcessedPreviousLinkOffset);
+                    success &= Config.Stream.SetValue(obj.Address, lastGroupObj + ObjectConfig.ProcessedNextLinkOffset);
+                    success &= Config.Stream.SetValue(lastGroupObj, obj.Address + ObjectConfig.ProcessedPreviousLinkOffset);
+                    success &= Config.Stream.SetValue(nextObj, obj.Address + ObjectConfig.ProcessedNextLinkOffset);
+
+                    obj.IsActive = true;
+
+                    if (!Config.Stream.RefreshRam() || !success)
+                        break;
                 }
-
-                // Insert object in new group
-                nextObj = Config.Stream.GetUInt32(lastGroupObj + ObjectConfig.ProcessedNextLinkOffset);
-                success &= Config.Stream.SetValue(obj.Address, nextObj + ObjectConfig.ProcessedPreviousLinkOffset);
-                success &= Config.Stream.SetValue(obj.Address, lastGroupObj + ObjectConfig.ProcessedNextLinkOffset);
-                success &= Config.Stream.SetValue(lastGroupObj, obj.Address + ObjectConfig.ProcessedPreviousLinkOffset);
-                success &= Config.Stream.SetValue(nextObj, obj.Address + ObjectConfig.ProcessedNextLinkOffset);
-
-                obj.IsActive = true;
-
-                if (!Config.Stream.RefreshRam() || !success)
-                    break;
             }
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
             return success;
         }
 
@@ -565,16 +551,15 @@ namespace STROOP.Utilities
             uint releasedValue = useThrownValue ? ObjectConfig.ReleaseStatusThrownValue : ObjectConfig.ReleaseStatusDroppedValue;
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
 
-            foreach (var obj in objects)
+            using (Config.Stream.Suspend())
             {
-                obj.ReleaseStatus = releasedValue;
-                success &= Config.Stream.SetValue(ObjectConfig.StackIndexReleasedValue, obj.Address + ObjectConfig.StackIndexOffset);
+                foreach (var obj in objects)
+                {
+                    obj.ReleaseStatus = releasedValue;
+                    success &= Config.Stream.SetValue(ObjectConfig.StackIndexReleasedValue, obj.Address + ObjectConfig.StackIndexOffset);
+                }
             }
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
             return success;
         }
 
@@ -584,17 +569,15 @@ namespace STROOP.Utilities
                 return false;
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            foreach (var obj in objects)
+            using (Config.Stream.Suspend())
             {
-                uint initialReleaseStatus = Config.Stream.GetUInt32(obj.Address + ObjectConfig.InitialReleaseStatusOffset);
-                success &= Config.Stream.SetValue(initialReleaseStatus, obj.Address + ObjectConfig.ReleaseStatusOffset);
-                success &= Config.Stream.SetValue(ObjectConfig.StackIndexUnReleasedValue, obj.Address + ObjectConfig.StackIndexOffset);
+                foreach (var obj in objects)
+                {
+                    uint initialReleaseStatus = Config.Stream.GetUInt32(obj.Address + ObjectConfig.InitialReleaseStatusOffset);
+                    success &= Config.Stream.SetValue(initialReleaseStatus, obj.Address + ObjectConfig.ReleaseStatusOffset);
+                    success &= Config.Stream.SetValue(ObjectConfig.StackIndexUnReleasedValue, obj.Address + ObjectConfig.StackIndexOffset);
+                }
             }
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
             return success;
         }
 
@@ -604,13 +587,11 @@ namespace STROOP.Utilities
                 return false;
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            foreach (var obj in objects)
-                obj.InteractionStatus = 0xFFFFFFFF;
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+            using (Config.Stream.Suspend())
+            {
+                foreach (var obj in objects)
+                    obj.InteractionStatus = 0xFFFFFFFF;
+            }
             return success;
         }
 
@@ -620,56 +601,50 @@ namespace STROOP.Utilities
                 return false;
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            foreach (var obj in objects)
-                obj.InteractionStatus = 0x00000000;
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+            using (Config.Stream.Suspend())
+            {
+                foreach (var obj in objects)
+                    obj.InteractionStatus = 0x00000000;
+            }
             return success;
         }
 
         public static bool ToggleHandsfree()
         {
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            var heldObj = Config.Stream.GetUInt32(MarioConfig.StructAddress + MarioConfig.HeldObjectPointerOffset);
-
-            if (heldObj != 0x00000000U)
+            using (Config.Stream.Suspend())
             {
-                uint currentAction = Config.Stream.GetUInt32(MarioConfig.StructAddress + MarioConfig.ActionOffset);
-                uint nextAction = TableConfig.MarioActions.GetHandsfreeValue(currentAction);
-                success = Config.Stream.SetValue(nextAction, MarioConfig.StructAddress + MarioConfig.ActionOffset);
-            }
+                var heldObj = Config.Stream.GetUInt32(MarioConfig.StructAddress + MarioConfig.HeldObjectPointerOffset);
 
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+                if (heldObj != 0x00000000U)
+                {
+                    uint currentAction = Config.Stream.GetUInt32(MarioConfig.StructAddress + MarioConfig.ActionOffset);
+                    uint nextAction = TableConfig.MarioActions.GetHandsfreeValue(currentAction);
+                    success = Config.Stream.SetValue(nextAction, MarioConfig.StructAddress + MarioConfig.ActionOffset);
+                }
+            }
             return success;
         }
 
         public static bool ToggleVisibility()
         {
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            var marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
-            if (marioObjRef != 0x00000000U)
+            using (Config.Stream.Suspend())
             {
-                var marioGraphics = Config.Stream.GetUInt32(marioObjRef + ObjectConfig.BehaviorGfxOffset);
-                if (marioGraphics == 0)
+                var marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
+                if (marioObjRef != 0x00000000U)
                 {
-                    success &= Config.Stream.SetValue(MarioObjectConfig.GraphicValue, marioObjRef + ObjectConfig.BehaviorGfxOffset);
-                }
-                else
-                {
-                    success &= Config.Stream.SetValue(0x00000000U, marioObjRef + ObjectConfig.BehaviorGfxOffset);
+                    var marioGraphics = Config.Stream.GetUInt32(marioObjRef + ObjectConfig.BehaviorGfxOffset);
+                    if (marioGraphics == 0)
+                    {
+                        success &= Config.Stream.SetValue(MarioObjectConfig.GraphicValue, marioObjRef + ObjectConfig.BehaviorGfxOffset);
+                    }
+                    else
+                    {
+                        success &= Config.Stream.SetValue(0x00000000U, marioObjRef + ObjectConfig.BehaviorGfxOffset);
+                    }
                 }
             }
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
             return success;
         }
 
@@ -744,12 +719,11 @@ namespace STROOP.Utilities
             yaw += (ushort)yawOffset;
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
 
-            success &= Config.Stream.SetValue(yaw, MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+            using (Config.Stream.Suspend())
+            {
+                success &= Config.Stream.SetValue(yaw, MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
+            }
             return success;
         }
 
@@ -759,12 +733,10 @@ namespace STROOP.Utilities
             hspd += hspdOffset;
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            success &= Config.Stream.SetValue(hspd, MarioConfig.StructAddress + MarioConfig.HSpeedOffset);
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+            using (Config.Stream.Suspend())
+            {
+                success &= Config.Stream.SetValue(hspd, MarioConfig.StructAddress + MarioConfig.HSpeedOffset);
+            }
             return success;
         }
 
@@ -774,12 +746,10 @@ namespace STROOP.Utilities
             vspd += vspdOffset;
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            success &= Config.Stream.SetValue(vspd, MarioConfig.StructAddress + MarioConfig.YSpeedOffset);
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+            using (Config.Stream.Suspend())
+            {
+                success &= Config.Stream.SetValue(vspd, MarioConfig.StructAddress + MarioConfig.YSpeedOffset);
+            }
             return success;
         }
 
@@ -791,13 +761,11 @@ namespace STROOP.Utilities
             float newSlidingSpeedX = slidingSpeedX + xOffset;
             ushort newSlidingSpeedYaw = MoreMath.AngleTo_AngleUnitsRounded(newSlidingSpeedX, slidingSpeedZ);
 
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            Config.Stream.SetValue(newSlidingSpeedX, MarioConfig.StructAddress + MarioConfig.SlidingSpeedXOffset);
-            Config.Stream.SetValue(newSlidingSpeedYaw, MarioConfig.StructAddress + MarioConfig.SlidingYawOffset);
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+            using (Config.Stream.Suspend())
+            {
+                Config.Stream.SetValue(newSlidingSpeedX, MarioConfig.StructAddress + MarioConfig.SlidingSpeedXOffset);
+                Config.Stream.SetValue(newSlidingSpeedYaw, MarioConfig.StructAddress + MarioConfig.SlidingYawOffset);
+            }
         }
 
         public static void MarioChangeSlidingSpeedZ(float zOffset)
@@ -808,13 +776,11 @@ namespace STROOP.Utilities
             float newSlidingSpeedZ = slidingSpeedZ + zOffset;
             ushort newSlidingSpeedYaw = MoreMath.AngleTo_AngleUnitsRounded(slidingSpeedX, newSlidingSpeedZ);
 
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            Config.Stream.SetValue(newSlidingSpeedZ, MarioConfig.StructAddress + MarioConfig.SlidingSpeedZOffset);
-            Config.Stream.SetValue(newSlidingSpeedYaw, MarioConfig.StructAddress + MarioConfig.SlidingYawOffset);
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+            using (Config.Stream.Suspend())
+            {
+                Config.Stream.SetValue(newSlidingSpeedZ, MarioConfig.StructAddress + MarioConfig.SlidingSpeedZOffset);
+                Config.Stream.SetValue(newSlidingSpeedYaw, MarioConfig.StructAddress + MarioConfig.SlidingYawOffset);
+            }
         }
 
         public static void MarioChangeSlidingSpeedH(float hOffset)
@@ -831,14 +797,12 @@ namespace STROOP.Utilities
             (double newSlidingSpeedX, double newSlidingSpeedZ) = MoreMath.GetComponentsFromVector(newSlidingSpeedH, slidingSpeedYaw);
             double newSlidingSpeedYaw = MoreMath.AngleTo_AngleUnits(newSlidingSpeedX, newSlidingSpeedZ);
 
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            Config.Stream.SetValue((float)newSlidingSpeedX, MarioConfig.StructAddress + MarioConfig.SlidingSpeedXOffset);
-            Config.Stream.SetValue((float)newSlidingSpeedZ, MarioConfig.StructAddress + MarioConfig.SlidingSpeedZOffset);
-            Config.Stream.SetValue(MoreMath.NormalizeAngleUshort(newSlidingSpeedYaw), MarioConfig.StructAddress + MarioConfig.SlidingYawOffset);
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+            using (Config.Stream.Suspend())
+            {
+                Config.Stream.SetValue((float)newSlidingSpeedX, MarioConfig.StructAddress + MarioConfig.SlidingSpeedXOffset);
+                Config.Stream.SetValue((float)newSlidingSpeedZ, MarioConfig.StructAddress + MarioConfig.SlidingSpeedZOffset);
+                Config.Stream.SetValue(MoreMath.NormalizeAngleUshort(newSlidingSpeedYaw), MarioConfig.StructAddress + MarioConfig.SlidingYawOffset);
+            }
         }
 
         public static void MarioChangeSlidingSpeedYaw(float yawOffset)
@@ -854,14 +818,12 @@ namespace STROOP.Utilities
             double newSlidingSpeedYaw = slidingSpeedYaw + yawOffset;
             (double newSlidingSpeedX, double newSlidingSpeedZ) = MoreMath.GetComponentsFromVector(slidingSpeedH, newSlidingSpeedYaw);
 
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            Config.Stream.SetValue((float)newSlidingSpeedX, MarioConfig.StructAddress + MarioConfig.SlidingSpeedXOffset);
-            Config.Stream.SetValue((float)newSlidingSpeedZ, MarioConfig.StructAddress + MarioConfig.SlidingSpeedZOffset);
-            Config.Stream.SetValue(MoreMath.NormalizeAngleUshort(newSlidingSpeedYaw), MarioConfig.StructAddress + MarioConfig.SlidingYawOffset);
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+            using (Config.Stream.Suspend())
+            {
+                Config.Stream.SetValue((float)newSlidingSpeedX, MarioConfig.StructAddress + MarioConfig.SlidingSpeedXOffset);
+                Config.Stream.SetValue((float)newSlidingSpeedZ, MarioConfig.StructAddress + MarioConfig.SlidingSpeedZOffset);
+                Config.Stream.SetValue(MoreMath.NormalizeAngleUshort(newSlidingSpeedYaw), MarioConfig.StructAddress + MarioConfig.SlidingYawOffset);
+            }
         }
 
         public static bool FullHp()
@@ -877,46 +839,40 @@ namespace STROOP.Utilities
         public static bool GameOver()
         {
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            success &= Config.Stream.SetValue((sbyte)0, MarioConfig.StructAddress + HudConfig.LifeCountOffset);
-            success &= Config.Stream.SetValue(HudConfig.DeathHp, MarioConfig.StructAddress + HudConfig.HpCountOffset);
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+            using (Config.Stream.Suspend())
+            {
+                success &= Config.Stream.SetValue((sbyte)0, MarioConfig.StructAddress + HudConfig.LifeCountOffset);
+                success &= Config.Stream.SetValue(HudConfig.DeathHp, MarioConfig.StructAddress + HudConfig.HpCountOffset);
+            }
             return success;
         }
 
         public static bool StandardHud()
         {
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
+            using (Config.Stream.Suspend())
+            {
+                success &= Config.Stream.SetValue(HudConfig.FullHp, MarioConfig.StructAddress + HudConfig.HpCountOffset);
+                success &= Config.Stream.SetValue(HudConfig.StandardCoins, MarioConfig.StructAddress + HudConfig.CoinCountOffset);
+                success &= Config.Stream.SetValue(HudConfig.StandardLives, MarioConfig.StructAddress + HudConfig.LifeCountOffset);
+                success &= Config.Stream.SetValue(HudConfig.StandardStars, MarioConfig.StructAddress + HudConfig.StarCountOffset);
 
-            success &= Config.Stream.SetValue(HudConfig.FullHp, MarioConfig.StructAddress + HudConfig.HpCountOffset);
-            success &= Config.Stream.SetValue(HudConfig.StandardCoins, MarioConfig.StructAddress + HudConfig.CoinCountOffset);
-            success &= Config.Stream.SetValue(HudConfig.StandardLives, MarioConfig.StructAddress + HudConfig.LifeCountOffset);
-            success &= Config.Stream.SetValue(HudConfig.StandardStars, MarioConfig.StructAddress + HudConfig.StarCountOffset);
-
-            success &= Config.Stream.SetValue(HudConfig.FullHpInt, MarioConfig.StructAddress + HudConfig.HpDisplayOffset);
-            success &= Config.Stream.SetValue(HudConfig.StandardCoins, MarioConfig.StructAddress + HudConfig.CoinDisplayOffset);
-            success &= Config.Stream.SetValue((short)HudConfig.StandardLives, MarioConfig.StructAddress + HudConfig.LifeDisplayOffset);
-            success &= Config.Stream.SetValue(HudConfig.StandardStars, MarioConfig.StructAddress + HudConfig.StarDisplayOffset);
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+                success &= Config.Stream.SetValue(HudConfig.FullHpInt, MarioConfig.StructAddress + HudConfig.HpDisplayOffset);
+                success &= Config.Stream.SetValue(HudConfig.StandardCoins, MarioConfig.StructAddress + HudConfig.CoinDisplayOffset);
+                success &= Config.Stream.SetValue((short)HudConfig.StandardLives, MarioConfig.StructAddress + HudConfig.LifeDisplayOffset);
+                success &= Config.Stream.SetValue(HudConfig.StandardStars, MarioConfig.StructAddress + HudConfig.StarDisplayOffset);
+            }
             return success;
         }
 
         public static bool Coins99()
         {
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            success &= Config.Stream.SetValue((short)99, MarioConfig.StructAddress + HudConfig.CoinCountOffset);
-            success &= Config.Stream.SetValue((short)99, MarioConfig.StructAddress + HudConfig.CoinDisplayOffset);
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+            using (Config.Stream.Suspend())
+            {
+                success &= Config.Stream.SetValue((short)99, MarioConfig.StructAddress + HudConfig.CoinCountOffset);
+                success &= Config.Stream.SetValue((short)99, MarioConfig.StructAddress + HudConfig.CoinDisplayOffset);
+            }
             return success;
         }
 
@@ -930,13 +886,11 @@ namespace STROOP.Utilities
         public static bool Lives100()
         {
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            success &= Config.Stream.SetValue((sbyte)100, MarioConfig.StructAddress + HudConfig.LifeCountOffset);
-            success &= Config.Stream.SetValue((short)100, MarioConfig.StructAddress + HudConfig.LifeDisplayOffset);
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+            using (Config.Stream.Suspend())
+            {
+                success &= Config.Stream.SetValue((sbyte)100, MarioConfig.StructAddress + HudConfig.LifeCountOffset);
+                success &= Config.Stream.SetValue((short)100, MarioConfig.StructAddress + HudConfig.LifeDisplayOffset);
+            }
             return success;
         }
 
@@ -991,45 +945,43 @@ namespace STROOP.Utilities
             if (triangleAddresses.Count == 1 && triangleAddresses[0] == 0) return false;
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            foreach (uint triangleAddress in triangleAddresses)
+            using (Config.Stream.Suspend())
             {
-                float normX, normY, normZ, oldNormOffset;
-                normX = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormX);
-                normY = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormY);
-                normZ = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormZ);
-                oldNormOffset = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormOffset);
+                foreach (uint triangleAddress in triangleAddresses)
+                {
+                    float normX, normY, normZ, oldNormOffset;
+                    normX = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormX);
+                    normY = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormY);
+                    normZ = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormZ);
+                    oldNormOffset = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormOffset);
 
-                // Get Mario position
-                float marioX, marioY, marioZ;
-                marioX = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.XOffset);
-                marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
-                marioZ = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.ZOffset);
+                    // Get Mario position
+                    float marioX, marioY, marioZ;
+                    marioX = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.XOffset);
+                    marioY = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset);
+                    marioZ = Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.ZOffset);
 
-                float normOffset = -(normX * marioX + normY * marioY + normZ * marioZ);
-                float normDiff = normOffset - oldNormOffset;
+                    float normOffset = -(normX * marioX + normY * marioY + normZ * marioZ);
+                    float normDiff = normOffset - oldNormOffset;
 
-                short yOffset = (short)(-normDiff * normY);
+                    short yOffset = (short)(-normDiff * normY);
 
-                short v1Y, v2Y, v3Y;
-                v1Y = (short)(TriangleOffsetsConfig.GetY1(triangleAddress) + yOffset);
-                v2Y = (short)(TriangleOffsetsConfig.GetY2(triangleAddress) + yOffset);
-                v3Y = (short)(TriangleOffsetsConfig.GetY3(triangleAddress) + yOffset);
+                    short v1Y, v2Y, v3Y;
+                    v1Y = (short)(TriangleOffsetsConfig.GetY1(triangleAddress) + yOffset);
+                    v2Y = (short)(TriangleOffsetsConfig.GetY2(triangleAddress) + yOffset);
+                    v3Y = (short)(TriangleOffsetsConfig.GetY3(triangleAddress) + yOffset);
 
-                short yMin = (short)(Math.Min(Math.Min(v1Y, v2Y), v3Y) - 5);
-                short yMax = (short)(Math.Max(Math.Max(v1Y, v2Y), v3Y) + 5);
+                    short yMin = (short)(Math.Min(Math.Min(v1Y, v2Y), v3Y) - 5);
+                    short yMax = (short)(Math.Max(Math.Max(v1Y, v2Y), v3Y) + 5);
 
-                success &= TriangleOffsetsConfig.SetY1(v1Y, triangleAddress);
-                success &= TriangleOffsetsConfig.SetY2(v2Y, triangleAddress);
-                success &= TriangleOffsetsConfig.SetY3(v3Y, triangleAddress);
-                success &= Config.Stream.SetValue(yMin, triangleAddress + TriangleOffsetsConfig.YMinMinus5);
-                success &= Config.Stream.SetValue(yMax, triangleAddress + TriangleOffsetsConfig.YMaxPlus5);
-                success &= Config.Stream.SetValue(normOffset, triangleAddress + TriangleOffsetsConfig.NormOffset);
+                    success &= TriangleOffsetsConfig.SetY1(v1Y, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetY2(v2Y, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetY3(v3Y, triangleAddress);
+                    success &= Config.Stream.SetValue(yMin, triangleAddress + TriangleOffsetsConfig.YMinMinus5);
+                    success &= Config.Stream.SetValue(yMax, triangleAddress + TriangleOffsetsConfig.YMaxPlus5);
+                    success &= Config.Stream.SetValue(normOffset, triangleAddress + TriangleOffsetsConfig.NormOffset);
+                }
             }
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
             return success;
         }
 
@@ -1040,15 +992,13 @@ namespace STROOP.Utilities
             short neutralizeValue = SavedSettingsConfig.NeutralizeTriangleValue(use0x15Nullable);
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            foreach (uint triangleAddress in triangleAddresses)
+            using (Config.Stream.Suspend())
             {
-                success &= Config.Stream.SetValue(neutralizeValue, triangleAddress + TriangleOffsetsConfig.SurfaceType);
+                foreach (uint triangleAddress in triangleAddresses)
+                {
+                    success &= Config.Stream.SetValue(neutralizeValue, triangleAddress + TriangleOffsetsConfig.SurfaceType);
+                }
             }
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
             return success;
         }
 
@@ -1058,14 +1008,12 @@ namespace STROOP.Utilities
                 return false;
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            byte oldFlags = Config.Stream.GetByte(triangleAddress + TriangleOffsetsConfig.Flags);
-            byte newFlags = MoreMath.ApplyValueToMaskedByte(oldFlags, TriangleOffsetsConfig.NoCamCollisionMask, true);
-            success &= Config.Stream.SetValue(newFlags, triangleAddress + TriangleOffsetsConfig.Flags);
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+            using (Config.Stream.Suspend())
+            {
+                byte oldFlags = Config.Stream.GetByte(triangleAddress + TriangleOffsetsConfig.Flags);
+                byte newFlags = MoreMath.ApplyValueToMaskedByte(oldFlags, TriangleOffsetsConfig.NoCamCollisionMask, true);
+                success &= Config.Stream.SetValue(newFlags, triangleAddress + TriangleOffsetsConfig.Flags);
+            }
             return success;
         }
 
@@ -1090,27 +1038,25 @@ namespace STROOP.Utilities
             float normOffset = 16000;
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            foreach (uint triangleAddress in triangleAddresses)
+            using (Config.Stream.Suspend())
             {
-                success &= TriangleOffsetsConfig.SetX1(v1X, triangleAddress);
-                success &= TriangleOffsetsConfig.SetY1(v1Y, triangleAddress);
-                success &= TriangleOffsetsConfig.SetZ1(v1Z, triangleAddress);
-                success &= TriangleOffsetsConfig.SetX2(v2X, triangleAddress);
-                success &= TriangleOffsetsConfig.SetY2(v2Y, triangleAddress);
-                success &= TriangleOffsetsConfig.SetZ2(v2Z, triangleAddress);
-                success &= TriangleOffsetsConfig.SetX3(v3X, triangleAddress);
-                success &= TriangleOffsetsConfig.SetY3(v3Y, triangleAddress);
-                success &= TriangleOffsetsConfig.SetZ3(v3Z, triangleAddress);
-                success &= Config.Stream.SetValue(normX, triangleAddress + TriangleOffsetsConfig.NormX);
-                success &= Config.Stream.SetValue(normY, triangleAddress + TriangleOffsetsConfig.NormY);
-                success &= Config.Stream.SetValue(normZ, triangleAddress + TriangleOffsetsConfig.NormZ);
-                success &= Config.Stream.SetValue(normOffset, triangleAddress + TriangleOffsetsConfig.NormOffset);
+                foreach (uint triangleAddress in triangleAddresses)
+                {
+                    success &= TriangleOffsetsConfig.SetX1(v1X, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetY1(v1Y, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetZ1(v1Z, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetX2(v2X, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetY2(v2Y, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetZ2(v2Z, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetX3(v3X, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetY3(v3Y, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetZ3(v3Z, triangleAddress);
+                    success &= Config.Stream.SetValue(normX, triangleAddress + TriangleOffsetsConfig.NormX);
+                    success &= Config.Stream.SetValue(normY, triangleAddress + TriangleOffsetsConfig.NormY);
+                    success &= Config.Stream.SetValue(normZ, triangleAddress + TriangleOffsetsConfig.NormZ);
+                    success &= Config.Stream.SetValue(normOffset, triangleAddress + TriangleOffsetsConfig.NormOffset);
+                }
             }
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
             return success;
         }
 
@@ -1125,57 +1071,55 @@ namespace STROOP.Utilities
             if (triangleAddresses.Count == 1 && triangleAddresses[0] == 0) return false;
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            foreach (uint triangleAddress in triangleAddresses)
+            using (Config.Stream.Suspend())
             {
-                float xOffset = xOffsetBase;
-                float yOffset = yOffsetBase;
-                float zOffset = zOffsetBase;
+                foreach (uint triangleAddress in triangleAddresses)
+                {
+                    float xOffset = xOffsetBase;
+                    float yOffset = yOffsetBase;
+                    float zOffset = zOffsetBase;
 
-                HandleScaling(ref xOffset, ref zOffset);
+                    HandleScaling(ref xOffset, ref zOffset);
 
-                float normX, normY, normZ, oldNormOffset;
-                normX = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormX);
-                normY = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormY);
-                normZ = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormZ);
-                oldNormOffset = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormOffset);
+                    float normX, normY, normZ, oldNormOffset;
+                    normX = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormX);
+                    normY = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormY);
+                    normZ = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormZ);
+                    oldNormOffset = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormOffset);
 
-                ushort relativeAngle = MoreMath.getUphillAngle(normX, normY, normZ);
-                HandleRelativeAngle(ref xOffset, ref zOffset, useRelative, relativeAngle);
+                    ushort relativeAngle = MoreMath.getUphillAngle(normX, normY, normZ);
+                    HandleRelativeAngle(ref xOffset, ref zOffset, useRelative, relativeAngle);
 
-                float newNormOffset = oldNormOffset - normX * xOffset - normY * yOffset - normZ * zOffset;
+                    float newNormOffset = oldNormOffset - normX * xOffset - normY * yOffset - normZ * zOffset;
 
-                short newX1, newY1, newZ1, newX2, newY2, newZ2, newX3, newY3, newZ3;
-                newX1 = (short)(TriangleOffsetsConfig.GetX1(triangleAddress) + xOffset);
-                newY1 = (short)(TriangleOffsetsConfig.GetY1(triangleAddress) + yOffset);
-                newZ1 = (short)(TriangleOffsetsConfig.GetZ1(triangleAddress) + zOffset);
-                newX2 = (short)(TriangleOffsetsConfig.GetX2(triangleAddress) + xOffset);
-                newY2 = (short)(TriangleOffsetsConfig.GetY2(triangleAddress) + yOffset);
-                newZ2 = (short)(TriangleOffsetsConfig.GetZ2(triangleAddress) + zOffset);
-                newX3 = (short)(TriangleOffsetsConfig.GetX3(triangleAddress) + xOffset);
-                newY3 = (short)(TriangleOffsetsConfig.GetY3(triangleAddress) + yOffset);
-                newZ3 = (short)(TriangleOffsetsConfig.GetZ3(triangleAddress) + zOffset);
+                    short newX1, newY1, newZ1, newX2, newY2, newZ2, newX3, newY3, newZ3;
+                    newX1 = (short)(TriangleOffsetsConfig.GetX1(triangleAddress) + xOffset);
+                    newY1 = (short)(TriangleOffsetsConfig.GetY1(triangleAddress) + yOffset);
+                    newZ1 = (short)(TriangleOffsetsConfig.GetZ1(triangleAddress) + zOffset);
+                    newX2 = (short)(TriangleOffsetsConfig.GetX2(triangleAddress) + xOffset);
+                    newY2 = (short)(TriangleOffsetsConfig.GetY2(triangleAddress) + yOffset);
+                    newZ2 = (short)(TriangleOffsetsConfig.GetZ2(triangleAddress) + zOffset);
+                    newX3 = (short)(TriangleOffsetsConfig.GetX3(triangleAddress) + xOffset);
+                    newY3 = (short)(TriangleOffsetsConfig.GetY3(triangleAddress) + yOffset);
+                    newZ3 = (short)(TriangleOffsetsConfig.GetZ3(triangleAddress) + zOffset);
 
-                short newYMin = (short)(Math.Min(Math.Min(newY1, newY2), newY3) - 5);
-                short newYMax = (short)(Math.Max(Math.Max(newY1, newY2), newY3) + 5);
+                    short newYMin = (short)(Math.Min(Math.Min(newY1, newY2), newY3) - 5);
+                    short newYMax = (short)(Math.Max(Math.Max(newY1, newY2), newY3) + 5);
 
-                success &= Config.Stream.SetValue(newNormOffset, triangleAddress + TriangleOffsetsConfig.NormOffset);
-                success &= TriangleOffsetsConfig.SetX1(newX1, triangleAddress);
-                success &= TriangleOffsetsConfig.SetY1(newY1, triangleAddress);
-                success &= TriangleOffsetsConfig.SetZ1(newZ1, triangleAddress);
-                success &= TriangleOffsetsConfig.SetX2(newX2, triangleAddress);
-                success &= TriangleOffsetsConfig.SetY2(newY2, triangleAddress);
-                success &= TriangleOffsetsConfig.SetZ2(newZ2, triangleAddress);
-                success &= TriangleOffsetsConfig.SetX3(newX3, triangleAddress);
-                success &= TriangleOffsetsConfig.SetY3(newY3, triangleAddress);
-                success &= TriangleOffsetsConfig.SetZ3(newZ3, triangleAddress);
-                success &= Config.Stream.SetValue(newYMin, triangleAddress + TriangleOffsetsConfig.YMinMinus5);
-                success &= Config.Stream.SetValue(newYMax, triangleAddress + TriangleOffsetsConfig.YMaxPlus5);
+                    success &= Config.Stream.SetValue(newNormOffset, triangleAddress + TriangleOffsetsConfig.NormOffset);
+                    success &= TriangleOffsetsConfig.SetX1(newX1, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetY1(newY1, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetZ1(newZ1, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetX2(newX2, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetY2(newY2, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetZ2(newZ2, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetX3(newX3, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetY3(newY3, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetZ3(newZ3, triangleAddress);
+                    success &= Config.Stream.SetValue(newYMin, triangleAddress + TriangleOffsetsConfig.YMinMinus5);
+                    success &= Config.Stream.SetValue(newYMax, triangleAddress + TriangleOffsetsConfig.YMaxPlus5);
+                }
             }
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
             return success;
         }
 
@@ -1184,52 +1128,50 @@ namespace STROOP.Utilities
             if (triangleAddresses.Count == 1 && triangleAddresses[0] == 0) return false;
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            foreach (uint triangleAddress in triangleAddresses)
+            using (Config.Stream.Suspend())
             {
-                float normX, normY, normZ, oldNormOffset;
-                normX = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormX);
-                normY = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormY);
-                normZ = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormZ);
-                oldNormOffset = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormOffset);
+                foreach (uint triangleAddress in triangleAddresses)
+                {
+                    float normX, normY, normZ, oldNormOffset;
+                    normX = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormX);
+                    normY = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormY);
+                    normZ = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormZ);
+                    oldNormOffset = Config.Stream.GetSingle(triangleAddress + TriangleOffsetsConfig.NormOffset);
 
-                float newNormOffset = oldNormOffset - normalChange;
+                    float newNormOffset = oldNormOffset - normalChange;
 
-                double xChange = normalChange * normX;
-                double yChange = normalChange * normY;
-                double zChange = normalChange * normZ;
+                    double xChange = normalChange * normX;
+                    double yChange = normalChange * normY;
+                    double zChange = normalChange * normZ;
 
-                short newX1, newY1, newZ1, newX2, newY2, newZ2, newX3, newY3, newZ3;
-                newX1 = (short)(TriangleOffsetsConfig.GetX1(triangleAddress) + xChange);
-                newY1 = (short)(TriangleOffsetsConfig.GetY1(triangleAddress) + yChange);
-                newZ1 = (short)(TriangleOffsetsConfig.GetZ1(triangleAddress) + zChange);
-                newX2 = (short)(TriangleOffsetsConfig.GetX2(triangleAddress) + xChange);
-                newY2 = (short)(TriangleOffsetsConfig.GetY2(triangleAddress) + yChange);
-                newZ2 = (short)(TriangleOffsetsConfig.GetZ2(triangleAddress) + zChange);
-                newX3 = (short)(TriangleOffsetsConfig.GetX3(triangleAddress) + xChange);
-                newY3 = (short)(TriangleOffsetsConfig.GetY3(triangleAddress) + yChange);
-                newZ3 = (short)(TriangleOffsetsConfig.GetZ3(triangleAddress) + zChange);
+                    short newX1, newY1, newZ1, newX2, newY2, newZ2, newX3, newY3, newZ3;
+                    newX1 = (short)(TriangleOffsetsConfig.GetX1(triangleAddress) + xChange);
+                    newY1 = (short)(TriangleOffsetsConfig.GetY1(triangleAddress) + yChange);
+                    newZ1 = (short)(TriangleOffsetsConfig.GetZ1(triangleAddress) + zChange);
+                    newX2 = (short)(TriangleOffsetsConfig.GetX2(triangleAddress) + xChange);
+                    newY2 = (short)(TriangleOffsetsConfig.GetY2(triangleAddress) + yChange);
+                    newZ2 = (short)(TriangleOffsetsConfig.GetZ2(triangleAddress) + zChange);
+                    newX3 = (short)(TriangleOffsetsConfig.GetX3(triangleAddress) + xChange);
+                    newY3 = (short)(TriangleOffsetsConfig.GetY3(triangleAddress) + yChange);
+                    newZ3 = (short)(TriangleOffsetsConfig.GetZ3(triangleAddress) + zChange);
 
-                short newYMin = (short)(Math.Min(Math.Min(newY1, newY2), newY3) - 5);
-                short newYMax = (short)(Math.Max(Math.Max(newY1, newY2), newY3) + 5);
+                    short newYMin = (short)(Math.Min(Math.Min(newY1, newY2), newY3) - 5);
+                    short newYMax = (short)(Math.Max(Math.Max(newY1, newY2), newY3) + 5);
 
-                success &= Config.Stream.SetValue(newNormOffset, triangleAddress + TriangleOffsetsConfig.NormOffset);
-                success &= TriangleOffsetsConfig.SetX1(newX1, triangleAddress);
-                success &= TriangleOffsetsConfig.SetY1(newY1, triangleAddress);
-                success &= TriangleOffsetsConfig.SetZ1(newZ1, triangleAddress);
-                success &= TriangleOffsetsConfig.SetX2(newX2, triangleAddress);
-                success &= TriangleOffsetsConfig.SetY2(newY2, triangleAddress);
-                success &= TriangleOffsetsConfig.SetZ2(newZ2, triangleAddress);
-                success &= TriangleOffsetsConfig.SetX3(newX3, triangleAddress);
-                success &= TriangleOffsetsConfig.SetY3(newY3, triangleAddress);
-                success &= TriangleOffsetsConfig.SetZ3(newZ3, triangleAddress);
-                success &= Config.Stream.SetValue(newYMin, triangleAddress + TriangleOffsetsConfig.YMinMinus5);
-                success &= Config.Stream.SetValue(newYMax, triangleAddress + TriangleOffsetsConfig.YMaxPlus5);
+                    success &= Config.Stream.SetValue(newNormOffset, triangleAddress + TriangleOffsetsConfig.NormOffset);
+                    success &= TriangleOffsetsConfig.SetX1(newX1, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetY1(newY1, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetZ1(newZ1, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetX2(newX2, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetY2(newY2, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetZ2(newZ2, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetX3(newX3, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetY3(newY3, triangleAddress);
+                    success &= TriangleOffsetsConfig.SetZ3(newZ3, triangleAddress);
+                    success &= Config.Stream.SetValue(newYMin, triangleAddress + TriangleOffsetsConfig.YMinMinus5);
+                    success &= Config.Stream.SetValue(newYMax, triangleAddress + TriangleOffsetsConfig.YMaxPlus5);
+                }
             }
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
             return success;
         }
 
@@ -1255,14 +1197,12 @@ namespace STROOP.Utilities
             (newX, newY, newZ) = MoreMath.OffsetSphericallyAboutPivot(oldX, oldY, oldZ, radiusOffset, thetaOffset, phiOffset, pivotX, pivotY, pivotZ);
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            success &= Config.Stream.SetValue((float)newX, CameraConfig.StructAddress + CameraConfig.XOffset);
-            success &= Config.Stream.SetValue((float)newY, CameraConfig.StructAddress + CameraConfig.YOffset);
-            success &= Config.Stream.SetValue((float)newZ, CameraConfig.StructAddress + CameraConfig.ZOffset);
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+            using (Config.Stream.Suspend())
+            {
+                success &= Config.Stream.SetValue((float)newX, CameraConfig.StructAddress + CameraConfig.XOffset);
+                success &= Config.Stream.SetValue((float)newY, CameraConfig.StructAddress + CameraConfig.YOffset);
+                success &= Config.Stream.SetValue((float)newZ, CameraConfig.StructAddress + CameraConfig.ZOffset);
+            }
             return success;
         }
 
@@ -1290,14 +1230,12 @@ namespace STROOP.Utilities
             (newX, newY, newZ) = MoreMath.OffsetSphericallyAboutPivot(oldX, oldY, oldZ, radiusOffset, thetaOffset, phiOffset, pivotX, pivotY, pivotZ);
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            success &= Config.Stream.SetValue((float)newX, CameraConfig.StructAddress + CameraConfig.FocusXOffset);
-            success &= Config.Stream.SetValue((float)newY, CameraConfig.StructAddress + CameraConfig.FocusYOffset);
-            success &= Config.Stream.SetValue((float)newZ, CameraConfig.StructAddress + CameraConfig.FocusZOffset);
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+            using (Config.Stream.Suspend())
+            {
+                success &= Config.Stream.SetValue((float)newX, CameraConfig.StructAddress + CameraConfig.FocusXOffset);
+                success &= Config.Stream.SetValue((float)newY, CameraConfig.StructAddress + CameraConfig.FocusYOffset);
+                success &= Config.Stream.SetValue((float)newZ, CameraConfig.StructAddress + CameraConfig.FocusZOffset);
+            }
             return success;
         }
 
@@ -1399,14 +1337,12 @@ namespace STROOP.Utilities
                         }
 
                         bool success = true;
-                        bool streamAlreadySuspended = Config.Stream.IsSuspended;
-                        if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-                        success &= Config.Stream.SetValue((float)radius, CamHackConfig.StructAddress + CamHackConfig.RadiusOffset);
-                        success &= Config.Stream.SetValue(MoreMath.NormalizeAngleUshort(theta + 32768 - relativeYawOffset), CamHackConfig.StructAddress + CamHackConfig.ThetaOffset);
-                        success &= Config.Stream.SetValue((float)height, CamHackConfig.StructAddress + CamHackConfig.RelativeHeightOffset);
-
-                        if (!streamAlreadySuspended) Config.Stream.Resume();
+                        using (Config.Stream.Suspend())
+                        {
+                            success &= Config.Stream.SetValue((float)radius, CamHackConfig.StructAddress + CamHackConfig.RadiusOffset);
+                            success &= Config.Stream.SetValue(MoreMath.NormalizeAngleUshort(theta + 32768 - relativeYawOffset), CamHackConfig.StructAddress + CamHackConfig.ThetaOffset);
+                            success &= Config.Stream.SetValue((float)height, CamHackConfig.StructAddress + CamHackConfig.RelativeHeightOffset);
+                        }
                         return success;
                     }
 
@@ -1483,14 +1419,12 @@ namespace STROOP.Utilities
                         }
 
                         bool success = true;
-                        bool streamAlreadySuspended = Config.Stream.IsSuspended;
-                        if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-                        success &= Config.Stream.SetValue((float)radius, CamHackConfig.StructAddress + CamHackConfig.RadiusOffset);
-                        success &= Config.Stream.SetValue(MoreMath.NormalizeAngleUshort(theta + 32768 - relativeYawOffset), CamHackConfig.StructAddress + CamHackConfig.ThetaOffset);
-                        success &= Config.Stream.SetValue((float)height, CamHackConfig.StructAddress + CamHackConfig.RelativeHeightOffset);
-
-                        if (!streamAlreadySuspended) Config.Stream.Resume();
+                        using (Config.Stream.Suspend())
+                        {
+                            success &= Config.Stream.SetValue((float)radius, CamHackConfig.StructAddress + CamHackConfig.RadiusOffset);
+                            success &= Config.Stream.SetValue(MoreMath.NormalizeAngleUshort(theta + 32768 - relativeYawOffset), CamHackConfig.StructAddress + CamHackConfig.ThetaOffset);
+                            success &= Config.Stream.SetValue((float)height, CamHackConfig.StructAddress + CamHackConfig.RelativeHeightOffset);
+                        }
                         return success;
                     }
 
@@ -1538,16 +1472,14 @@ namespace STROOP.Utilities
         public static bool TranslateCameraHackBoth(CamHackMode camHackMode, float xOffset, float yOffset, float zOffset, bool useRelative)
         {
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            if (camHackMode != CamHackMode.RELATIVE_ANGLE && camHackMode != CamHackMode.ABSOLUTE_ANGLE)
+            using (Config.Stream.Suspend())
             {
-                success &= TranslateCameraHack(camHackMode, xOffset, yOffset, zOffset, useRelative);
+                if (camHackMode != CamHackMode.RELATIVE_ANGLE && camHackMode != CamHackMode.ABSOLUTE_ANGLE)
+                {
+                    success &= TranslateCameraHack(camHackMode, xOffset, yOffset, zOffset, useRelative);
+                }
+                success &= TranslateCameraHackFocus(camHackMode, xOffset, yOffset, zOffset, useRelative);
             }
-            success &= TranslateCameraHackFocus(camHackMode, xOffset, yOffset, zOffset, useRelative);
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
             return success;
         }
 
@@ -1557,28 +1489,26 @@ namespace STROOP.Utilities
             byte newHudVisibility = MoreMath.ApplyValueToMaskedByte(currentHudVisibility, HudConfig.VisibilityMask, setHudOn);
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            success &= Config.Stream.SetValue(newHudVisibility, MarioConfig.StructAddress + HudConfig.VisibilityOffset);
-
-            if (changeLevelIndex)
+            using (Config.Stream.Suspend())
             {
-                success &= Config.Stream.SetValue((short)(setHudOn ? 1 : 0), MiscConfig.LevelIndexAddress);
-            }
-            else
-            {
-                if (setHudOn)
+                success &= Config.Stream.SetValue(newHudVisibility, MarioConfig.StructAddress + HudConfig.VisibilityOffset);
+
+                if (changeLevelIndex)
                 {
-                    success &= Config.Stream.SetValue(0, HudConfig.FunctionDisableCoinDisplayAddress);
+                    success &= Config.Stream.SetValue((short)(setHudOn ? 1 : 0), MiscConfig.LevelIndexAddress);
                 }
                 else
                 {
-                    success &= Config.Stream.SetValue(0, HudConfig.FunctionEnableCoinDisplayAddress);
+                    if (setHudOn)
+                    {
+                        success &= Config.Stream.SetValue(0, HudConfig.FunctionDisableCoinDisplayAddress);
+                    }
+                    else
+                    {
+                        success &= Config.Stream.SetValue(0, HudConfig.FunctionEnableCoinDisplayAddress);
+                    }
                 }
             }
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
             return success;
         }
     }

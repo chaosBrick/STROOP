@@ -362,19 +362,20 @@ namespace STROOP
                     if (obj == null) return;
 
                     List<float?> floatList = stringList.ConvertAll(s => ParsingUtilities.ParseFloatNullable(s));
-                    Config.Stream.Suspend();
-                    if (count == 2)
+                    using (Config.Stream.Suspend())
                     {
-                        if (floatList[0].HasValue) obj.X = floatList[0].Value;
-                        if (floatList[1].HasValue) obj.Z = floatList[1].Value;
+                        if (count == 2)
+                        {
+                            if (floatList[0].HasValue) obj.X = floatList[0].Value;
+                            if (floatList[1].HasValue) obj.Z = floatList[1].Value;
+                        }
+                        else
+                        {
+                            if (floatList[0].HasValue) obj.X = floatList[0].Value;
+                            if (floatList[1].HasValue) obj.Y = floatList[1].Value;
+                            if (floatList[2].HasValue) obj.Z = floatList[2].Value;
+                        }
                     }
-                    else
-                    {
-                        if (floatList[0].HasValue) obj.X = floatList[0].Value;
-                        if (floatList[1].HasValue) obj.Y = floatList[1].Value;
-                        if (floatList[2].HasValue) obj.Z = floatList[2].Value;
-                    }
-                    Config.Stream.Resume();
                 });
             };
 

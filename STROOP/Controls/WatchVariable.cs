@@ -291,11 +291,12 @@ namespace STROOP
             if (addressList.Count() == 0) return false;
             if (Config.Stream == null) return false;
 
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-            bool success = addressList.ConvertAll(address => SetValueYes(address, value))
-                .Aggregate(true, (b1, b2) => b1 && b2);
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+            bool success = true;
+            using (Config.Stream.Suspend())
+            {
+                success = addressList.ConvertAll(address => SetValueYes(address, value))
+                    .Aggregate(true, (b1, b2) => b1 && b2);
+            }
 
             return success;
         }
@@ -306,16 +307,15 @@ namespace STROOP
             if (addressList.Count == 0) return false;
             int minCount = Math.Min(addressList.Count, values.Count);
 
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
             bool success = true;
-            for (int i = 0; i < minCount; i++)
+            using (Config.Stream.Suspend())
             {
-                if (values[i] == null) continue;
-                success &= SetValueYes(addressList[i], values[i]);
+                for (int i = 0; i < minCount; i++)
+                {
+                    if (values[i] == null) continue;
+                    success &= SetValueYes(addressList[i], values[i]);
+                }
             }
-            if (!streamAlreadySuspended) Config.Stream.Resume();
-
 
             return success;
         }

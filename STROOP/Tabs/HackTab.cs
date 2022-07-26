@@ -79,15 +79,14 @@ namespace STROOP.Tabs
                 return;
             }
 
-            Config.Stream.Suspend();
+            using (Config.Stream.Suspend())
+            {
+                HackConfig.SpawnHack.LoadPayload();
 
-            HackConfig.SpawnHack.LoadPayload(false);
-
-            Config.Stream.SetValue(behavior, HackConfig.BehaviorAddress);
-            Config.Stream.SetValue((UInt16)gfxId, HackConfig.GfxIdAddress);
-            Config.Stream.SetValue((UInt16)extra, HackConfig.ExtraAddress);
-
-            Config.Stream.Resume();
+                Config.Stream.SetValue(behavior, HackConfig.BehaviorAddress);
+                Config.Stream.SetValue((UInt16)gfxId, HackConfig.GfxIdAddress);
+                Config.Stream.SetValue((UInt16)extra, HackConfig.ExtraAddress);
+            }
         }
 
         private void _checkList_ItemCheck(object sender, ItemCheckEventArgs e)

@@ -68,26 +68,23 @@ namespace STROOP.Structs
             while (nextEnd != -1);
         }
 
-        public void LoadPayload(bool suspendStream = true)
+        public void LoadPayload()
         {
             var originalMemory = new List<Tuple<uint, byte[]>>();
             bool success = true;
 
-            if (suspendStream)
-                Config.Stream.Suspend();
-
-            foreach (var (address, data) in _payload)
+            using (Config.Stream.Suspend())
             {
-                // Hacks are entered as big endian; we need to swap the address endianess before writing 
-                var fixedAddress = EndiannessUtilities.SwapAddressEndianness(address, data.Length);
+                foreach (var (address, data) in _payload)
+                {
+                    // Hacks are entered as big endian; we need to swap the address endianess before writing 
+                    var fixedAddress = EndiannessUtilities.SwapAddressEndianness(address, data.Length);
 
-                // Read original memory before replacing
-                originalMemory.Add(new Tuple<uint, byte[]>(fixedAddress, Config.Stream.ReadRam((UIntPtr)fixedAddress, data.Length, EndiannessType.Big)));
-                success &= Config.Stream.WriteRam(data, fixedAddress, EndiannessType.Big);
+                    // Read original memory before replacing
+                    originalMemory.Add(new Tuple<uint, byte[]>(fixedAddress, Config.Stream.ReadRam((UIntPtr)fixedAddress, data.Length, EndiannessType.Big)));
+                    success &= Config.Stream.WriteRam(data, fixedAddress, EndiannessType.Big);
+                }
             }
-
-            if (suspendStream)
-                Config.Stream.Resume();
 
             // Update original memory upon success
             if (success)
@@ -105,15 +102,12 @@ namespace STROOP.Structs
 
             if (_originalMemory.Count != _payload.Count)
                 return false;
-
-            Config.Stream.Suspend();
-
-            foreach (var address in _originalMemory)
-                // Read original memory before replacing
-                success &= Config.Stream.WriteRam(address.Item2, address.Item1, EndiannessType.Big);
-
-            Config.Stream.Resume();
-
+            using (Config.Stream.Suspend())
+            {
+                foreach (var address in _originalMemory)
+                    // Read original memory before replacing
+                    success &= Config.Stream.WriteRam(address.Item2, address.Item1, EndiannessType.Big);
+            }
             Enabled = !success;
 
             return success;

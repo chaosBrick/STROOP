@@ -53,14 +53,12 @@ namespace STROOP.Utilities
             double newMarioZ = GetCoordinateInPu(z, puZIndex);
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            success &= Config.Stream.SetValue((float)newMarioX, MarioConfig.StructAddress + MarioConfig.XOffset);
-            success &= Config.Stream.SetValue((float)newMarioY, MarioConfig.StructAddress + MarioConfig.YOffset);
-            success &= Config.Stream.SetValue((float)newMarioZ, MarioConfig.StructAddress + MarioConfig.ZOffset);
-
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+            using (Config.Stream.Suspend())
+            {
+                success &= Config.Stream.SetValue((float)newMarioX, MarioConfig.StructAddress + MarioConfig.XOffset);
+                success &= Config.Stream.SetValue((float)newMarioY, MarioConfig.StructAddress + MarioConfig.YOffset);
+                success &= Config.Stream.SetValue((float)newMarioZ, MarioConfig.StructAddress + MarioConfig.ZOffset);
+            }
             return success;
         }
 
@@ -92,20 +90,19 @@ namespace STROOP.Utilities
             double newCamZ = GetCoordinateInPu(cameraZ, newPuZ);
 
             bool success = true;
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            success &= Config.Stream.SetValue((float)newMarioX, MarioConfig.StructAddress + MarioConfig.XOffset);
-            success &= Config.Stream.SetValue((float)newMarioY, MarioConfig.StructAddress + MarioConfig.YOffset);
-            success &= Config.Stream.SetValue((float)newMarioZ, MarioConfig.StructAddress + MarioConfig.ZOffset);
-            if (SavedSettingsConfig.MoveCameraWithPu)
+            using (Config.Stream.Suspend())
             {
-                success &= Config.Stream.SetValue((float)newCamX, CameraConfig.StructAddress + CameraConfig.XOffset);
-                success &= Config.Stream.SetValue((float)newCamY, CameraConfig.StructAddress + CameraConfig.YOffset);
-                success &= Config.Stream.SetValue((float)newCamZ, CameraConfig.StructAddress + CameraConfig.ZOffset);
-            }
 
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+                success &= Config.Stream.SetValue((float)newMarioX, MarioConfig.StructAddress + MarioConfig.XOffset);
+                success &= Config.Stream.SetValue((float)newMarioY, MarioConfig.StructAddress + MarioConfig.YOffset);
+                success &= Config.Stream.SetValue((float)newMarioZ, MarioConfig.StructAddress + MarioConfig.ZOffset);
+                if (SavedSettingsConfig.MoveCameraWithPu)
+                {
+                    success &= Config.Stream.SetValue((float)newCamX, CameraConfig.StructAddress + CameraConfig.XOffset);
+                    success &= Config.Stream.SetValue((float)newCamY, CameraConfig.StructAddress + CameraConfig.YOffset);
+                    success &= Config.Stream.SetValue((float)newCamZ, CameraConfig.StructAddress + CameraConfig.ZOffset);
+                }
+            }
             return success;
         }
 

@@ -38,7 +38,6 @@ namespace STROOP.Utilities
 
         public byte[] Ram => _ram;
         public string ProcessName => _io?.Name ?? "(No Emulator)";
-        public bool IsSuspended => _io?.IsSuspended ?? false;
         public double FpsInPractice => _fpsTimes.Count == 0 ? 0 : 1 / _fpsTimes.Average();
         public double lastFrameTime => _fpsTimes.Count == 0 ? RefreshRateConfig.RefreshRateInterval : _fpsTimes.Last();
 
@@ -135,16 +134,29 @@ namespace STROOP.Utilities
             return SwitchIO(newIo);
         }
 
-        public void Suspend()
-        {
-            _lastUpdateBeforePausing = true;
-            _io?.Suspend();
-        }
 
-        public void Resume()
+        int suspendCounter = 0;
+        class SuspendScope : Scope
         {
-            _io?.Resume();
+            readonly ProcessStream stream;
+            public SuspendScope(ProcessStream stream)
+            {
+                this.stream = stream;
+                if (stream.suspendCounter == 0)
+                {
+                    stream._io?.Suspend();
+                    stream._lastUpdateBeforePausing = true;
+                }
+                stream.suspendCounter++;
+            }
+            protected override void Close()
+            {
+                stream.suspendCounter--;
+                if (stream.suspendCounter == 0)
+                    stream._io?.Resume();
+            }
         }
+        public Scope Suspend() => new SuspendScope(this);
 
         private void ProcessClosed(object sender, EventArgs e)
         {

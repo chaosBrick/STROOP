@@ -105,29 +105,29 @@ namespace STROOP.Utilities
 
         public static void AnnihilateAllTrianglesButDeathBarriers()
         {
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-            List<uint> triangleAddresses = GetLevelTriangleAddresses();
-            triangleAddresses.ForEach(address =>
+            using (Config.Stream.Suspend())
             {
-                short type = Config.Stream.GetInt16(address + TriangleOffsetsConfig.SurfaceType);
-                if (type != 0x0A)
+                List<uint> triangleAddresses = GetLevelTriangleAddresses();
+                triangleAddresses.ForEach(address =>
                 {
-                    ButtonUtilities.AnnihilateTriangle(new List<uint>() { address });
-                }
-            });
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+                    short type = Config.Stream.GetInt16(address + TriangleOffsetsConfig.SurfaceType);
+                    if (type != 0x0A)
+                    {
+                        ButtonUtilities.AnnihilateTriangle(new List<uint>() { address });
+                    }
+                });
+            }
         }
 
         public static void AnnihilateAllCeilings()
         {
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-            List<uint> ceilingAddresses = GetLevelTriangles()
+            using (Config.Stream.Suspend())
+            {
+                List<uint> ceilingAddresses = GetLevelTriangles()
                 .FindAll(tri => tri.IsCeiling())
                 .ConvertAll(tri => tri.Address);
-            ButtonUtilities.AnnihilateTriangle(ceilingAddresses);
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+                ButtonUtilities.AnnihilateTriangle(ceilingAddresses);
+            }
         }
 
         public static void NeutralizeTriangles(TriangleClassification? classification = null)

@@ -112,11 +112,11 @@ namespace STROOP.Forms
             List<string> values = ParsingUtilities.ParseStringList(_textBoxGetSet.Text);
             if (values.Count == 0) return;
 
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-            for (int i = 0; i < _watchVarWrappers.Count; i++)
-                _watchVarWrappers[i].SetValue(values[i % values.Count], _fixedAddressLists[i]);
-            if (!streamAlreadySuspended) Config.Stream.Resume();
+            using (Config.Stream.Suspend())
+            {
+                for (int i = 0; i < _watchVarWrappers.Count; i++)
+                    _watchVarWrappers[i].SetValue(values[i % values.Count], _fixedAddressLists[i]);
+            }
         }
 
         private Color GetColorForCheckState(CheckState checkState)

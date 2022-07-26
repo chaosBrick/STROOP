@@ -11,7 +11,7 @@ using System.Xml.Linq;
 namespace STROOP.Tabs
 {
     public partial class CamHackTab : STROOPTab
-    { 
+    {
         [InitializeBaseAddress]
         static void InitBaseAddresses()
         {
@@ -19,7 +19,7 @@ namespace STROOP.Tabs
         }
 
         public CamHackMode CurrentCamHackMode { get; private set; }
-        
+
         private int _numPans = 0;
         private List<IEnumerable<WatchVariableControl>> _panVars = new List<IEnumerable<WatchVariableControl>>();
 
@@ -296,145 +296,142 @@ namespace STROOP.Tabs
                 SpecialConfig.PanCamRotation == 0 &&
                 SpecialConfig.PanFOV == 0) return;
 
-            bool streamAlreadySuspended = Config.Stream.IsSuspended;
-            if (!streamAlreadySuspended) Config.Stream.Suspend();
-
-            int panIndex = (int)SpecialConfig.CurrentPan;
-            if (panIndex == -1)
-                goto END;
-            PanModel panModel = SpecialConfig.PanModels[panIndex];
-
-            uint globalTimer = Config.Stream.GetUInt32(MiscConfig.GlobalTimerAddress);
-            double camX = Config.Stream.GetSingle(CamHackConfig.StructAddress + CamHackConfig.CameraXOffset);
-            double camY = Config.Stream.GetSingle(CamHackConfig.StructAddress + CamHackConfig.CameraYOffset);
-            double camZ = Config.Stream.GetSingle(CamHackConfig.StructAddress + CamHackConfig.CameraZOffset);
-
-            if (SpecialConfig.PanCamPos != 0)
+            using (Config.Stream.Suspend())
             {
-                if (globalTimer <= panModel.PanStartTime)
+                int panIndex = (int)SpecialConfig.CurrentPan;
+                if (panIndex == -1)
+                    return;
+                PanModel panModel = SpecialConfig.PanModels[panIndex];
+
+                uint globalTimer = Config.Stream.GetUInt32(MiscConfig.GlobalTimerAddress);
+                double camX = Config.Stream.GetSingle(CamHackConfig.StructAddress + CamHackConfig.CameraXOffset);
+                double camY = Config.Stream.GetSingle(CamHackConfig.StructAddress + CamHackConfig.CameraYOffset);
+                double camZ = Config.Stream.GetSingle(CamHackConfig.StructAddress + CamHackConfig.CameraZOffset);
+
+                if (SpecialConfig.PanCamPos != 0)
                 {
-                    Config.Stream.SetValue((float)panModel.PanCamStartX, CamHackConfig.StructAddress + CamHackConfig.CameraXOffset);
-                    Config.Stream.SetValue((float)panModel.PanCamStartY, CamHackConfig.StructAddress + CamHackConfig.CameraYOffset);
-                    Config.Stream.SetValue((float)panModel.PanCamStartZ, CamHackConfig.StructAddress + CamHackConfig.CameraZOffset);
+                    if (globalTimer <= panModel.PanStartTime)
+                    {
+                        Config.Stream.SetValue((float)panModel.PanCamStartX, CamHackConfig.StructAddress + CamHackConfig.CameraXOffset);
+                        Config.Stream.SetValue((float)panModel.PanCamStartY, CamHackConfig.StructAddress + CamHackConfig.CameraYOffset);
+                        Config.Stream.SetValue((float)panModel.PanCamStartZ, CamHackConfig.StructAddress + CamHackConfig.CameraZOffset);
+                    }
+                    else if (globalTimer >= panModel.PanEndTime)
+                    {
+                        Config.Stream.SetValue((float)panModel.PanCamEndX, CamHackConfig.StructAddress + CamHackConfig.CameraXOffset);
+                        Config.Stream.SetValue((float)panModel.PanCamEndY, CamHackConfig.StructAddress + CamHackConfig.CameraYOffset);
+                        Config.Stream.SetValue((float)panModel.PanCamEndZ, CamHackConfig.StructAddress + CamHackConfig.CameraZOffset);
+                    }
+                    else
+                    {
+                        double proportion = (globalTimer - panModel.PanStartTime) / (panModel.PanEndTime - panModel.PanStartTime);
+                        proportion = EasingUtilities.Ease(panModel.PanEaseDegree, proportion, panModel.PanEaseStart != 0, panModel.PanEaseEnd != 0);
+                        camX = panModel.PanCamStartX + proportion * (panModel.PanCamEndX - panModel.PanCamStartX);
+                        camY = panModel.PanCamStartY + proportion * (panModel.PanCamEndY - panModel.PanCamStartY);
+                        camZ = panModel.PanCamStartZ + proportion * (panModel.PanCamEndZ - panModel.PanCamStartZ);
+                        Config.Stream.SetValue((float)camX, CamHackConfig.StructAddress + CamHackConfig.CameraXOffset);
+                        Config.Stream.SetValue((float)camY, CamHackConfig.StructAddress + CamHackConfig.CameraYOffset);
+                        Config.Stream.SetValue((float)camZ, CamHackConfig.StructAddress + CamHackConfig.CameraZOffset);
+                    }
                 }
-                else if (globalTimer >= panModel.PanEndTime)
+
+                if (SpecialConfig.PanCamAngle != 0)
                 {
-                    Config.Stream.SetValue((float)panModel.PanCamEndX, CamHackConfig.StructAddress + CamHackConfig.CameraXOffset);
-                    Config.Stream.SetValue((float)panModel.PanCamEndY, CamHackConfig.StructAddress + CamHackConfig.CameraYOffset);
-                    Config.Stream.SetValue((float)panModel.PanCamEndZ, CamHackConfig.StructAddress + CamHackConfig.CameraZOffset);
+                    double camYaw;
+                    double camPitch;
+
+                    if (globalTimer <= panModel.PanStartTime)
+                    {
+                        camYaw = panModel.PanCamStartYaw;
+                        camPitch = panModel.PanCamStartPitch;
+                    }
+                    else if (globalTimer >= panModel.PanEndTime)
+                    {
+                        camYaw = panModel.PanCamEndYaw;
+                        camPitch = panModel.PanCamEndPitch;
+                    }
+                    else
+                    {
+                        double proportion = (globalTimer - panModel.PanStartTime) / (panModel.PanEndTime - panModel.PanStartTime);
+                        proportion = EasingUtilities.Ease(panModel.PanEaseDegree, proportion, panModel.PanEaseStart != 0, panModel.PanEaseEnd != 0);
+
+                        double yawDist = MoreMath.GetUnsignedAngleDifference(panModel.PanCamStartYaw, panModel.PanCamEndYaw);
+                        if (panModel.PanRotateCW != 0 && yawDist != 0) yawDist -= 65536;
+                        camYaw = panModel.PanCamStartYaw + proportion * yawDist;
+                        camYaw = MoreMath.NormalizeAngleDouble(camYaw);
+
+                        double pitchDist = panModel.PanCamEndPitch - panModel.PanCamStartPitch;
+                        camPitch = panModel.PanCamStartPitch + proportion * pitchDist;
+                    }
+
+                    (double diffX, double diffY, double diffZ) = MoreMath.SphericalToEuler_AngleUnits(1000, camYaw, camPitch);
+                    (double focusX, double focusY, double focusZ) = (camX + diffX, camY + diffY, camZ + diffZ);
+                    Config.Stream.SetValue((float)focusX, CamHackConfig.StructAddress + CamHackConfig.FocusXOffset);
+                    Config.Stream.SetValue((float)focusY, CamHackConfig.StructAddress + CamHackConfig.FocusYOffset);
+                    Config.Stream.SetValue((float)focusZ, CamHackConfig.StructAddress + CamHackConfig.FocusZOffset);
                 }
-                else
+
+                if (SpecialConfig.PanCamRotation != 0)
                 {
-                    double proportion = (globalTimer - panModel.PanStartTime) / (panModel.PanEndTime - panModel.PanStartTime);
-                    proportion = EasingUtilities.Ease(panModel.PanEaseDegree, proportion, panModel.PanEaseStart != 0, panModel.PanEaseEnd != 0);
-                    camX = panModel.PanCamStartX + proportion * (panModel.PanCamEndX - panModel.PanCamStartX);
-                    camY = panModel.PanCamStartY + proportion * (panModel.PanCamEndY - panModel.PanCamStartY);
-                    camZ = panModel.PanCamStartZ + proportion * (panModel.PanCamEndZ - panModel.PanCamStartZ);
-                    Config.Stream.SetValue((float)camX, CamHackConfig.StructAddress + CamHackConfig.CameraXOffset);
-                    Config.Stream.SetValue((float)camY, CamHackConfig.StructAddress + CamHackConfig.CameraYOffset);
-                    Config.Stream.SetValue((float)camZ, CamHackConfig.StructAddress + CamHackConfig.CameraZOffset);
+                    double radius;
+                    double camYaw;
+                    double camPitch;
+
+                    if (globalTimer <= panModel.PanStartTime)
+                    {
+                        radius = panModel.PanRadiusStart;
+                        camYaw = panModel.PanCamStartYaw;
+                        camPitch = panModel.PanCamStartPitch;
+                    }
+                    else if (globalTimer >= panModel.PanEndTime)
+                    {
+                        radius = panModel.PanRadiusEnd;
+                        camYaw = panModel.PanCamEndYaw;
+                        camPitch = panModel.PanCamEndPitch;
+                    }
+                    else
+                    {
+                        double proportion = (globalTimer - panModel.PanStartTime) / (panModel.PanEndTime - panModel.PanStartTime);
+                        proportion = EasingUtilities.Ease(panModel.PanEaseDegree, proportion, panModel.PanEaseStart != 0, panModel.PanEaseEnd != 0);
+
+                        double radiusDist = panModel.PanRadiusEnd - panModel.PanRadiusStart;
+                        radius = panModel.PanRadiusStart + proportion * radiusDist;
+
+                        double yawDist = MoreMath.GetUnsignedAngleDifference(panModel.PanCamStartYaw, panModel.PanCamEndYaw);
+                        if (panModel.PanRotateCW != 0 && yawDist != 0) yawDist -= 65536;
+                        camYaw = panModel.PanCamStartYaw + proportion * yawDist;
+                        camYaw = MoreMath.NormalizeAngleDouble(camYaw);
+
+                        double pitchDist = panModel.PanCamEndPitch - panModel.PanCamStartPitch;
+                        camPitch = panModel.PanCamStartPitch + proportion * pitchDist;
+                    }
+
+                    (double offsetX, double offsetY, double offsetZ) = MoreMath.SphericalToEuler_AngleUnits(radius, camYaw, -1 * camPitch);
+                    (double radius2D, double angle, double height) = MoreMath.EulerToCylindrical_AngleUnits(offsetX, offsetY, offsetZ);
+                    Config.Stream.SetValue((float)radius2D, CamHackConfig.StructAddress + CamHackConfig.RadiusOffset);
+                    Config.Stream.SetValue(MoreMath.NormalizeAngleUshort(angle), CamHackConfig.StructAddress + CamHackConfig.ThetaOffset);
+                    Config.Stream.SetValue((float)height, CamHackConfig.StructAddress + CamHackConfig.RelativeHeightOffset);
+                }
+
+                if (SpecialConfig.PanFOV != 0)
+                {
+                    if (globalTimer <= panModel.PanStartTime)
+                    {
+                        Config.Stream.SetValue((float)panModel.PanFOVStart, CameraConfig.FOVStructAddress + CameraConfig.FOVValueOffset);
+                    }
+                    else if (globalTimer >= panModel.PanEndTime)
+                    {
+                        Config.Stream.SetValue((float)panModel.PanFOVEnd, CameraConfig.FOVStructAddress + CameraConfig.FOVValueOffset);
+                    }
+                    else
+                    {
+                        double proportion = (globalTimer - panModel.PanStartTime) / (panModel.PanEndTime - panModel.PanStartTime);
+                        proportion = EasingUtilities.Ease(panModel.PanEaseDegree, proportion, panModel.PanEaseStart != 0, panModel.PanEaseEnd != 0);
+                        double fov = panModel.PanFOVStart + proportion * (panModel.PanFOVEnd - panModel.PanFOVStart);
+                        Config.Stream.SetValue((float)fov, CameraConfig.FOVStructAddress + CameraConfig.FOVValueOffset);
+                    }
                 }
             }
-
-            if (SpecialConfig.PanCamAngle != 0)
-            {
-                double camYaw;
-                double camPitch;
-
-                if (globalTimer <= panModel.PanStartTime)
-                {
-                    camYaw = panModel.PanCamStartYaw;
-                    camPitch = panModel.PanCamStartPitch;
-                }
-                else if (globalTimer >= panModel.PanEndTime)
-                {
-                    camYaw = panModel.PanCamEndYaw;
-                    camPitch = panModel.PanCamEndPitch;
-                }
-                else
-                {
-                    double proportion = (globalTimer - panModel.PanStartTime) / (panModel.PanEndTime - panModel.PanStartTime);
-                    proportion = EasingUtilities.Ease(panModel.PanEaseDegree, proportion, panModel.PanEaseStart != 0, panModel.PanEaseEnd != 0);
-
-                    double yawDist = MoreMath.GetUnsignedAngleDifference(panModel.PanCamStartYaw, panModel.PanCamEndYaw);
-                    if (panModel.PanRotateCW != 0 && yawDist != 0) yawDist -= 65536;
-                    camYaw = panModel.PanCamStartYaw + proportion * yawDist;
-                    camYaw = MoreMath.NormalizeAngleDouble(camYaw);
-
-                    double pitchDist = panModel.PanCamEndPitch - panModel.PanCamStartPitch;
-                    camPitch = panModel.PanCamStartPitch + proportion * pitchDist;
-                }
-
-                (double diffX, double diffY, double diffZ) = MoreMath.SphericalToEuler_AngleUnits(1000, camYaw, camPitch);
-                (double focusX, double focusY, double focusZ) = (camX + diffX, camY + diffY, camZ + diffZ);
-                Config.Stream.SetValue((float)focusX, CamHackConfig.StructAddress + CamHackConfig.FocusXOffset);
-                Config.Stream.SetValue((float)focusY, CamHackConfig.StructAddress + CamHackConfig.FocusYOffset);
-                Config.Stream.SetValue((float)focusZ, CamHackConfig.StructAddress + CamHackConfig.FocusZOffset);
-            }
-
-            if (SpecialConfig.PanCamRotation != 0)
-            {
-                double radius;
-                double camYaw;
-                double camPitch;
-
-                if (globalTimer <= panModel.PanStartTime)
-                {
-                    radius = panModel.PanRadiusStart;
-                    camYaw = panModel.PanCamStartYaw;
-                    camPitch = panModel.PanCamStartPitch;
-                }
-                else if (globalTimer >= panModel.PanEndTime)
-                {
-                    radius = panModel.PanRadiusEnd;
-                    camYaw = panModel.PanCamEndYaw;
-                    camPitch = panModel.PanCamEndPitch;
-                }
-                else
-                {
-                    double proportion = (globalTimer - panModel.PanStartTime) / (panModel.PanEndTime - panModel.PanStartTime);
-                    proportion = EasingUtilities.Ease(panModel.PanEaseDegree, proportion, panModel.PanEaseStart != 0, panModel.PanEaseEnd != 0);
-
-                    double radiusDist = panModel.PanRadiusEnd - panModel.PanRadiusStart;
-                    radius = panModel.PanRadiusStart + proportion * radiusDist;
-
-                    double yawDist = MoreMath.GetUnsignedAngleDifference(panModel.PanCamStartYaw, panModel.PanCamEndYaw);
-                    if (panModel.PanRotateCW != 0 && yawDist != 0) yawDist -= 65536;
-                    camYaw = panModel.PanCamStartYaw + proportion * yawDist;
-                    camYaw = MoreMath.NormalizeAngleDouble(camYaw);
-
-                    double pitchDist = panModel.PanCamEndPitch - panModel.PanCamStartPitch;
-                    camPitch = panModel.PanCamStartPitch + proportion * pitchDist;
-                }
-
-                (double offsetX, double offsetY, double offsetZ) = MoreMath.SphericalToEuler_AngleUnits(radius, camYaw, -1 * camPitch);
-                (double radius2D, double angle, double height) = MoreMath.EulerToCylindrical_AngleUnits(offsetX, offsetY, offsetZ);
-                Config.Stream.SetValue((float)radius2D, CamHackConfig.StructAddress + CamHackConfig.RadiusOffset);
-                Config.Stream.SetValue(MoreMath.NormalizeAngleUshort(angle), CamHackConfig.StructAddress + CamHackConfig.ThetaOffset);
-                Config.Stream.SetValue((float)height, CamHackConfig.StructAddress + CamHackConfig.RelativeHeightOffset);
-            }
-
-            if (SpecialConfig.PanFOV != 0)
-            {
-                if (globalTimer <= panModel.PanStartTime)
-                {
-                    Config.Stream.SetValue((float)panModel.PanFOVStart, CameraConfig.FOVStructAddress + CameraConfig.FOVValueOffset);
-                }
-                else if (globalTimer >= panModel.PanEndTime)
-                {
-                    Config.Stream.SetValue((float)panModel.PanFOVEnd, CameraConfig.FOVStructAddress + CameraConfig.FOVValueOffset);
-                }
-                else
-                {
-                    double proportion = (globalTimer - panModel.PanStartTime) / (panModel.PanEndTime - panModel.PanStartTime);
-                    proportion = EasingUtilities.Ease(panModel.PanEaseDegree, proportion, panModel.PanEaseStart != 0, panModel.PanEaseEnd != 0);
-                    double fov = panModel.PanFOVStart + proportion * (panModel.PanFOVEnd - panModel.PanFOVStart);
-                    Config.Stream.SetValue((float)fov, CameraConfig.FOVStructAddress + CameraConfig.FOVValueOffset);
-                }
-            }
-
-            END:
-            if (!streamAlreadySuspended) Config.Stream.Resume();
         }
 
         private int _globalTimer = 0;

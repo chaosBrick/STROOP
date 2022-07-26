@@ -44,12 +44,14 @@ namespace STROOP.Structs
                 List<string> stringList = ParsingUtilities.ParseStringList(Clipboard.GetText());
                 if (stringList.Count == 0) return;
 
-                Config.Stream.Suspend();
-                for (int i = 0; i < vars.Count; i++)
+
+                using (Config.Stream.Suspend())
                 {
-                    vars[i].SetValue(stringList[i % stringList.Count]);
+                    for (int i = 0; i < vars.Count; i++)
+                    {
+                        vars[i].SetValue(stringList[i % stringList.Count]);
+                    }
                 }
-                Config.Stream.Resume();
             };
             itemList.Add(itemPaste);
             itemList.Add(new ToolStripSeparator());

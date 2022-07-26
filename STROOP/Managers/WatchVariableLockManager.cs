@@ -31,17 +31,17 @@ namespace STROOP.Structs
         public static void Update()
         {
             if (LockConfig.LockingDisabled) return;
-            bool shouldSuspend = _lockList.Count >= 2;
-            if (shouldSuspend) Config.Stream.Suspend();
-            var removeList = new List<WatchVariable>();
-            foreach (var varLock in _lockList)
+            using (Config.Stream.Suspend())
             {
-                if (!varLock.InvokeLocks())
-                    removeList.Add(varLock);
+                var removeList = new List<WatchVariable>();
+                foreach (var varLock in _lockList)
+                {
+                    if (!varLock.InvokeLocks())
+                        removeList.Add(varLock);
+                }
+                foreach (var remove in removeList)
+                    _lockList.Remove(remove);
             }
-            foreach (var remove in removeList)
-                _lockList.Remove(remove);
-            if (shouldSuspend) Config.Stream.Resume();
         }
 
         public static bool ContainsAnyLocksForObject(uint baseAddress)
