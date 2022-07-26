@@ -246,6 +246,7 @@ namespace STROOP.Tabs.GhostTab
                 }
                 else
                 {
+                    ghostTransparent = checkTransparentGhosts.Checked;
                     var marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
 
                     Vector3 marioPosition = new Vector3(Config.Stream.GetSingle(marioObjRef + 0x20), Config.Stream.GetSingle(marioObjRef + 0x24), Config.Stream.GetSingle(marioObjRef + 0x28));
