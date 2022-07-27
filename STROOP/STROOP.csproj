@@ -413,6 +413,7 @@
     <Compile Include="Tabs\MapTab\MapObjects\MapAllObjectFloorObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapAllObjectWallObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapCustomCameraPath.cs" />
+    <Compile Include="Tabs\MapTab\MapObjects\MapIwerlipsesObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapObjectTrianglePrediction.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapTapeMeasureObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapNearbyFloorUnits.cs" />
