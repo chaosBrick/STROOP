@@ -343,6 +343,21 @@ namespace STROOP.Utilities
                 double angle = ParsingUtilities.ParseDoubleNullable(parts[1]) ?? double.NaN;
                 return new CustomPositionAngle(double.NaN, double.NaN, double.NaN, angle);
             }
+            else if (parts.Count == 2 && parts[0] == "ghost")
+            {
+                uint? ghostIndex = ParsingUtilities.ParseUIntNullable(parts[1]);
+                if (ghostIndex == null) return null;
+                var tab = AccessScope<StroopMainForm>.content.GetTab<Tabs.GhostTab.GhostTab>();
+                PositionAngle GetGhost()
+                {
+                    int i = 0;
+                    foreach (var g in tab.GetGhosts())
+                        if (i++ == ghostIndex.Value)
+                            return g;
+                    return PositionAngle.NaN;
+                }
+                return new HybridPositionAngle(GetGhost, GetGhost);
+            }
             else if (parts.Count == 1)
             {
                 foreach (var p in HybridPositionAngle.pointPAs)
