@@ -472,7 +472,7 @@ namespace STROOP.Controls
                 location.Y -= borderMargin;
                 var x = location.X / elementWidth;
                 var y = location.Y / elementHeight;
-                int maxRows = (int)((target.Height - borderMargin * 2 - SystemInformation.HorizontalScrollBarHeight) / elementHeight);
+                int maxRows = GetMaxRows();
                 int index = x * maxRows + y;
                 if (index < 0)
                     return (0, null, false);
