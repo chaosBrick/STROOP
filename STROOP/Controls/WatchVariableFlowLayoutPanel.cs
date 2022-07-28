@@ -540,7 +540,7 @@ namespace STROOP.Controls
                 while (PositionAngle.HybridPositionAngle.pointPAs.Any(pa => pa.name.ToLower() == $"point{ptCount}"))
                     ptCount++;
                 var newName = DialogUtilities.GetStringFromDialog($"Point{ptCount}", "Enter name of new custom point", "Add custom point");
-                if (newName.Trim() != null)
+                if (newName?.Trim() != null)
                     PositionAngle.HybridPositionAngle.pointPAs.Add(
                         new PositionAngle.HybridPositionAngle(() => PositionAngle.Mario, () => PositionAngle.Mario, newName));
             };
