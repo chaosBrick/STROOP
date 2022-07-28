@@ -83,40 +83,36 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
-            if (_contextMenuStrip == null)
+            ToolStripMenuItem itemUseColoredMarios = new ToolStripMenuItem("Use Colored Marios");
+            itemUseColoredMarios.Click += (sender, e) =>
             {
-                ToolStripMenuItem itemUseColoredMarios = new ToolStripMenuItem("Use Colored Marios");
-                itemUseColoredMarios.Click += (sender, e) =>
-                {
-                    _useColoredMarios = !_useColoredMarios;
-                    itemUseColoredMarios.Checked = _useColoredMarios;
-                };
+                _useColoredMarios = !_useColoredMarios;
                 itemUseColoredMarios.Checked = _useColoredMarios;
+            };
+            itemUseColoredMarios.Checked = _useColoredMarios;
 
-                ToolStripMenuItem itemShowQuarterSteps = new ToolStripMenuItem("Show Quarter Steps");
-                itemShowQuarterSteps.Click += (sender, e) =>
-                {
-                    _showQuarterSteps = !_showQuarterSteps;
-                    itemShowQuarterSteps.Checked = _showQuarterSteps;
-                };
+            ToolStripMenuItem itemShowQuarterSteps = new ToolStripMenuItem("Show Quarter Steps");
+            itemShowQuarterSteps.Click += (sender, e) =>
+            {
+                _showQuarterSteps = !_showQuarterSteps;
                 itemShowQuarterSteps.Checked = _showQuarterSteps;
+            };
+            itemShowQuarterSteps.Checked = _showQuarterSteps;
 
-                ToolStripMenuItem itemSetNumFrames = new ToolStripMenuItem("Set Num Frames...");
-                itemSetNumFrames.Click += (sender, e) =>
-                {
-                    string text = DialogUtilities.GetStringFromDialog(labelText: "Enter num frames to the nearest 1/4th.");
-                    double? numFramesNullable = ParsingUtilities.ParseDoubleNullable(text);
-                    if (!numFramesNullable.HasValue) return;
-                    double numFrames = numFramesNullable.Value;
-                    _numFrames = numFrames;
-                };
+            ToolStripMenuItem itemSetNumFrames = new ToolStripMenuItem("Set Num Frames...");
+            itemSetNumFrames.Click += (sender, e) =>
+            {
+                string text = DialogUtilities.GetStringFromDialog(labelText: "Enter num frames to the nearest 1/4th.");
+                double? numFramesNullable = ParsingUtilities.ParseDoubleNullable(text);
+                if (!numFramesNullable.HasValue) return;
+                double numFrames = numFramesNullable.Value;
+                _numFrames = numFrames;
+            };
 
-                _contextMenuStrip = new ContextMenuStrip();
-                _contextMenuStrip.Items.Add(itemUseColoredMarios);
-                _contextMenuStrip.Items.Add(itemShowQuarterSteps);
-                _contextMenuStrip.Items.Add(itemSetNumFrames);
-            }
-
+            var _contextMenuStrip = new ContextMenuStrip();
+            _contextMenuStrip.Items.Add(itemUseColoredMarios);
+            _contextMenuStrip.Items.Add(itemShowQuarterSteps);
+            _contextMenuStrip.Items.Add(itemSetNumFrames);
             return _contextMenuStrip;
         }
 

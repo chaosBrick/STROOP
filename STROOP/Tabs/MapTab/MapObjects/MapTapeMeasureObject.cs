@@ -115,20 +115,17 @@ namespace STROOP.Tabs.MapTab.MapObjects
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             this.targetTracker = targetTracker;
-            if (_contextMenuStrip == null)
+
+            itemEnableDragging = new ToolStripMenuItem("Enable dragging");
+            var capturedMapTab = currentMapTab;
+            itemEnableDragging.Click += (sender, e) =>
             {
-                itemEnableDragging = new ToolStripMenuItem("Enable dragging");
-                var capturedMapTab = currentMapTab;
-                itemEnableDragging.Click += (sender, e) =>
-                {
-                    itemEnableDragging.Checked = !itemEnableDragging.Checked;
-                };
+                itemEnableDragging.Checked = !itemEnableDragging.Checked;
+            };
 
-                _contextMenuStrip = new ContextMenuStrip();
-                _contextMenuStrip.Items.Add(itemEnableDragging);
-                itemEnableDragging.PerformClick();
-            }
-
+            var _contextMenuStrip = new ContextMenuStrip();
+            _contextMenuStrip.Items.Add(itemEnableDragging);
+            itemEnableDragging.PerformClick();
             return _contextMenuStrip;
         }
 
@@ -180,13 +177,15 @@ namespace STROOP.Tabs.MapTab.MapObjects
                     }
                     if (!float.IsNaN(end.Y))
                         p1.Y = p2.Y = end.Y == 0 ? p1.Y : p2.Y;
-                    else { 
+                    else
+                    {
                         nameString += "y";
                         colorIndex |= 2;
                     }
                     if (!float.IsNaN(end.Z))
                         p1.Z = p2.Z = end.Z == 0 ? p1.Z : p2.Z;
-                    else { 
+                    else
+                    {
                         nameString += "z";
                         colorIndex |= 4;
                     }

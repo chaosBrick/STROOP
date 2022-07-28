@@ -120,18 +120,16 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
-            if (_contextMenuStrip == null)
-            {
-                List<string> itemNames = new List<string>() { "Setting 1", "Setting 2", "Setting 3" };
-                List<PuGridlineSetting> itemValues = EnumUtilities.GetEnumValues<PuGridlineSetting>(typeof(PuGridlineSetting));
-                Action<PuGridlineSetting> setterAction = (PuGridlineSetting setting) => _setting = setting;
-                PuGridlineSetting startingValue = _setting;
-                (List<ToolStripMenuItem> itemList, Action<PuGridlineSetting> valueAction) =
-                    ControlUtilities.CreateCheckableItems(
-                        itemNames, itemValues, setterAction, startingValue);
-                _contextMenuStrip = new ContextMenuStrip();
-                itemList.ForEach(item => _contextMenuStrip.Items.Add(item));
-            }
+            List<string> itemNames = new List<string>() { "Setting 1", "Setting 2", "Setting 3" };
+            List<PuGridlineSetting> itemValues = EnumUtilities.GetEnumValues<PuGridlineSetting>(typeof(PuGridlineSetting));
+            Action<PuGridlineSetting> setterAction = (PuGridlineSetting setting) => _setting = setting;
+            PuGridlineSetting startingValue = _setting;
+            (List<ToolStripMenuItem> itemList, Action<PuGridlineSetting> valueAction) =
+                ControlUtilities.CreateCheckableItems(
+                    itemNames, itemValues, setterAction, startingValue);
+
+            var _contextMenuStrip = new ContextMenuStrip();
+            itemList.ForEach(item => _contextMenuStrip.Items.Add(item));
 
             return _contextMenuStrip;
         }

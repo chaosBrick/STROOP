@@ -44,10 +44,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
-            base.GetContextMenuStrip(targetTracker);
-            if (_contextMenuStrip == null)
-                _contextMenuStrip = new ContextMenuStrip();
-
+            var _contextMenuStrip = base.GetContextMenuStrip(targetTracker);
+            
             ToolStripMenuItem itemSetHorizontalExpanse = new ToolStripMenuItem("[3D] Set horizontal expanse");
             itemSetHorizontalExpanse.Click += (sender, e) =>
             {

@@ -34,27 +34,24 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
-            if (_contextMenuStrip == null)
+            List<BackgroundImage> backgroundImages = MapTab.MapAssociations.GetAllBackgroundImages();
+            List<object> backgroundImageChoices = new List<object>() { "Recommended" };
+            backgroundImages.ForEach(backgroundImage => backgroundImageChoices.Add(backgroundImage));
+
+            ToolStripMenuItem itemSelectMap = new ToolStripMenuItem("Select Background");
+            itemSelectMap.Click += (sender, e) =>
             {
-                List<BackgroundImage> backgroundImages = MapTab.MapAssociations.GetAllBackgroundImages();
-                List<object> backgroundImageChoices = new List<object>() { "Recommended" };
-                backgroundImages.ForEach(backgroundImage => backgroundImageChoices.Add(backgroundImage));
+                SelectionForm form = new SelectionForm();
+                form.Initialize(
+                    "Select a Background",
+                    "Set Background",
+                    backgroundImageChoices,
+                    backgroundChoice => _backgroundChoice = backgroundChoice);
+                form.Show();
+            };
 
-                ToolStripMenuItem itemSelectMap = new ToolStripMenuItem("Select Background");
-                itemSelectMap.Click += (sender, e) =>
-                {
-                    SelectionForm form = new SelectionForm();
-                    form.Initialize(
-                        "Select a Background",
-                        "Set Background",
-                        backgroundImageChoices,
-                        backgroundChoice => _backgroundChoice = backgroundChoice);
-                    form.Show();
-                };
-                _contextMenuStrip = new ContextMenuStrip();
-                _contextMenuStrip.Items.Add(itemSelectMap);
-            }
-
+            var _contextMenuStrip = new ContextMenuStrip();
+            _contextMenuStrip.Items.Add(itemSelectMap);
             return _contextMenuStrip;
         }
     }

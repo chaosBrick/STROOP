@@ -58,29 +58,25 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
-            if (_contextMenuStrip == null)
+            ToolStripMenuItem itemUseFixedSize = new ToolStripMenuItem("Use Fixed Size");
+            itemUseFixedSize.Click += (sender, e) =>
             {
-                ToolStripMenuItem itemUseFixedSize = new ToolStripMenuItem("Use Fixed Size");
-                itemUseFixedSize.Click += (sender, e) =>
-                {
-                    _useFixedSize = !_useFixedSize;
-                    itemUseFixedSize.Checked = _useFixedSize;
-                };
+                _useFixedSize = !_useFixedSize;
+                itemUseFixedSize.Checked = _useFixedSize;
+            };
 
-                ToolStripMenuItem itemSetBackwardsSize = new ToolStripMenuItem("Set Backwards Size...");
-                itemSetBackwardsSize.Click += (sender, e) =>
-                {
-                    string text = DialogUtilities.GetStringFromDialog(labelText: "Enter backwards size.");
-                    double? backwardsSizeNullable = ParsingUtilities.ParseDoubleNullable(text);
-                    if (!backwardsSizeNullable.HasValue) return;
-                    _backwardsSize = (float)backwardsSizeNullable.Value;
-                };
+            ToolStripMenuItem itemSetBackwardsSize = new ToolStripMenuItem("Set Backwards Size...");
+            itemSetBackwardsSize.Click += (sender, e) =>
+            {
+                string text = DialogUtilities.GetStringFromDialog(labelText: "Enter backwards size.");
+                double? backwardsSizeNullable = ParsingUtilities.ParseDoubleNullable(text);
+                if (!backwardsSizeNullable.HasValue) return;
+                _backwardsSize = (float)backwardsSizeNullable.Value;
+            };
 
-                _contextMenuStrip = new ContextMenuStrip();
-                _contextMenuStrip.Items.Add(itemUseFixedSize);
-                _contextMenuStrip.Items.Add(itemSetBackwardsSize);
-            }
-
+            var _contextMenuStrip = new ContextMenuStrip();
+            _contextMenuStrip.Items.Add(itemUseFixedSize);
+            _contextMenuStrip.Items.Add(itemSetBackwardsSize);
             return _contextMenuStrip;
         }
 

@@ -55,29 +55,28 @@ namespace STROOP.Tabs.MapTab.MapObjects
             });
         }
         protected override List<Vector3> GetVertices(MapGraphics graphics) => new List<Vector3>();
-        
+
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.ArrowImage;
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
-            if (_contextMenuStrip == null)
+            var _contextMenuStrip = base.GetContextMenuStrip(targetTracker);
+
+            _itemRecommendedArrowLength = new ToolStripMenuItem("Use Recommended Arrow Size");
+            _itemRecommendedArrowLength.Click += (sender, e) => _itemRecommendedArrowLength.Checked = !_itemRecommendedArrowLength.Checked;
+
+            ToolStripMenuItem itemSetArrowHeadSideLength = new ToolStripMenuItem("Set Arrow Head Side Length");
+            itemSetArrowHeadSideLength.Click += (sender, e) =>
             {
-                _itemRecommendedArrowLength = new ToolStripMenuItem("Use Recommended Arrow Size");
-                _itemRecommendedArrowLength.Click += (sender, e) => _itemRecommendedArrowLength.Checked = !_itemRecommendedArrowLength.Checked;
+                string text = DialogUtilities.GetStringFromDialog(labelText: "Enter the side length of the arrow head:");
+                float? arrowHeadSideLength = ParsingUtilities.ParseFloatNullable(text);
+                if (arrowHeadSideLength.HasValue)
+                    _arrowHeadSideLength = arrowHeadSideLength.Value;
+            };
 
-                ToolStripMenuItem itemSetArrowHeadSideLength = new ToolStripMenuItem("Set Arrow Head Side Length");
-                itemSetArrowHeadSideLength.Click += (sender, e) =>
-                {
-                    string text = DialogUtilities.GetStringFromDialog(labelText: "Enter the side length of the arrow head:");
-                    float? arrowHeadSideLength = ParsingUtilities.ParseFloatNullable(text);
-                    if (arrowHeadSideLength.HasValue)
-                        _arrowHeadSideLength = arrowHeadSideLength.Value;
-                };
-
-                _contextMenuStrip = new ContextMenuStrip();
-                _contextMenuStrip.Items.Add(_itemRecommendedArrowLength);
-                _contextMenuStrip.Items.Add(itemSetArrowHeadSideLength);
-            }
+            _contextMenuStrip = new ContextMenuStrip();
+            _contextMenuStrip.Items.Add(_itemRecommendedArrowLength);
+            _contextMenuStrip.Items.Add(itemSetArrowHeadSideLength);
 
             return _contextMenuStrip;
         }

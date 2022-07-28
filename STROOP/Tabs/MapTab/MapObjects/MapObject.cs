@@ -139,8 +139,6 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         public bool ShowTriUnits = false;
 
-        protected ContextMenuStrip _contextMenuStrip = null;
-
         public MapObject() { }
 
         protected MapObject(ObjectCreateParams creationParameters) { this.creationParameters = creationParameters; }
@@ -148,25 +146,25 @@ namespace STROOP.Tabs.MapTab.MapObjects
         public static float Get3DIconScale(MapGraphics graphics, float x, float y, float z) => (0.5f * (float)Math.Tan(1) * (new Vector3(x, y, z) - graphics.view.position).Length) / graphics.glControl.Height;
 
         public void DrawIcon(
-            MapGraphics graphics, 
-            bool sortTransparent, 
-            float x, float y, float z, float angle, 
-            Image image, 
+            MapGraphics graphics,
+            bool sortTransparent,
+            float x, float y, float z, float angle,
+            Image image,
             Vector4 color) =>
             DrawIcon(
-                graphics, 
-                sortTransparent, 
-                x, y, z, graphics.view.mode != MapView.ViewMode.TopDown ? 0x8000 : angle, 
-                Size, 
-                image, 
+                graphics,
+                sortTransparent,
+                x, y, z, graphics.view.mode != MapView.ViewMode.TopDown ? 0x8000 : angle,
+                Size,
+                image,
                 color);
 
         public static void DrawIcon(
-            MapGraphics graphics, 
-            bool sortTransparent, 
-            float x, float y, float z, float angle, 
-            float size, 
-            Image image, 
+            MapGraphics graphics,
+            bool sortTransparent,
+            float x, float y, float z, float angle,
+            float size,
+            Image image,
             Vector4 color)
         {
             if (image == null)
@@ -251,13 +249,10 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected virtual ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
-            if (_contextMenuStrip == null)
-            {
-                _contextMenuStrip = new ContextMenuStrip();
-                enableDragging.Checked = false;
-                enableDragging.Click += (_, __) => enableDragging.Checked = !enableDragging.Checked;
-                _contextMenuStrip.Items.Add(enableDragging);
-            }
+            var _contextMenuStrip = new ContextMenuStrip();
+            enableDragging.Checked = false;
+            enableDragging.Click += (_, __) => enableDragging.Checked = !enableDragging.Checked;
+            _contextMenuStrip.Items.Add(enableDragging);
 
             return _contextMenuStrip;
         }

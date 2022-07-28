@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
+using System.Windows.Forms;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {
@@ -35,6 +36,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
             }
             return quads;
         }
+
+        protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker) => new ContextMenuStrip();
 
         public override string GetName() => $"Current Unit for {PositionAngle.NameOfMultiple(positionAngleProvider())}";
 

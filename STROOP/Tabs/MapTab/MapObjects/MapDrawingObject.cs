@@ -74,20 +74,16 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
-            if (_contextMenuStrip == null)
-            {
-                itemEnableDrawing = new ToolStripMenuItem("Enable Drawing");
-                var capturedMapTab = currentMapTab;
-                itemEnableDrawing.Click += (sender, e) => drawingEnabled = !drawingEnabled;
+            itemEnableDrawing = new ToolStripMenuItem("Enable Drawing");
+            var capturedMapTab = currentMapTab;
+            itemEnableDrawing.Click += (sender, e) => drawingEnabled = !drawingEnabled;
 
-                ToolStripMenuItem itemClearDrawing = new ToolStripMenuItem("Clear Drawing");
-                itemClearDrawing.Click += (sender, e) => ClearDrawing();
+            ToolStripMenuItem itemClearDrawing = new ToolStripMenuItem("Clear Drawing");
+            itemClearDrawing.Click += (sender, e) => ClearDrawing();
 
-                _contextMenuStrip = new ContextMenuStrip();
-                _contextMenuStrip.Items.Add(itemEnableDrawing);
-                _contextMenuStrip.Items.Add(itemClearDrawing);
-            }
-
+            var _contextMenuStrip = new ContextMenuStrip();
+            _contextMenuStrip.Items.Add(itemEnableDrawing);
+            _contextMenuStrip.Items.Add(itemClearDrawing);
             return _contextMenuStrip;
         }
 

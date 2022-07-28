@@ -32,49 +32,45 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
-            if (_contextMenuStrip == null)
+            itemAutoUpdate = new ToolStripMenuItem("Auto Update");
+            itemAutoUpdate.Click += (sender, e) => itemAutoUpdate.Checked = !itemAutoUpdate.Checked;
+            itemAutoUpdate.Checked = true;
+
+            ToolStripMenuItem itemReset = new ToolStripMenuItem("Reset");
+            itemReset.Click += (sender, e) => ResetTriangles();
+
+            ToolStripMenuItem itemRemoveCurrentTri = new ToolStripMenuItem("Remove Current Tri");
+            itemRemoveCurrentTri.Click += (sender, e) =>
             {
-                itemAutoUpdate = new ToolStripMenuItem("Auto Update");
-                itemAutoUpdate.Click += (sender, e) => itemAutoUpdate.Checked = !itemAutoUpdate.Checked;
-                itemAutoUpdate.Checked = true;
+                _removeCurrentTri = !_removeCurrentTri;
+                itemRemoveCurrentTri.Checked = _removeCurrentTri;
+            };
 
-                ToolStripMenuItem itemReset = new ToolStripMenuItem("Reset");
-                itemReset.Click += (sender, e) => ResetTriangles();
+            ToolStripMenuItem itemShowTriData = new ToolStripMenuItem("Show Tri Data");
+            itemShowTriData.Click += (sender, e) =>
+            {
+                TriangleUtilities.ShowTriangles(_bufferedTris);
+            };
 
-                ToolStripMenuItem itemRemoveCurrentTri = new ToolStripMenuItem("Remove Current Tri");
-                itemRemoveCurrentTri.Click += (sender, e) =>
-                {
-                    _removeCurrentTri = !_removeCurrentTri;
-                    itemRemoveCurrentTri.Checked = _removeCurrentTri;
-                };
+            ToolStripMenuItem itemOpenForm = new ToolStripMenuItem("Open Form");
+            itemOpenForm.Click += (sender, e) =>
+            {
+                if (_triangleListForm != null) return;
+                _triangleListForm = new TriangleListForm(
+                    this, TriangleClassification.Ceiling, _bufferedTris.ConvertAll(_ => _.Address));
+                _triangleListForm.Show();
+            };
 
-                ToolStripMenuItem itemShowTriData = new ToolStripMenuItem("Show Tri Data");
-                itemShowTriData.Click += (sender, e) =>
-                {
-                    TriangleUtilities.ShowTriangles(_bufferedTris);
-                };
-
-                ToolStripMenuItem itemOpenForm = new ToolStripMenuItem("Open Form");
-                itemOpenForm.Click += (sender, e) =>
-                {
-                    if (_triangleListForm != null) return;
-                    _triangleListForm = new TriangleListForm(
-                        this, TriangleClassification.Ceiling, _bufferedTris.ConvertAll(_ => _.Address));
-                    _triangleListForm.Show();
-                };
-
-                _contextMenuStrip = new ContextMenuStrip();
-                _contextMenuStrip.Items.Add(itemAutoUpdate);
-                _contextMenuStrip.Items.Add(itemReset);
-                _contextMenuStrip.Items.Add(itemRemoveCurrentTri);
-                _contextMenuStrip.Items.Add(itemShowTriData);
-                _contextMenuStrip.Items.Add(itemOpenForm);
-                _contextMenuStrip.Items.Add(new ToolStripSeparator());
-                GetHorizontalTriangleToolStripMenuItems(targetTracker).ForEach(item => _contextMenuStrip.Items.Add(item));
-                _contextMenuStrip.Items.Add(new ToolStripSeparator());
-                GetTriangleToolStripMenuItems().ForEach(item => _contextMenuStrip.Items.Add(item));
-            }
-
+            var _contextMenuStrip = new ContextMenuStrip();
+            _contextMenuStrip.Items.Add(itemAutoUpdate);
+            _contextMenuStrip.Items.Add(itemReset);
+            _contextMenuStrip.Items.Add(itemRemoveCurrentTri);
+            _contextMenuStrip.Items.Add(itemShowTriData);
+            _contextMenuStrip.Items.Add(itemOpenForm);
+            _contextMenuStrip.Items.Add(new ToolStripSeparator());
+            GetHorizontalTriangleToolStripMenuItems(targetTracker).ForEach(item => _contextMenuStrip.Items.Add(item));
+            _contextMenuStrip.Items.Add(new ToolStripSeparator());
+            GetTriangleToolStripMenuItems().ForEach(item => _contextMenuStrip.Items.Add(item));
             return _contextMenuStrip;
         }
 

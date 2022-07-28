@@ -51,24 +51,21 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
-            if (_contextMenuStrip == null)
+            _itemUseRelativeAngles = new ToolStripMenuItem("Use Relative Angles");
+            _itemUseRelativeAngles.Click += (sender, e) => _itemUseRelativeAngles.Checked = !_itemUseRelativeAngles.Checked;
+
+            ToolStripMenuItem itemSetAngleDiff = new ToolStripMenuItem("Set Angle Diff");
+            itemSetAngleDiff.Click += (sender, e) =>
             {
-                _itemUseRelativeAngles = new ToolStripMenuItem("Use Relative Angles");
-                _itemUseRelativeAngles.Click += (sender, e) => _itemUseRelativeAngles.Checked = !_itemUseRelativeAngles.Checked;
+                string text = DialogUtilities.GetStringFromDialog(labelText: "Enter angle diff.");
+                int? angleDiff = ParsingUtilities.ParseIntNullable(text);
+                if (angleDiff.HasValue && angleDiff.Value > 0)
+                    _angleDiff = angleDiff.Value;
+            };
 
-                ToolStripMenuItem itemSetAngleDiff = new ToolStripMenuItem("Set Angle Diff");
-                itemSetAngleDiff.Click += (sender, e) =>
-                {
-                    string text = DialogUtilities.GetStringFromDialog(labelText: "Enter angle diff.");
-                    int? angleDiff = ParsingUtilities.ParseIntNullable(text);
-                    if (angleDiff.HasValue && angleDiff.Value > 0)
-                        _angleDiff = angleDiff.Value;
-                };
-
-                _contextMenuStrip = new ContextMenuStrip();
-                _contextMenuStrip.Items.Add(_itemUseRelativeAngles);
-                _contextMenuStrip.Items.Add(itemSetAngleDiff);
-            }
+            var _contextMenuStrip = new ContextMenuStrip();
+            _contextMenuStrip.Items.Add(_itemUseRelativeAngles);
+            _contextMenuStrip.Items.Add(itemSetAngleDiff);
 
             return _contextMenuStrip;
         }

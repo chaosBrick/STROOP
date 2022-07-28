@@ -24,7 +24,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
-            base.GetContextMenuStrip(targetTracker);
+            var _contextMenuStrip = base.GetContextMenuStrip(targetTracker);
             predictionProvider.AddContextMenuItems(_contextMenuStrip.Items);
             return _contextMenuStrip;
         }
@@ -49,7 +49,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
-            base.GetContextMenuStrip(targetTracker);
+            var _contextMenuStrip = base.GetContextMenuStrip(targetTracker);
             predictionProvider.AddContextMenuItems(_contextMenuStrip.Items);
             return _contextMenuStrip;
         }
@@ -78,7 +78,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
-            base.GetContextMenuStrip(targetTracker);
+            var _contextMenuStrip = base.GetContextMenuStrip(targetTracker);
             predictionProvider.AddContextMenuItems(_contextMenuStrip.Items);
             return _contextMenuStrip;
         }

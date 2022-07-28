@@ -69,20 +69,17 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
-            if (_contextMenuStrip == null)
+            ToolStripMenuItem itemSetAngleRadius = new ToolStripMenuItem("Set Angle Radius");
+            itemSetAngleRadius.Click += (sender, e) =>
             {
-                ToolStripMenuItem itemSetAngleRadius = new ToolStripMenuItem("Set Angle Radius");
-                itemSetAngleRadius.Click += (sender, e) =>
-                {
-                    string text = DialogUtilities.GetStringFromDialog(labelText: "Enter the angle radius for sector:");
-                    float? angleRadius = ParsingUtilities.ParseFloatNullable(text);
-                    if (angleRadius.HasValue)
-                        _angleRadius = angleRadius.Value;
-                };
+                string text = DialogUtilities.GetStringFromDialog(labelText: "Enter the angle radius for sector:");
+                float? angleRadius = ParsingUtilities.ParseFloatNullable(text);
+                if (angleRadius.HasValue)
+                    _angleRadius = angleRadius.Value;
+            };
 
-                _contextMenuStrip = new ContextMenuStrip();
-                _contextMenuStrip.Items.Add(itemSetAngleRadius);
-            }
+            var _contextMenuStrip = new ContextMenuStrip();
+            _contextMenuStrip.Items.Add(itemSetAngleRadius);
 
             return _contextMenuStrip;
         }

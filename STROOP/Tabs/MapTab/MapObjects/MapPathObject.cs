@@ -161,37 +161,34 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
-            if (_contextMenuStrip == null)
+            ToolStripMenuItem itemResetPath = new ToolStripMenuItem("Reset Path");
+            itemResetPath.Click += (sender, e) => _dictionary.Clear();
+
+            _itemResetPathOnLevelChange = new ToolStripMenuItem("Reset Path on Level Change");
+            _itemResetPathOnLevelChange.Click += (sender, e) => _itemResetPathOnLevelChange.Checked = !_itemResetPathOnLevelChange.Checked;
+
+            _itemUseBlending = new ToolStripMenuItem("Use Blending");
+            _itemUseBlending.Click += (sender, e) => _itemUseBlending.Checked = !_itemUseBlending.Checked;
+            _itemUseBlending.Checked = true;
+
+            _itemPause = new ToolStripMenuItem("Pause");
+            _itemPause.Click += (sender, e) => _itemPause.Checked = !_itemPause.Checked;
+
+            ToolStripMenuItem itemSetModulo = new ToolStripMenuItem("Set Modulo");
+            itemSetModulo.Click += (sender, e) =>
             {
-                ToolStripMenuItem itemResetPath = new ToolStripMenuItem("Reset Path");
-                itemResetPath.Click += (sender, e) => _dictionary.Clear();
+                string text = DialogUtilities.GetStringFromDialog(labelText: "Enter modulo.");
+                int? moduloNullable = ParsingUtilities.ParseIntNullable(text);
+                if (moduloNullable.HasValue && moduloNullable.Value > 0)
+                    _modulo = moduloNullable.Value;
+            };
 
-                _itemResetPathOnLevelChange = new ToolStripMenuItem("Reset Path on Level Change");
-                _itemResetPathOnLevelChange.Click += (sender, e) => _itemResetPathOnLevelChange.Checked = !_itemResetPathOnLevelChange.Checked;
-
-                _itemUseBlending = new ToolStripMenuItem("Use Blending");
-                _itemUseBlending.Click += (sender, e) => _itemUseBlending.Checked = !_itemUseBlending.Checked;
-                _itemUseBlending.Checked = true;
-
-                _itemPause = new ToolStripMenuItem("Pause");
-                _itemPause.Click += (sender, e) => _itemPause.Checked = !_itemPause.Checked;
-
-                ToolStripMenuItem itemSetModulo = new ToolStripMenuItem("Set Modulo");
-                itemSetModulo.Click += (sender, e) =>
-                {
-                    string text = DialogUtilities.GetStringFromDialog(labelText: "Enter modulo.");
-                    int? moduloNullable = ParsingUtilities.ParseIntNullable(text);
-                    if (moduloNullable.HasValue && moduloNullable.Value > 0)
-                        _modulo = moduloNullable.Value;
-                };
-
-                _contextMenuStrip = new ContextMenuStrip();
-                _contextMenuStrip.Items.Add(itemResetPath);
-                _contextMenuStrip.Items.Add(_itemResetPathOnLevelChange);
-                _contextMenuStrip.Items.Add(_itemUseBlending);
-                _contextMenuStrip.Items.Add(_itemPause);
-                _contextMenuStrip.Items.Add(itemSetModulo);
-            }
+            var _contextMenuStrip = new ContextMenuStrip();
+            _contextMenuStrip.Items.Add(itemResetPath);
+            _contextMenuStrip.Items.Add(_itemResetPathOnLevelChange);
+            _contextMenuStrip.Items.Add(_itemUseBlending);
+            _contextMenuStrip.Items.Add(_itemPause);
+            _contextMenuStrip.Items.Add(itemSetModulo);
 
             return _contextMenuStrip;
         }

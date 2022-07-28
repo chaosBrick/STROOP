@@ -32,10 +32,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             });
         }
 
-        protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
-        {
-            return _contextMenuStrip = new ContextMenuStrip();
-        }
+        protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker) => new ContextMenuStrip();
 
         protected override void DrawOrthogonal(MapGraphics graphics) => DrawTopDown(graphics);
 

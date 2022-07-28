@@ -223,7 +223,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
-            base.GetContextMenuStrip(targetTracker);
+            var _contextMenuStrip = base.GetContextMenuStrip(targetTracker);
 
             var itemAddKeyframe = new ToolStripMenuItem("Add Keyframe");
             itemAddKeyframe.Click += (_, __) =>

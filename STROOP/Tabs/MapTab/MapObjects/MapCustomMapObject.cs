@@ -31,27 +31,23 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
-            if (_contextMenuStrip == null)
+            List<MapLayout> mapLayouts = MapTab.MapAssociations.GetAllMaps();
+            List<object> mapLayoutChoices = new List<object>() { "Recommended" };
+            mapLayouts.ForEach(mapLayout => mapLayoutChoices.Add(mapLayout));
+
+            ToolStripMenuItem itemSelectMap = new ToolStripMenuItem("Select Map");
+            itemSelectMap.Click += (sender, e) =>
             {
-                List<MapLayout> mapLayouts = MapTab.MapAssociations.GetAllMaps();
-                List<object> mapLayoutChoices = new List<object>() { "Recommended" };
-                mapLayouts.ForEach(mapLayout => mapLayoutChoices.Add(mapLayout));
-
-                ToolStripMenuItem itemSelectMap = new ToolStripMenuItem("Select Map");
-                itemSelectMap.Click += (sender, e) =>
-                {
-                    SelectionForm form = new SelectionForm();
-                    form.Initialize(
-                        "Select a Map",
-                        "Set Map",
-                        mapLayoutChoices,
-                        mapLayoutChoice => _mapLayoutChoice = mapLayoutChoice);
-                    form.Show();
-                };
-                _contextMenuStrip = new ContextMenuStrip();
-                _contextMenuStrip.Items.Add(itemSelectMap);
-            }
-
+                SelectionForm form = new SelectionForm();
+                form.Initialize(
+                    "Select a Map",
+                    "Set Map",
+                    mapLayoutChoices,
+                    mapLayoutChoice => _mapLayoutChoice = mapLayoutChoice);
+                form.Show();
+            };
+            var _contextMenuStrip = new ContextMenuStrip();
+            _contextMenuStrip.Items.Add(itemSelectMap);
             return _contextMenuStrip;
         }
     }

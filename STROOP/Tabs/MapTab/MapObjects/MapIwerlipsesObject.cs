@@ -26,7 +26,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
-            _contextMenuStrip = base.GetContextMenuStrip(targetTracker);
+            var _contextMenuStrip = base.GetContextMenuStrip(targetTracker);
 
             itemLockPositions = new ToolStripMenuItem("Lock positions");
             itemLockPositions.Click += (_, __) => itemLockPositions.Checked = !itemLockPositions.Checked;

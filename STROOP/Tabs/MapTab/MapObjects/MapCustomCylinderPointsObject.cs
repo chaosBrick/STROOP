@@ -45,30 +45,29 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
-            if (_contextMenuStrip == null)
+            var _contextMenuStrip = base.GetContextMenuStrip(targetTracker);
+
+            ToolStripMenuItem itemSetRelativeMinY = new ToolStripMenuItem("Set Relative Min Y...");
+            itemSetRelativeMinY.Click += (sender, e) =>
             {
-                ToolStripMenuItem itemSetRelativeMinY = new ToolStripMenuItem("Set Relative Min Y...");
-                itemSetRelativeMinY.Click += (sender, e) =>
-                {
-                    string text = DialogUtilities.GetStringFromDialog(labelText: "Enter a number.");
-                    float? relativeMinY = ParsingUtilities.ParseFloatNullable(text);
-                    if (relativeMinY.HasValue)
-                        _relativeMinY = relativeMinY.Value;
-                };
+                string text = DialogUtilities.GetStringFromDialog(labelText: "Enter a number.");
+                float? relativeMinY = ParsingUtilities.ParseFloatNullable(text);
+                if (relativeMinY.HasValue)
+                    _relativeMinY = relativeMinY.Value;
+            };
 
-                ToolStripMenuItem itemSetRelativeMaxY = new ToolStripMenuItem("Set Relative Max Y...");
-                itemSetRelativeMaxY.Click += (sender, e) =>
-                {
-                    string text = DialogUtilities.GetStringFromDialog(labelText: "Enter a number.");
-                    float? relativeMaxY = ParsingUtilities.ParseFloatNullable(text);
-                    if (relativeMaxY.HasValue)
-                        _relativeMaxY = relativeMaxY.Value;
-                };
+            ToolStripMenuItem itemSetRelativeMaxY = new ToolStripMenuItem("Set Relative Max Y...");
+            itemSetRelativeMaxY.Click += (sender, e) =>
+            {
+                string text = DialogUtilities.GetStringFromDialog(labelText: "Enter a number.");
+                float? relativeMaxY = ParsingUtilities.ParseFloatNullable(text);
+                if (relativeMaxY.HasValue)
+                    _relativeMaxY = relativeMaxY.Value;
+            };
 
-                _contextMenuStrip = new ContextMenuStrip();
-                _contextMenuStrip.Items.Add(itemSetRelativeMinY);
-                _contextMenuStrip.Items.Add(itemSetRelativeMaxY);
-            }
+            _contextMenuStrip = new ContextMenuStrip();
+            _contextMenuStrip.Items.Add(itemSetRelativeMinY);
+            _contextMenuStrip.Items.Add(itemSetRelativeMaxY);
 
             return _contextMenuStrip;
         }

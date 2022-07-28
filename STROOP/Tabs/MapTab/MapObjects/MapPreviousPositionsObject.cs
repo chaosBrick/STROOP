@@ -56,10 +56,10 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 var data = GetData();
                 foreach (var dataPoint in data)
                     DrawIcon(
-                        graphics, 
-                        graphics.view.mode == MapView.ViewMode.ThreeDimensional, 
-                        dataPoint.x, dataPoint.y, dataPoint.z, dataPoint.angle, 
-                        dataPoint.tex.Value, 
+                        graphics,
+                        graphics.view.mode == MapView.ViewMode.ThreeDimensional,
+                        dataPoint.x, dataPoint.y, dataPoint.z, dataPoint.angle,
+                        dataPoint.tex.Value,
                         new Vector4(1));
 
                 if (OutlineWidth != 0)
@@ -112,7 +112,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
             var val = Config.Stream.GetInt32(RomVersionConfig.Version == RomVersion.US ? 0x80372E3C : 0x80400000);
             int numQFrames = (val - 0x10 * numBaseFrames) / 0x40;
-            
+
             List<DataPoint> allResults = new List<DataPoint>();
             for (int i = 0; i < numBaseFrames; i++)
                 allResults.Add(new DataPoint(qsData[i].qsX, qsData[i].qsY, qsData[i].qsZ, qsData[i].qsA, marioImages[i]));
@@ -158,28 +158,26 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
-            if (_contextMenuStrip == null)
+            var _contextMenuStrip = base.GetContextMenuStrip(targetTracker);
+            ToolStripMenuItem itemShowEachPoint = new ToolStripMenuItem("Show Each Point");
+            itemShowEachPoint.Click += (sender, e) =>
             {
-                ToolStripMenuItem itemShowEachPoint = new ToolStripMenuItem("Show Each Point");
-                itemShowEachPoint.Click += (sender, e) =>
-                {
-                    _showEachPointStartTime = DateTime.Now;
-                };
+                _showEachPointStartTime = DateTime.Now;
+            };
 
-                ToolStripMenuItem itemSetNumFrames = new ToolStripMenuItem("Set Number of Frames");
-                itemSetNumFrames.Click += (sender, e) =>
-                {
-                    string text = DialogUtilities.GetStringFromDialog(labelText: "Enter num frames.");
-                    uint? numFramesNullable = ParsingUtilities.ParseUIntNullable(text);
-                    if (!numFramesNullable.HasValue) return;
-                    numFramesToShow = numFramesNullable.Value;
+            ToolStripMenuItem itemSetNumFrames = new ToolStripMenuItem("Set Number of Frames");
+            itemSetNumFrames.Click += (sender, e) =>
+            {
+                string text = DialogUtilities.GetStringFromDialog(labelText: "Enter num frames.");
+                uint? numFramesNullable = ParsingUtilities.ParseUIntNullable(text);
+                if (!numFramesNullable.HasValue) return;
+                numFramesToShow = numFramesNullable.Value;
 
-                };
+            };
 
-                _contextMenuStrip = new ContextMenuStrip();
-                _contextMenuStrip.Items.Add(itemShowEachPoint);
-                _contextMenuStrip.Items.Add(itemSetNumFrames);
-            }
+            _contextMenuStrip = new ContextMenuStrip();
+            _contextMenuStrip.Items.Add(itemShowEachPoint);
+            _contextMenuStrip.Items.Add(itemSetNumFrames);
 
             return _contextMenuStrip;
         }
