@@ -142,6 +142,10 @@ namespace STROOP.Tabs.MapTab
                 colorSelectorOutline.AddColorChangeAction((Color color) => SetOutlineColor(color));
 
                 pictureBoxCog.ContextMenuStrip = this.mapObject.BindToTracker(this);
+                if (pictureBoxCog.ContextMenuStrip.Items.Count == 0)
+                    pictureBoxCog.ContextMenuStrip.Items.Add(
+                        new ToolStripMenuItem("No options available") { Enabled = false }
+                        );
                 pictureBoxCog.Click += (sender, e) => pictureBoxCog.ContextMenuStrip.Show(Cursor.Position);
 
                 MapUtilities.CreateTrackBarContextMenuStrip(trackBarSize);
