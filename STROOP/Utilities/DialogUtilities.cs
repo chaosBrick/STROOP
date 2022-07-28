@@ -170,6 +170,7 @@ namespace STROOP.Utilities
             Parser<T> parser = null) where T : IConvertible
         {
             var str = GetStringFromDialog(textboxText, labelText, buttonText);
+            if (str == null) return;
             if (parser != null)
             {
                 if (parser(str, out T result))
