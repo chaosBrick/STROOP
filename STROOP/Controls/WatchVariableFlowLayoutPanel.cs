@@ -15,34 +15,59 @@ namespace STROOP.Controls
 {
     public partial class WatchVariablePanel : Panel
     {
-        static float variablePanelSize = 8.5f;
-        static int variablePanelNameWidth = 120;
-        static int variablePanelValueWidth = 80;
-
         public delegate void CustomDraw(Graphics g, Rectangle rect);
 
         [InitializeSpecial]
         static void InitializeSpecial()
         {
             var target = WatchVariableSpecialUtilities.dictionary;
-            target.Add("WatchVarPanelSize", ((uint _) => variablePanelSize, (object value, uint __) =>
+            target.Add("WatchVarPanelNameWidth", ((uint _) => SavedSettingsConfig.WatchVarPanelNameWidth, (object value, uint __) =>
             {
-                variablePanelSize = Convert.ToSingle(value);
+                SavedSettingsConfig.WatchVarPanelNameWidth = Math.Max(1, (int)Convert.ToSingle(value));
                 return true;
             }
             ));
-            target.Add("WatchVarPanelNameWidth", ((uint _) => variablePanelNameWidth, (object value, uint __) =>
+            target.Add("WatchVarPanelValueWidth", ((uint _) => SavedSettingsConfig.WatchVarPanelValueWidth, (object value, uint __) =>
             {
-                variablePanelNameWidth = Math.Max(1, (int)Convert.ToSingle(value));
+                SavedSettingsConfig.WatchVarPanelValueWidth = Math.Max(1, (int)Convert.ToSingle(value));
                 return true;
             }
             ));
-            target.Add("WatchVarPanelValueWidth", ((uint _) => variablePanelValueWidth, (object value, uint __) =>
+            target.Add("WatchVarPanelXMargin", ((uint _) => SavedSettingsConfig.WatchVarPanelHorizontalMargin, (object value, uint __) =>
             {
-                variablePanelValueWidth = Math.Max(1, (int)Convert.ToSingle(value));
+                SavedSettingsConfig.WatchVarPanelHorizontalMargin = (uint)Math.Max(1, (int)Convert.ToSingle(value));
                 return true;
             }
             ));
+            target.Add("WatchVarPanelYMargin", ((uint _) => SavedSettingsConfig.WatchVarPanelVerticalMargin, (object value, uint __) =>
+            {
+                SavedSettingsConfig.WatchVarPanelVerticalMargin = (uint)Math.Max(1, (int)Convert.ToSingle(value));
+                return true;
+            }
+            ));
+            target.Add("WatchVarPanelBoldNames", ((uint _) => SavedSettingsConfig.WatchVarPanelBoldNames ? 1 : 0, (object value, uint __) =>
+            {
+                SavedSettingsConfig.WatchVarPanelBoldNames = Convert.ToDouble(value) != 0;
+                return true;
+            }
+            ));
+            target.Add("WatchVarPanelFont", ((uint _) => SavedSettingsConfig.WatchVarPanelFontOverride?.Name ?? "(default)", (object value, uint __) => false));
+            WatchVariableStringWrapper.specialTypeContextMenuHandlers.Add("WatchVarPanelFont", () =>
+            {
+                var dlg = new FontDialog();
+                if (SavedSettingsConfig.WatchVarPanelFontOverride != null)
+                    dlg.Font = SavedSettingsConfig.WatchVarPanelFontOverride;
+                try
+                {
+                    if (dlg.ShowDialog() == DialogResult.OK)
+                        SavedSettingsConfig.WatchVarPanelFontOverride = dlg.Font;
+                }
+                catch (ArgumentException ex)
+                {
+                    // Apparently ACCEPTING a FontDialog can throw if the selected Font is not a TrueType-Font.
+                    MessageBox.Show($"This font is not supported.\nHere's a scary error report:\n\n{ex.Message}");
+                }
+            });
         }
 
         public readonly Func<List<WatchVariableControl>> GetSelectedVars;
@@ -75,22 +100,6 @@ namespace STROOP.Controls
         ToolStripMenuItem filterVariablesItem = new ToolStripMenuItem("Filter Variables...");
 
         WatchVariablePanelRenderer renderer;
-        bool fontCreated = false;
-
-        public float FontSize
-        {
-            get { return renderer.Font.Size; }
-            set
-            {
-                if (!fontCreated || value != renderer.Font.Size)
-                {
-                    if (fontCreated)
-                        renderer.Font.Dispose();
-                    fontCreated = true;
-                    renderer.Font = new Font(renderer.Font.FontFamily, value, renderer.Font.Style);
-                }
-            }
-        }
 
         public new event System.Windows.Forms.MouseEventHandler MouseDown
         {
@@ -824,7 +833,11 @@ namespace STROOP.Controls
 
         public void UpdatePanel()
         {
-            FontSize = variablePanelSize;
+            if (SavedSettingsConfig.WatchVarPanelFontOverride != null)
+                Font = SavedSettingsConfig.WatchVarPanelFontOverride;
+            else if (Font != SystemFonts.DefaultFont)
+                Font = SystemFonts.DefaultFont;
+
             var searchForm = (FindForm() as StroopMainForm)?.searchVariableDialog ?? null;
             _hiddenSearchResults.Clear();
             var shownVars = new HashSet<WatchVariableControl>(_shownWatchVarControls);

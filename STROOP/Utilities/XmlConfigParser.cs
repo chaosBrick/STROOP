@@ -23,6 +23,9 @@ namespace STROOP.Utilities
     {
         public class ResourceXmlResolver : XmlResolver
         {
+            //I am finding that this is absolutely not used for what it's meant for.
+            //Considering deleting it, along with its nonsensical uses.
+
             /// <summary>
             /// When overridden in a derived class, maps a URI to an object containing the actual resource.
             /// </summary>
@@ -106,97 +109,6 @@ namespace STROOP.Utilities
 
             return doc;
         }
-
-        public static void OpenSavedSettings(string path)
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-
-            // Create schema set
-            var schemaSet = new XmlSchemaSet() { XmlResolver = new ResourceXmlResolver() };
-            schemaSet.Add("http://tempuri.org/ReusableTypes.xsd", "ReusableTypes.xsd");
-            schemaSet.Add("http://tempuri.org/ConfigSchema.xsd", "ConfigSchema.xsd");
-            schemaSet.Compile();
-
-            // Load and validate document
-            var doc = XDocument.Load(path);
-            doc.Validate(schemaSet, Validation);
-
-            foreach (var element in doc.Root.Elements())
-            {
-                switch (element.Name.ToString())
-                {
-                    case "DisplayYawAnglesAsUnsigned":
-                        SavedSettingsConfig.DisplayYawAnglesAsUnsigned = bool.Parse(element.Value);
-                        break;
-                    case "VariableValuesFlushRight":
-                        SavedSettingsConfig.VariableValuesFlushRight = bool.Parse(element.Value);
-                        break;
-                    case "StartSlotIndexsFromOne":
-                        SavedSettingsConfig.StartSlotIndexsFromOne = bool.Parse(element.Value);
-                        break;
-                    case "OffsetGotoRetrieveFunctions":
-                        SavedSettingsConfig.OffsetGotoRetrieveFunctions = bool.Parse(element.Value);
-                        break;
-                    case "MoveCameraWithPu":
-                        SavedSettingsConfig.MoveCameraWithPu = bool.Parse(element.Value);
-                        break;
-                    case "ScaleDiagonalPositionControllerButtons":
-                        SavedSettingsConfig.ScaleDiagonalPositionControllerButtons = bool.Parse(element.Value);
-                        break;
-                    case "ExcludeDustForClosestObject":
-                        SavedSettingsConfig.ExcludeDustForClosestObject = bool.Parse(element.Value);
-                        break;
-                    case "UseMisalignmentOffsetForDistanceToLine":
-                        SavedSettingsConfig.UseMisalignmentOffsetForDistanceToLine = bool.Parse(element.Value);
-                        break;
-                    case "DontRoundValuesToZero":
-                        SavedSettingsConfig.DontRoundValuesToZero = bool.Parse(element.Value);
-                        break;
-                    case "DisplayAsHexUsesMemory":
-                        SavedSettingsConfig.DisplayAsHexUsesMemory = bool.Parse(element.Value);
-                        break;
-                    case "NeutralizeTrianglesWith0x15":
-                        SavedSettingsConfig.NeutralizeTrianglesWith0x15 = bool.Parse(element.Value);
-                        break;
-                    case "CloningUpdatesHolpType":
-                        SavedSettingsConfig.CloningUpdatesHolpType = bool.Parse(element.Value);
-                        break;
-                    case "UseInGameTrigForAngleLogic":
-                        SavedSettingsConfig.UseInGameTrigForAngleLogic = bool.Parse(element.Value);
-                        break;
-                    case "UseExtendedLevelBoundaries":
-                        SavedSettingsConfig.UseExtendedLevelBoundaries = bool.Parse(element.Value);
-                        break;
-                    case "UseExpandedRamSize":
-                        SavedSettingsConfig.UseExpandedRamSize = bool.Parse(element.Value);
-                        break;
-
-                    case "TabOrder":
-                        {
-                            List<string> tabNames = new List<string>();
-                            foreach (var tabName in element.Elements())
-                            {
-                                tabNames.Add(tabName.Value);
-                            }
-                            SavedSettingsConfig.InitiallySavedTabOrder = tabNames;
-                        }
-                        break;
-
-                    case "RemovedTabs":
-                        {
-                            List<string> tabNames = new List<string>();
-                            foreach (var tabName in element.Elements())
-                            {
-                                tabNames.Add(tabName.Value);
-                            }
-                            SavedSettingsConfig.InitiallySavedRemovedTabs = tabNames;
-                        }
-                        break;
-                }
-            }
-            SavedSettingsConfig.IsLoaded = true;
-        }
-
         public static List<WatchVariable> OpenWatchVariables(string path) => OpenWatchVariableControlPrecursors(path);
 
         public static List<WatchVariable> OpenWatchVariableControlPrecursors(string path)

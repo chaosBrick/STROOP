@@ -51,7 +51,7 @@ namespace STROOP
                 () =>
                 {
                     config = XmlConfigParser.OpenConfig(@"Config/Config.xml");
-                    XmlConfigParser.OpenSavedSettings(@"Config/SavedSettings.xml");
+                    SavedSettingsConfig.Load(@"Config/SavedSettings.xml");
                 }
             ),
                 ("Loading Object Associations",

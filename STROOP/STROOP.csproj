@@ -887,6 +887,7 @@
     <Compile Include="Utilities\EndiannessUtilities.cs" />
     <Compile Include="Utilities\EndianUtilities.cs" />
     <Compile Include="Utilities\CogUtilities.cs" />
+    <Compile Include="Utilities\Serialization.cs" />
     <Compile Include="Utilities\Stream\DolphinProcessIO.cs" />
     <Compile Include="Utilities\Stream\BaseProcessIO.cs" />
     <Compile Include="Utilities\Stream\SigScanSharp.cs" />

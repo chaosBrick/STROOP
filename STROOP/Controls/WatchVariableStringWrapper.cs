@@ -7,9 +7,10 @@ namespace STROOP.Controls
 {
     public class WatchVariableStringWrapper : WatchVariableWrapper
     {
-        public static Dictionary<string, EventHandler> specialTypeContextMenuHandlers = new Dictionary<string, EventHandler>();
+        public static Dictionary<string, Action> specialTypeContextMenuHandlers = new Dictionary<string, Action>();
 
         protected CarretlessTextBox textBox = null;
+        Action editValueHandler;
 
         protected WatchVariableStringWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl, int ignore)
             : base(watchVar, watchVarControl) { }
@@ -29,11 +30,8 @@ namespace STROOP.Controls
             ToolStripMenuItem itemSelectValue = new ToolStripMenuItem("Select Value...");
             bool addedClickAction = true;
 
-            EventHandler handler;
-            if (specialTypeContextMenuHandlers.TryGetValue(specialType, out handler))
-            {
-                itemSelectValue.Click += handler;
-            }
+            if (specialTypeContextMenuHandlers.TryGetValue(specialType, out var handler))
+                editValueHandler = handler;
             else
             {
                 switch (specialType)
@@ -82,38 +80,43 @@ namespace STROOP.Controls
         public override void Edit(Control parent, System.Drawing.Rectangle bounds)
         {
             base.Edit(parent, bounds);
-            textBox = new CarretlessTextBox();
-            textBox.Bounds = bounds;
-            textBox.Text = GetValueText();
-
-            bool updateValue = true;
-            textBox.Multiline = false;
-            textBox.KeyDown += (_, e) =>
+            if (editValueHandler != null)
+                editValueHandler();
+            else
             {
-                updateValue = true;
-                if (e.KeyCode == Keys.Enter)
-                    textBox.Parent.Focus();
-                else if (e.KeyCode == Keys.Escape)
+                textBox = new CarretlessTextBox();
+                textBox.Bounds = bounds;
+                textBox.Text = GetValueText();
+
+                bool updateValue = true;
+                textBox.Multiline = false;
+                textBox.KeyDown += (_, e) =>
                 {
-                    updateValue = false;
-                    textBox.Parent.Focus();
-                }
-            };
-            EventHandler asf = null;
-            asf = (_, e) =>
-            {
-                if (updateValue)
-                    SetValue(textBox.Text);
-                textBox.Parent.LostFocus -= asf;
-                textBox.Parent.Controls.Remove(textBox);
-                textBox.Dispose();
-            };
+                    updateValue = true;
+                    if (e.KeyCode == Keys.Enter)
+                        textBox.Parent.Focus();
+                    else if (e.KeyCode == Keys.Escape)
+                    {
+                        updateValue = false;
+                        textBox.Parent.Focus();
+                    }
+                };
+                EventHandler asf = null;
+                asf = (_, e) =>
+                {
+                    if (updateValue)
+                        SetValue(textBox.Text);
+                    textBox.Parent.LostFocus -= asf;
+                    textBox.Parent.Controls.Remove(textBox);
+                    textBox.Dispose();
+                };
 
-            textBox.LostFocus += asf;
+                textBox.LostFocus += asf;
 
-            parent.Controls.Add(textBox);
-            textBox.Parent.LostFocus += asf;
-            textBox.Focus();
+                parent.Controls.Add(textBox);
+                textBox.Parent.LostFocus += asf;
+                textBox.Focus();
+            }
         }
 
         protected override string GetClass()

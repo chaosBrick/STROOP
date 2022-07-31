@@ -112,30 +112,30 @@ namespace STROOP.Controls
 
             BufferedGraphics bufferedGraphics = null;
 
-            OnDemand<Font> varNameFont;
+            OnDemand<Font> boldFont;
             OnDemand<Pen> cellBorderPen, cellSeparatorPen, insertionMarkerPen;
             OnDemand<StringFormat> rightAlignFormat;
 
             WatchVariablePanel target;
 
             int borderMargin = 2;
-            int elementMarginTopBottom = 2;
-            int elementMarginLeftRight = 2;
+            static int elementMarginTopBottom => (int)SavedSettingsConfig.WatchVarPanelHorizontalMargin;
+            static int elementMarginLeftRight => (int)SavedSettingsConfig.WatchVarPanelVerticalMargin;
             int elementHeight => Font.Height + 2 * elementMarginTopBottom;
 
-            int elementNameWidth => variablePanelNameWidth;
-            int elementValueWidth => variablePanelValueWidth;
+            int elementNameWidth => SavedSettingsConfig.WatchVarPanelNameWidth;
+            int elementValueWidth => SavedSettingsConfig.WatchVarPanelValueWidth;
             int elementWidth => elementNameWidth + elementValueWidth;
 
             public int GetMaxRows()
             {
                 var effectiveHeight = target.Height - borderMargin * 2;
-                var dsjakl = target.GetCurrentVariableControls().Count;
+                var totalVariableCount = target.GetCurrentVariableControls().Count;
                 var knolz = effectiveHeight / elementHeight;
-                var numColumnsWithoutScrollbar =  dsjakl / knolz;
-                if (dsjakl % knolz > 0)
+                var numColumnsWithoutScrollbar = totalVariableCount / knolz;
+                if (totalVariableCount % knolz > 0)
                     numColumnsWithoutScrollbar++;
-                if (numColumnsWithoutScrollbar * (variablePanelNameWidth + variablePanelValueWidth) >
+                if (numColumnsWithoutScrollbar * (SavedSettingsConfig.WatchVarPanelNameWidth + SavedSettingsConfig.WatchVarPanelValueWidth) >
                     target.ClientRectangle.Width - 2 * borderMargin)
                     effectiveHeight -= SystemInformation.HorizontalScrollBarHeight;
                 return effectiveHeight / elementHeight;
@@ -144,7 +144,11 @@ namespace STROOP.Controls
             public WatchVariablePanelRenderer(WatchVariablePanel target)
             {
                 this.target = target;
-                varNameFont = new OnDemand<Font>(OnDispose, () => new Font(Font, FontStyle.Bold), OnInvalidateFonts);
+                boldFont = new OnDemand<Font>(
+                    OnDispose, 
+                    () => Font.FontFamily.IsStyleAvailable(FontStyle.Bold) ? new Font(Font, FontStyle.Bold) : Font, 
+                    OnInvalidateFonts);
+
                 cellBorderPen = new OnDemand<Pen>(OnDispose, () => new Pen(Color.Gray, 2));
                 cellSeparatorPen = new OnDemand<Pen>(OnDispose, () => new Pen(Color.Gray, 1));
                 insertionMarkerPen = new OnDemand<Pen>(OnDispose, () => new Pen(Color.Blue, 3));
@@ -165,6 +169,7 @@ namespace STROOP.Controls
                     return;
 
                 var displayedWatchVars = target.GetCurrentVariableControls();
+                var varNameFont = SavedSettingsConfig.WatchVarPanelBoldNames ? boldFont : Font;
 
                 lastRefreshed = DateTime.Now;
                 var searchForm = (form as StroopMainForm)?.searchVariableDialog;
@@ -179,7 +184,6 @@ namespace STROOP.Controls
 
                     Bounds = newRect;
                     bufferedGraphics = BufferedGraphicsManager.Current.Allocate(CreateGraphics(), ClientRectangle);
-                    bufferedGraphics.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
                     bufferedGraphics.Graphics.TranslateTransform(borderMargin, borderMargin);
                 }
 
