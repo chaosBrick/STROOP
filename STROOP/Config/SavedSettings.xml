@@ -14,7 +14,6 @@
   <CloningUpdatesHolpType>true</CloningUpdatesHolpType>
   <UseInGameTrigForAngleLogic>false</UseInGameTrigForAngleLogic>
   <UseExtendedLevelBoundaries>false</UseExtendedLevelBoundaries>
-  <UseExpandedRamSize>true</UseExpandedRamSize>
   <TabOrder>
     <Tab>Object</Tab>
     <Tab>Mario</Tab>

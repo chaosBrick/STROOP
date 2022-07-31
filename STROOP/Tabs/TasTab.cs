@@ -122,7 +122,6 @@ namespace STROOP.Tabs
 
         public void EnableTASerSettings()
         {
-            SavedSettingsConfig.UseExpandedRamSize = true;
             splitContainerTas.Panel1Collapsed = true;
             splitContainerTas.Panel2Collapsed = false;
             ShowTaserVariables();

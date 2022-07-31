@@ -124,14 +124,7 @@ namespace STROOP.Structs.Configurations
             set => SetAndSave(ref _useExtendedLevelBoundaries, value);
         }
         public static int TriangleVertexMultiplier => _useExtendedLevelBoundaries ? 4 : 1;
-
-        private static bool _useExpandedRamSize;
-        public static bool UseExpandedRamSize
-        {
-            get => _useExpandedRamSize;
-            set => SetAndSave(ref _useExpandedRamSize, value);
-        }
-
+        
         private static System.Drawing.Font _watchVarPanelFontOverride;
         public static System.Drawing.Font WatchVarPanelFontOverride
         {
@@ -323,7 +316,6 @@ namespace STROOP.Structs.Configurations
             lst.Add(new XElement("CloningUpdatesHolpType", _cloningUpdatesHolpType));
             lst.Add(new XElement("UseInGameTrigForAngleLogic", _useInGameTrigForAngleLogic));
             lst.Add(new XElement("UseExtendedLevelBoundaries", _useExtendedLevelBoundaries));
-            lst.Add(new XElement("UseExpandedRamSize", _useExpandedRamSize));
             if (WatchVarPanelFontOverride != null)
                 lst.Add(new XElement(nameof(WatchVarPanelFontOverride), FontSerializationHelper.ToString(_watchVarPanelFontOverride)));
             lst.Add(new XElement(nameof(WatchVarPanelBoldNames), _useBoldVariableNames));
@@ -391,9 +383,6 @@ namespace STROOP.Structs.Configurations
                     case "UseExtendedLevelBoundaries":
                         UseExtendedLevelBoundaries = bool.Parse(element.Value);
                         break;
-                    case "UseExpandedRamSize":
-                        UseExpandedRamSize = bool.Parse(element.Value);
-                        break;
                     case nameof(WatchVarPanelFontOverride): //If you're gonna do terrible code, at least do it well...
                         WatchVarPanelFontOverride = FontSerializationHelper.FromString(element.Value);
                         break;
@@ -456,7 +445,6 @@ namespace STROOP.Structs.Configurations
             _cloningUpdatesHolpType = true;
             _useInGameTrigForAngleLogic = false;
             _useExtendedLevelBoundaries = false;
-            _useExpandedRamSize = false;
             _watchVarPanelFontOverride = null;
             _useBoldVariableNames = true;
             _watchVarPanelNameWidth = 120;
