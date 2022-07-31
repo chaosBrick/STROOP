@@ -309,7 +309,6 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.watchVariablePanelGhost.AutoScroll = true;
             this.watchVariablePanelGhost.DataPath = "Config/GhostData.xml";
-            this.watchVariablePanelGhost.FontSize = 8.25F;
             this.watchVariablePanelGhost.Location = new System.Drawing.Point(6, 19);
             this.watchVariablePanelGhost.Name = "watchVariablePanelGhost";
             this.watchVariablePanelGhost.Size = new System.Drawing.Size(209, 432);
