@@ -119,8 +119,8 @@ namespace STROOP.Controls
             WatchVariablePanel target;
 
             int borderMargin = 2;
-            static int elementMarginTopBottom => (int)SavedSettingsConfig.WatchVarPanelHorizontalMargin;
-            static int elementMarginLeftRight => (int)SavedSettingsConfig.WatchVarPanelVerticalMargin;
+            static int elementMarginTopBottom => (int)SavedSettingsConfig.WatchVarPanelVerticalMargin;
+            static int elementMarginLeftRight => (int)SavedSettingsConfig.WatchVarPanelHorizontalMargin;
             int elementHeight => Font.Height + 2 * elementMarginTopBottom;
 
             int elementNameWidth => SavedSettingsConfig.WatchVarPanelNameWidth;
