@@ -53,7 +53,7 @@ namespace STROOP.Controls
                 if (!combinedValues.meaningfulValue)
                     SetValue(0);
                 else if (System.Convert.ToDecimal(combinedValues.value) == 0)
-                    SetValue(WatchVar.Mask);
+                    SetValue(WatchVar.Mask ?? 1);
                 else
                     SetValue(0);
             }
