@@ -180,7 +180,7 @@ namespace STROOP.Utilities
                 {
                     uint? address = addressGetter();
                     if (address == null) return double.NaN;
-                    return TriangleOffsetsConfig.GetXIndex(address.Value, index - 1);
+                    return TriangleOffsetsConfig.GetYIndex(address.Value, index - 1);
                 }
             }
 
@@ -190,7 +190,7 @@ namespace STROOP.Utilities
                 {
                     uint? address = addressGetter();
                     if (address == null) return double.NaN;
-                    return TriangleOffsetsConfig.GetXIndex(address.Value, index - 1);
+                    return TriangleOffsetsConfig.GetZIndex(address.Value, index - 1);
                 }
             }
             public override double Angle => Double.NaN;
