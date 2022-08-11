@@ -480,6 +480,8 @@ namespace STROOP
 
         private void buttonBypass_Click(object sender, EventArgs e)
         {
+            Config.Stream.SwitchIO(null);
+            labelProcessSelect.Text = "Not connected.";
             panelConnect.Visible = false;
         }
 
@@ -529,8 +531,7 @@ namespace STROOP
         {
             if (openFileDialogSt.ShowDialog() != DialogResult.OK)
                 return;
-            string stextension = Path.GetExtension(openFileDialogSt.FileName);
-            if (openFileDialogSt.CheckFileExists == true && stextension != ".st")
+            if (openFileDialogSt.CheckFileExists == true)
             {
                 try
                 {

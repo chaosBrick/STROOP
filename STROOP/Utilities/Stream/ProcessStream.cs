@@ -122,7 +122,7 @@ namespace STROOP.Utilities
             try
             {
                 newIo = newProcess != null ? _ioCreationTable[emulator.IOType](newProcess, emulator) : null;
-                var messages = newIo.GetLastMessages();
+                var messages = newIo?.GetLastMessages() ?? string.Empty;
                 if (string.Empty != messages)
                     MessageBox.Show(messages);
             }
