@@ -4,16 +4,15 @@ using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using System.Windows.Forms;
 using STROOP.Utilities;
-
+using System.Linq;
 
 namespace STROOP.Tabs
 {
     public partial class OptionsTab : STROOPTab
     {
-        private readonly List<Func<bool>> _savedSettingsGetterList;
-        private readonly List<Action<bool>> _savedSettingsSetterList;
-        private readonly List<string> _savedSettingsTextList;
-        private readonly List<ToolStripMenuItem> _savedSettingsItemList;
+
+        readonly List<SavedSettingsConfig.SavedVariable<bool>> _savedSettingsVariables;
+        readonly List<ToolStripMenuItem> _savedSettingsItemList;
 
         public OptionsTab()
         {
@@ -21,85 +20,21 @@ namespace STROOP.Tabs
 
             if (Program.IsVisualStudioHostProcess()) return;
 
-            _savedSettingsTextList = new List<string>()
+            _savedSettingsVariables = SavedSettingsConfig.GetBoolVariables().ToList();
+            _savedSettingsItemList = new List<ToolStripMenuItem>();
+            foreach (var prop_it in _savedSettingsVariables)
             {
-                "Display Yaw Angles as Unsigned",
-                "Variable Values Flush Right",
-                "Start Slot Index From 1",
-                "Offset Goto/Retrieve Functions",
-                "PU Controller Moves Camera",
-                "Scale Diagonal Position Controller Buttons",
-                "Exclude Dust for Closest Object",
-                "Use Misalignment Offset For Distance To Line",
-                "Don't Round Values to 0",
-                "Display as Hex Uses Memory",
-                "Neutralize Triangles with 0x15",
-                "Cloning Updates Holp Type",
-                "Use In-Game Trig for Angle Logic",
-                "Use Extended Level Boundaries",
-            };
-
-            _savedSettingsGetterList = new List<Func<bool>>()
-            {
-                () => SavedSettingsConfig.DisplayYawAnglesAsUnsigned,
-                () => SavedSettingsConfig.VariableValuesFlushRight,
-                () => SavedSettingsConfig.StartSlotIndexsFromOne,
-                () => SavedSettingsConfig.OffsetGotoRetrieveFunctions,
-                () => SavedSettingsConfig.MoveCameraWithPu,
-                () => SavedSettingsConfig.ScaleDiagonalPositionControllerButtons,
-                () => SavedSettingsConfig.ExcludeDustForClosestObject,
-                () => SavedSettingsConfig.UseMisalignmentOffsetForDistanceToLine,
-                () => SavedSettingsConfig.DontRoundValuesToZero,
-                () => SavedSettingsConfig.DisplayAsHexUsesMemory,
-                () => SavedSettingsConfig.NeutralizeTrianglesWith0x15,
-                () => SavedSettingsConfig.CloningUpdatesHolpType,
-                () => SavedSettingsConfig.UseInGameTrigForAngleLogic,
-                () => SavedSettingsConfig.UseExtendedLevelBoundaries,
-            };
-
-            _savedSettingsSetterList = new List<Action<bool>>()
-            {
-                (bool value) => SavedSettingsConfig.DisplayYawAnglesAsUnsigned.value = value,
-                (bool value) => SavedSettingsConfig.VariableValuesFlushRight.value = value,
-                (bool value) => SavedSettingsConfig.StartSlotIndexsFromOne.value = value,
-                (bool value) => SavedSettingsConfig.OffsetGotoRetrieveFunctions.value = value,
-                (bool value) => SavedSettingsConfig.MoveCameraWithPu.value = value,
-                (bool value) => SavedSettingsConfig.ScaleDiagonalPositionControllerButtons.value = value,
-                (bool value) => SavedSettingsConfig.ExcludeDustForClosestObject.value = value,
-                (bool value) => SavedSettingsConfig.UseMisalignmentOffsetForDistanceToLine.value = value,
-                (bool value) => SavedSettingsConfig.DontRoundValuesToZero.value = value,
-                (bool value) => SavedSettingsConfig.DisplayAsHexUsesMemory.value = value,
-                (bool value) => SavedSettingsConfig.NeutralizeTrianglesWith0x15.value = value,
-                (bool value) => SavedSettingsConfig.CloningUpdatesHolpType.value = value,
-                (bool value) => SavedSettingsConfig.UseInGameTrigForAngleLogic.value = value,
-                (bool value) => SavedSettingsConfig.UseExtendedLevelBoundaries.value = value,
-            };
-
-            for (int i = 0; i < _savedSettingsTextList.Count; i++)
-            {
-                checkedListBoxSavedSettings.Items.Add(_savedSettingsTextList[i], _savedSettingsGetterList[i]());
+                var prop = prop_it;
+                checkedListBoxSavedSettings.Items.Add(prop.name, prop.value);
+                var item = new ToolStripMenuItem(prop.name);
+                item.Checked = prop.value;
+                item.Click += (sender, e) => prop.value = (item.Checked = !prop.value);
+                _savedSettingsItemList.Add(item);
             }
-            checkedListBoxSavedSettings.ItemCheck += (sender, e) =>
-            {
-                _savedSettingsSetterList[e.Index](e.NewValue == CheckState.Checked);
-            };
+
+            checkedListBoxSavedSettings.ItemCheck += (sender, e) => _savedSettingsVariables[e.Index].value = (e.NewValue == CheckState.Checked);
 
             buttonOptionsResetSavedSettings.Click += (sender, e) => SavedSettingsConfig.ResetSavedSettings();
-
-            _savedSettingsItemList = _savedSettingsTextList.ConvertAll(text => new ToolStripMenuItem(text));
-            for (int i = 0; i < _savedSettingsItemList.Count; i++)
-            {
-                ToolStripMenuItem item = _savedSettingsItemList[i];
-                Action<bool> setter = _savedSettingsSetterList[i];
-                Func<bool> getter = _savedSettingsGetterList[i];
-                item.Click += (sender, e) =>
-                {
-                    bool newValue = !getter();
-                    setter(newValue);
-                    item.Checked = newValue;
-                };
-                item.Checked = getter();
-            }
 
             // object slot overlays
             List<string> objectSlotOverlayTextList = new List<string>()
@@ -223,7 +158,7 @@ namespace STROOP.Tabs
         {
             for (int i = 0; i < checkedListBoxSavedSettings.Items.Count; i++)
             {
-                bool value = _savedSettingsGetterList[i]();
+                bool value = _savedSettingsVariables[i].value;
                 checkedListBoxSavedSettings.SetItemChecked(i, value);
                 _savedSettingsItemList[i].Checked = value;
             }

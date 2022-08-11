@@ -84,6 +84,13 @@ namespace STROOP.Structs.Configurations
         public static SavedVariable<uint> WatchVarPanelHorizontalMargin = new SavedVariable<uint>("VariablePanel Horizontal Margin", 2);
         public static SavedVariable<uint> WatchVarPanelVerticalMargin = new SavedVariable<uint>("VariablePanel Vertical Margin", 2);
 
+        public static IEnumerable<SavedVariable<bool>> GetBoolVariables()
+        {
+            foreach (var field in savedFieldsByName)
+                if (field.Value.FieldType.GenericTypeArguments[0] == typeof(bool))
+                    yield return (SavedVariable<bool>)field.Value.GetValue(null);
+        }
+
         public static List<TabPage> _allTabs = new List<TabPage>();
 
         public static void InvokeRecommendedTabOrder()
