@@ -21,25 +21,25 @@ namespace STROOP.Controls
         static void InitializeSpecial()
         {
             var target = WatchVariableSpecialUtilities.dictionary;
-            target.Add("WatchVarPanelNameWidth", ((uint _) => SavedSettingsConfig.WatchVarPanelNameWidth, (object value, uint __) =>
+            target.Add("WatchVarPanelNameWidth", ((uint _) => SavedSettingsConfig.WatchVarPanelNameWidth.value, (object value, uint __) =>
             {
                 SavedSettingsConfig.WatchVarPanelNameWidth.value = Math.Max(1, (uint)Convert.ToSingle(value));
                 return true;
             }
             ));
-            target.Add("WatchVarPanelValueWidth", ((uint _) => SavedSettingsConfig.WatchVarPanelValueWidth, (object value, uint __) =>
+            target.Add("WatchVarPanelValueWidth", ((uint _) => SavedSettingsConfig.WatchVarPanelValueWidth.value, (object value, uint __) =>
             {
                 SavedSettingsConfig.WatchVarPanelValueWidth.value = Math.Max(1, (uint)Convert.ToSingle(value));
                 return true;
             }
             ));
-            target.Add("WatchVarPanelXMargin", ((uint _) => SavedSettingsConfig.WatchVarPanelHorizontalMargin, (object value, uint __) =>
+            target.Add("WatchVarPanelXMargin", ((uint _) => SavedSettingsConfig.WatchVarPanelHorizontalMargin.value, (object value, uint __) =>
             {
                 SavedSettingsConfig.WatchVarPanelHorizontalMargin.value = (uint)Math.Max(1, (int)Convert.ToSingle(value));
                 return true;
             }
             ));
-            target.Add("WatchVarPanelYMargin", ((uint _) => SavedSettingsConfig.WatchVarPanelVerticalMargin, (object value, uint __) =>
+            target.Add("WatchVarPanelYMargin", ((uint _) => SavedSettingsConfig.WatchVarPanelVerticalMargin.value, (object value, uint __) =>
             {
                 SavedSettingsConfig.WatchVarPanelVerticalMargin.value = (uint)Math.Max(1, (int)Convert.ToSingle(value));
                 return true;
