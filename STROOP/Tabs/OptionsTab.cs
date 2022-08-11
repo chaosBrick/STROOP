@@ -59,20 +59,20 @@ namespace STROOP.Tabs
 
             _savedSettingsSetterList = new List<Action<bool>>()
             {
-                (bool value) => SavedSettingsConfig.DisplayYawAnglesAsUnsigned = value,
-                (bool value) => SavedSettingsConfig.VariableValuesFlushRight = value,
-                (bool value) => SavedSettingsConfig.StartSlotIndexsFromOne = value,
-                (bool value) => SavedSettingsConfig.OffsetGotoRetrieveFunctions = value,
-                (bool value) => SavedSettingsConfig.MoveCameraWithPu = value,
-                (bool value) => SavedSettingsConfig.ScaleDiagonalPositionControllerButtons = value,
-                (bool value) => SavedSettingsConfig.ExcludeDustForClosestObject = value,
-                (bool value) => SavedSettingsConfig.UseMisalignmentOffsetForDistanceToLine = value,
-                (bool value) => SavedSettingsConfig.DontRoundValuesToZero = value,
-                (bool value) => SavedSettingsConfig.DisplayAsHexUsesMemory = value,
-                (bool value) => SavedSettingsConfig.NeutralizeTrianglesWith0x15 = value,
-                (bool value) => SavedSettingsConfig.CloningUpdatesHolpType = value,
-                (bool value) => SavedSettingsConfig.UseInGameTrigForAngleLogic = value,
-                (bool value) => {SavedSettingsConfig.UseExtendedLevelBoundaries = value; AccessScope<StroopMainForm>.content?.GetTab<MapTab.MapTab>().RequireGeometryUpdate(); },
+                (bool value) => SavedSettingsConfig.DisplayYawAnglesAsUnsigned.value = value,
+                (bool value) => SavedSettingsConfig.VariableValuesFlushRight.value = value,
+                (bool value) => SavedSettingsConfig.StartSlotIndexsFromOne.value = value,
+                (bool value) => SavedSettingsConfig.OffsetGotoRetrieveFunctions.value = value,
+                (bool value) => SavedSettingsConfig.MoveCameraWithPu.value = value,
+                (bool value) => SavedSettingsConfig.ScaleDiagonalPositionControllerButtons.value = value,
+                (bool value) => SavedSettingsConfig.ExcludeDustForClosestObject.value = value,
+                (bool value) => SavedSettingsConfig.UseMisalignmentOffsetForDistanceToLine.value = value,
+                (bool value) => SavedSettingsConfig.DontRoundValuesToZero.value = value,
+                (bool value) => SavedSettingsConfig.DisplayAsHexUsesMemory.value = value,
+                (bool value) => SavedSettingsConfig.NeutralizeTrianglesWith0x15.value = value,
+                (bool value) => SavedSettingsConfig.CloningUpdatesHolpType.value = value,
+                (bool value) => SavedSettingsConfig.UseInGameTrigForAngleLogic.value = value,
+                (bool value) => {SavedSettingsConfig.UseExtendedLevelBoundaries.value = value; AccessScope<StroopMainForm>.content?.GetTab<MapTab.MapTab>().RequireGeometryUpdate(); },
             };
 
 

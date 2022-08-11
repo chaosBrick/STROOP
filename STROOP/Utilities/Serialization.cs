@@ -9,6 +9,8 @@ namespace STROOP.Utilities
 
         static public Font FromString(string value)
         {
+            if (value.ToLower() == "<null>")
+                return null;
             var parts = value.Split(':');
             return new Font(
                 parts[0],                                                   // FontFamily.Name
@@ -22,6 +24,8 @@ namespace STROOP.Utilities
 
         static public string ToString(Font font)
         {
+            if (font == null)
+                return "<null>";
             return font.FontFamily.Name
                     + ":" + font.Size
                     + ":" + font.Style

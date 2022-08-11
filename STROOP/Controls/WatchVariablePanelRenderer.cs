@@ -119,13 +119,13 @@ namespace STROOP.Controls
             WatchVariablePanel target;
 
             int borderMargin = 2;
-            static int elementMarginTopBottom => (int)SavedSettingsConfig.WatchVarPanelVerticalMargin;
-            static int elementMarginLeftRight => (int)SavedSettingsConfig.WatchVarPanelHorizontalMargin;
-            int elementHeight => Font.Height + 2 * elementMarginTopBottom;
+            static int elementMarginTopBottom => (int)(uint)SavedSettingsConfig.WatchVarPanelVerticalMargin;
+            static int elementMarginLeftRight => (int)(uint)SavedSettingsConfig.WatchVarPanelHorizontalMargin;
+            int elementHeight => (int)(Font.Height + 2 * elementMarginTopBottom);
 
-            int elementNameWidth => SavedSettingsConfig.WatchVarPanelNameWidth;
-            int elementValueWidth => SavedSettingsConfig.WatchVarPanelValueWidth;
-            int elementWidth => elementNameWidth + elementValueWidth;
+            int elementNameWidth => (int)(uint)SavedSettingsConfig.WatchVarPanelNameWidth;
+            int elementValueWidth => (int)(uint)SavedSettingsConfig.WatchVarPanelValueWidth;
+            int elementWidth => (int)(elementNameWidth + elementValueWidth);
 
             public int GetMaxRows()
             {

@@ -4,98 +4,67 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Xml.Linq;
-using System.Xml.Schema;
+using System;
 
 namespace STROOP.Structs.Configurations
 {
     public static class SavedSettingsConfig
     {
-        static void SetAndSave<T>(ref T target, T value)
+        public class SavedVariable<T>
         {
-            if (!(target == null ^ value == null) && (target == null || target.Equals(value))) return;
-            target = value;
-            if (IsLoaded) Save();
+            T _value;
+            public readonly T defaultValue;
+            public readonly string name;
+            public T value
+            {
+                get => _value;
+                set
+                {
+                    _value = value;
+                    if (_isLoaded)
+                        Save();
+                }
+            }
+
+            public SavedVariable(string name, T defaultValue)
+            {
+                this.name = name;
+                this.defaultValue = defaultValue;
+                this._value = defaultValue;
+            }
+            public static implicit operator T(SavedVariable<T> var) => var.value;
+            public void Reset() => value = defaultValue;
         }
 
-        public static bool IsLoaded = false;
-
-        private static bool _displayYawAnglesAsUnsigned;
-        public static bool DisplayYawAnglesAsUnsigned
+        static Dictionary<string, FieldInfo> savedFieldsByName = GetFieldsByNames();
+        static Dictionary<string, FieldInfo> GetFieldsByNames()
         {
-            get => _displayYawAnglesAsUnsigned;
-            set => SetAndSave(ref _displayYawAnglesAsUnsigned, value);
+            var result = new Dictionary<string, FieldInfo>();
+            foreach (var savedVariable in typeof(SavedSettingsConfig).GetFields(BindingFlags.Public | BindingFlags.Static))
+                if (savedVariable.FieldType.IsGenericType && savedVariable.FieldType.GetGenericTypeDefinition() == typeof(SavedVariable<>))
+                    result[savedVariable.Name] = savedVariable;
+            return result;
         }
-
-        private static bool _variableValuesFlushRight;
-        public static bool VariableValuesFlushRight
+        static Dictionary<Type, (Func<string, object> parse, Func<object, string> tostring)> typeParsers = new Dictionary<Type, (Func<string, object>, Func<object, string>)>()
         {
-            get => _variableValuesFlushRight;
-            set => SetAndSave(ref _variableValuesFlushRight, value);
-        }
+            [typeof(bool)] = (_ => bool.Parse(_), _ => (Convert.ToBoolean(_)).ToString()),
+            [typeof(uint)] = (_ => uint.Parse(_), _ => (Convert.ToUInt32(_)).ToString()),
+            [typeof(System.Drawing.Font)] = (_ => FontSerializationHelper.FromString(_), _ => FontSerializationHelper.ToString((System.Drawing.Font)_))
+        };
 
-        //TODO: Pannen know English challenge
-        private static bool _startSlotIndexsFromOne;
-        public static bool StartSlotIndexsFromOne
-        {
-            get => _startSlotIndexsFromOne;
-            set => SetAndSave(ref _startSlotIndexsFromOne, value);
-        }
+        static bool _isLoaded = false;
 
-        private static bool _offsetGotoRetrieveFunctions;
-        public static bool OffsetGotoRetrieveFunctions
-        {
-            get => _offsetGotoRetrieveFunctions;
-            set => SetAndSave(ref _offsetGotoRetrieveFunctions, value);
-        }
-
-        private static bool _moveCameraWithPu;
-        public static bool MoveCameraWithPu
-        {
-            get => _moveCameraWithPu;
-            set => SetAndSave(ref _moveCameraWithPu, value);
-        }
-
-        private static bool _scaleDiagonalPositionControllerButtons;
-        public static bool ScaleDiagonalPositionControllerButtons
-        {
-            get => _scaleDiagonalPositionControllerButtons;
-            set => SetAndSave(ref _scaleDiagonalPositionControllerButtons, value);
-        }
-
-        private static bool _excludeDustForClosestObject;
-        public static bool ExcludeDustForClosestObject
-        {
-            get => _excludeDustForClosestObject;
-            set => SetAndSave(ref _excludeDustForClosestObject, value);
-        }
-
-        private static bool _useMisalignmentOffsetForDistanceToLine;
-        public static bool UseMisalignmentOffsetForDistanceToLine
-        {
-            get => _useMisalignmentOffsetForDistanceToLine;
-            set => SetAndSave(ref _useMisalignmentOffsetForDistanceToLine, value);
-        }
-
-        private static bool _dontRoundValuesToZero;
-        public static bool DontRoundValuesToZero
-        {
-            get => _dontRoundValuesToZero;
-            set => SetAndSave(ref _dontRoundValuesToZero, value);
-        }
-
-        private static bool _displayAsHexUsesMemory;
-        public static bool DisplayAsHexUsesMemory
-        {
-            get => _displayAsHexUsesMemory;
-            set => SetAndSave(ref _displayAsHexUsesMemory, value);
-        }
-
-        private static bool _neutralizeTrianglesWith0x15;
-        public static bool NeutralizeTrianglesWith0x15
-        {
-            get => _neutralizeTrianglesWith0x15;
-            set => SetAndSave(ref _neutralizeTrianglesWith0x15, value);
-        }
+        public static SavedVariable<bool> DisplayYawAnglesAsUnsigned = new SavedVariable<bool>("Display Yaw Angles As Unsigned", true);
+        public static SavedVariable<bool> VariableValuesFlushRight = new SavedVariable<bool>("Variable Values Flush Right", true);
+        public static SavedVariable<bool> StartSlotIndexsFromOne = new SavedVariable<bool>("Start Slot Index From 1", true);
+        public static SavedVariable<bool> OffsetGotoRetrieveFunctions = new SavedVariable<bool>("Offset Goto/Retrieve Functions", true);
+        public static SavedVariable<bool> MoveCameraWithPu = new SavedVariable<bool>("PU Controller Moves Camera", true);
+        public static SavedVariable<bool> ScaleDiagonalPositionControllerButtons = new SavedVariable<bool>("Scale Diagonal Position Controller Buttons", true);
+        public static SavedVariable<bool> ExcludeDustForClosestObject = new SavedVariable<bool>("Exclude Dut for Closest Object", true);
+        public static SavedVariable<bool> UseMisalignmentOffsetForDistanceToLine = new SavedVariable<bool>("Use Misalignment Offset For Distance To Line", true);
+        public static SavedVariable<bool> DontRoundValuesToZero = new SavedVariable<bool>("Don't Round Values to 0", false);
+        public static SavedVariable<bool> DisplayAsHexUsesMemory = new SavedVariable<bool>("Display as Hex Uses Memory", false);
+        public static SavedVariable<bool> NeutralizeTrianglesWith0x15 = new SavedVariable<bool>("Neutralize Triangles with 0x15", true);
 
         public static short NeutralizeTriangleValue(bool? use0x15Nullable = null)
         {
@@ -103,70 +72,17 @@ namespace STROOP.Structs.Configurations
             return (short)(use0x15 ? 0x15 : 0);
         }
 
-        private static bool _cloningUpdatesHolpType;
-        public static bool CloningUpdatesHolpType
-        {
-            get => _cloningUpdatesHolpType;
-            set => SetAndSave(ref _cloningUpdatesHolpType, value);
-        }
+        public static SavedVariable<bool> CloningUpdatesHolpType = new SavedVariable<bool>("Cloning Updates Holp Type", true);
+        public static SavedVariable<bool> UseInGameTrigForAngleLogic = new SavedVariable<bool>("Use In-Game Trig for Angle Logic", false);
+        public static SavedVariable<bool> UseExtendedLevelBoundaries = new SavedVariable<bool>("Use Extended Level Boundaries", false);
+        public static int TriangleVertexMultiplier => UseExtendedLevelBoundaries ? 4 : 1;
 
-        private static bool _useInGameTrigForAngleLogic;
-        public static bool UseInGameTrigForAngleLogic
-        {
-            get => _useInGameTrigForAngleLogic;
-            set => SetAndSave(ref _useInGameTrigForAngleLogic, value);
-        }
-
-        private static bool _useExtendedLevelBoundaries;
-        public static bool UseExtendedLevelBoundaries
-        {
-            get => _useExtendedLevelBoundaries;
-            set => SetAndSave(ref _useExtendedLevelBoundaries, value);
-        }
-        public static int TriangleVertexMultiplier => _useExtendedLevelBoundaries ? 4 : 1;
-        
-        private static System.Drawing.Font _watchVarPanelFontOverride;
-        public static System.Drawing.Font WatchVarPanelFontOverride
-        {
-            get => _watchVarPanelFontOverride;
-            set => SetAndSave(ref _watchVarPanelFontOverride, value);
-        }
-
-        // This can be done better with some System.Reflection
-        private static bool _useBoldVariableNames = true;
-        public static bool WatchVarPanelBoldNames
-        {
-            get => _useBoldVariableNames;
-            set => SetAndSave(ref _useBoldVariableNames, value);
-        }
-
-        private static int _watchVarPanelNameWidth = 120;
-        public static int WatchVarPanelNameWidth
-        {
-            get => _watchVarPanelNameWidth;
-            set => SetAndSave(ref _watchVarPanelNameWidth, value);
-        }
-
-        private static int _watchVarPanelValueWidth = 80;
-        public static int WatchVarPanelValueWidth
-        {
-            get => _watchVarPanelValueWidth;
-            set => SetAndSave(ref _watchVarPanelValueWidth, value);
-        }
-
-        private static uint _watchVarPanelHorizontalMargin = 2;
-        public static uint WatchVarPanelHorizontalMargin
-        {
-            get => _watchVarPanelHorizontalMargin;
-            set => SetAndSave(ref _watchVarPanelHorizontalMargin, value);
-        }
-
-        private static uint _watchVarPanelVerticalMargin = 2;
-        public static uint WatchVarPanelVerticalMargin
-        {
-            get => _watchVarPanelVerticalMargin;
-            set => SetAndSave(ref _watchVarPanelVerticalMargin, value);
-        }
+        public static SavedVariable<bool> WatchVarPanelBoldNames = new SavedVariable<bool>("Bold Variable Names", true);
+        public static SavedVariable<System.Drawing.Font> WatchVarPanelFontOverride = new SavedVariable<System.Drawing.Font>("VariablePanel Font", null);
+        public static SavedVariable<uint> WatchVarPanelNameWidth = new SavedVariable<uint>("VariablePanel Name Width", 120);
+        public static SavedVariable<uint> WatchVarPanelValueWidth = new SavedVariable<uint>("VariablePanel Value Width", 80);
+        public static SavedVariable<uint> WatchVarPanelHorizontalMargin = new SavedVariable<uint>("VariablePanel Horizontal Margin", 2);
+        public static SavedVariable<uint> WatchVarPanelVerticalMargin = new SavedVariable<uint>("VariablePanel Vertical Margin", 2);
 
         public static List<TabPage> _allTabs = new List<TabPage>();
 
@@ -301,28 +217,11 @@ namespace STROOP.Structs.Configurations
             }
 
             var lst = new List<XElement>();
-
-            lst.Add(new XElement("DisplayYawAnglesAsUnsigned", _displayYawAnglesAsUnsigned));
-            lst.Add(new XElement("VariableValuesFlushRight", _variableValuesFlushRight));
-            lst.Add(new XElement("StartSlotIndexsFromOne", _startSlotIndexsFromOne));
-            lst.Add(new XElement("OffsetGotoRetrieveFunctions", _offsetGotoRetrieveFunctions));
-            lst.Add(new XElement("MoveCameraWithPu", _moveCameraWithPu));
-            lst.Add(new XElement("ScaleDiagonalPositionControllerButtons", _scaleDiagonalPositionControllerButtons));
-            lst.Add(new XElement("ExcludeDustForClosestObject", _excludeDustForClosestObject));
-            lst.Add(new XElement("UseMisalignmentOffsetForDistanceToLine", _useMisalignmentOffsetForDistanceToLine));
-            lst.Add(new XElement("DontRoundValuesToZero", _dontRoundValuesToZero));
-            lst.Add(new XElement("DisplayAsHexUsesMemory", _displayAsHexUsesMemory));
-            lst.Add(new XElement("NeutralizeTrianglesWith0x15", _neutralizeTrianglesWith0x15));
-            lst.Add(new XElement("CloningUpdatesHolpType", _cloningUpdatesHolpType));
-            lst.Add(new XElement("UseInGameTrigForAngleLogic", _useInGameTrigForAngleLogic));
-            lst.Add(new XElement("UseExtendedLevelBoundaries", _useExtendedLevelBoundaries));
-            if (WatchVarPanelFontOverride != null)
-                lst.Add(new XElement(nameof(WatchVarPanelFontOverride), FontSerializationHelper.ToString(_watchVarPanelFontOverride)));
-            lst.Add(new XElement(nameof(WatchVarPanelBoldNames), _useBoldVariableNames));
-            lst.Add(new XElement(nameof(WatchVarPanelHorizontalMargin), _watchVarPanelVerticalMargin));
-            lst.Add(new XElement(nameof(WatchVarPanelVerticalMargin), _watchVarPanelHorizontalMargin));
+            foreach (var field in savedFieldsByName)
+                lst.Add(new XElement(field.Key, typeParsers[field.Value.FieldType.GenericTypeArguments[0]].tostring(
+                    field.Value.FieldType.GetProperty(nameof(SavedVariable<int>.value)).GetValue(field.Value.GetValue(null)))));
             lst.Add(tabOrderXElement);
-            lst.Add(removedTabsXElement); ;
+            lst.Add(removedTabsXElement);
             return lst;
         }
 
@@ -341,67 +240,6 @@ namespace STROOP.Structs.Configurations
                 //This is stupid.
                 switch (element.Name.ToString())
                 {
-                    case "DisplayYawAnglesAsUnsigned":
-                        DisplayYawAnglesAsUnsigned = bool.Parse(element.Value);
-                        break;
-                    case "VariableValuesFlushRight":
-                        VariableValuesFlushRight = bool.Parse(element.Value);
-                        break;
-                    case "StartSlotIndexsFromOne":
-                        StartSlotIndexsFromOne = bool.Parse(element.Value);
-                        break;
-                    case "OffsetGotoRetrieveFunctions":
-                        OffsetGotoRetrieveFunctions = bool.Parse(element.Value);
-                        break;
-                    case "MoveCameraWithPu":
-                        MoveCameraWithPu = bool.Parse(element.Value);
-                        break;
-                    case "ScaleDiagonalPositionControllerButtons":
-                        ScaleDiagonalPositionControllerButtons = bool.Parse(element.Value);
-                        break;
-                    case "ExcludeDustForClosestObject":
-                        ExcludeDustForClosestObject = bool.Parse(element.Value);
-                        break;
-                    case "UseMisalignmentOffsetForDistanceToLine":
-                        UseMisalignmentOffsetForDistanceToLine = bool.Parse(element.Value);
-                        break;
-                    case "DontRoundValuesToZero":
-                        DontRoundValuesToZero = bool.Parse(element.Value);
-                        break;
-                    case "DisplayAsHexUsesMemory":
-                        DisplayAsHexUsesMemory = bool.Parse(element.Value);
-                        break;
-                    case "NeutralizeTrianglesWith0x15":
-                        NeutralizeTrianglesWith0x15 = bool.Parse(element.Value);
-                        break;
-                    case "CloningUpdatesHolpType":
-                        CloningUpdatesHolpType = bool.Parse(element.Value);
-                        break;
-                    case "UseInGameTrigForAngleLogic":
-                        UseInGameTrigForAngleLogic = bool.Parse(element.Value);
-                        break;
-                    case "UseExtendedLevelBoundaries":
-                        UseExtendedLevelBoundaries = bool.Parse(element.Value);
-                        break;
-                    case nameof(WatchVarPanelFontOverride): //If you're gonna do terrible code, at least do it well...
-                        WatchVarPanelFontOverride = FontSerializationHelper.FromString(element.Value);
-                        break;
-                    case nameof(WatchVarPanelBoldNames): //repeat
-                        WatchVarPanelBoldNames = bool.Parse(element.Value); //I cannot believe I just wrote this.
-                        break;
-                    case nameof(WatchVarPanelHorizontalMargin): //So tired of this
-                        WatchVarPanelHorizontalMargin = uint.Parse(element.Value);
-                        break;
-                    case nameof(WatchVarPanelVerticalMargin): //If there's a typo anywhere in this I'm blaming Pannen.
-                        WatchVarPanelVerticalMargin= uint.Parse(element.Value);
-                        break;
-                    case nameof(WatchVarPanelNameWidth): //aaaaaaaaaaa
-                        WatchVarPanelNameWidth = int.Parse(element.Value);
-                        break;
-                    case nameof(WatchVarPanelValueWidth): //I'm dead
-                        WatchVarPanelValueWidth = int.Parse(element.Value);
-                        break;
-
                     case "TabOrder":
                         {
                             List<string> tabNames = new List<string>();
@@ -423,34 +261,22 @@ namespace STROOP.Structs.Configurations
                             InitiallySavedRemovedTabs = tabNames;
                         }
                         break;
+                    default:
+                        if (savedFieldsByName.TryGetValue(element.Name.ToString(), out var var))
+                            var.FieldType.GetProperty(nameof(SavedVariable<int>.value))
+                                .SetValue(var.GetValue(null), typeParsers[var.FieldType.GenericTypeArguments[0]].parse(element.Value));
+                        break;
                 }
             }
-            IsLoaded = true;
+            _isLoaded = true;
         }
-
 
         public static void ResetSavedSettings()
         {
-            _displayYawAnglesAsUnsigned = true;
-            _variableValuesFlushRight = true;
-            _startSlotIndexsFromOne = true;
-            _offsetGotoRetrieveFunctions = true;
-            _moveCameraWithPu = true;
-            _scaleDiagonalPositionControllerButtons = true;
-            _excludeDustForClosestObject = true;
-            _useMisalignmentOffsetForDistanceToLine = true;
-            _dontRoundValuesToZero = true;
-            _displayAsHexUsesMemory = true;
-            _neutralizeTrianglesWith0x15 = true;
-            _cloningUpdatesHolpType = true;
-            _useInGameTrigForAngleLogic = false;
-            _useExtendedLevelBoundaries = false;
-            _watchVarPanelFontOverride = null;
-            _useBoldVariableNames = true;
-            _watchVarPanelNameWidth = 120;
-            _watchVarPanelValueWidth = 80;
-            _watchVarPanelHorizontalMargin = 2; //Deeeeeeeeeeeeeeeeee
-            _watchVarPanelVerticalMargin = 2; //Deeeeeeeeeeeeeeeeee (This line was brought to you by Copy-Paste gang)
+            _isLoaded = false;
+            foreach (var savedVariable in savedFieldsByName)
+                savedVariable.Value.FieldType.GetMethod(nameof(SavedVariable<int>.Reset)).Invoke(savedVariable.Value.GetValue(null), new object[0]);
+            _isLoaded = true;
             Save();
         }
     }

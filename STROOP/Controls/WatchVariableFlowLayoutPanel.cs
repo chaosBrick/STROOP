@@ -23,44 +23,44 @@ namespace STROOP.Controls
             var target = WatchVariableSpecialUtilities.dictionary;
             target.Add("WatchVarPanelNameWidth", ((uint _) => SavedSettingsConfig.WatchVarPanelNameWidth, (object value, uint __) =>
             {
-                SavedSettingsConfig.WatchVarPanelNameWidth = Math.Max(1, (int)Convert.ToSingle(value));
+                SavedSettingsConfig.WatchVarPanelNameWidth.value = Math.Max(1, (uint)Convert.ToSingle(value));
                 return true;
             }
             ));
             target.Add("WatchVarPanelValueWidth", ((uint _) => SavedSettingsConfig.WatchVarPanelValueWidth, (object value, uint __) =>
             {
-                SavedSettingsConfig.WatchVarPanelValueWidth = Math.Max(1, (int)Convert.ToSingle(value));
+                SavedSettingsConfig.WatchVarPanelValueWidth.value = Math.Max(1, (uint)Convert.ToSingle(value));
                 return true;
             }
             ));
             target.Add("WatchVarPanelXMargin", ((uint _) => SavedSettingsConfig.WatchVarPanelHorizontalMargin, (object value, uint __) =>
             {
-                SavedSettingsConfig.WatchVarPanelHorizontalMargin = (uint)Math.Max(1, (int)Convert.ToSingle(value));
+                SavedSettingsConfig.WatchVarPanelHorizontalMargin.value = (uint)Math.Max(1, (int)Convert.ToSingle(value));
                 return true;
             }
             ));
             target.Add("WatchVarPanelYMargin", ((uint _) => SavedSettingsConfig.WatchVarPanelVerticalMargin, (object value, uint __) =>
             {
-                SavedSettingsConfig.WatchVarPanelVerticalMargin = (uint)Math.Max(1, (int)Convert.ToSingle(value));
+                SavedSettingsConfig.WatchVarPanelVerticalMargin.value = (uint)Math.Max(1, (int)Convert.ToSingle(value));
                 return true;
             }
             ));
             target.Add("WatchVarPanelBoldNames", ((uint _) => SavedSettingsConfig.WatchVarPanelBoldNames ? 1 : 0, (object value, uint __) =>
             {
-                SavedSettingsConfig.WatchVarPanelBoldNames = Convert.ToDouble(value) != 0;
+                SavedSettingsConfig.WatchVarPanelBoldNames.value = Convert.ToDouble(value) != 0;
                 return true;
             }
             ));
-            target.Add("WatchVarPanelFont", ((uint _) => SavedSettingsConfig.WatchVarPanelFontOverride?.Name ?? "(default)", (object value, uint __) => false));
+            target.Add("WatchVarPanelFont", ((uint _) => SavedSettingsConfig.WatchVarPanelFontOverride.value?.Name ?? "(default)", (object value, uint __) => false));
             WatchVariableStringWrapper.specialTypeContextMenuHandlers.Add("WatchVarPanelFont", () =>
             {
                 var dlg = new FontDialog();
-                if (SavedSettingsConfig.WatchVarPanelFontOverride != null)
+                if (SavedSettingsConfig.WatchVarPanelFontOverride.value != null)
                     dlg.Font = SavedSettingsConfig.WatchVarPanelFontOverride;
                 try
                 {
                     if (dlg.ShowDialog() == DialogResult.OK)
-                        SavedSettingsConfig.WatchVarPanelFontOverride = dlg.Font;
+                        SavedSettingsConfig.WatchVarPanelFontOverride.value = dlg.Font;
                 }
                 catch (ArgumentException ex)
                 {
@@ -833,7 +833,7 @@ namespace STROOP.Controls
 
         public void UpdatePanel()
         {
-            if (SavedSettingsConfig.WatchVarPanelFontOverride != null)
+            if (SavedSettingsConfig.WatchVarPanelFontOverride.value != null)
                 Font = SavedSettingsConfig.WatchVarPanelFontOverride;
             else if (Font != SystemFonts.DefaultFont)
                 Font = SystemFonts.DefaultFont;
