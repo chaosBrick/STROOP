@@ -93,6 +93,7 @@ namespace STROOP.Tabs.MapTab
             (mapLayoutChoice ?? comboBoxMapOptionsLevel.SelectedItem) as MapLayout ?? MapAssociations.GetBestMap();
 
 
+        bool displayingExtendedBoundaries = false;
         bool needsGeometryRefresh, _needsGeometryRefreshInternal;
         public bool NeedsGeometryRefresh() => needsGeometryRefresh;
         public void RequireGeometryUpdate() => _needsGeometryRefreshInternal = true;
@@ -545,6 +546,11 @@ namespace STROOP.Tabs.MapTab
             if (!_isLoaded2D) return;
 
             graphics.UpdateCursor();
+            if (displayingExtendedBoundaries != SavedSettingsConfig.UseExtendedLevelBoundaries)
+            {
+                displayingExtendedBoundaries = SavedSettingsConfig.UseExtendedLevelBoundaries;
+                RequireGeometryUpdate();
+            }
 
             if (!IsContextMenuOpen())
                 UpdateHover();
