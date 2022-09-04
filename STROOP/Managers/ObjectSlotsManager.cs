@@ -18,11 +18,9 @@ namespace STROOP.Managers
         /// </summary>
         public static readonly int DefaultSlotSize = 36;
 
-        public enum TabType { Object, Map, Model, Memory, Custom, Warp, TAS, CamHack, Other };
         public enum SortMethodType { ProcessingOrder, MemoryOrder, DistanceToMario };
         public enum SlotLabelType { Recommended, SlotPosVs, SlotPos, SlotIndex, RngUsage };
         public enum SelectionMethodType { Clicked, Held, StoodOn, Interaction, Used, Floor, Wall, Ceiling, Closest };
-        public enum ClickType { ObjectClick, MapClick, ModelClick, MemoryClick, CamHackClick, MarkClick };
 
         public uint? HoveredObjectAddress;
 
@@ -31,10 +29,8 @@ namespace STROOP.Managers
         Dictionary<uint, Tuple<int?, int?>> _lockedSlotIndices = new Dictionary<uint, Tuple<int?, int?>>();
         public bool LabelsLocked = false;
 
-        public readonly List<uint> SelectedSlotsAddresses = new List<uint>();
-        public readonly List<uint> SelectedOnMapSlotsAddresses = new List<uint>();
+        public readonly HashSet<uint> SelectedSlotsAddresses = new HashSet<uint>();
 
-        public readonly List<uint> MarkedSlotsAddresses = new List<uint>();
         public readonly Dictionary<uint, int> MarkedSlotsAddressesDictionary = new Dictionary<uint, int>();
 
         public List<ObjectDataModel> SelectedObjects = new List<ObjectDataModel>();
@@ -42,7 +38,6 @@ namespace STROOP.Managers
         private Dictionary<ObjectDataModel, string> _slotLabels = new Dictionary<ObjectDataModel, string>();
         public IReadOnlyDictionary<ObjectDataModel, string> SlotLabelsForObjects { get; private set; }
 
-        public TabType ActiveTab;
         public SortMethodType SortMethod = SortMethodType.ProcessingOrder;
         public SlotLabelType LabelMethod = SlotLabelType.Recommended;
 
@@ -60,12 +55,9 @@ namespace STROOP.Managers
             mainForm.comboBoxLabelMethod.DataSource = Enum.GetValues(typeof(SlotLabelType));
             mainForm.comboBoxSelectionMethod.DataSource = Enum.GetValues(typeof(SelectionMethodType));
 
-            mainForm.tabControlMain.Selected += TabControl_Selected;
-            TabControl_Selected(this, new TabControlEventArgs(mainForm.tabControlMain.SelectedTab, -1, TabControlAction.Selected));
-
             // Create and setup object slots
             ObjectSlots = new List<ObjectSlot>();
-            foreach (int i in Enumerable.Range(0, ObjectSlotsConfig.MaxSlots))
+            for (int i = 0; i < ObjectSlotsConfig.MaxSlots; i++)
             {
                 var objectSlot = new ObjectSlot(this, i, new Size(DefaultSlotSize, DefaultSlotSize));
                 objectSlot.Click += (sender, e) => OnSlotClick(sender, e);
@@ -91,27 +83,6 @@ namespace STROOP.Managers
                 objSlot.Size = new Size(newSize, newSize);
         }
 
-        private static readonly Dictionary<string, TabType> TabNameToTabType = new Dictionary<string, TabType>()
-        {
-            ["Object"] = TabType.Object,
-            ["Map"] = TabType.Map,
-            ["Model"] = TabType.Model,
-            ["Memory"] = TabType.Memory,
-            ["Custom"] = TabType.Custom,
-            ["Warp"] = TabType.Warp,
-            ["TAS"] = TabType.TAS,
-            ["Cam Hack"] = TabType.CamHack,
-        };
-        private void TabControl_Selected(object sender, TabControlEventArgs e)
-        {
-            TabType tabType = TabType.Other;
-            if (e.TabPage != null && TabNameToTabType.ContainsKey(e.TabPage.Text))
-            {
-                tabType = TabNameToTabType[e.TabPage.Text];
-            }
-            ActiveTab = tabType;
-        }
-
         private void OnSlotClick(object sender, EventArgs e)
         {
             // Make sure the tab has loaded
@@ -134,11 +105,40 @@ namespace STROOP.Managers
         {
             bool isMarking = isAltKeyHeld || numberHeld.HasValue;
             int? markedColor = isAltKeyHeld ? 10 : numberHeld;
-            ClickType click = GetClickType(isMarking);
-            bool shouldToggle = ShouldToggle(isCtrlKeyHeld, isMarking);
             bool shouldExtendRange = isShiftKeyHeld;
-            TabPage tabDestination = GetTabDestination(isMarking);
-            DoSlotClickUsingSpecifications(selectedSlot, click, shouldToggle, shouldExtendRange, tabDestination, markedColor);
+            TabPage tabDestination = isMarking ? null : mainForm.tabControlMain.SelectedTab;
+            List<ObjectSlot> newSelection;
+            if (isMarking)
+            {
+                if (shouldExtendRange)
+                {
+                    var markedSlots = new HashSet<uint>();
+                    foreach (var kvp in MarkedSlotsAddressesDictionary)
+                        markedSlots.Add(kvp.Key);
+                    newSelection = ExtendSelection(selectedSlot, markedSlots);
+                }
+                else
+                    newSelection = new List<ObjectSlot>() { selectedSlot };
+                foreach (var objSlot in newSelection)
+                    MarkedSlotsAddressesDictionary[objSlot.CurrentObject.Address] = markedColor.Value;
+            }
+            else
+                foreach (var ctrl in tabDestination.Controls)
+                    if (ctrl is Tabs.STROOPTab stroopTab)
+                    {
+                        var selection = stroopTab.selection;
+                        if (selection == Config.ObjectSlotsManager.SelectedSlotsAddresses)
+                            mainForm.comboBoxSelectionMethod.SelectedItem = SelectionMethodType.Clicked;
+                        if (shouldExtendRange)
+                            newSelection = ExtendSelection(selectedSlot, selection);
+                        else
+                        {
+                            selection.Clear();
+                            selection.Add(selectedSlot.CurrentObject.Address);
+                            newSelection = new List<ObjectSlot>() { selectedSlot };
+                        }
+                        stroopTab.objectSlotsClicked?.Invoke(newSelection);
+                    }
         }
 
         public void SelectSlotByAddress(uint address)
@@ -147,202 +147,39 @@ namespace STROOP.Managers
             if (slot != null) DoSlotClickUsingInput(slot, false, false, false, null);
         }
 
-        private ClickType GetClickType(bool isMarking)
+        List<ObjectSlot> ExtendSelection(ObjectSlot selectedSlot, HashSet<uint> selection)
         {
-            if (isMarking)
+            var newSelection = new List<ObjectSlot>();
+            int? startRange = ObjectSlots.FirstOrDefault(s => s.CurrentObject.Address == selection.Last())?.Index;
+            int endRange = selectedSlot.Index;
+
+            if (startRange.HasValue)
             {
-                return ClickType.MarkClick;
-            }
-            else
-            {
-                switch (ActiveTab)
+                int rangeSize = Math.Abs(endRange - startRange.Value);
+                int iteratorDirection = endRange > startRange ? 1 : -1;
+
+                for (int i = 0; i <= rangeSize; i++)
                 {
-                    case TabType.CamHack:
-                        return ClickType.CamHackClick;
-                    case TabType.Map:
-                        return ClickType.MapClick;
-                    case TabType.Model:
-                        return ClickType.ModelClick;
-                    case TabType.Memory:
-                        return ClickType.MemoryClick;
-                    case TabType.Object:
-                    case TabType.Custom:
-                    case TabType.Warp:
-                    case TabType.TAS:
-                    case TabType.Other:
-                        return ClickType.ObjectClick;
-                    default:
-                        throw new ArgumentOutOfRangeException();
+                    int index = startRange.Value + i * iteratorDirection;
+                    uint address = ObjectSlots[index].CurrentObject.Address;
+                    selection.Add(address);
+                    newSelection.Add(ObjectSlots[index]);
                 }
             }
+            return newSelection;
         }
 
-        private bool ShouldToggle(bool isCtrlKeyHeld, bool isMarking)
-        {
-            bool isTogglingTab =
-                ActiveTab == TabType.Map ||
-                ActiveTab == TabType.CamHack;
-            bool isToggleState = isMarking ? true : isTogglingTab;
-            return isToggleState != isCtrlKeyHeld;
-        }
-
-        private TabPage GetTabDestination(bool isMarking)
-        {
-            if (isMarking) return null;
-            if (ActiveTab == TabType.Other) return mainForm.GetTab<Tabs.ObjectTab>().Tab;
-            return null;
-        }
-
-        public void DoSlotClickUsingSpecifications(
-            ObjectSlot selectedSlot, ClickType click, bool shouldToggle, bool shouldExtendRange, TabPage tabDestination, int? markedColor)
-        {
-            if (selectedSlot.CurrentObject == null)
-                return;
-
-            if (click == ClickType.ObjectClick)
-            {
-                mainForm.comboBoxSelectionMethod.SelectedItem = SelectionMethodType.Clicked;
-            }
-
-            if (click == ClickType.ModelClick)
-            {
-                var tab = mainForm.GetTab<Tabs.ModelTab>();
-                uint currentModelObjectAddress = tab.ModelObjectAddress;
-                uint newModelObjectAddress = currentModelObjectAddress == selectedSlot.CurrentObject.Address ? 0
-                    : selectedSlot.CurrentObject.Address;
-                tab.ModelObjectAddress = newModelObjectAddress;
-                tab.ManualMode = false;
-            }
-            else if (click == ClickType.CamHackClick)
-            {
-                uint currentCamHackSlot = Config.Stream.GetUInt32(CamHackConfig.StructAddress + CamHackConfig.ObjectOffset);
-                uint newCamHackSlot = currentCamHackSlot == selectedSlot.CurrentObject.Address ? 0
-                    : selectedSlot.CurrentObject.Address;
-                Config.Stream.SetValue(newCamHackSlot, CamHackConfig.StructAddress + CamHackConfig.ObjectOffset);
-            }
-            else
-            {
-                List<uint> selection;
-                switch (click)
-                {
-                    case ClickType.ObjectClick:
-                    case ClickType.MemoryClick:
-                        selection = SelectedSlotsAddresses;
-                        break;
-                    case ClickType.MapClick:
-                        selection = SelectedOnMapSlotsAddresses;
-                        break;
-                    case ClickType.MarkClick:
-                        selection = MarkedSlotsAddresses;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-
-                if (tabDestination != null)
-                {
-                    List<TabPage> tabPages = ControlUtilities.GetTabPages(Config.TabControlMain);
-                    bool containsTab = tabPages.Any(tabPage => tabPage == tabDestination);
-                    if (containsTab) Config.TabControlMain.SelectTab(tabDestination);
-                }
-
-                if (shouldExtendRange && selection.Count > 0)
-                {
-                    int? startRange = ObjectSlots.FirstOrDefault(s => s.CurrentObject.Address == selection.Last())?.Index;
-                    int endRange = selectedSlot.Index;
-
-                    if (!startRange.HasValue)
-                        return;
-
-                    int rangeSize = Math.Abs(endRange - startRange.Value);
-                    int iteratorDirection = endRange > startRange ? 1 : -1;
-
-                    for (int i = 0; i <= rangeSize; i++)
-                    {
-                        int index = startRange.Value + i * iteratorDirection;
-                        uint address = ObjectSlots[index].CurrentObject.Address;
-                        if (!selection.Contains(address))
-                        {
-                            selection.Add(address);
-                            if (selection == MarkedSlotsAddresses)
-                            {
-                                MarkedSlotsAddressesDictionary[address] = markedColor.Value;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    if (!shouldToggle)
-                    {
-                        selection.Clear();
-                        if (selection == MarkedSlotsAddresses)
-                        {
-                            MarkedSlotsAddressesDictionary.Clear();
-                        }
-                    }
-
-                    if (selection.Contains(selectedSlot.CurrentObject.Address))
-                    {
-                        if (selection == MarkedSlotsAddresses)
-                        {
-                            int oldMarkedColor = MarkedSlotsAddressesDictionary[selectedSlot.CurrentObject.Address];
-                            if (markedColor == oldMarkedColor) // remove mark
-                            {
-                                selection.Remove(selectedSlot.CurrentObject.Address);
-                                MarkedSlotsAddressesDictionary.Remove(selectedSlot.CurrentObject.Address);
-                            }
-                            else // update the color
-                            {
-                                MarkedSlotsAddressesDictionary[selectedSlot.CurrentObject.Address] = markedColor.Value;
-                            }
-                        }
-                        else
-                        {
-                            selection.Remove(selectedSlot.CurrentObject.Address);
-                        }
-                    }
-                    else
-                    {
-                        selection.Add(selectedSlot.CurrentObject.Address);
-                        if (selection == MarkedSlotsAddresses)
-                        {
-                            MarkedSlotsAddressesDictionary[selectedSlot.CurrentObject.Address] = markedColor.Value;
-                        }
-                    }
-                }
-            }
-
-            if (click == ClickType.MemoryClick)
-            {
-                var memoryTab = mainForm.GetTab<Tabs.MemoryTab>();
-                memoryTab.SetObjectAddress(selectedSlot.CurrentObject?.Address);
-                memoryTab.UpdateHexDisplay();
-            }
-        }
-
-        public void MarkAddresses(List<uint> addresses)
+        public void MarkAddresses(List<uint> addresses, int markColor)
         {
             foreach (uint address in addresses)
-            {
-                if (!MarkedSlotsAddresses.Contains(address))
-                {
-                    MarkedSlotsAddresses.Add(address);
-                    MarkedSlotsAddressesDictionary[address] = 10;
-                }
-            }
+                MarkedSlotsAddressesDictionary[address] = markColor;
         }
 
         public void UnmarkAddresses(List<uint> addresses)
         {
             foreach (uint address in addresses)
-            {
-                if (MarkedSlotsAddresses.Contains(address))
-                {
-                    MarkedSlotsAddresses.Remove(address);
-                    MarkedSlotsAddressesDictionary.Remove(address);
-                }
-            }
+                MarkedSlotsAddressesDictionary.Remove(address);
+
         }
 
         public void Update()
@@ -385,7 +222,6 @@ namespace STROOP.Managers
             UpdateSlots(sortedObjects);
 
             List<ObjectDataModel> objs = DataModels.Objects.Where(o => o != null && SelectedSlotsAddresses.Contains(o.Address)).ToList();
-            objs.Sort((obj1, obj2) => SelectedSlotsAddresses.IndexOf(obj1.Address) - SelectedSlotsAddresses.IndexOf(obj2.Address));
             SelectedObjects = objs;
         }
 

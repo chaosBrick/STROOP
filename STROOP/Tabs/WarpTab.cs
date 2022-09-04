@@ -60,7 +60,7 @@ namespace STROOP.Tabs
             {
                 watchVariablePanelWarp.RemoveVariableGroup(VariableGroup.WarpNode);
                 watchVariablePanelWarp.AddVariables(
-                    GetWarpNodeVariables(warpNodeAddresses).ConvertAll( _ => (new WatchVariable(_), (WatchVariable.IVariableView)_))
+                    GetWarpNodeVariables(warpNodeAddresses).ConvertAll(_ => (new WatchVariable(_), (WatchVariable.IVariableView)_))
                     );
                 _warpNodeAddresses = warpNodeAddresses;
             }

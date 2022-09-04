@@ -117,10 +117,10 @@ namespace STROOP
 
                 //TODO: Figure out what "LockReadOnly" is supposed to be
                 Func<ObjectSlot, uint, bool> shownOnMap = (obj, address) =>
-                    obj._manager.ActiveTab == TabType.Map && Config.ObjectSlotsManager.SelectedOnMapSlotsAddresses.Contains(address);
+                    AccessScope<StroopMainForm>.content.GetTab<Tabs.MapTab.MapTab>().TracksObject(address);
 
                 Func<ObjectSlot, uint, bool> shownOnModel = (obj, address) =>
-                    obj._manager.ActiveTab == TabType.Model && address == AccessScope<StroopMainForm>.content.GetTab<Tabs.ModelTab>().ModelObjectAddress;
+                    AccessScope<StroopMainForm>.content.GetTab<Tabs.ModelTab>().ShowsObject(address);
 
                 lst.Add(new Overlay("TrackedAndShown", GetAddressExpression(shownOnMap)));
                 lst.Add(new Overlay("Model", GetAddressExpression(shownOnModel)));
@@ -257,26 +257,15 @@ namespace STROOP
 
         private void SetUpContextMenuStrip()
         {
-            ToolStripMenuItem itemSelectInObjectTab = new ToolStripMenuItem("Select in Object Tab");
-            itemSelectInObjectTab.Click += (sender, e) =>
-            {
-                Config.ObjectSlotsManager.DoSlotClickUsingSpecifications(
-                    this, ClickType.ObjectClick, false, false, AccessScope<StroopMainForm>.content.GetTab<Tabs.ObjectTab>().Tab, null);
-            };
-
-            ToolStripMenuItem itemSelectInMemoryTab = new ToolStripMenuItem("Select in Memory Tab");
-            itemSelectInMemoryTab.Click += (sender, e) =>
-            {
-                Config.ObjectSlotsManager.DoSlotClickUsingSpecifications(
-                    this, ClickType.MemoryClick, false, false, AccessScope<StroopMainForm>.content.GetTab<Tabs.MemoryTab>().Tab, null);
-            };
-
-            ToolStripMenuItem itemSelectInCurrentTab = new ToolStripMenuItem("Select in Current Tab");
-            itemSelectInCurrentTab.Click += (sender, e) =>
-            {
-                Config.ObjectSlotsManager.DoSlotClickUsingSpecifications(
-                    this, ClickType.ObjectClick, false, false, null, null);
-            };
+            ContextMenuStrip = new ContextMenuStrip();
+            foreach (var tab_it in _manager.mainForm.EnumerateTabs())
+                if (tab_it.objectSlotsClicked != null)
+                {
+                    var tab = tab_it;
+                    var selectInTabItem = new ToolStripMenuItem($"Select in {tab.GetDisplayName()}");
+                    selectInTabItem.DropDownItemClicked += (sender, e) => tab.objectSlotsClicked(new[] { this });
+                    ContextMenuStrip.Items.Add(selectInTabItem);
+                }
 
             Func<List<ObjectDataModel>> getObjects = () => KeyboardUtilities.IsCtrlHeld()
                 ? Config.ObjectSlotsManager.SelectedObjects
@@ -331,7 +320,7 @@ namespace STROOP
             itemMark.Click += (sender, e) =>
             {
                 List<uint> addresses = getObjects().ConvertAll(obj => obj.Address);
-                Config.ObjectSlotsManager.MarkAddresses(addresses);
+                Config.ObjectSlotsManager.MarkAddresses(addresses, 10);
             };
 
             ToolStripMenuItem itemUnmark = new ToolStripMenuItem("Unmark");
@@ -412,10 +401,6 @@ namespace STROOP
                 }
             };
 
-            ContextMenuStrip = new ContextMenuStrip();
-            ContextMenuStrip.Items.Add(itemSelectInObjectTab);
-            ContextMenuStrip.Items.Add(itemSelectInMemoryTab);
-            ContextMenuStrip.Items.Add(itemSelectInCurrentTab);
             ContextMenuStrip.Items.Add(new ToolStripSeparator());
             ContextMenuStrip.Items.Add(itemGoto);
             ContextMenuStrip.Items.Add(itemRetrieve);

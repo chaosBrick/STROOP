@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using STROOP.Structs;
 using System.Windows.Forms;
 using STROOP.Utilities;
@@ -24,7 +25,7 @@ namespace STROOP.Tabs
             }
         }
         private uint _previousModelPointer = 0;
-        
+
         /// <summary>
         /// Mode of camera movement in the view. ManualMode indicates the camera 
         /// should fly around with user input. Otherwise a value of false indicates
@@ -66,6 +67,18 @@ namespace STROOP.Tabs
             _modelView = new ModelGraphics(glControlModelView);
             _modelView.Load();
         }
+
+        public bool ShowsObject(uint address) => IsActiveTab && ModelObjectAddress == address;
+        
+        public override Action<IEnumerable<ObjectSlot>> objectSlotsClicked => objs =>
+        {
+            var selectedSlot = objs.Last();
+            uint currentModelObjectAddress = ModelObjectAddress;
+            uint newModelObjectAddress = currentModelObjectAddress == selectedSlot.CurrentObject.Address ? 0
+                : selectedSlot.CurrentObject.Address;
+            ModelObjectAddress = newModelObjectAddress;
+            ManualMode = false;
+        };
 
         private void UpdateCounts()
         {

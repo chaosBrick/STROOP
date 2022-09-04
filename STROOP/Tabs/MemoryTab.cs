@@ -140,6 +140,13 @@ namespace STROOP.Tabs
             buttonMemoryMoveDownContinuously.MouseUp += (sender, e) => moveDownContinuouslyTimer.Stop();
         }
 
+        public override Action<IEnumerable<ObjectSlot>> objectSlotsClicked => objs =>
+        {
+            var selectedSlot = objs.Last();
+            SetObjectAddress(selectedSlot.CurrentObject?.Address);
+            UpdateHexDisplay();
+        };
+
         private void ScrollMemory(int numLines)
         {
             uint? address = Address;

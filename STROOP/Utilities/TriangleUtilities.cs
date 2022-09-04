@@ -58,7 +58,7 @@ namespace STROOP.Utilities
         public static List<TriangleDataModel> GetSelectedObjectTriangles()
         {
             List<TriangleDataModel> allObjectTriangles = GetObjectTriangles();
-            List<uint> selectedAddresses = Config.ObjectSlotsManager.SelectedSlotsAddresses;
+            HashSet<uint> selectedAddresses = Config.ObjectSlotsManager.SelectedSlotsAddresses;
             List<TriangleDataModel> selectedObjectTriangles = allObjectTriangles.FindAll(
                 tri => selectedAddresses.Contains(tri.AssociatedObject));
             return selectedObjectTriangles;

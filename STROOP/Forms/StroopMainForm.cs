@@ -571,6 +571,11 @@ namespace STROOP
         }
 
         public T GetTab<T>() where T : Tabs.STROOPTab => (T)tabsByType[typeof(T)];
+        public IEnumerable<Tabs.STROOPTab> EnumerateTabs()
+        {
+            foreach (var t in tabsByType)
+                yield return t.Value;
+        }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {

@@ -5,6 +5,7 @@ using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
@@ -192,6 +193,15 @@ namespace STROOP.Tabs
                         useRelative);
                 });
         }
+
+        public override Action<IEnumerable<ObjectSlot>> objectSlotsClicked => objs =>
+        {
+            var selectedSlot = objs.Last();
+            uint currentCamHackSlot = Config.Stream.GetUInt32(CamHackConfig.StructAddress + CamHackConfig.ObjectOffset);
+            uint newCamHackSlot = currentCamHackSlot == selectedSlot.CurrentObject.Address ? 0
+                : selectedSlot.CurrentObject.Address;
+            Config.Stream.SetValue(newCamHackSlot, CamHackConfig.StructAddress + CamHackConfig.ObjectOffset);
+        };
 
         public override void Update(bool updateView)
         {

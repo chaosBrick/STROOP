@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Linq;
 using STROOP.Structs;
 using STROOP.Utilities;
 using System.Windows.Forms;
@@ -62,6 +63,44 @@ namespace STROOP.Tabs.MapTab
         {
             InitializeComponent();
             if (Program.IsVisualStudioHostProcess()) return;
+        }
+
+        private HashSet<uint> _selection = new HashSet<uint>();
+        public override HashSet<uint> selection => _selection;
+
+        public override Action<IEnumerable<ObjectSlot>> objectSlotsClicked => objectSlots =>
+        {
+            bool? unselectFirst = null;
+            foreach (var objectSlot in objectSlots)
+            {
+                bool hasKey = semaphoreTrackers.TryGetValue(objectSlot, out var tracker);
+                if (unselectFirst == null)
+                    unselectFirst = hasKey ^ selection.Count > 1;
+                if (hasKey && unselectFirst.Value)
+                {
+                    flowLayoutPanelMapTrackers.Controls.Remove(tracker);
+                    semaphoreTrackers.Remove(objectSlot);
+                }
+                else if (!hasKey && !unselectFirst.Value)
+                {
+                    var newTracker = new MapTracker(this, $"ObjectSlot{objectSlot.Index}", new MapObjectObject(objectSlot.CurrentObject.Address));
+                    semaphoreTrackers[objectSlot] = newTracker;
+                    flowLayoutPanelMapTrackers.Controls.Add(newTracker);
+                }
+            }
+        };
+
+        public bool TracksObject(uint address)
+        {
+            if (!IsActiveTab)
+                return false;
+            foreach (var tracker in flowLayoutPanelMapTrackers.EnumerateTrackers())
+                if (tracker.mapObject.positionAngleProvider().Any(
+                    pa => (pa is PositionAngle.ObjectPositionAngle objPA
+                            && objPA.objectAddress.HasValue
+                            && objPA.objectAddress.Value == address)))
+                    return true;
+            return false;
         }
 
         public override string GetDisplayName() => "Map";
@@ -157,6 +196,16 @@ namespace STROOP.Tabs.MapTab
                         flowLayoutPanelMapTrackers.Controls.Add(capture.tracker);
                     }
                 };
+            }
+            for (int i = 0; i < ObjectSlotsConfig.MaxSlots; i++)
+            {
+                var capture = i;
+                var creationIdentifier = $"ObjectSlot{i}";
+                newTrackerByName[creationIdentifier] = _ => new MapTracker(
+                    this,
+                    creationIdentifier,
+                    new MapObjectObject(Config.ObjectSlotsManager.ObjectSlots[capture].CurrentObject.Address)
+                    );
             }
             checkBoxMapOptionsTrackMario.Checked = true;
 
@@ -636,49 +685,21 @@ namespace STROOP.Tabs.MapTab
 
         private void UpdateBasedOnObjectsSelectedOnMap()
         {
-            // Determine which obj slots have been checked/unchecked since the last update
-            List<int> currentObjIndexes = Config.StroopMainForm.ObjectSlotsManager.SelectedOnMapSlotsAddresses
-                .ConvertAll(address => ObjectUtilities.GetObjectIndex(address))
-                .FindAll(address => address.HasValue)
-                .ConvertAll(address => address.Value);
-
-            foreach (var lastChecked in _currentObjIndexes)
-            {
-                if (!currentObjIndexes.Contains(lastChecked))
-                    if (semaphoreTrackers.TryGetValue(lastChecked, out var mapTracker))
-                    {
-                        mapTracker.RemoveFromMap();
-                        semaphoreTrackers.Remove(lastChecked);
-                    }
-            }
-            _currentObjIndexes = currentObjIndexes;
-            foreach (var index in _currentObjIndexes)
-            {
-                if (!semaphoreTrackers.ContainsKey(index))
-                {
-                    uint address = ObjectUtilities.GetObjectAddress(index);
-                    MapObject mapObj = new MapObjectObject(address);
-                    MapTracker tracker = new MapTracker(this, null, mapObj);
-                    flowLayoutPanelMapTrackers.Controls.Add(tracker);
-                    semaphoreTrackers[index] = tracker;
-                }
-            }
-
-            foreach (var lolz in quickSemaphores)
+            foreach (var semaphore in quickSemaphores)
             {
                 MapTracker semaphoreTracker = null;
-                foreach (var _ in flowLayoutPanelMapTrackers.Controls)
-                    if (((MapTracker)_).mapObject == lolz.tracker.mapObject)
+                foreach (var tracker in flowLayoutPanelMapTrackers.EnumerateTrackers())
+                    if (tracker.mapObject == semaphore.tracker.mapObject)
                     {
-                        semaphoreTracker = (MapTracker)_;
+                        semaphoreTracker = tracker;
                         break;
                     }
 
-                if (semaphoreTracker == null && lolz.checkBox.Checked)
-                    lolz.checkBox.Checked = false;
-                else if (semaphoreTracker != null && !lolz.checkBox.Checked)
+                if (semaphoreTracker == null && semaphore.checkBox.Checked)
+                    semaphore.checkBox.Checked = false;
+                else if (semaphoreTracker != null && !semaphore.checkBox.Checked)
                 {
-                    semaphoreTrackers.Remove(lolz.checkBox);
+                    semaphoreTrackers.Remove(semaphore.checkBox);
                     semaphoreTracker.RemoveFromMap();
                 }
             }

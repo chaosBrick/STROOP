@@ -22,7 +22,8 @@ namespace STROOP.Controls
             itemSelectMarkedSlots.Click += (sender, e) =>
             {
                 Config.ObjectSlotsManager.SelectedSlotsAddresses.Clear();
-                Config.ObjectSlotsManager.SelectedSlotsAddresses.AddRange(Config.ObjectSlotsManager.MarkedSlotsAddresses);
+                foreach (var kvp in Config.ObjectSlotsManager.MarkedSlotsAddressesDictionary)
+                    Config.ObjectSlotsManager.SelectedSlotsAddresses.Add(kvp.Key);
             };
 
             ToolStripMenuItem itemSelectCopiedAddress = new ToolStripMenuItem("Select Copied Address");
@@ -34,10 +35,7 @@ namespace STROOP.Controls
 
             ToolStripMenuItem itemClearMarkedSlots = new ToolStripMenuItem("Clear Marked Slots");
             itemClearMarkedSlots.Click += (sender, e) =>
-            {
-                Config.ObjectSlotsManager.MarkedSlotsAddresses.Clear();
                 Config.ObjectSlotsManager.MarkedSlotsAddressesDictionary.Clear();
-            };
 
             ToolStripMenuItem itemClearSelectedSlots = new ToolStripMenuItem("Clear Selected Slots");
             itemClearSelectedSlots.Click += (sender, e) =>
@@ -50,7 +48,7 @@ namespace STROOP.Controls
             {
                 List<ObjectDataModel> objsToUnload =
                     DataModels.ObjectProcessor.Objects.ToList().FindAll(
-                        obj => !Config.ObjectSlotsManager.MarkedSlotsAddresses.Contains(obj.Address));
+                        obj => !Config.ObjectSlotsManager.MarkedSlotsAddressesDictionary.ContainsKey(obj.Address));
                 ButtonUtilities.UnloadObject(objsToUnload);
             };
 

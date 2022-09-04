@@ -106,9 +106,9 @@ namespace STROOP.Utilities
         public static PositionAngle Selected = new MemoryPositionAngle(
             () =>
             {
-                List<uint> objAddresses = Config.ObjectSlotsManager.SelectedSlotsAddresses;
-                if (objAddresses.Count == 0) return null;
-                return objAddresses[0];
+                foreach (var first in Config.ObjectSlotsManager.SelectedSlotsAddresses)
+                    return first;
+                return null;
             },
             ObjectConfig.XOffset,
             ObjectConfig.YOffset,

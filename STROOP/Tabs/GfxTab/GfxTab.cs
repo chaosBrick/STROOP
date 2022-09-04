@@ -114,7 +114,7 @@ namespace STROOP.Tabs.GfxTab
         private void RefreshButtonObject_Click(object sender, EventArgs e)
         {
 
-            List<uint> list = Config.ObjectSlotsManager.SelectedSlotsAddresses;
+            HashSet<uint> list = Config.ObjectSlotsManager.SelectedSlotsAddresses;
             if (list != null && list.Count > 0)
             {
                 treeViewGfx.Nodes.Clear();

@@ -114,7 +114,7 @@ namespace STROOP.Tabs
         }
         #endregion
 
-        private List<uint> _addresses
+        private HashSet<uint> _addresses
         {
             get => Config.StroopMainForm.ObjectSlotsManager.SelectedSlotsAddresses;
         }

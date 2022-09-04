@@ -64,6 +64,7 @@ namespace STROOP.Utilities
 
         public class ObjectPositionAngle : MemoryPositionAngle, IHoldsObjectAddress
         {
+            public uint? objectAddress => baseGetter();
             public ObjectPositionAngle(Func<uint?> baseGetter)
                 : base(baseGetter, ObjectConfig.XOffset, ObjectConfig.YOffset, ObjectConfig.ZOffset, ObjectConfig.YawFacingOffset)
             { }

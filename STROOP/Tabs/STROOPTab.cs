@@ -2,6 +2,7 @@
 using STROOP.Controls;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Collections.Generic;
 
 namespace STROOP.Tabs
 {
@@ -19,6 +20,14 @@ namespace STROOP.Tabs
         }
 
         public TabPage Tab => Parent as TabPage;
+        public bool IsActiveTab
+        {
+            get
+            {
+                var form = Tab.FindForm() as StroopMainForm;
+                return form != null && form.tabControlMain.SelectedTab == Tab;
+            }
+        }
         static readonly Size InitSize = new Size(915, 463);
 
         bool initialized = false;
@@ -32,6 +41,9 @@ namespace STROOP.Tabs
             get => initialized ? base.MinimumSize : InitSize;
             set => base.MinimumSize = initialized ? value : InitSize;
         }
+
+        public virtual Action<IEnumerable<ObjectSlot>> objectSlotsClicked => null;
+        public virtual HashSet<uint> selection => Structs.Configurations.Config.ObjectSlotsManager.SelectedSlotsAddresses;
 
         public STROOPTab()
         {
