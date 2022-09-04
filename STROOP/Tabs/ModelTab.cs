@@ -184,7 +184,7 @@ namespace STROOP.Tabs
             {
                 ushort type = Config.Stream.GetUInt16(contModelPtr); // Type (unused, but here anyway for doc.)
 
-                if (contModelPtr > Config.RamSize)
+                if (contModelPtr > (0x80000000 |Config.RamSize))
                     return new List<int[]>();
                 if (type == 0x41)
                     break;

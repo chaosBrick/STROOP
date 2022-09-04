@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenTK;
-using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using System.Windows.Forms;
 using System.Drawing;
-using System.Drawing.Imaging;
-using STROOP.Structs;
 using STROOP.Utilities;
 
 namespace STROOP.Controls
@@ -54,7 +49,7 @@ namespace STROOP.Controls
                 float speed = 0.01f;
                 if (keyState.IsKeyDown(Key.ControlLeft) || keyState.IsKeyDown(Key.ControlRight))
                     speed = 0.0f;
-                else if(keyState.IsKeyDown(Key.ShiftLeft) || keyState.IsKeyDown(Key.ShiftRight))
+                else if (keyState.IsKeyDown(Key.ShiftLeft) || keyState.IsKeyDown(Key.ShiftRight))
                     speed = 0.03f;
                 else if (keyState.IsKeyDown(Key.AltLeft) || keyState.IsKeyDown(Key.AltRight))
                     speed = 0.003f;
@@ -128,11 +123,11 @@ namespace STROOP.Controls
 
                 if (_cameraManualAngleLong > Math.PI / 2 - 0.001f)
                 {
-                    _cameraManualAngleLong = (float) (Math.PI / 2) - 0.001f;
+                    _cameraManualAngleLong = (float)(Math.PI / 2) - 0.001f;
                 }
                 else if (_cameraManualAngleLong < -Math.PI / 2 + 0.001f)
                 {
-                    _cameraManualAngleLong = (float) (-Math.PI / 2) + 0.001f;
+                    _cameraManualAngleLong = (float)(-Math.PI / 2) + 0.001f;
                 }
 
                 // Update mouse coordinates for next time
@@ -221,10 +216,10 @@ namespace STROOP.Controls
             if (ManualMode)
             {
                 // Convert the long. and lat. angles into a camera look vector
-                _cameraLook.Y = (float) (Math.Sin(_cameraManualAngleLong));
-                float yy = (float) Math.Sqrt(1 - _cameraLook.Y * _cameraLook.Y);
-                _cameraLook.X = (float) Math.Cos(_cameraManualAngleLat) * yy;
-                _cameraLook.Z = (float) Math.Sin(_cameraManualAngleLat) * yy;
+                _cameraLook.Y = (float)(Math.Sin(_cameraManualAngleLong));
+                float yy = (float)Math.Sqrt(1 - _cameraLook.Y * _cameraLook.Y);
+                _cameraLook.X = (float)Math.Cos(_cameraManualAngleLat) * yy;
+                _cameraLook.Z = (float)Math.Sin(_cameraManualAngleLat) * yy;
             }
             else
             {
@@ -234,8 +229,8 @@ namespace STROOP.Controls
                 _cameraLook = (_modelCenter - _cameraPosition).Normalized();
 
                 // Update the long. and lat. angles for switching to manual mode
-                _cameraManualAngleLat = (float) Math.Atan2(_cameraLook.Z, _cameraLook.X);
-                _cameraManualAngleLong = (float) Math.Asin(_cameraLook.Y);
+                _cameraManualAngleLat = (float)Math.Atan2(_cameraLook.Z, _cameraLook.X);
+                _cameraManualAngleLong = (float)Math.Asin(_cameraLook.Y);
             }
 
             _pov = (float)(90f + Math.Atan(_zoom) * 180f / Math.PI);
@@ -323,7 +318,7 @@ namespace STROOP.Controls
                     // Only show vertices that are selected
                     if (!_vertexSelected[i])
                         continue;
-                    
+
                     GL.Vertex3(v);
                 }
                 GL.End();
@@ -354,7 +349,7 @@ namespace STROOP.Controls
             var maxHeight = vertices.Max(v => v[1]);
             var minHeight = vertices.Min(v => v[1]);
 
-            _cameraHeight = maxHeight + (float) (Math.Sqrt(2) * maxRadius);
+            _cameraHeight = maxHeight + (float)(Math.Sqrt(2) * maxRadius);
             _cameraRadius = (float)maxRadius * 2f;
 
             _modelCenter = new Vector3(0, (maxHeight + minHeight) / 2, 0);
@@ -409,9 +404,9 @@ namespace STROOP.Controls
 
         private void SetPerspectiveProjection(int width, int height, float FOV)
         {
-            var projectionMatrix = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI * (FOV / 180f), width / (float)height, 0.2f, 100000.0f);
+            var projectionMatrix = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI * (FOV / 180f), width / (float)height, 10f, 100000.0f);
             GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadMatrix(ref projectionMatrix); // this replaces the old matrix, no need for GL.LoadIdentity()
+            GL.LoadMatrix(ref projectionMatrix);
         }
 
         private void SetLookAtCamera(Vector3 position, Vector3 target)
