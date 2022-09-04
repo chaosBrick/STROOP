@@ -201,11 +201,17 @@ namespace STROOP.Tabs.MapTab
             {
                 var capture = i;
                 var creationIdentifier = $"ObjectSlot{i}";
-                newTrackerByName[creationIdentifier] = _ => new MapTracker(
-                    this,
-                    creationIdentifier,
-                    new MapObjectObject(Config.ObjectSlotsManager.ObjectSlots[capture].CurrentObject.Address)
-                    );
+                newTrackerByName[creationIdentifier] = _ =>
+                {
+                    var objectSlot = Config.ObjectSlotsManager.ObjectSlots[capture];
+                    var newTracker = new MapTracker(
+                        this,
+                        creationIdentifier,
+                        new MapObjectObject(objectSlot.CurrentObject.Address)
+                        );
+                    semaphoreTrackers[objectSlot] = newTracker;
+                    return newTracker;
+                };
             }
             checkBoxMapOptionsTrackMario.Checked = true;
 
@@ -759,18 +765,22 @@ namespace STROOP.Tabs.MapTab
 
         void LoadTrackerConfigAndDisplay(string trackerFile)
         {
+            var oldSemaphoreTrackers = semaphoreTrackers;
+            semaphoreTrackers = new Dictionary<object, MapTracker>();
             if (LoadTrackerConfig(trackerFile, out var loadedTrackers))
             {
                 foreach (var ctrl in flowLayoutPanelMapTrackers.Controls)
                     if (ctrl is MapTracker tracker)
                         tracker.CleanUp();
-                semaphoreTrackers.Clear();
                 flowLayoutPanelMapTrackers.Controls.Clear();
                 foreach (var tracker in loadedTrackers)
                     flowLayoutPanelMapTrackers.Controls.Add(tracker);
             }
             else
+            {
+                semaphoreTrackers = oldSemaphoreTrackers;
                 MessageBox.Show("Failed to load tracker configuration!");
+            }
         }
 
         private void buttonMapOptionsSaveTrackerSettings_Click(object sender, EventArgs e)
