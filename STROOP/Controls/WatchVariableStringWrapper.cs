@@ -7,7 +7,17 @@ namespace STROOP.Controls
 {
     public class WatchVariableStringWrapper : WatchVariableWrapper
     {
-        public static Dictionary<string, Action> specialTypeContextMenuHandlers = new Dictionary<string, Action>();
+        public static Dictionary<string, Action> specialTypeContextMenuHandlers = new Dictionary<string, Action>()
+        {
+            ["ActionDescription"] = () => SelectionForm.ShowActionDescriptionSelectionForm(),
+            ["PrevActionDescription"] = () => SelectionForm.ShowPreviousActionDescriptionSelectionForm(),
+            ["AnimationDescription"] = () => SelectionForm.ShowAnimationDescriptionSelectionForm(),
+            ["TriangleTypeDescription"] = () => SelectionForm.ShowTriangleTypeDescriptionSelectionForm(),
+            ["DemoCounterDescription"] = () => SelectionForm.ShowDemoCounterDescriptionSelectionForm(),
+            ["TtcSpeedSettingDescription"] = () => SelectionForm.ShowTtcSpeedSettingDescriptionSelectionForm(),
+            ["AreaTerrainDescription"] = () => SelectionForm.ShowAreaTerrainDescriptionSelectionForm(),
+        };
+        static Dictionary<string, WatchVariableSetting> settingsForSpecials = new Dictionary<string, WatchVariableSetting>();
 
         protected CarretlessTextBox textBox = null;
         Action editValueHandler;
@@ -15,9 +25,7 @@ namespace STROOP.Controls
         protected WatchVariableStringWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl, int ignore)
             : base(watchVar, watchVarControl) { }
 
-        public WatchVariableStringWrapper(
-            WatchVariable watchVar,
-            WatchVariableControl watchVarControl)
+        public WatchVariableStringWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl)
             : this(watchVar, watchVarControl, 0)
         {
             AddStringContextMenuStripItems(watchVarControl.view.GetValueByKey(WatchVariable.ViewProperties.specialType));
@@ -27,46 +35,17 @@ namespace STROOP.Controls
 
         private void AddStringContextMenuStripItems(string specialType)
         {
-            ToolStripMenuItem itemSelectValue = new ToolStripMenuItem("Select Value...");
-            bool addedClickAction = true;
-
-            if (specialTypeContextMenuHandlers.TryGetValue(specialType, out var handler))
-                editValueHandler = handler;
-            else
+            if (specialTypeContextMenuHandlers.TryGetValue(specialType, out editValueHandler))
             {
-                switch (specialType)
-                {
-                    case "ActionDescription":
-                        itemSelectValue.Click += (sender, e) => SelectionForm.ShowActionDescriptionSelectionForm();
-                        break;
-                    case "PrevActionDescription":
-                        itemSelectValue.Click += (sender, e) => SelectionForm.ShowPreviousActionDescriptionSelectionForm();
-                        break;
-                    case "AnimationDescription":
-                        itemSelectValue.Click += (sender, e) => SelectionForm.ShowAnimationDescriptionSelectionForm();
-                        break;
-                    case "TriangleTypeDescription":
-                        itemSelectValue.Click += (sender, e) => SelectionForm.ShowTriangleTypeDescriptionSelectionForm();
-                        break;
-                    case "DemoCounterDescription":
-                        itemSelectValue.Click += (sender, e) => SelectionForm.ShowDemoCounterDescriptionSelectionForm();
-                        break;
-                    case "TtcSpeedSettingDescription":
-                        itemSelectValue.Click += (sender, e) => SelectionForm.ShowTtcSpeedSettingDescriptionSelectionForm();
-                        break;
-                    case "AreaTerrainDescription":
-                        itemSelectValue.Click += (sender, e) => SelectionForm.ShowAreaTerrainDescriptionSelectionForm();
-                        break;
-                    default:
-                        addedClickAction = false;
-                        break;
-                }
-            }
-
-            if (addedClickAction)
-            {
-                _contextMenuStrip.AddToBeginningList(new ToolStripSeparator());
-                _contextMenuStrip.AddToBeginningList(itemSelectValue);
+                WatchVariableSetting applicableSetting;
+                if (!settingsForSpecials.TryGetValue(specialType, out applicableSetting))
+                    settingsForSpecials[specialType] = applicableSetting = new WatchVariableSetting($"Select {specialType}...",
+                        (ctrl, obj) =>
+                        {
+                            editValueHandler();
+                            return false;
+                        });
+                _watchVarControl.AddSetting(applicableSetting);
             }
         }
 

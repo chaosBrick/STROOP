@@ -110,7 +110,7 @@ namespace STROOP.Controls
             currentColor = _baseColor;
             _isFlashing = false;
             _flashStartTime = DateTime.Now;
-            
+
             AddSetting(DefaultSettings.BackgroundColorSetting);
             AddSetting(DefaultSettings.HighlightColorSetting);
             AddSetting(DefaultSettings.FixAddressSetting);
@@ -126,28 +126,22 @@ namespace STROOP.Controls
 
         public void ShowContextMenu()
         {
-            ContextMenuStrip ctx;
-            if (!IsSelected)
-                ctx = WatchVarWrapper.GetContextMenuStrip();
-            else
+            ContextMenuStrip ctx = new ContextMenuStrip();
+            if (containingPanel != null)
             {
-                ctx = new ContextMenuStrip();
-                if (containingPanel != null)
-                {
-                    var uniqueSettings = new HashSet<WatchVariableSetting>();
-                    foreach (var selectedVar in containingPanel.GetSelectedVars())
-                        foreach (var setting in selectedVar.availableSettings)
-                            uniqueSettings.Add(setting.Value);
+                var uniqueSettings = new HashSet<WatchVariableSetting>();
+                foreach (var selectedVar in containingPanel.GetSelectedVars())
+                    foreach (var setting in selectedVar.availableSettings)
+                        uniqueSettings.Add(setting.Value);
 
-                    var sortedOptions = uniqueSettings.ToList();
-                    sortedOptions.Sort((a, b) => string.Compare(a.Name, b.Name));
-                    foreach (var setting in sortedOptions)
-                        setting.CreateContextMenuEntry(ctx.Items, containingPanel.GetSelectedVars);
+                var sortedOptions = uniqueSettings.ToList();
+                sortedOptions.Sort((a, b) => string.Compare(a.Name, b.Name));
+                foreach (var setting in sortedOptions)
+                    setting.CreateContextMenuEntry(ctx.Items, containingPanel.GetSelectedVars);
 
-                    ctx.Items.Add(new ToolStripSeparator());
-                    foreach (var item in WatchVariableSelectionUtilities.CreateSelectionToolStripItems(containingPanel.GetSelectedVars(), containingPanel))
-                        ctx.Items.Add(item);
-                }
+                ctx.Items.Add(new ToolStripSeparator());
+                foreach (var item in WatchVariableSelectionUtilities.CreateSelectionToolStripItems(containingPanel.GetSelectedVars(), containingPanel))
+                    ctx.Items.Add(item);
             }
             ctx.Show(System.Windows.Forms.Cursor.Position);
         }

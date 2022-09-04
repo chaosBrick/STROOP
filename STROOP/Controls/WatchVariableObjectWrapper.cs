@@ -1,20 +1,39 @@
-﻿using STROOP.Extensions;
-using STROOP.Managers;
-using STROOP.Models;
+﻿using STROOP.Models;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Windows.Forms;
 
 namespace STROOP.Controls
 {
     public class WatchVariableObjectWrapper : WatchVariableAddressWrapper
     {
+        static WatchVariableSetting DisplayAsObjectSetting = new WatchVariableSetting(
+            "Display as Object",
+                (ctrl, obj) =>
+                {
+                    if (ctrl.WatchVarWrapper is WatchVariableObjectWrapper objectWrapper)
+                        if (obj is bool doDisplayAsObject)
+                            objectWrapper._displayAsObject = doDisplayAsObject;
+                        else
+                            return false;
+                    return true;
+                },
+                ("Object", () => true, WrapperProperty<WatchVariableObjectWrapper>(o => o._displayAsObject)),
+                ("Address", () => true, WrapperProperty<WatchVariableObjectWrapper>(o => !o._displayAsObject))
+            );
+
+        static WatchVariableSetting SelectObjectSetting = new WatchVariableSetting(
+            "Select Object",
+            (ctrl, obj) =>
+            {
+                object value = ctrl.WatchVarWrapper.UndisplayValue(ctrl.WatchVarWrapper.GetValue(true, false));
+                uint? uintValueNullable = ParsingUtilities.ParseUIntNullable(value);
+                if (!uintValueNullable.HasValue) return false;
+                uint uintValue = uintValueNullable.Value;
+                Config.ObjectSlotsManager.SelectSlotByAddress(uintValue);
+                return false;
+            });
+
         private bool _displayAsObject;
 
         public WatchVariableObjectWrapper(
@@ -29,27 +48,8 @@ namespace STROOP.Controls
 
         private void AddObjectContextMenuStripItems()
         {
-            ToolStripMenuItem itemDisplayAsObject = new ToolStripMenuItem("Display as Object");
-            itemDisplayAsObject.Click += (sender, e) =>
-            {
-                _displayAsObject = !_displayAsObject;
-                itemDisplayAsObject.Checked = _displayAsObject;
-            };
-            itemDisplayAsObject.Checked = _displayAsObject;
-
-            ToolStripMenuItem itemSelectObject = new ToolStripMenuItem("Select Object");
-            itemSelectObject.Click += (sender, e) =>
-            {
-                object value = GetValue(true, false);
-                uint? uintValueNullable = ParsingUtilities.ParseUIntNullable(value);
-                if (!uintValueNullable.HasValue) return;
-                uint uintValue = uintValueNullable.Value;
-                Config.ObjectSlotsManager.SelectSlotByAddress(uintValue);
-            };
-
-            _contextMenuStrip.AddToBeginningList(new ToolStripSeparator());
-            _contextMenuStrip.AddToBeginningList(itemDisplayAsObject);
-            _contextMenuStrip.AddToBeginningList(itemSelectObject);
+            _watchVarControl.AddSetting(DisplayAsObjectSetting);
+            _watchVarControl.AddSetting(SelectObjectSetting);
         }
 
         protected override string GetClass() => "Object";

@@ -15,9 +15,17 @@ namespace STROOP.Controls
 {
     public class WatchVariableTriangleWrapper : WatchVariableAddressWrapper
     {
-        public WatchVariableTriangleWrapper(
-            WatchVariable watchVar,
-            WatchVariableControl watchVarControl)
+        static WatchVariableSetting SelectTriangleSetting = new WatchVariableSetting("Select Triangle", (ctrl, _) =>
+        {
+            object value = ctrl.WatchVarWrapper.GetValue(true, false, ctrl.FixedAddressListGetter());
+            uint? uintValueNullable = ParsingUtilities.ParseUIntNullable(value);
+            if (!uintValueNullable.HasValue) return false;
+            uint uintValue = uintValueNullable.Value;
+            AccessScope<StroopMainForm>.content.GetTab<Tabs.TrianglesTab>().SetCustomTriangleAddresses(uintValue);
+            return false;
+        });
+
+        public WatchVariableTriangleWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl)
             : base(watchVar, watchVarControl)
         {
             AddTriangleContextMenuStripItems();
@@ -25,18 +33,7 @@ namespace STROOP.Controls
 
         private void AddTriangleContextMenuStripItems()
         {
-            ToolStripMenuItem itemSelectTriangle = new ToolStripMenuItem("Select Triangle");
-            itemSelectTriangle.Click += (sender, e) =>
-            {
-                object value = GetValue(true, false, _watchVarControl.FixedAddressListGetter());
-                uint? uintValueNullable = ParsingUtilities.ParseUIntNullable(value);
-                if (!uintValueNullable.HasValue) return;
-                uint uintValue = uintValueNullable.Value;
-                AccessScope<StroopMainForm>.content.GetTab<Tabs.TrianglesTab>().SetCustomTriangleAddresses(uintValue);
-            };
-
-            _contextMenuStrip.AddToBeginningList(new ToolStripSeparator());
-            _contextMenuStrip.AddToBeginningList(itemSelectTriangle);
+            _watchVarControl.AddSetting(SelectTriangleSetting);
         }
 
         protected override string GetClass()

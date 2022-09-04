@@ -1,23 +1,30 @@
-﻿using STROOP.Extensions;
-using STROOP.Managers;
-using STROOP.Models;
-using STROOP.Structs;
-using STROOP.Structs.Configurations;
+﻿using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
 using System.Windows.Forms;
 
 namespace STROOP.Controls
 {
     public class WatchVariableAddressWrapper : WatchVariableNumberWrapper
     {
-        public WatchVariableAddressWrapper(
-            WatchVariable watchVar,
-            WatchVariableControl watchVarControl)
+        static WatchVariableSetting ViewAddressSetting = new WatchVariableSetting(
+            "View Address",
+            (ctrl, obj) =>
+            {
+                object value = ctrl.WatchVarWrapper.UndisplayValue(ctrl.WatchVarWrapper.GetValue(true, false, ctrl.FixedAddressListGetter()));
+                uint? uintValueNullable = ParsingUtilities.ParseUIntNullable(value);
+                if (!uintValueNullable.HasValue) return false;
+                uint uintValue = uintValueNullable.Value;
+                if (uintValue == 0) return false;
+                if (ObjectUtilities.IsObjectAddress(uintValue))
+                    AccessScope<StroopMainForm>.content.GetTab<Tabs.MemoryTab>().SetObjectAddress(uintValue);
+                else
+                    AccessScope<StroopMainForm>.content.GetTab<Tabs.MemoryTab>().SetCustomAddress(uintValue);
+                Config.TabControlMain.SelectedTab = Config.TabControlMain.TabPages["tabPageMemory"];
+                return false;
+            });
+
+        public WatchVariableAddressWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl)
             : base(watchVar, watchVarControl)
         {
             AddAddressContextMenuStripItems();
@@ -25,27 +32,7 @@ namespace STROOP.Controls
 
         private void AddAddressContextMenuStripItems()
         {
-            ToolStripMenuItem itemViewAddress = new ToolStripMenuItem("View Address");
-            itemViewAddress.Click += (sender, e) =>
-            {
-                object value = GetValue(true, false, _watchVarControl.FixedAddressListGetter());
-                uint? uintValueNullable = ParsingUtilities.ParseUIntNullable(value);
-                if (!uintValueNullable.HasValue) return;
-                uint uintValue = uintValueNullable.Value;
-                if (uintValue == 0) return;
-                if (ObjectUtilities.IsObjectAddress(uintValue))
-                {
-                    AccessScope<StroopMainForm>.content.GetTab<Tabs.MemoryTab>().SetObjectAddress(uintValue);
-                }
-                else
-                {
-                    AccessScope<StroopMainForm>.content.GetTab<Tabs.MemoryTab>().SetCustomAddress(uintValue);
-                }
-                Config.TabControlMain.SelectedTab = Config.TabControlMain.TabPages["tabPageMemory"];
-            };
-
-            _contextMenuStrip.AddToBeginningList(new ToolStripSeparator());
-            _contextMenuStrip.AddToBeginningList(itemViewAddress);
+            _watchVarControl.AddSetting(ViewAddressSetting);
         }
 
         public override bool DisplayAsHex() => true;

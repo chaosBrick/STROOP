@@ -13,6 +13,13 @@ namespace STROOP.Controls
         public readonly string Name;
         public readonly Func<WatchVariableControl, object, bool> SetterFunction;
         public readonly (string name, Func<object> valueGetter, Func<WatchVariableControl, bool> isSelected)[] DropDownValues;
+
+        /// <summary>Constructs a new WatchVariableSetting</summary>
+        /// <param name="name">The name of the setting as displayed in the DropdownBox</param>
+        /// <param name="setterFunction">The function that applies a selected value to a WatchVariableControl. If no <see cref="DropDownValues"/> are provided, this will be called with <see langword="null"/></param>
+        /// <param name="dropDownValues">
+        /// A list of tuples representing selectable values, where 'name' is a readable representation of the selection, 'valueGetter' is a function returning the value associated with the setter, and 'isSelected' yields whether this option can be seen as selected
+        /// </param>
         public WatchVariableSetting(
             string name,
             Func<WatchVariableControl, object, bool> setterFunction,
@@ -23,9 +30,14 @@ namespace STROOP.Controls
             this.SetterFunction = setterFunction;
             this.DropDownValues = dropDownValues;
         }
+
         public void CreateContextMenuEntry(ToolStripItemCollection target, Func<List<WatchVariableControl>> getWatchVars)
         {
-            var newThingy = new ToolStripMenuItem(Name + "...");
+            string mainItemText = Name;
+            if (DropDownValues.Length > 0)
+                mainItemText += "...";
+
+            var optionsItem = new ToolStripMenuItem(mainItemText);
             foreach (var option in DropDownValues)
             {
                 var item = new ToolStripMenuItem(option.name);
@@ -53,10 +65,13 @@ namespace STROOP.Controls
                     else
                         item.Checked = !firstValue.HasValue ? false : firstValue.Value;
                 }
-                newThingy.DropDownItems.Add(item);
+                optionsItem.DropDownItems.Add(item);
             }
 
-            target.Add(newThingy);
+            if (DropDownValues.Length == 0)
+                optionsItem.Click += (_, __) => getWatchVars().ForEach(v => v.ApplySettings(Name, null));
+
+            target.Add(optionsItem);
         }
     }
 

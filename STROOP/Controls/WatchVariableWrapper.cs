@@ -57,19 +57,6 @@ namespace STROOP.Controls
         // Main objects
         public readonly WatchVariable WatchVar;
         protected readonly WatchVariableControl _watchVarControl;
-        protected readonly BetterContextMenuStrip _contextMenuStrip;
-
-        // Main items
-        private ToolStripMenuItem _itemHighlight;
-        private ToolStripMenuItem _itemLock;
-        private ToolStripMenuItem _itemRemoveAllLocks;
-        private ToolStripMenuItem _itemDisableAllLocks;
-
-        // Custom items
-        private ToolStripSeparator _separatorCustom;
-        private ToolStripMenuItem _itemFixAddress;
-        private ToolStripMenuItem _itemRename;
-        private ToolStripMenuItem _itemRemove;
 
         public virtual WatchVariablePanel.CustomDraw CustomDrawOperation => null;
 
@@ -77,90 +64,6 @@ namespace STROOP.Controls
         {
             WatchVar = watchVar;
             _watchVarControl = watchVarControl;
-
-            _contextMenuStrip = new BetterContextMenuStrip();
-
-            _contextMenuStrip.SuspendLayout();
-            AddContextMenuStripItems();
-            AddExternalContextMenuStripItems();
-            AddCustomContextMenuStripItems();
-        }
-
-        public ContextMenuStrip GetContextMenuStrip()
-        {
-            _contextMenuStrip.ResumeLayout();
-            return _contextMenuStrip;
-        }
-
-        private void AddContextMenuStripItems()
-        {
-            _itemHighlight = new ToolStripMenuItem("Highlight");
-            _itemHighlight.Click += (sender, e) => _watchVarControl.ToggleHighlighted();
-            _itemHighlight.Checked = _watchVarControl.Highlighted;
-
-            _itemLock = new ToolStripMenuItem("Lock");
-            _itemLock.Click += (sender, e) => ToggleLocked(null, _watchVarControl.FixedAddressListGetter());
-
-            _itemRemoveAllLocks = new ToolStripMenuItem("Remove All Locks");
-            _itemRemoveAllLocks.Click += (sender, e) => WatchVariableLockManager.RemoveAllLocks();
-
-            _itemDisableAllLocks = new ToolStripMenuItem("Disable All Locks");
-            _itemDisableAllLocks.Click += (sender, e) => LockConfig.LockingDisabled = !LockConfig.LockingDisabled;
-
-            ToolStripMenuItem itemCopyUnrounded = new ToolStripMenuItem("Copy");
-            itemCopyUnrounded.Click += (sender, e) => Clipboard.SetText(
-                GetValue(false, true, _watchVarControl.FixedAddressListGetter()).ToString());
-
-            ToolStripMenuItem itemPaste = new ToolStripMenuItem("Paste");
-            itemPaste.Click += (sender, e) => _watchVarControl.SetValue(Clipboard.GetText());
-
-            _contextMenuStrip.AddToBeginningList(_itemHighlight);
-            _contextMenuStrip.AddToBeginningList(_itemLock);
-            _contextMenuStrip.AddToBeginningList(_itemRemoveAllLocks);
-            _contextMenuStrip.AddToBeginningList(_itemDisableAllLocks);
-            _contextMenuStrip.AddToBeginningList(itemCopyUnrounded);
-            _contextMenuStrip.AddToBeginningList(itemPaste);
-        }
-
-        private void AddExternalContextMenuStripItems()
-        {
-            ToolStripMenuItem itemOpenController = new ToolStripMenuItem("Open Controller");
-            itemOpenController.Click += (sender, e) => ShowControllerForm();
-
-            ToolStripMenuItem itemOpenBitController = new ToolStripMenuItem("Open Bit Controller");
-            itemOpenBitController.Click += (sender, e) => ShowBitForm();
-
-            ToolStripMenuItem itemAddToCustomTab = new ToolStripMenuItem("Add to Custom Tab");
-            itemAddToCustomTab.Click += (sender, e) => new NotImplementedException("What");
-            //_watchVarControl.AddToTab(AccessScope<StroopMainForm>.content.GetTab<Tabs.CustomTab>().watchVariablePanelCustom);
-
-            _contextMenuStrip.AddToEndingList(new ToolStripSeparator());
-            _contextMenuStrip.AddToEndingList(itemOpenController);
-            _contextMenuStrip.AddToEndingList(itemOpenBitController);
-            _contextMenuStrip.AddToEndingList(itemAddToCustomTab);
-        }
-
-        private void AddCustomContextMenuStripItems()
-        {
-            _separatorCustom = new ToolStripSeparator();
-
-            _itemFixAddress = new ToolStripMenuItem("Fix Address");
-            _itemFixAddress.Click += (sender, e) =>
-            {
-                _watchVarControl.ToggleFixedAddress();
-                _itemFixAddress.Checked = _watchVarControl.FixedAddressListGetter() != null;
-            };
-
-            _itemRename = new ToolStripMenuItem("Rename");
-            _itemRename.Click += (sender, e) => { _watchVarControl.RenameMode = true; };
-
-            _itemRemove = new ToolStripMenuItem("Remove");
-            _itemRemove.Click += (sender, e) => { _watchVarControl.RemoveFromPanel(); };
-
-            _contextMenuStrip.AddToEndingList(_separatorCustom);
-            _contextMenuStrip.AddToEndingList(_itemFixAddress);
-            _contextMenuStrip.AddToEndingList(_itemRename);
-            _contextMenuStrip.AddToEndingList(_itemRemove);
         }
 
         public void ShowVarInfo()
@@ -250,12 +153,6 @@ namespace STROOP.Controls
 
         public void UpdateItemCheckStates(List<uint> addresses = null)
         {
-            _itemHighlight.Checked = _watchVarControl.Highlighted;
-            _itemLock.Checked = WatchVar.locked;
-            _itemRemoveAllLocks.Visible = WatchVar.locked;
-            _itemDisableAllLocks.Visible = WatchVar.locked || LockConfig.LockingDisabled;
-            _itemDisableAllLocks.Checked = LockConfig.LockingDisabled;
-            _itemFixAddress.Checked = _watchVarControl.FixedAddressListGetter() != null;
             UpdateControls();
         }
 

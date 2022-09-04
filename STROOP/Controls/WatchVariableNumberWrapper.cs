@@ -102,7 +102,6 @@ namespace STROOP.Controls
             _defaultDisplayAsHex = (bool.TryParse(watchVarControl.view.GetValueByKey(WatchVariable.ViewProperties.useHex), out var a)) ? a : DEFAULT_DISPLAY_AS_HEX;
             _displayAsHex = _defaultDisplayAsHex;
 
-            AddCoordinateContextMenuStripItems();
             AddNumberContextMenuStripItems();
         }
 
@@ -111,73 +110,6 @@ namespace STROOP.Controls
             _watchVarControl.AddSetting(RoundToSetting);
             _watchVarControl.AddSetting(DisplayAsHexSetting);
         }
-
-        private void AddCoordinateContextMenuStripItems()
-        {
-            _separatorCoordinates = new ToolStripSeparator();
-            _separatorCoordinates.Visible = false;
-
-            _itemCopyCoordinates = new ToolStripMenuItem("Copy Coordinates");
-            _itemCopyCoordinates.Visible = false;
-
-            _itemPasteCoordinates = new ToolStripMenuItem("Paste Coordinates");
-            _itemPasteCoordinates.Visible = false;
-
-            _contextMenuStrip.AddToBeginningList(_separatorCoordinates);
-            _contextMenuStrip.AddToBeginningList(_itemCopyCoordinates);
-            _contextMenuStrip.AddToBeginningList(_itemPasteCoordinates);
-        }
-
-        public void EnableCoordinateContextMenuStripItemFunctionality(List<WatchVariableNumberWrapper> coordinateVarList)
-        {
-            int coordinateCount = coordinateVarList.Count;
-            if (coordinateCount != 2 && coordinateCount != 3)
-                throw new ArgumentOutOfRangeException();
-
-            Action<string> copyCoordinatesWithSeparator = (string separator) =>
-            {
-                Clipboard.SetText(
-                    String.Join(separator, coordinateVarList.ConvertAll(
-                        coord => coord.GetValue(false))));
-            };
-
-            ToolStripMenuItem itemCopyCoordinatesCommas = new ToolStripMenuItem("Copy Coordinates with Commas");
-            itemCopyCoordinatesCommas.Click += (sender, e) => copyCoordinatesWithSeparator(",");
-
-            ToolStripMenuItem itemCopyCoordinatesTabs = new ToolStripMenuItem("Copy Coordinates with Tabs");
-            itemCopyCoordinatesTabs.Click += (sender, e) => copyCoordinatesWithSeparator("\t");
-
-            ToolStripMenuItem itemCopyCoordinatesLineBreaks = new ToolStripMenuItem("Copy Coordinates with Line Breaks");
-            itemCopyCoordinatesLineBreaks.Click += (sender, e) => copyCoordinatesWithSeparator("\r\n");
-
-            ToolStripMenuItem itemCopyCoordinatesCommasAndSpaces = new ToolStripMenuItem("Copy Coordinates with Commas and Spaces");
-            itemCopyCoordinatesCommasAndSpaces.Click += (sender, e) => copyCoordinatesWithSeparator(", ");
-
-            _itemCopyCoordinates.DropDownItems.Add(itemCopyCoordinatesCommas);
-            _itemCopyCoordinates.DropDownItems.Add(itemCopyCoordinatesTabs);
-            _itemCopyCoordinates.DropDownItems.Add(itemCopyCoordinatesLineBreaks);
-            _itemCopyCoordinates.DropDownItems.Add(itemCopyCoordinatesCommasAndSpaces);
-
-            _itemPasteCoordinates.Click += (sender, e) =>
-            {
-                List<string> stringList = ParsingUtilities.ParseStringList(Clipboard.GetText());
-                int stringCount = stringList.Count;
-                if (stringCount != 2 && stringCount != 3) return;
-
-                using (Config.Stream.Suspend())
-                {
-                    coordinateVarList[0]._watchVarControl.SetValue(stringList[0]);
-                    if (coordinateCount == 3 && stringCount == 3)
-                        coordinateVarList[1]._watchVarControl.SetValue(stringList[1]);
-                    coordinateVarList[coordinateCount - 1]._watchVarControl.SetValue(stringList[stringCount - 1]);
-                }
-            };
-
-            _separatorCoordinates.Visible = true;
-            _itemCopyCoordinates.Visible = true;
-            _itemPasteCoordinates.Visible = true;
-        }
-
 
         protected override void HandleVerification(object value)
         {
