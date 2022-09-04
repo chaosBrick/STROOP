@@ -563,11 +563,11 @@ namespace STROOP
             io.SaveMemory(saveFileDialogSt.FileName);
         }
 
-        public void SwitchTab(string name)
+        public void SwitchTab(Tabs.STROOPTab stroopTab)
         {
-            List<TabPage> tabPages = ControlUtilities.GetTabPages(tabControlMain);
-            bool containsTab = tabPages.Any(tabPage => tabPage.Name == name);
-            if (containsTab) tabControlMain.SelectTab(name);
+            if (!tabControlMain.TabPages.Contains(stroopTab.Tab))
+                SavedSettingsConfig.AddTab(stroopTab.Tab);
+            tabControlMain.SelectedTab = stroopTab.Tab;
         }
 
         public T GetTab<T>() where T : Tabs.STROOPTab => (T)tabsByType[typeof(T)];

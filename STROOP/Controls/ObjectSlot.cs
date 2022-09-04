@@ -262,8 +262,15 @@ namespace STROOP
                 if (tab_it.objectSlotsClicked != null)
                 {
                     var tab = tab_it;
-                    var selectInTabItem = new ToolStripMenuItem($"Select in {tab.GetDisplayName()}");
-                    selectInTabItem.DropDownItemClicked += (sender, e) => tab.objectSlotsClicked(new[] { this });
+                    var selectInTabItem = new ToolStripMenuItem($"Select in {tab.GetDisplayName()} Tab");
+                    selectInTabItem.Click += (sender, e) =>
+                    {
+                        _manager.mainForm.SwitchTab(tab);
+                        tab.UpdateOrInitialize(true);
+                        tab.selection?.Clear();
+                        tab.selection?.Add(CurrentObject.Address);
+                        tab.objectSlotsClicked(new[] { this });
+                    };
                     ContextMenuStrip.Items.Add(selectInTabItem);
                 }
 

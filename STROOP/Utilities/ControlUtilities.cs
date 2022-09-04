@@ -748,9 +748,7 @@ namespace STROOP.Utilities
         {
             List<TabPage> tabPages = new List<TabPage>();
             foreach (TabPage tabPage in tabControl.TabPages)
-            {
                 tabPages.Add(tabPage);
-            }
             return tabPages;
         }
 

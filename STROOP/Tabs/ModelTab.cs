@@ -69,7 +69,9 @@ namespace STROOP.Tabs
         }
 
         public bool ShowsObject(uint address) => IsActiveTab && ModelObjectAddress == address;
-        
+
+        public override HashSet<uint> selection => null;
+
         public override Action<IEnumerable<ObjectSlot>> objectSlotsClicked => objs =>
         {
             var selectedSlot = objs.Last();

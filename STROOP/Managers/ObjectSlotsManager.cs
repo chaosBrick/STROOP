@@ -129,7 +129,9 @@ namespace STROOP.Managers
                         var selection = stroopTab.selection;
                         if (selection == Config.ObjectSlotsManager.SelectedSlotsAddresses)
                             mainForm.comboBoxSelectionMethod.SelectedItem = SelectionMethodType.Clicked;
-                        if (shouldExtendRange)
+                        if (selection == null)
+                            newSelection = new List<ObjectSlot>() { selectedSlot };
+                        else if (shouldExtendRange)
                             newSelection = ExtendSelection(selectedSlot, selection);
                         else
                         {

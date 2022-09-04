@@ -424,13 +424,16 @@ namespace STROOP.Tabs
                 });
         }
 
+        // Having an empty action assigned to this adds the context menu entry to the ObjectSlot controls
+        public override Action<IEnumerable<ObjectSlot>> objectSlotsClicked => objectSlots => { };
+
         private void _objBehaviorLabel_Click(object sender, EventArgs e)
         {
             if (_objects.Count == 0)
                 return;
 
             var scriptAddress = Config.Stream.GetUInt32(_objects.First().Address + ObjectConfig.BehaviorScriptOffset);
-            Config.StroopMainForm.SwitchTab("tabPageScripts");
+            Config.StroopMainForm.SwitchTab(Config.StroopMainForm.GetTab<Tabs.ScriptTab>());
         }
 
         public void SetBehaviorWatchVariables(IEnumerable<WatchVariable> watchVars, Color color)
