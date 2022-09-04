@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.Serialization;
-using System.Xml.Serialization;
 using STROOP.Structs;
 using System.ComponentModel;
 using STROOP.Utilities;
@@ -13,7 +10,12 @@ namespace STROOP.M64
 {
     public class M64Header
     {
-        public enum MovieStartTypeEnum { FromStart, FromSnapshot }
+        public enum MovieStartTypeEnum : ushort
+        {
+            FromSnapshot = 1, //movie begins from snapshot (the snapshot will be loaded from an external file with the movie filename and a .st extension)
+            FromStart = 2, //movie begins from power-on
+            FromEEPRom = 4, //movie begins from power-on but doesn't reset eeprom
+        }
 
         private readonly M64File _m64File;
         private readonly Tabs.M64Tab _gui;
@@ -34,10 +36,6 @@ namespace STROOP.M64
         public int NumRerecords { get => _numRerecords; set { _numRerecords = value; NotifyChange(); } }
 
         // 01C 2-byte unsigned int: movie start type
-        // value 1: movie begins from snapshot(the snapshot will be loaded from an externalfile
-        //     with the movie filename and a .st extension)
-        // value 2: movie begins from power-on
-        // other values: invalid movie
         private MovieStartTypeEnum _movieStartType;
         [CategoryAttribute("\u200B\u200B\u200B\u200B\u200BMain"), DisplayName("\u200BMovie Start Type")]
         public MovieStartTypeEnum MovieStartType { get => _movieStartType; set { _movieStartType = value; NotifyChange(); } }
@@ -191,8 +189,7 @@ namespace STROOP.M64
             NumControllers = bytes[0x015];
             NumInputs = BitConverter.ToInt32(bytes, 0x018);
 
-            short movieStartTypeShort = BitConverter.ToInt16(bytes, 0x01C);
-            MovieStartType = ConvertShortToMovieStartTypeEnum(movieStartTypeShort);
+            MovieStartType = (MovieStartTypeEnum)BitConverter.ToUInt16(bytes, 0x01C);
 
             uint controllerFlagsValue = BitConverter.ToUInt16(bytes, 0x020);
             Controller1Present = (controllerFlagsValue & (1 << 0)) != 0;
@@ -234,7 +231,7 @@ namespace STROOP.M64
             bytes.AddRange(TypeUtilities.GetBytes(NumControllers));
             bytes.AddRange(new byte[2]);
             bytes.AddRange(TypeUtilities.GetBytes(NumInputs));
-            bytes.AddRange(TypeUtilities.GetBytes(ConvertMovieStartTypeEnumToShort(MovieStartType)));
+            bytes.AddRange(TypeUtilities.GetBytes((ushort)MovieStartType));
             bytes.AddRange(new byte[2]);
             bytes.AddRange(TypeUtilities.GetBytes(GetControllerFlagsValue()));
             bytes.AddRange(new byte[160]);
@@ -281,32 +278,6 @@ namespace STROOP.M64
                 Controller3RumblePak,
                 Controller4RumblePak,
             };
-        }
-
-        private short ConvertMovieStartTypeEnumToShort(MovieStartTypeEnum movieStartType)
-        {
-            switch (movieStartType)
-            {
-                case MovieStartTypeEnum.FromStart:
-                    return 2;
-                case MovieStartTypeEnum.FromSnapshot:
-                    return 1;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        private MovieStartTypeEnum ConvertShortToMovieStartTypeEnum(short shortValue)
-        {
-            switch (shortValue)
-            {
-                case 1:
-                    return MovieStartTypeEnum.FromSnapshot;
-                case 2:
-                    return MovieStartTypeEnum.FromStart;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
         }
 
         public void Clear()
