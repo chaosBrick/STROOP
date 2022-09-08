@@ -54,10 +54,9 @@ namespace STROOP.Tabs.MapTab
         bool makeInGameCameraFollow = false;
 
         public bool HasMouseListeners => hoverData.Count > 0;
-        Dictionary<object, MapTracker> semaphoreTrackers = new Dictionary<object, MapTracker>();
+        Dictionary<uint, MapTracker> semaphoreTrackers = new Dictionary<uint, MapTracker>();
         List<(CheckBox checkBox, MapTracker tracker)> quickSemaphores = new List<(CheckBox checkBox, MapTracker tracker)>();
         Dictionary<string, MapTracker.CreateTracker> newTrackerByName = new Dictionary<string, MapTracker.CreateTracker>();
-
 
         public MapTab()
         {
@@ -73,35 +72,21 @@ namespace STROOP.Tabs.MapTab
             bool? unselectFirst = null;
             foreach (var objectSlot in objectSlots)
             {
-                bool hasKey = semaphoreTrackers.TryGetValue(objectSlot, out var tracker);
+                bool hasKey = semaphoreTrackers.TryGetValue(objectSlot.CurrentObject.Address, out var tracker);
                 if (unselectFirst == null)
                     unselectFirst = hasKey ^ selection.Count > 1;
                 if (hasKey && unselectFirst.Value)
-                {
-                    flowLayoutPanelMapTrackers.Controls.Remove(tracker);
-                    semaphoreTrackers.Remove(objectSlot);
-                }
+                    tracker.RemoveFromMap();
                 else if (!hasKey && !unselectFirst.Value)
                 {
                     var newTracker = new MapTracker(this, $"ObjectSlot{objectSlot.Index}", new MapObjectObject(objectSlot.CurrentObject.Address));
-                    semaphoreTrackers[objectSlot] = newTracker;
                     flowLayoutPanelMapTrackers.Controls.Add(newTracker);
                 }
             }
         };
 
-        public bool TracksObject(uint address)
-        {
-            if (!IsActiveTab)
-                return false;
-            foreach (var tracker in flowLayoutPanelMapTrackers.EnumerateTrackers())
-                if (tracker.mapObject.positionAngleProvider().Any(
-                    pa => (pa is PositionAngle.ObjectPositionAngle objPA
-                            && objPA.objectAddress.HasValue
-                            && objPA.objectAddress.Value == address)))
-                    return true;
-            return false;
-        }
+        HashSet<uint> trackedAddresses = new HashSet<uint>();
+        public bool TracksObject(uint address) => IsActiveTab && trackedAddresses.Contains(address);
 
         public override string GetDisplayName() => "Map";
 
@@ -191,10 +176,7 @@ namespace STROOP.Tabs.MapTab
                 capture.checkBox.CheckedChanged += (_, __) =>
                 {
                     if (capture.checkBox.Checked)
-                    {
-                        semaphoreTrackers[capture.checkBox] = capture.tracker;
                         flowLayoutPanelMapTrackers.Controls.Add(capture.tracker);
-                    }
                 };
             }
             for (int i = 0; i < ObjectSlotsConfig.MaxSlots; i++)
@@ -209,7 +191,6 @@ namespace STROOP.Tabs.MapTab
                         creationIdentifier,
                         new MapObjectObject(objectSlot.CurrentObject.Address)
                         );
-                    semaphoreTrackers[objectSlot] = newTracker;
                     return newTracker;
                 };
             }
@@ -600,6 +581,21 @@ namespace STROOP.Tabs.MapTab
         {
             if (!_isLoaded2D) return;
 
+            semaphoreTrackers.Clear();
+            trackedAddresses.Clear();
+            foreach (var tracker in flowLayoutPanelMapTrackers.EnumerateTrackers())
+            {
+                if (tracker.mapObject is MapObjectObject obj)
+                    semaphoreTrackers[((PositionAngle.ObjectPositionAngle)obj.positionAngleProvider().FirstOrDefault()).objectAddress.Value] = tracker;
+                foreach (var pa in tracker.mapObject.positionAngleProvider())
+                    if (pa is PositionAngle.ObjectPositionAngle objPA)
+                    {
+                        var a = objPA.objectAddress;
+                        if (a.HasValue)
+                            trackedAddresses.Add(a.Value);
+                    }
+            }
+
             graphics.UpdateCursor();
             if (displayingExtendedBoundaries != SavedSettingsConfig.UseExtendedLevelBoundaries)
             {
@@ -704,10 +700,7 @@ namespace STROOP.Tabs.MapTab
                 if (semaphoreTracker == null && semaphore.checkBox.Checked)
                     semaphore.checkBox.Checked = false;
                 else if (semaphoreTracker != null && !semaphore.checkBox.Checked)
-                {
-                    semaphoreTrackers.Remove(semaphore.checkBox);
                     semaphoreTracker.RemoveFromMap();
-                }
             }
         }
 
@@ -765,8 +758,6 @@ namespace STROOP.Tabs.MapTab
 
         void LoadTrackerConfigAndDisplay(string trackerFile)
         {
-            var oldSemaphoreTrackers = semaphoreTrackers;
-            semaphoreTrackers = new Dictionary<object, MapTracker>();
             if (LoadTrackerConfig(trackerFile, out var loadedTrackers))
             {
                 foreach (var ctrl in flowLayoutPanelMapTrackers.Controls)
@@ -777,10 +768,7 @@ namespace STROOP.Tabs.MapTab
                     flowLayoutPanelMapTrackers.Controls.Add(tracker);
             }
             else
-            {
-                semaphoreTrackers = oldSemaphoreTrackers;
                 MessageBox.Show("Failed to load tracker configuration!");
-            }
         }
 
         private void buttonMapOptionsSaveTrackerSettings_Click(object sender, EventArgs e)
