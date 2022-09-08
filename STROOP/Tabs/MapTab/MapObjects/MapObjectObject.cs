@@ -165,13 +165,13 @@ namespace STROOP.Tabs.MapTab.MapObjects
             var collisionItem = new ToolStripMenuItem("Collision");
 
             collisionItem.DropDownItems.AddHandlerToItem("Add Tracker for Object Wall Triangles",
-                            tracker.MakeCreateTrackerHandler(mapTab, "Object Walls Predicition", _ => new MapObjectWallPrediction(positionAngleProvider)));
+                            tracker.MakeCreateTrackerHandler(mapTab, "ObjectWallsPredicition", _ => new MapObjectWallPrediction(positionAngleProvider)));
 
             collisionItem.DropDownItems.AddHandlerToItem("Add Tracker for Object Floor Triangles",
-                            tracker.MakeCreateTrackerHandler(mapTab, "Object Floors Prediction", _ => new MapObjectFloorPrediction(positionAngleProvider)));
+                            tracker.MakeCreateTrackerHandler(mapTab, "ObjectFloorsPrediction", _ => new MapObjectFloorPrediction(positionAngleProvider)));
 
             collisionItem.DropDownItems.AddHandlerToItem("Add Tracker for Object Ceiling Triangles",
-                            tracker.MakeCreateTrackerHandler(mapTab, "Object Ceilings Prediction", _ => new MapObjectCeilingPrediction(positionAngleProvider)));
+                            tracker.MakeCreateTrackerHandler(mapTab, "ObjectCeilingsPrediction", _ => new MapObjectCeilingPrediction(positionAngleProvider)));
 
             targetStrip.Items.Add(collisionItem);
         }
