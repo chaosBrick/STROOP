@@ -67,6 +67,26 @@ The displayed cap state of the ghost is not representative of its actual cap sta
             frm.ShowDialog();
         }
 
+        private void buttonHelpGfxPool_Click(object sender, EventArgs e)
+        {
+            Forms.InfoForm frm = new Forms.InfoForm();
+            frm.Size = new System.Drawing.Size(1050, 330);
+            frm.SetText("Ghost Help",
+                        "Moving and expanding the GFX Pool",
+@"You can move the game's GFX pools to a custom location in RAM and assign a custom size to them to allow for more graphics to be rendered.
+This can enable you to render a lot of ghosts at once, since the original GFX Pool usually overflows at ~15 to ~18 ghosts.
+
+Unless you are on Pure Interpreter, you will need to savestate and loadstate after moving the GFX pool for the first time.
+
+Be careful not to override any important data such as the ghost hack itself or other hacked data, especially when dealing with ROM hacks.
+It is recommended to make a backup savestate before moving the GFX Pool.
+
+If you move the GFX pools more than once and the game has rendered in-between, you may get a warning about overriding non-zero data.
+You can usually safely ignore this warning then, although at this point it won't be able to distinguish GFX data from other data."
+);
+            frm.ShowDialog();
+        }
+
         private void buttonTutorialFileWatch_Click(object sender, EventArgs e)
         {
             Forms.InfoForm frm = new Forms.InfoForm();

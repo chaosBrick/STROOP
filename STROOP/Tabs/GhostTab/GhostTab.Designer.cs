@@ -55,12 +55,22 @@
             this.buttonTutorialFileWatch = new System.Windows.Forms.Button();
             this.buttonTutorialPlayback = new System.Windows.Forms.Button();
             this.buttonTutorialNotes = new System.Windows.Forms.Button();
+            this.groupBoxGfxPool = new System.Windows.Forms.GroupBox();
+            this.textBoxPoolSize = new System.Windows.Forms.TextBox();
+            this.textBoxPoolAddr2 = new System.Windows.Forms.TextBox();
+            this.textBoxPoolAddr1 = new System.Windows.Forms.TextBox();
+            this.labelPoolSize = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.labelPool1Address = new System.Windows.Forms.Label();
+            this.buttonMoveGfxPool = new System.Windows.Forms.Button();
+            this.buttonHelpGfxPool = new System.Windows.Forms.Button();
             this.groupBoxGhosts.SuspendLayout();
             this.groupBoxGhostInfo.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownStartOfPlayback)).BeginInit();
             this.groupGhostHack.SuspendLayout();
             this.groupBoxVariables.SuspendLayout();
             this.groupBoxHelp.SuspendLayout();
+            this.groupBoxGfxPool.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBoxGhosts
@@ -330,19 +340,20 @@
             // 
             this.groupBoxHelp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.groupBoxHelp.Controls.Add(this.buttonTutorialFileWatch);
+            this.groupBoxHelp.Controls.Add(this.buttonHelpGfxPool);
             this.groupBoxHelp.Controls.Add(this.buttonTutorialPlayback);
             this.groupBoxHelp.Controls.Add(this.buttonTutorialNotes);
             this.groupBoxHelp.Controls.Add(this.buttonTutorialRecord);
-            this.groupBoxHelp.Location = new System.Drawing.Point(3, 173);
+            this.groupBoxHelp.Location = new System.Drawing.Point(3, 288);
             this.groupBoxHelp.Name = "groupBoxHelp";
-            this.groupBoxHelp.Size = new System.Drawing.Size(161, 287);
+            this.groupBoxHelp.Size = new System.Drawing.Size(161, 172);
             this.groupBoxHelp.TabIndex = 8;
             this.groupBoxHelp.TabStop = false;
             this.groupBoxHelp.Text = "Help";
             // 
             // buttonTutorialFileWatch
             // 
-            this.buttonTutorialFileWatch.Location = new System.Drawing.Point(9, 110);
+            this.buttonTutorialFileWatch.Location = new System.Drawing.Point(9, 139);
             this.buttonTutorialFileWatch.Name = "buttonTutorialFileWatch";
             this.buttonTutorialFileWatch.Size = new System.Drawing.Size(146, 23);
             this.buttonTutorialFileWatch.TabIndex = 7;
@@ -370,11 +381,100 @@
             this.buttonTutorialNotes.UseVisualStyleBackColor = true;
             this.buttonTutorialNotes.Click += new System.EventHandler(this.buttonTutorialNotes_Click);
             // 
+            // groupBoxGfxPool
+            // 
+            this.groupBoxGfxPool.Controls.Add(this.textBoxPoolSize);
+            this.groupBoxGfxPool.Controls.Add(this.textBoxPoolAddr2);
+            this.groupBoxGfxPool.Controls.Add(this.textBoxPoolAddr1);
+            this.groupBoxGfxPool.Controls.Add(this.labelPoolSize);
+            this.groupBoxGfxPool.Controls.Add(this.label1);
+            this.groupBoxGfxPool.Controls.Add(this.labelPool1Address);
+            this.groupBoxGfxPool.Controls.Add(this.buttonMoveGfxPool);
+            this.groupBoxGfxPool.Location = new System.Drawing.Point(3, 171);
+            this.groupBoxGfxPool.Name = "groupBoxGfxPool";
+            this.groupBoxGfxPool.Size = new System.Drawing.Size(155, 111);
+            this.groupBoxGfxPool.TabIndex = 9;
+            this.groupBoxGfxPool.TabStop = false;
+            this.groupBoxGfxPool.Text = "Gfx Pool";
+            // 
+            // textBoxPoolSize
+            // 
+            this.textBoxPoolSize.Location = new System.Drawing.Point(80, 57);
+            this.textBoxPoolSize.Name = "textBoxPoolSize";
+            this.textBoxPoolSize.Size = new System.Drawing.Size(69, 20);
+            this.textBoxPoolSize.TabIndex = 2;
+            this.textBoxPoolSize.Text = "FFF00";
+            // 
+            // textBoxPoolAddr2
+            // 
+            this.textBoxPoolAddr2.Location = new System.Drawing.Point(80, 35);
+            this.textBoxPoolAddr2.Name = "textBoxPoolAddr2";
+            this.textBoxPoolAddr2.Size = new System.Drawing.Size(69, 20);
+            this.textBoxPoolAddr2.TabIndex = 2;
+            this.textBoxPoolAddr2.Text = "80700000";
+            // 
+            // textBoxPoolAddr1
+            // 
+            this.textBoxPoolAddr1.Location = new System.Drawing.Point(80, 13);
+            this.textBoxPoolAddr1.Name = "textBoxPoolAddr1";
+            this.textBoxPoolAddr1.Size = new System.Drawing.Size(69, 20);
+            this.textBoxPoolAddr1.TabIndex = 2;
+            this.textBoxPoolAddr1.Text = "80600000";
+            // 
+            // labelPoolSize
+            // 
+            this.labelPoolSize.AutoSize = true;
+            this.labelPoolSize.Location = new System.Drawing.Point(23, 60);
+            this.labelPoolSize.Name = "labelPoolSize";
+            this.labelPoolSize.Size = new System.Drawing.Size(51, 13);
+            this.labelPoolSize.TabIndex = 1;
+            this.labelPoolSize.Text = "Pool Size";
+            this.labelPoolSize.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(6, 38);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(68, 13);
+            this.label1.TabIndex = 1;
+            this.label1.Text = "Pool Addr. 2:";
+            // 
+            // labelPool1Address
+            // 
+            this.labelPool1Address.AutoSize = true;
+            this.labelPool1Address.Location = new System.Drawing.Point(6, 16);
+            this.labelPool1Address.Name = "labelPool1Address";
+            this.labelPool1Address.Size = new System.Drawing.Size(68, 13);
+            this.labelPool1Address.TabIndex = 1;
+            this.labelPool1Address.Text = "Pool Addr. 1:";
+            // 
+            // buttonMoveGfxPool
+            // 
+            this.buttonMoveGfxPool.Location = new System.Drawing.Point(52, 82);
+            this.buttonMoveGfxPool.Name = "buttonMoveGfxPool";
+            this.buttonMoveGfxPool.Size = new System.Drawing.Size(97, 23);
+            this.buttonMoveGfxPool.TabIndex = 0;
+            this.buttonMoveGfxPool.Text = "Move GFX Pool";
+            this.buttonMoveGfxPool.UseVisualStyleBackColor = true;
+            this.buttonMoveGfxPool.Click += new System.EventHandler(this.buttonMoveGfxPool_Click);
+            // 
+            // buttonHelpGfxPool
+            // 
+            this.buttonHelpGfxPool.Location = new System.Drawing.Point(9, 110);
+            this.buttonHelpGfxPool.Name = "buttonHelpGfxPool";
+            this.buttonHelpGfxPool.Size = new System.Drawing.Size(146, 23);
+            this.buttonHelpGfxPool.TabIndex = 7;
+            this.buttonHelpGfxPool.Text = "Moving the GFX Pool";
+            this.buttonHelpGfxPool.UseVisualStyleBackColor = true;
+            this.buttonHelpGfxPool.Click += new System.EventHandler(this.buttonHelpGfxPool_Click);
+            // 
             // GhostTab
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.Controls.Add(this.groupBoxGfxPool);
             this.Controls.Add(this.groupBoxHelp);
             this.Controls.Add(this.groupBoxVariables);
             this.Controls.Add(this.groupBoxGhosts);
@@ -388,6 +488,8 @@
             this.groupGhostHack.PerformLayout();
             this.groupBoxVariables.ResumeLayout(false);
             this.groupBoxHelp.ResumeLayout(false);
+            this.groupBoxGfxPool.ResumeLayout(false);
+            this.groupBoxGfxPool.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -421,5 +523,14 @@
         private System.Windows.Forms.Button buttonGhostColor;
         private System.Windows.Forms.CheckBox checkTransparentGhosts;
         private System.Windows.Forms.Button buttonMarioColor;
+        private System.Windows.Forms.GroupBox groupBoxGfxPool;
+        private System.Windows.Forms.Button buttonMoveGfxPool;
+        private System.Windows.Forms.TextBox textBoxPoolSize;
+        private System.Windows.Forms.TextBox textBoxPoolAddr2;
+        private System.Windows.Forms.TextBox textBoxPoolAddr1;
+        private System.Windows.Forms.Label labelPoolSize;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label labelPool1Address;
+        private System.Windows.Forms.Button buttonHelpGfxPool;
     }
 }
