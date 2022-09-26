@@ -518,8 +518,11 @@ namespace STROOP.Utilities
                 if (absoluteAddress)
                     result = _io?.WriteAbsolute(address, writeBytes, endianness) ?? false;
                 else
+                {
                     result = _io?.WriteRelative(address.ToUInt32(), writeBytes, endianness) ?? false;
-
+                    if (result && _io.ReadRelative(address.ToUInt32(), writeBytes, endianness))
+                        Array.Copy(writeBytes, 0, Ram, address.ToUInt32() & 0x00FFFFFF, writeBytes.Length);
+                }
                 // Resume stream 
                 if (safeWrite && !preSuspended)
                     _io?.Resume();
