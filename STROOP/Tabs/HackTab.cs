@@ -89,8 +89,11 @@ namespace STROOP.Tabs
             }
         }
 
+        bool suspendCheckHandler = false;
         private void _checkList_ItemCheck(object sender, ItemCheckEventArgs e)
         {
+            if (suspendCheckHandler)
+                return;
             var hack = (RomHack)checkedListBoxHacks.Items[e.Index];
             if (e.NewValue == CheckState.Checked)
                 hack.LoadPayload();
@@ -100,15 +103,17 @@ namespace STROOP.Tabs
 
         public override void Update(bool active)
         {
+            suspendCheckHandler = true;
             // Update rom hack statuses
             for (int i = 0; i < checkedListBoxHacks.Items.Count; i++)
             {
                 var hack = (RomHack)checkedListBoxHacks.Items[i];
-                //hack.UpdateEnabledStatus();
+                hack.UpdateEnabledStatus();
 
                 if (checkedListBoxHacks.GetItemChecked(i) != hack.Enabled)
                     checkedListBoxHacks.SetItemChecked(i, hack.Enabled);
             }
+            suspendCheckHandler = false;
         }
 
         private void buttonInjectFile_Click(object sender, EventArgs e)
