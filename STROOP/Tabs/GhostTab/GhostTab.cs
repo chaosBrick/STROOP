@@ -167,7 +167,7 @@ namespace STROOP.Tabs.GhostTab
         float yTargetPosition;
         int lastGlobalTimer;
 
-        bool updateGhostData => ghostHack.Enabled;
+        bool updateGhostData => ghostHack.Status != RomHack.EnabledStatus.Disabled;
 
         public IEnumerable<PositionAngle> GetGhosts()
         {
@@ -195,12 +195,13 @@ namespace STROOP.Tabs.GhostTab
             }
             var buffer = new byte[0x1000];
             ghostHack.UpdateEnabledStatus();
-            labelHackActiveState.Text = (ghostsActive && ghostHack.Enabled) ?
+            bool enabled = ghostHack.Status != RomHack.EnabledStatus.Disabled;
+            labelHackActiveState.Text = (ghostsActive && enabled) ?
                                          "Ghost hack is enabled." :
-                                         (ghostHack.Enabled ?
+                                         (enabled ?
                                          "Ghost hack is enabled\nbut not running.\nInside a level,\nsave state and load state,\nthen frame advance." :
                                          "Ghost hack is disabled.");
-            buttonDisableGhostHack.Enabled = ghostHack.Enabled;
+            buttonDisableGhostHack.Enabled = enabled;
 
             var globalTimer = Config.Stream.GetInt32(MiscConfig.GlobalTimerAddress);
             var ghostArr = GetSelectedGhosts().ToArray();

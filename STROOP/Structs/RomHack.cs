@@ -12,7 +12,15 @@ namespace STROOP.Structs
 {
     public class RomHack
     {
-        public bool Enabled = false;
+        // Compatible with System.Windows.Forms.CheckState
+        public enum EnabledStatus
+        {
+            Disabled = 0,
+            Enabled = 1,
+            Changed = 2
+        }
+
+        public EnabledStatus Status { get; private set; }
         public string Name;
         List<Tuple<uint, byte[]>> _payload = new List<Tuple<uint, byte[]>>();
         List<Tuple<uint, byte[]>> _originalMemory = new List<Tuple<uint, byte[]>>();
@@ -70,8 +78,9 @@ namespace STROOP.Structs
 
         public void LoadPayload()
         {
-            var originalMemory = new List<Tuple<uint, byte[]>>();
             bool success = true;
+
+            Status = EnabledStatus.Disabled;
 
             using (Config.Stream.Suspend())
             {
@@ -81,43 +90,58 @@ namespace STROOP.Structs
                     var fixedAddress = EndiannessUtilities.SwapAddressEndianness(address, data.Length);
 
                     // Read original memory before replacing
-                    originalMemory.Add(new Tuple<uint, byte[]>(fixedAddress, Config.Stream.ReadRam((UIntPtr)fixedAddress, data.Length, EndiannessType.Big)));
+                    _originalMemory.Add(new Tuple<uint, byte[]>(fixedAddress, Config.Stream.ReadRam((UIntPtr)fixedAddress, data.Length, EndiannessType.Big)));
                     success &= Config.Stream.WriteRam(data, fixedAddress, EndiannessType.Big);
+                    if (success)
+                        Status = EnabledStatus.Changed;
                 }
             }
 
-            // Update original memory upon success
-            if (success)
-            {
-                _originalMemory.Clear();
-                _originalMemory.AddRange(originalMemory);
-            }
-
-            Enabled = success;
+            Status = EnabledStatus.Enabled;
         }
 
         public bool ClearPayload()
         {
+            if (_originalMemory.Count == 0)
+                return false;
+
             bool success = true;
 
             if (_originalMemory.Count != _payload.Count)
+            {
+                Status = EnabledStatus.Changed;
                 return false;
+            }
+
             using (Config.Stream.Suspend())
             {
                 foreach (var address in _originalMemory)
-                    // Read original memory before replacing
                     success &= Config.Stream.WriteRam(address.Item2, address.Item1, EndiannessType.Big);
             }
-            Enabled = !success;
 
+            if (success)
+            {
+                Status = EnabledStatus.Disabled;
+                _originalMemory.Clear();
+            }
             return success;
         }
 
         public void UpdateEnabledStatus()
         {
-            Enabled = true;
+            Status = _originalMemory.Count == 0 ? EnabledStatus.Disabled : EnabledStatus.Enabled;
+            if (_originalMemory.Count == 0)
+                return;
+
             foreach (var address in _payload)
-                Enabled &= address.Item2.SequenceEqual(Config.Stream.ReadRam(address.Item1, address.Item2.Length, EndiannessType.Big));
+            {
+                var gameMemory = Config.Stream.ReadRam(address.Item1, address.Item2.Length, EndiannessType.Big);
+                if (!address.Item2.SequenceEqual(gameMemory))
+                {
+                    Status = EnabledStatus.Changed;
+                    return;
+                }
+            }
         }
 
         public override string ToString()

@@ -110,8 +110,8 @@ namespace STROOP.Tabs
                 var hack = (RomHack)checkedListBoxHacks.Items[i];
                 hack.UpdateEnabledStatus();
 
-                if (checkedListBoxHacks.GetItemChecked(i) != hack.Enabled)
-                    checkedListBoxHacks.SetItemChecked(i, hack.Enabled);
+                if (checkedListBoxHacks.GetItemCheckState(i) != (CheckState)hack.Status)
+                    checkedListBoxHacks.SetItemCheckState(i, (CheckState)hack.Status);
             }
             suspendCheckHandler = false;
         }
