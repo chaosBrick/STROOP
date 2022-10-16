@@ -92,7 +92,7 @@ namespace STROOP.Tabs.MapTab.DataUtil
                 catch { /*inconsistent game states can fail to read predictions*/ }
             }
         }
-        public List<TriangleDataModel> GetTrianlges() => bufferedTris;
+        public List<TriangleDataModel> GetTriangles() => bufferedTris;
 
         List<TriangleDataModel> ComputeNewTriangles(MapObject.PositionAngleProvider positionAngleProvider, uint gTimerMinus1)
         {

@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {
-    [ObjectDescription("All Object Floor Trianlges", "Triangles")]
+    [ObjectDescription("All Object Floor Triangles", "Triangles")]
     public class MapAllObjectFloorObject : MapFloorObject
     {
         CustomTriangleList customTris = new CustomTriangleList(() => TriangleUtilities.GetObjectTriangles().FindAll(tri => tri.IsFloor()));

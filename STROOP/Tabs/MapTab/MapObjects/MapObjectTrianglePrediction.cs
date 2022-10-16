@@ -35,7 +35,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             base.Update();
         }
 
-        protected override List<TriangleDataModel> GetTrianglesOfAnyDist() => predictionProvider.GetTrianlges();
+        protected override List<TriangleDataModel> GetTrianglesOfAnyDist() => predictionProvider.GetTriangles();
     }
 
     public class MapObjectFloorPrediction : MapFloorObject
@@ -64,7 +64,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             base.Update();
         }
 
-        protected override List<TriangleDataModel> GetTrianglesOfAnyDist() => predictionProvider.GetTrianlges();
+        protected override List<TriangleDataModel> GetTrianglesOfAnyDist() => predictionProvider.GetTriangles();
     }
 
     public class MapObjectCeilingPrediction : MapCeilingObject
@@ -93,6 +93,6 @@ namespace STROOP.Tabs.MapTab.MapObjects
             base.Update();
         }
 
-        protected override List<TriangleDataModel> GetTrianglesOfAnyDist() => predictionProvider.GetTrianlges();
+        protected override List<TriangleDataModel> GetTrianglesOfAnyDist() => predictionProvider.GetTriangles();
     }
 }
