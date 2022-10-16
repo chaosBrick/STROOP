@@ -96,7 +96,7 @@ namespace STROOP.Tabs.MapTab
 
         public readonly CachedCollisionStructure floors = new CachedCollisionStructure(_ => _.Classification == TriangleClassification.Floor);
         public readonly CachedCollisionStructure ceilings = new CachedCollisionStructure(_ => _.Classification == TriangleClassification.Ceiling);
-        
+
         private enum MapScale { CourseDefault, MaxCourseSize, Custom };
         private enum MapCenter { BestFit, Origin, Mario, Custom };
         private enum MapAngle { Angle0, Angle16384, Angle32768, Angle49152, Mario, Camera, Centripetal, Custom };
@@ -212,9 +212,12 @@ namespace STROOP.Tabs.MapTab
             };
             glControl.Resize += (_, __) =>
             {
-                DeleteMainSurfaces();
-                transparencyRenderer.SetDimensions(glControl.Width, glControl.Height);
-                InitMainSurfaces();
+                if (glControl.Width * glControl.Height > 0)
+                {
+                    DeleteMainSurfaces();
+                    transparencyRenderer.SetDimensions(glControl.Width, glControl.Height);
+                    InitMainSurfaces();
+                }
             };
 
             GL.ClearColor(Color.FromKnownColor(KnownColor.Control));
@@ -339,7 +342,7 @@ namespace STROOP.Tabs.MapTab
             UpdateAngle();
             UpdateScale();
             UpdateCenter();
-            var scale = 2 * MapViewScaleValue / glControl.Width;
+            var scale = 2 * MapViewScaleValue / glControl.Height;
             Matrix4 swapYZ = new Matrix4(
                 1, 0, 0, 0,
                 0, 0, 1, 0,
