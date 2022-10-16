@@ -13,11 +13,15 @@ namespace STROOP.Tabs.MapTab
         public MapPopout(MapTab tab)
         {
             InitializeComponent();
+            ClientSize = tab.graphics.glControl.ClientRectangle.Size;
             glControl = new GLControl();
             glControl.Bounds = ClientRectangle;
             glControl.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top | AnchorStyles.Bottom;
             Controls.Add(glControl);
             graphics = new MapGraphics(tab, glControl, tab.graphics.context);
+            graphics.MapViewAngleValue = tab.graphics.MapViewAngleValue;
+            graphics.MapViewScaleValue = tab.graphics.MapViewScaleValue;
+            graphics.view.position = tab.graphics.view.position;
             Shown += (_, __) => graphics.Load(() => tab.graphics.rendererCollection);
         }
 
