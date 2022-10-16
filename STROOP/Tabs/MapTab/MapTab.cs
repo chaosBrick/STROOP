@@ -153,6 +153,102 @@ namespace STROOP.Tabs.MapTab
 
         public int MaybeReverse(int value) => checkBoxMapOptionsReverseDragging.Checked ? -1 * value : value;
 
+        void InitAddTrackerButton()
+        {
+            var adders = new Dictionary<string, Wrapper<(bool, ObjectDescriptionAttribute, Func<ToolStripMenuItem>)>>();
+            foreach (var type in GeneralUtilities.EnumerateTypes(_ => _.IsSubclassOf(typeof(MapObject))))
+            {
+                var attrArray = type.GetCustomAttributes<ObjectDescriptionAttribute>();
+                foreach (var attr in attrArray)
+                {
+                    var capturedType = type;
+                    var creationIdentifier = attr.DisplayName.Replace(' ', '_');
+                    MapTracker.CreateTracker newObjectFunc;
+                    if (attr.Initializer == null)
+                        newTrackerByName[creationIdentifier] = newObjectFunc =
+                            _ => new MapTracker(this, creationIdentifier, (MapObject)Activator.CreateInstance(capturedType));
+                    else
+                        newTrackerByName[creationIdentifier] = newObjectFunc = creationParameters =>
+                        {
+                            var newObj = (MapObject)
+                                    (capturedType.GetMethod(attr.Initializer, BindingFlags.Public | BindingFlags.Static)
+                                    ?.Invoke(null, new object[] { creationParameters })
+                                    ?? null);
+                            return newObj != null ? new MapTracker(this, creationIdentifier, newObj) : null;
+                        };
+
+                    adders[attr.DisplayName] = new Wrapper<(bool, ObjectDescriptionAttribute, Func<ToolStripMenuItem>)>((false, attr, () =>
+                    {
+                        var toolStripItem = new ToolStripMenuItem($"Add Tracker for {attr.DisplayName}");
+                        toolStripItem.Click += (sender, e) =>
+                        {
+                            using (new AccessScope<MapTab>(this))
+                            {
+                                var tracker = newObjectFunc(null);
+                                if (tracker != null)
+                                    flowLayoutPanelMapTrackers.Controls.Add(tracker);
+                            }
+                        };
+                        return toolStripItem;
+                    }
+                    ));
+                }
+            }
+
+            buttonMapOptionsAddNewTracker.ContextMenuStrip = new ContextMenuStrip();
+            var categoryItems = new Dictionary<string, ToolStripMenuItem>();
+            ToolStripMenuItem GetCategoryItem(string categoryName)
+            {
+                ToolStripMenuItem categoryItem;
+                if (!categoryItems.TryGetValue(categoryName, out categoryItem))
+                {
+                    categoryItems[categoryName] = categoryItem = new ToolStripMenuItem(categoryName);
+                    buttonMapOptionsAddNewTracker.ContextMenuStrip.Items.Add(categoryItem);
+                }
+                return categoryItem;
+            }
+
+            if (System.IO.File.Exists("Config/MapTrackerOrder.xml"))
+            {
+                var doc = new System.Xml.XmlDocument();
+                doc.Load("Config/MapTrackerOrder.xml");
+                var currentNode = doc.SelectSingleNode("AddTracker").FirstChild;
+                while (currentNode != null)
+                {
+                    if (currentNode.Name == "Category")
+                    {
+                        var categoryItem = GetCategoryItem(currentNode.Attributes["name"].Value);
+                        var trackerNode = currentNode.FirstChild;
+                        while (trackerNode != null)
+                        {
+                            switch (trackerNode.Name)
+                            {
+                                case "Tracker":
+                                    if (adders.TryGetValue(trackerNode.Attributes["name"].Value, out var trackThis))
+                                    {
+                                        categoryItem.DropDownItems.Add(trackThis.value.Item3());
+                                        trackThis.value.Item1 = true;
+                                    }
+                                    break;
+                                case "Separator":
+                                    categoryItem.DropDownItems.Add(new ToolStripSeparator());
+                                    break;
+                            }
+                            trackerNode = trackerNode.NextSibling;
+                        }
+                    }
+                    currentNode = currentNode.NextSibling;
+                }
+            }
+
+            foreach (var trackerAddFunction in adders)
+                if (!trackerAddFunction.Value.value.Item1)
+                {
+                    var categoryItem = GetCategoryItem(trackerAddFunction.Value.value.Item2.Category);
+                    categoryItem.DropDownItems.Add(trackerAddFunction.Value.value.Item3());
+                }
+        }
+
         private void InitializeControls()
         {
             quickSemaphores = new List<(CheckBox checkBox, MapTracker tracker)>(new[]
@@ -213,59 +309,7 @@ namespace STROOP.Tabs.MapTab
             comboBoxMapOptionsBackground.DataSource = backgroundImageChoices;
 
             // Buttons on Options
-
-            Dictionary<string, List<ToolStripMenuItem>> adders = new Dictionary<string, List<ToolStripMenuItem>>();
-            foreach (var type in GeneralUtilities.EnumerateTypes(_ => _.IsSubclassOf(typeof(MapObject))))
-            {
-
-                var attrArray = type.GetCustomAttributes<ObjectDescriptionAttribute>();
-                foreach (var attr in attrArray)
-                {
-                    var capturedType = type;
-                    var toolStripItem = new ToolStripMenuItem($"Add Tracker for {attr.DisplayName}");
-                    var creationIdentifier = attr.DisplayName.Replace(' ', '_');
-                    MapTracker.CreateTracker newObjectFunc;
-                    if (attr.Initializer == null)
-                        newTrackerByName[creationIdentifier] = newObjectFunc =
-                            _ => new MapTracker(this, creationIdentifier, (MapObject)Activator.CreateInstance(capturedType));
-                    else
-                        newTrackerByName[creationIdentifier] = newObjectFunc = creationParameters =>
-                        {
-                            var newObj = (MapObject)
-                                    (capturedType.GetMethod(attr.Initializer, BindingFlags.Public | BindingFlags.Static)
-                                    ?.Invoke(null, new object[] { creationParameters })
-                                    ?? null);
-                            return newObj != null ? new MapTracker(this, creationIdentifier, newObj) : null;
-                        };
-
-                    toolStripItem.Click += (sender, e) =>
-                    {
-                        using (new AccessScope<MapTab>(this))
-                        {
-                            var tracker = newObjectFunc(null);
-                            if (tracker != null)
-                                flowLayoutPanelMapTrackers.Controls.Add(tracker);
-                        }
-                    };
-
-                    List<ToolStripMenuItem> categoryList;
-                    if (!adders.TryGetValue(attr.Category, out categoryList))
-                        adders[attr.Category] = categoryList = new List<ToolStripMenuItem>();
-                    categoryList.Add(toolStripItem);
-                }
-            }
-
-            buttonMapOptionsAddNewTracker.ContextMenuStrip = new ContextMenuStrip();
-
-            foreach (var trackerAddFunction in adders)
-            {
-                var addTrackerCategory = new ToolStripMenuItem(trackerAddFunction.Key);
-                trackerAddFunction.Value.Sort((a, b) => a.Text.CompareTo(b.Text));
-                foreach (var addTrackerItem in trackerAddFunction.Value)
-                    addTrackerCategory.DropDownItems.Add(addTrackerItem);
-                buttonMapOptionsAddNewTracker.ContextMenuStrip.Items.Add(addTrackerCategory);
-            }
-
+            InitAddTrackerButton();
             buttonMapOptionsAddNewTracker.Click += (sender, e) =>
                 buttonMapOptionsAddNewTracker.ContextMenuStrip.Show(Cursor.Position);
             buttonMapOptionsClearAllTrackers.Click += (sender, e) =>
