@@ -44,6 +44,7 @@ namespace STROOP.Tabs.MapTab
 
         public GLControl glControlMap2D { get; private set; }
         public MapGraphics graphics { get; private set; }
+        public List<MapPopout> popouts = new List<MapPopout>();
 
         private List<int> _currentObjIndexes = new List<int>();
         public List<IHoverData> hoverData { get; private set; } = new List<IHoverData>();
@@ -413,7 +414,13 @@ namespace STROOP.Tabs.MapTab
 
             contextMenu.Items.Add(new ToolStripSeparator());
             var openPopoutItem = new ToolStripMenuItem("Open Popout");
-            openPopoutItem.Click += (e, args) => (new MapPopout(this) { Owner = FindForm() }).Show();
+            openPopoutItem.Click += (e, args) =>
+            {
+                var popout = new MapPopout(this) { Owner = FindForm() };
+                popout.Show();
+                popout.FormClosed += (_, __) => popouts.Remove(popout);
+                popouts.Add(popout);
+            };
             contextMenu.Items.Add(openPopoutItem);
 
             contextMenu.Show(Cursor.Position);
@@ -609,6 +616,7 @@ namespace STROOP.Tabs.MapTab
             {
                 flowLayoutPanelMapTrackers.UpdateControl();
 
+                active |= popouts.Count > 0;
                 if (active)
                 {
                     base.Update(active);
