@@ -3,7 +3,7 @@ using STROOP.Models;
 using System;
 using System.Windows.Forms;
 
-namespace STROOP.Tabs.MapTab.MapObjects
+namespace STROOP.Tabs.MapTab.DataUtil
 {
     class CustomTriangleList
     {

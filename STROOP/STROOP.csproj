@@ -404,8 +404,8 @@
     <Compile Include="Tabs\MapTab\IHoverData.cs" />
     <Compile Include="Tabs\MapTab\MapAssociations.cs" />
     <Compile Include="Tabs\MapTab\MapLayout.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\CustomTriangleList.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\HoverDatas.cs" />
+    <Compile Include="Tabs\MapTab\DataUtil\CustomTriangleList.cs" />
+    <Compile Include="Tabs\MapTab\DataUtil\HoverDatas.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapAllObjectCeilingObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapAllObjectFloorObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapAllObjectWallObject.cs" />
