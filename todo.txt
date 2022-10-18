@@ -1,0 +1,2 @@
+- Add "show nearby hitboxes" feature
+- Add interacted walls display (modify previous positions tracker?)
