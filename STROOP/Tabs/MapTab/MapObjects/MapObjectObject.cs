@@ -10,34 +10,12 @@ namespace STROOP.Tabs.MapTab.MapObjects
 {
     public class MapObjectObject : MapIconPointObject
     {
-        public static void AddObjectSubTrackers(MapTracker tracker, string name, ContextMenuStrip targetStrip, PositionAngleProvider positionAngleProvider)
+        public static void AddPositionAngleSubTrackers(string name, MapTracker tracker, ContextMenuStrip targetStrip, PositionAngleProvider positionAngleProvider)
         {
             MapTab mapTab = tracker.mapTab;
-            var cylindersItem = new ToolStripMenuItem("Cylinders");
-            cylindersItem.DropDownItems.AddHandlerToItem("Add Tracker for Hitbox Cylinders",
-                tracker.MakeCreateTrackerHandler(mapTab, "HitboxCylinders", _ => new MapObjectCylinderObject(
-                    positionAngleProvider,
-                    MapObjectCylinderObject.Dimensions.HitBox,
-                    "Hitbox Cylinders")));
 
-            cylindersItem.DropDownItems.AddHandlerToItem("Add Tracker for Effective Hitbox Cylinders",
-                tracker.MakeCreateTrackerHandler(mapTab, "EffectiveHitboxCylinders", _ => new MapObjectCylinderObject(
-                    positionAngleProvider,
-                    MapObjectCylinderObject.Dimensions.EffectiveHitBox,
-                    "Effective Hitbox Cylinders")));
-
-            cylindersItem.DropDownItems.AddHandlerToItem("Add Tracker for Hurtbox Cylinders",
-                tracker.MakeCreateTrackerHandler(mapTab, "HurtboxCylinders", _ => new MapObjectCylinderObject(
-                    positionAngleProvider,
-                    MapObjectCylinderObject.Dimensions.HurtBox,
-                    "Hurtbox Cylinders")));
-
-            cylindersItem.DropDownItems.AddHandlerToItem("Add Tracker for Effective Hurtbox Cylinders",
-                tracker.MakeCreateTrackerHandler(mapTab, "EffectiveHurtboxCylinders", _ => new MapObjectCylinderObject(
-                    positionAngleProvider,
-                    MapObjectCylinderObject.Dimensions.EffectiveHitBox,
-                    "Effective Hurtbox Cylinders")));
-
+            // Cylinders
+            var cylindersItem = targetStrip.Items.GetSubItem("Cylinders");
             cylindersItem.DropDownItems.AddHandlerToItem("Add Tracker for Custom Cylinders",
                 tracker.MakeCreateTrackerHandler(mapTab, "CustomCylinders",
                 _ =>
@@ -63,10 +41,86 @@ namespace STROOP.Tabs.MapTab.MapObjects
                     return customCylinderObject;
                 }));
 
-            targetStrip.Items.Add(cylindersItem);
 
+            // Spheres
+            var spheresItem = targetStrip.Items.GetSubItem("Spheres");
+            spheresItem.DropDownItems.AddHandlerToItem("Add Tracker for Custom Spheres",
+                tracker.MakeCreateTrackerHandler(mapTab, "CustomHomeSpheres", _ =>
+                {
+                    var customSpheresObject = new MapObjectSphereObject(
+                            positionAngleProvider,
+                            null,
+                            "Custom Spheres");
+                    customSpheresObject.getDimensions = MapObjectSphereObject.Dimensions.CustomSize(() => customSpheresObject.Size);
+                    return customSpheresObject;
+                }));
+            spheresItem.DropDownItems.AddHandlerToItem("Add Tracker for Custom Spheres for Home",
+                    tracker.MakeCreateTrackerHandler(mapTab, "CustomSpheres", _ =>
+                    {
+                        var customSpheresObject = new MapObjectSphereObject(
+                                () => positionAngleProvider().ConvertAndRemoveNull(obj => PositionAngle.ObjHome(PositionAngle.GetObjectAddress(obj))),
+                                null,
+                                "Custom Spheres");
+                        customSpheresObject.getDimensions = MapObjectSphereObject.Dimensions.CustomSize(() => customSpheresObject.Size);
+                        return customSpheresObject;
+                    }));
 
-            var spheresItem = new ToolStripMenuItem("Spheres");
+            // Angles
+            var anglesItem = targetStrip.Items.GetSubItem("Angles");
+            anglesItem.DropDownItems.AddHandlerToItem("Add Tracker for Angle Range",
+                tracker.MakeCreateTrackerHandler(mapTab, "AngleRange", _ => new MapAngleRangeObject(positionAngleProvider)));
+
+            anglesItem.DropDownItems.AddHandlerToItem("Add Tracker for Facing Divider",
+                tracker.MakeCreateTrackerHandler(mapTab, "FacingDivider", _ => new MapFacingDividerObject(positionAngleProvider)));
+
+            anglesItem.DropDownItems.AddHandlerToItem("Add Tracker for Sector",
+                tracker.MakeCreateTrackerHandler(mapTab, "Sector", _ => new MapSectorObject(positionAngleProvider)));
+
+            // Current
+            var currentItem = targetStrip.Items.GetSubItem("Current");
+
+            currentItem.DropDownItems.AddHandlerToItem("Add Tracker for Current Unit",
+                            tracker.MakeCreateTrackerHandler(mapTab, "CurrentUnit", _ => new MapCurrentUnitsObject(positionAngleProvider)));
+
+            currentItem.DropDownItems.AddHandlerToItem("Add Tracker for Nearby Floor Units",
+                            tracker.MakeCreateTrackerHandler(mapTab, "NearbyFloorUnits", _ => new MapNearbyFloorUnits(positionAngleProvider)));
+
+            currentItem.DropDownItems.AddHandlerToItem("Add Tracker for Nearby Ceiling Units",
+                            tracker.MakeCreateTrackerHandler(mapTab, "NearbyCeilingUnits", _ => new MapNearbyCeilingUnits(positionAngleProvider)));
+
+            currentItem.DropDownItems.AddHandlerToItem("Add Tracker for Nearby Objects",
+                            tracker.MakeCreateTrackerHandler(mapTab, "NearbyObjects", _ => new MapNearbyObjectsObject(name, positionAngleProvider)));
+        }
+
+        public static void AddObjectSubTrackers(MapTracker tracker, string name, ContextMenuStrip targetStrip, PositionAngleProvider positionAngleProvider)
+        {
+            MapTab mapTab = tracker.mapTab;
+            var cylindersItem = targetStrip.Items.GetSubItem("Cylinders");
+            cylindersItem.DropDownItems.AddHandlerToItem("Add Tracker for Hitbox Cylinders",
+                tracker.MakeCreateTrackerHandler(mapTab, "HitboxCylinders", _ => new MapObjectCylinderObject(
+                    positionAngleProvider,
+                    MapObjectCylinderObject.Dimensions.HitBox,
+                    "Hitbox Cylinders")));
+
+            cylindersItem.DropDownItems.AddHandlerToItem("Add Tracker for Effective Hitbox Cylinders",
+                tracker.MakeCreateTrackerHandler(mapTab, "EffectiveHitboxCylinders", _ => new MapObjectCylinderObject(
+                    positionAngleProvider,
+                    MapObjectCylinderObject.Dimensions.EffectiveHitBox,
+                    "Effective Hitbox Cylinders")));
+
+            cylindersItem.DropDownItems.AddHandlerToItem("Add Tracker for Hurtbox Cylinders",
+                tracker.MakeCreateTrackerHandler(mapTab, "HurtboxCylinders", _ => new MapObjectCylinderObject(
+                    positionAngleProvider,
+                    MapObjectCylinderObject.Dimensions.HurtBox,
+                    "Hurtbox Cylinders")));
+
+            cylindersItem.DropDownItems.AddHandlerToItem("Add Tracker for Effective Hurtbox Cylinders",
+                tracker.MakeCreateTrackerHandler(mapTab, "EffectiveHurtboxCylinders", _ => new MapObjectCylinderObject(
+                    positionAngleProvider,
+                    MapObjectCylinderObject.Dimensions.EffectiveHitBox,
+                    "Effective Hurtbox Cylinders")));
+
+            var spheresItem = targetStrip.Items.GetSubItem("Spheres");
 
             spheresItem.DropDownItems.AddHandlerToItem("Add Tracker for Tangibility Sphere",
                         tracker.MakeCreateTrackerHandler(mapTab, "TangibilitySphere", _ => new MapObjectSphereObject(
@@ -80,32 +134,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                     MapObjectSphereObject.Dimensions.DrawDistance,
                     "Draw Distance Spheres")));
 
-            spheresItem.DropDownItems.AddHandlerToItem("Add Tracker for Custom Spheres",
-                tracker.MakeCreateTrackerHandler(mapTab, "CustomHomeSpheres", _ =>
-                {
-                    var customSpheresObject = new MapObjectSphereObject(
-                            positionAngleProvider,
-                            null,
-                            "Custom Spheres");
-                    customSpheresObject.getDimensions = MapObjectSphereObject.Dimensions.CustomSize(() => customSpheresObject.Size);
-                    return customSpheresObject;
-                }));
-
-            spheresItem.DropDownItems.AddHandlerToItem("Add Tracker for Custom Spheres for Home",
-                    tracker.MakeCreateTrackerHandler(mapTab, "CustomSpheres", _ =>
-                    {
-                        var customSpheresObject = new MapObjectSphereObject(
-                                () => positionAngleProvider().ConvertAndRemoveNull(obj => PositionAngle.ObjHome(PositionAngle.GetObjectAddress(obj))),
-                                null,
-                                "Custom Spheres");
-                        customSpheresObject.getDimensions = MapObjectSphereObject.Dimensions.CustomSize(() => customSpheresObject.Size);
-                        return customSpheresObject;
-                    }));
-
-
-            targetStrip.Items.Add(spheresItem);
-
-            var anglesItem = new ToolStripMenuItem("Angles");
+            var anglesItem = targetStrip.Items.GetSubItem("Angles");
 
             anglesItem.DropDownItems.AddHandlerToItem("Add Tracker for Object Facing Angle",
                             tracker.MakeCreateTrackerHandler(mapTab, "ObjectFacingAngle", _ => new MapArrowObject(
@@ -135,34 +164,10 @@ namespace STROOP.Tabs.MapTab.MapObjects
                     MapArrowObject.ArrowSource.ObjectDistanceToMario,
                     $"Object Angle to Mario for {name}")));
 
-            anglesItem.DropDownItems.AddHandlerToItem("Add Tracker for Angle Range",
-                tracker.MakeCreateTrackerHandler(mapTab, "AngleRange", _ => new MapAngleRangeObject(positionAngleProvider)));
-
-            anglesItem.DropDownItems.AddHandlerToItem("Add Tracker for Facing Divider",
-                tracker.MakeCreateTrackerHandler(mapTab, "FacingDivider", _ => new MapFacingDividerObject(positionAngleProvider)));
-
             anglesItem.DropDownItems.AddHandlerToItem("Add Tracker for Home Line",
                 tracker.MakeCreateTrackerHandler(mapTab, "HomeLine", _ => new MapHomeLineObject(positionAngleProvider)));
 
-            anglesItem.DropDownItems.AddHandlerToItem("Add Tracker for Sector",
-                tracker.MakeCreateTrackerHandler(mapTab, "Sector", _ => new MapSectorObject(positionAngleProvider)));
-
-            targetStrip.Items.Add(anglesItem);
-
-            var currentItem = new ToolStripMenuItem("Current");
-
-            currentItem.DropDownItems.AddHandlerToItem("Add Tracker for Current Unit",
-                            tracker.MakeCreateTrackerHandler(mapTab, "CurrentUnit", _ => new MapCurrentUnitsObject(positionAngleProvider)));
-
-            currentItem.DropDownItems.AddHandlerToItem("Add Tracker for Nearby Floor Units",
-                            tracker.MakeCreateTrackerHandler(mapTab, "NearbyFloorUnits", _ => new MapNearbyFloorUnits(positionAngleProvider)));
-
-            currentItem.DropDownItems.AddHandlerToItem("Add Tracker for Nearby Ceiling Units",
-                            tracker.MakeCreateTrackerHandler(mapTab, "NearbyCeilingUnits", _ => new MapNearbyCeilingUnits(positionAngleProvider)));
-
-            targetStrip.Items.Add(currentItem);
-
-            var collisionItem = new ToolStripMenuItem("Collision");
+            var collisionItem = targetStrip.Items.GetSubItem("Collision");
 
             collisionItem.DropDownItems.AddHandlerToItem("Add Tracker for Object Wall Triangles",
                             tracker.MakeCreateTrackerHandler(mapTab, "ObjectWallsPredicition", _ => new MapObjectWallPrediction(positionAngleProvider)));
@@ -173,7 +178,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             collisionItem.DropDownItems.AddHandlerToItem("Add Tracker for Object Ceiling Triangles",
                             tracker.MakeCreateTrackerHandler(mapTab, "ObjectCeilingsPrediction", _ => new MapObjectCeilingPrediction(positionAngleProvider)));
 
-            targetStrip.Items.Add(collisionItem);
+            AddPositionAngleSubTrackers(name, tracker, targetStrip, positionAngleProvider);
         }
 
         protected delegate ObjectDataModel[] ObjectProvider();

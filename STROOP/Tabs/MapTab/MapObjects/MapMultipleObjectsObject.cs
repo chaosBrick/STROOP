@@ -14,11 +14,10 @@ namespace STROOP.Tabs.MapTab.MapObjects
     [ObjectDescription("All Objects", "Objects", nameof(CreateAllObjects))]
     public class MapMultipleObjects : MapIconPointObject
     {
-        private readonly string _objName;
+        private readonly string _objName = "Object";
         private readonly Lazy<Image> _objImage;
         private readonly Lazy<Image> _objMapImage;
-        Func<ObjectDataModel, bool> predicate;
-        string objName = "Object";
+        protected Func<ObjectDataModel, bool> predicate;
 
         private MapMultipleObjects(ObjectCreateParams creationParameters, string name, Lazy<Image> image, Lazy<Image> mapImage)
             : base(creationParameters)
@@ -27,7 +26,14 @@ namespace STROOP.Tabs.MapTab.MapObjects
             _objImage = image;
             _objMapImage = mapImage;
             positionAngleProvider = () => Config.StroopMainForm.ObjectSlotsManager.GetLoadedObjectsWithPredicate(predicate).ConvertAll(_ => PositionAngle.Obj(_.Address));
-            objName = _objName;
+        }
+
+        protected MapMultipleObjects(string name, Lazy<Image> image, Lazy<Image> mapImage)
+            : base(null)
+        {
+            _objName = name;
+            _objImage = image;
+            _objMapImage = mapImage;
         }
 
         public static MapMultipleObjects CreateByName(ObjectCreateParams creationParameters)
@@ -69,7 +75,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 _objMapImage;
         }
 
-        public override string GetName() => PositionAngle.NameOfMultiple(positionAngleProvider(), $"All {objName}");
+        public override string GetName() => PositionAngle.NameOfMultiple(positionAngleProvider(), $"All {_objName}");
 
         protected override void DrawTopDown(MapGraphics graphics)
         {
