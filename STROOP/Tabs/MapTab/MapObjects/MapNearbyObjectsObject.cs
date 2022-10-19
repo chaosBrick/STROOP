@@ -96,6 +96,6 @@ namespace STROOP.Tabs.MapTab.MapObjects
             ? null
             : new Regex($"^{Regex.Escape(_nameFilter.ToLower()).Replace("\\$", ".*")}$");
 
-        public override string GetName() => $"{_nameFilterRegex == null ? "Objects" : _nameFilter} near {base.GetName()}";
+        public override string GetName() => $"{(_nameFilterRegex == null ? "Objects" : _nameFilter)} near {base.GetName()}";
     }
 }
