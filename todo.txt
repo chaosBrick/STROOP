@@ -1,2 +1,7 @@
+Features:
 - Add "show nearby hitboxes" feature
 - Add interacted walls display (modify previous positions tracker?)
+
+Internal:
+- Make Models.ObjectDataModel compatible as PositionAngle
+- Simplify MapTracker Settings parsing for basic cases
