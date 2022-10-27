@@ -4,6 +4,7 @@ using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using System.Windows.Forms;
 using OpenTK;
+using System.Collections.Generic;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {
@@ -26,7 +27,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         protected override float GetUnitY(MapGraphics graphics, float x, float y, float z)
         {
             var floorY = graphics.floors.GetTriangles().FindFloorAndY(x, y + searchYOffset, z).floorY;
-            return graphics.ceilings.GetTriangles().FindCeilingAndY(x, floorY, z).ceilY + displayOffset;
+            return graphics.ceilings.GetTriangles().FindCeilingAndY(x, floorY + 80, z).ceilY + displayOffset;
         }
         protected override string UnitTypeName() => "Ceiling";
     }
@@ -35,11 +36,16 @@ namespace STROOP.Tabs.MapTab.MapObjects
     {
         public int numUnitsX = 50, numUnitsZ = 50;
         public float searchYOffset = 0;
+        public float discardUnitsBelow = float.PositiveInfinity;
+        public float discardUnitsAbove = float.PositiveInfinity;
         protected abstract string UnitTypeName();
         protected abstract float GetMaxHeightDifference();
 
         bool showSteps => itemShowSteps.Checked;
         ToolStripMenuItem itemShowSteps = new ToolStripMenuItem("Show steps") { Checked = true };
+
+        uint? lastGlobalTimer = null;
+        Dictionary<PositionAngle, Wrapper<(Vector3, float[,])>> cache = new Dictionary<PositionAngle, Wrapper<(Vector3, float[,])>>();
 
         public MapNearbyUnits(PositionAngleProvider positionAngleProvider)
             : base()
@@ -58,6 +64,21 @@ namespace STROOP.Tabs.MapTab.MapObjects
         {
             var ctx = base.GetContextMenuStrip(targetTracker);
             ctx.Items.Add(itemShowSteps);
+            var itemSize = new ToolStripMenuItem("Search dimensions");
+            itemSize.MouseDown += (_, __) =>
+            {
+                DialogUtilities.UpdateNumberFromDialog(ref numUnitsX, labelText: "Set number of units to search in x/z dimension (default: 50)");
+                numUnitsZ = numUnitsX;
+            };
+            ctx.Items.Add(itemSize);
+            var itemDiscardUnitsBelow = new ToolStripMenuItem("Discard units below");
+            itemDiscardUnitsBelow.MouseDown += (_, __) =>
+                DialogUtilities.UpdateNumberFromDialog(ref discardUnitsBelow, labelText: "Discard units <x> units below tracker origin");
+            ctx.Items.Add(itemDiscardUnitsBelow);
+            var itemDiscardUnitsAbove = new ToolStripMenuItem("Discard units above");
+            itemDiscardUnitsAbove.MouseDown += (_, __) =>
+                DialogUtilities.UpdateNumberFromDialog(ref discardUnitsAbove, labelText: "Discard units <x> units above tracker origin");
+            ctx.Items.Add(itemDiscardUnitsAbove);
             return ctx;
         }
 
@@ -68,6 +89,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
             for (int z = 0; z < vs.GetLength(1); z++)
                 for (int x = 0; x < vs.GetLength(0); x++)
                 {
+                    if (float.IsNaN(vs[x, z]))
+                        continue;
                     Matrix4 transform = Matrix4.CreateRotationX((float)Math.PI / 2)
                         * Matrix4.CreateScale(0.5f)
                         * Matrix4.CreateTranslation(x + offset.x + 0.5f, vs[x, z], z + offset.z + 0.5f);
@@ -101,6 +124,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
             for (int z = 0; z < vs.GetLength(1); z++)
                 for (int x = 0; x < vs.GetLength(0); x++)
                 {
+                    if (float.IsNaN(vs[x, z]))
+                        continue;
                     float low, high;
                     Matrix4 transform;
                     if (x < vs.GetLength(1) - 1)
@@ -137,14 +162,26 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         (float[,] vs, int xOffset, int zOffset) GetRenderValues(MapGraphics graphics, PositionAngle obj)
         {
-            int maxX = (int)Math.Floor(obj.X + numUnitsX / 2);
-            int maxZ = (int)Math.Floor(obj.Z + numUnitsZ / 2);
             int minX = (int)Math.Floor(obj.X - numUnitsX / 2);
             int minZ = (int)Math.Floor(obj.Z - numUnitsZ / 2);
+
+            Wrapper<(Vector3 cachedPos, float[,] vs)> paCache;
+            if (!cache.TryGetValue(obj, out paCache))
+                cache[obj] = paCache = new Wrapper<(Vector3, float[,])>((obj.position, new float[numUnitsX, numUnitsZ]));
+            else if (obj.position == paCache.value.cachedPos)
+                return (paCache.value.vs, minX, minZ);
+
+            int maxX = (int)Math.Floor(obj.X + numUnitsX / 2);
+            int maxZ = (int)Math.Floor(obj.Z + numUnitsZ / 2);
             float[,] vs = new float[maxX - minX + 1, maxZ - minZ + 1];
             for (int z = minZ; z <= maxZ; z++)
                 for (int x = minX; x <= maxX; x++)
-                    vs[x - minX, z - minZ] = GetUnitY(graphics, x + 0.5f, (float)obj.Y, z + 0.5f);
+                {
+                    var y = GetUnitY(graphics, x + 0.5f, (float)obj.Y, z + 0.5f);
+                    vs[x - minX, z - minZ] = (y < obj.Y - discardUnitsBelow || y > obj.Y + discardUnitsAbove) ? float.NaN : y;
+                }
+            paCache.value.cachedPos = obj.position;
+            paCache.value.vs = vs;
             return (vs, minX, minZ);
         }
 
@@ -185,6 +222,17 @@ namespace STROOP.Tabs.MapTab.MapObjects
             });
         }
 
+        public override void Update()
+        {
+            base.Update();
+            var globalTimer = Config.Stream.GetUInt32(Structs.MiscConfig.GlobalTimerAddress);
+            if (lastGlobalTimer == null || globalTimer != lastGlobalTimer)
+            {
+                lastGlobalTimer = globalTimer;
+                cache.Clear();
+            }
+        }
+
         public override string GetName() => $"Nearby {UnitTypeName()} Units for {PositionAngle.NameOfMultiple(positionAngleProvider())}";
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.CurrentUnitImage;
@@ -194,6 +242,9 @@ namespace STROOP.Tabs.MapTab.MapObjects
             {
                 base.SettingsSaveLoad.save(node);
                 SaveValueNode(node, "ShowSteps", showSteps.ToString());
+                SaveValueNode(node, "NumUnits", numUnitsX.ToString());
+                SaveValueNode(node, "DiscardUnitsAbove", discardUnitsAbove.ToString());
+                SaveValueNode(node, "DiscardUnitsBelow", discardUnitsBelow.ToString());
             }
         ,
             node =>
@@ -201,6 +252,12 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 base.SettingsSaveLoad.load(node);
                 if (bool.TryParse(LoadValueNode(node, "ShowSteps"), out var newShowSteps))
                     itemShowSteps.Checked = newShowSteps;
+                if (int.TryParse(LoadValueNode(node, "NumUnits"), out var numUnits))
+                    numUnitsX = numUnitsZ = numUnits;
+                if (float.TryParse(LoadValueNode(node, "DiscardUnitsAbove"), out var discardAbove))
+                    discardUnitsAbove = discardAbove;
+                if (float.TryParse(LoadValueNode(node, "DiscardUnitsBelow"), out var discardBelow))
+                    discardUnitsBelow = discardBelow;
             }
         );
     }

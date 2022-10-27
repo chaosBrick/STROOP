@@ -69,8 +69,8 @@ namespace STROOP.Tabs.MapTab
 
         public class CachedCollisionStructure
         {
-            readonly Func<Models.TriangleDataModel, bool> filter;
-            public CachedCollisionStructure(Func<Models.TriangleDataModel, bool> filter)
+            readonly TriangleClassification filter;
+            public CachedCollisionStructure(TriangleClassification filter)
             {
                 this.filter = filter;
                 triangles = null;
@@ -84,18 +84,15 @@ namespace STROOP.Tabs.MapTab
                 uint globalTimer = Config.Stream.GetUInt32(MiscConfig.GlobalTimerAddress);
                 if (triangles == null || lastUpdate != globalTimer)
                 {
-                    triangles = new DataUtil.CollisionStructure(
-                        TriangleUtilities.GetLevelTriangles().Where(filter).ToList(),
-                        TriangleUtilities.GetObjectTriangles().Where(filter).ToList()
-                        );
+                    triangles = new DataUtil.CollisionStructure(filter);
                     lastUpdate = globalTimer;
                 }
                 return triangles;
             }
         }
 
-        public readonly CachedCollisionStructure floors = new CachedCollisionStructure(_ => _.Classification == TriangleClassification.Floor);
-        public readonly CachedCollisionStructure ceilings = new CachedCollisionStructure(_ => _.Classification == TriangleClassification.Ceiling);
+        public readonly CachedCollisionStructure floors = new CachedCollisionStructure(TriangleClassification.Floor);
+        public readonly CachedCollisionStructure ceilings = new CachedCollisionStructure(TriangleClassification.Ceiling);
 
         private enum MapScale { CourseDefault, MaxCourseSize, Custom };
         private enum MapCenter { BestFit, Origin, Mario, Custom };

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using STROOP.Models;
+using STROOP.Structs.Configurations;
+
 namespace STROOP.Tabs.MapTab.DataUtil
 {
     public class CollisionStructure
@@ -132,6 +134,34 @@ namespace STROOP.Tabs.MapTab.DataUtil
                 }
         }
 
+        static List<TriangleDataModel> GetCellTriangles(uint baseAddress)
+        {
+            var lst = new List<TriangleDataModel>();
+            baseAddress = Config.Stream.GetUInt32(baseAddress);
+            while (baseAddress != 0)
+            {
+                lst.Add(TriangleDataModel.Create(Config.Stream.GetUInt32(baseAddress + 4)));
+                baseAddress = Config.Stream.GetUInt32(baseAddress);
+            }
+            return lst;
+        }
+
+        public CollisionStructure(Structs.TriangleClassification classification)
+        {
+            int typeSize = 2 * 4;
+            int xSize = 3 * typeSize;
+            int zSize = 16 * xSize;
+            int type = (int)classification;
+
+            for (int y = 0; y < NUM_CELLS; y++)
+                for (int x = 0; x < NUM_CELLS; x++)
+                {
+                    var offset = y * zSize + x * xSize + type * typeSize;
+                    static_cells[x, y] = GetCellTriangles((uint)(TriangleConfig.StaticTrianglePartitionAddress + offset));
+                    dynamic_cells[x, y] = GetCellTriangles((uint)(TriangleConfig.DynamicTrianglePartitionAddress + offset));
+                }
+        }
+
         public List<TriangleDataModel> GetNearbyTriangles(float x, float z, float size, bool dynamic)
         {
             size = Math.Min(size, 50); //SM64 is funny like that
@@ -144,11 +174,8 @@ namespace STROOP.Tabs.MapTab.DataUtil
         {
             var tris = GetNearbyTriangles(x, z, 0, dynamic);
             foreach (var tri in tris)
-            {
-                bool isLegitimateTriangle = tri.NormX != 0 || tri.NormY != 0 || tri.NormZ != 0;
-                if (isLegitimateTriangle && tri.IsPointInsideAndAboveTriangle((short)x, (short)y, (short)z))
-                    return (tri, tri.GetTruncatedHeightOnTriangle(x, z));
-            }
+                if (tri.IsPointInsideAndAboveTriangle((short)x, (short)y, (short)z, out var truncatedHeight))
+                    return (tri, truncatedHeight);
             return (null, float.NaN);
         }
 
@@ -156,11 +183,8 @@ namespace STROOP.Tabs.MapTab.DataUtil
         {
             var tris = GetNearbyTriangles(x, z, 0, dynamic);
             foreach (var tri in tris)
-            {
-                bool isLegitimateTriangle = tri.NormX != 0 || tri.NormY != 0 || tri.NormZ != 0;
-                if (isLegitimateTriangle && tri.IsPointInsideAndBelowTriangle((short)x, (short)y, (short)z))
+                if (tri.IsPointInsideAndBelowTriangle((short)x, (short)y, (short)z, out var truncatedHeight))
                     return (tri, tri.GetTruncatedHeightOnTriangle(x, z));
-            }
             return (null, float.NaN);
         }
 
