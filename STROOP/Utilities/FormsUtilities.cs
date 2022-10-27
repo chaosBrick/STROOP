@@ -9,7 +9,7 @@ namespace STROOP.Utilities
         {
             ToolStripItem item;
             foreach (ToolStripItem fsjkl in strip)
-                if (fsjkl.Name == key)
+                if (fsjkl.Text == key)
                 {
                     item = fsjkl;
                     goto skipNew;
