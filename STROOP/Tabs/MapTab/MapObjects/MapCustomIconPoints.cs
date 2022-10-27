@@ -31,6 +31,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             positionAngleProvider = () => positionAngles;
             hoverData = new CustomPointHoverData(this);
             CreateNewPoint(AccessScope<MapTab>.content);
+            enableDragging = true;
         }
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)

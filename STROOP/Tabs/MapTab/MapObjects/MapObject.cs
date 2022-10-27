@@ -93,7 +93,12 @@ namespace STROOP.Tabs.MapTab.MapObjects
     {
         public readonly ObjectCreateParams creationParameters;
 
-        ToolStripMenuItem enableDragging = new ToolStripMenuItem("Enable dragging");
+        ToolStripMenuItem itemEnableDragging = new ToolStripMenuItem("Enable dragging");
+        public bool enableDragging
+        {
+            get => itemEnableDragging.Checked;
+            set => itemEnableDragging.Checked = value;
+        }
 
         public virtual IHoverData GetHoverData(MapGraphics graphics, ref Vector3 position) => null;
 
@@ -243,9 +248,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
         protected virtual ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             var _contextMenuStrip = new ContextMenuStrip();
-            enableDragging.Checked = false;
-            enableDragging.Click += (_, __) => enableDragging.Checked = !enableDragging.Checked;
-            _contextMenuStrip.Items.Add(enableDragging);
+            itemEnableDragging.Click += (_, __) => itemEnableDragging.Checked = !itemEnableDragging.Checked;
+            _contextMenuStrip.Items.Add(itemEnableDragging);
 
             return _contextMenuStrip;
         }
@@ -265,6 +269,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         public virtual (SaveSettings save, LoadSettings load) SettingsSaveLoad => (
         (System.Xml.XmlNode node) =>
         {
+            SaveValueNode(node, "EnableDragging", enableDragging.ToString());
             SaveValueNode(node, "Size", Size.ToString());
             SaveValueNode(node, "Color", Color.ToArgb().ToString("X"));
             SaveValueNode(node, "OutlineColor", OutlineColor.ToArgb().ToString("X"));
@@ -272,6 +277,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
         }
         , (System.Xml.XmlNode node) =>
         {
+            if (bool.TryParse(LoadValueNode(node, "EnableDragging"), out bool _enableDragging))
+                enableDragging = _enableDragging;
             if (float.TryParse(LoadValueNode(node, "Size"), out float size))
                 Size = size;
             if (int.TryParse(LoadValueNode(node, "Color"), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int color))

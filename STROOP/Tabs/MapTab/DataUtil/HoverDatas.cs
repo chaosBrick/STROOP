@@ -23,7 +23,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
             public virtual void RightClick(Vector3 position) { }
 
-            public virtual bool CanDrag() => parent.enableDragging.Checked;
+            public virtual bool CanDrag() => parent.itemEnableDragging.Checked;
 
             public void DragTo(Vector3 newPosition, bool setY)
             {
