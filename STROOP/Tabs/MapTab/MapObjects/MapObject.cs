@@ -252,8 +252,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         public virtual void InitSubTrackerContextMenuStrip(MapTab mapTab, ContextMenuStrip targetStrip)
         {
-            targetStrip.Items.AddHandlerToItem("Add Tracker for aggregated Path",
-                tracker.MakeCreateTrackerHandler(mapTab, "AggregatedPath", _ => new MapPathObject(positionAngleProvider)));
+            MapObjectObject.AddPositionAngleSubTrackers(GetName(), tracker, targetStrip, positionAngleProvider);
         }
 
         public virtual void Update() { }

@@ -90,6 +90,9 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
             currentItem.DropDownItems.AddHandlerToItem("Add Tracker for Nearby Objects",
                             tracker.MakeCreateTrackerHandler(mapTab, "NearbyObjects", _ => new MapNearbyObjectsObject(name, positionAngleProvider)));
+
+            targetStrip.Items.AddHandlerToItem("Add Tracker for aggregated Path",
+                tracker.MakeCreateTrackerHandler(mapTab, "AggregatedPath", _ => new MapPathObject(positionAngleProvider)));
         }
 
         public static void AddObjectSubTrackers(MapTracker tracker, string name, ContextMenuStrip targetStrip, PositionAngleProvider positionAngleProvider)
@@ -177,8 +180,6 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
             collisionItem.DropDownItems.AddHandlerToItem("Add Tracker for Object Ceiling Triangles",
                             tracker.MakeCreateTrackerHandler(mapTab, "ObjectCeilingsPrediction", _ => new MapObjectCeilingPrediction(positionAngleProvider)));
-
-            AddPositionAngleSubTrackers(name, tracker, targetStrip, positionAngleProvider);
         }
 
         protected delegate ObjectDataModel[] ObjectProvider();
