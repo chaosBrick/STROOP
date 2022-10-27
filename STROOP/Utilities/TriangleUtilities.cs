@@ -248,7 +248,7 @@ namespace STROOP.Utilities
             short shortX = (short)floatX;
             short shortY = (short)floatY;
             short shortZ = (short)floatZ;
-            
+
             if (shortX <= -LEVEL_BOUNDARY_MAX || shortX >= LEVEL_BOUNDARY_MAX)
             {
                 return null;
@@ -289,7 +289,7 @@ namespace STROOP.Utilities
                 uint triAddress = Config.Stream.GetUInt32(address + 4);
                 TriangleDataModel tri = TriangleDataModel.Create(triAddress);
                 bool isLegitimateTriangle = tri.NormX != 0 || tri.NormY != 0 || tri.NormZ != 0;
-                if (isLegitimateTriangle && tri.IsPointInsideAndAboveTriangle(shortX, shortY, shortZ)) return tri;
+                if (isLegitimateTriangle && tri.IsPointInsideAndAboveTriangle(shortX, shortY, shortZ, out var truncatedHeight)) return tri;
                 address = Config.Stream.GetUInt32(address);
             }
 
@@ -353,11 +353,11 @@ namespace STROOP.Utilities
                 uint triAddress = Config.Stream.GetUInt32(address + 4);
                 TriangleDataModel tri = TriangleDataModel.Create(triAddress);
                 bool isLegitimateTriangle = tri.NormX != 0 || tri.NormY != 0 || tri.NormZ != 0;
-                if (isLegitimateTriangle && tri.IsPointInsideAndBelowTriangle(shortX, shortY, shortZ)) return tri;
+                if (isLegitimateTriangle && tri.IsPointInsideAndBelowTriangle(shortX, shortY, shortZ, out var truncatedHeight)) return tri;
                 address = Config.Stream.GetUInt32(address);
             }
 
             return null;
         }
     }
-} 
+}

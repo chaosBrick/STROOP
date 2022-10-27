@@ -391,30 +391,35 @@ namespace STROOP.Models
             return (-x * normX - z * normZ - normOffset) / normY;
         }
 
-        public bool IsPointInsideAndAboveTriangle(double doubleX, double doubleY, double doubleZ)
+        public bool IsPointInsideAndAboveTriangle(short shortX, short shortY, short shortZ, out float truncatedHeight)
         {
-            short shortX = (short)doubleX;
-            short shortY = (short)doubleY;
-            short shortZ = (short)doubleZ;
+            truncatedHeight = float.NaN;
+            if (!IsInsideTriangle(shortX, shortZ, X1, Z1, X2, Z2, X3, Z3)) return false;
 
-            if (!MoreMath.IsPointInsideTriangle(shortX, shortZ, X1, Z1, X2, Z2, X3, Z3)) return false;
+            truncatedHeight = -(shortX * NormX + NormZ * shortZ + NormOffset) / NormY;
 
-            double heightOnTriangle = GetHeightOnTriangle(shortX, shortZ, NormX, NormY, NormZ, NormOffset);
-            if (shortY < heightOnTriangle - 78) return false;
+            if (shortY < truncatedHeight - 78) return false;
 
             return true;
         }
 
-        public bool IsPointInsideAndBelowTriangle(double doubleX, double doubleY, double doubleZ)
+        static int Side(short pX, short  pZ, short v1X, short v1Z, short v2X, short v2Z) => (v1Z - pZ) * (v2X - v1X) - (v1X - pX) * (v2Z - v1Z);
+        static bool IsInsideTriangle(short pX, short pZ, short v1X, short v1Z, short v2X, short v2Z, short v3X, short v3Z)
         {
-            short shortX = (short)doubleX;
-            short shortY = (short)doubleY;
-            short shortZ = (short)doubleZ;
+            int side12 = Side(pX, pZ, v1X, v1Z, v2X, v2Z);
+            int side23 = Side(pX, pZ, v2X, v2Z, v3X, v3Z);
+            int side31 = Side(pX, pZ, v3X, v3Z, v1X, v1Z);
+            return (side12 < 0 && side23 < 0 && side31 < 0) || (side12 > 0 && side23 > 0 && side31 > 0);
+        }
 
-            if (!MoreMath.IsPointInsideTriangle(shortX, shortZ, X1, Z1, X2, Z2, X3, Z3)) return false;
+        public bool IsPointInsideAndBelowTriangle(short shortX, short shortY, short shortZ, out float truncatedHeight)
+        {
+            truncatedHeight = float.NaN;
+            if (!IsInsideTriangle(shortX, shortZ, X1, Z1, X2, Z2, X3, Z3)) return false;
 
-            double heightOnTriangle = GetHeightOnTriangle(shortX, shortZ, NormX, NormY, NormZ, NormOffset);
-            if (shortY > heightOnTriangle + 78) return false;
+            truncatedHeight = -(shortX * NormX + NormZ * shortZ + NormOffset) / NormY;
+
+            if (shortY > truncatedHeight + 78) return false;
 
             return true;
         }
