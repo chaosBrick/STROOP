@@ -8,43 +8,49 @@ using OpenTK;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {
-    [ObjectDescription("Custom Points", "Custom")]
-    public class CustomPoints : MapIconPointObject
+    [ObjectDescription("Custom Icon Points", "Custom")]
+    public class MapCustomIconPoints : MapIconPointObject
     {
         class CustomPointHoverData : MapObjectHoverData
         {
-            public CustomPointHoverData(CustomPoints parent) : base(parent) { }
+            public CustomPointHoverData(MapCustomIconPoints parent) : base(parent) { }
             public override void AddContextMenuItems(MapTab tab, ContextMenuStrip menu)
             {
                 base.AddContextMenuItems(tab, menu);
                 menu.Items.GetSubItem(ToString()).DropDownItems.AddHandlerToItem(
                     "Remove",
-                    () => ((CustomPoints)parent).positionAngles.Remove(currentPositionAngle)
+                    () => ((MapCustomIconPoints)parent).positionAngles.Remove(currentPositionAngle)
                     );
             }
             public override string ToString() => $"Custom Point {currentPositionAngle.position}";
         }
 
         List<PositionAngle> positionAngles = new List<PositionAngle>();
-        public CustomPoints() : base(null)
+        public MapCustomIconPoints() : base(null)
         {
             positionAngleProvider = () => positionAngles;
             hoverData = new CustomPointHoverData(this);
+            CreateNewPoint(AccessScope<MapTab>.content);
         }
 
-        public override void InitSubTrackerContextMenuStrip(MapTab mapTab, ContextMenuStrip targetStrip)
+        protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
-            base.InitSubTrackerContextMenuStrip(mapTab, targetStrip);
-            var itemAddThingyBob = new ToolStripMenuItem("Add point");
-            itemAddThingyBob.Click += (_, __) =>
-            {
-                var newPointPos = mapTab.graphics.view.position;
-                if (mapTab.graphics.view.mode == MapView.ViewMode.ThreeDimensional)
-                    newPointPos += mapTab.graphics.view.ComputeViewDirection() * 50;
-                positionAngles.Add(PositionAngle.Custom(newPointPos));
-            };
-            targetStrip.Items.Insert(0, itemAddThingyBob);
-            MapObjectObject.AddPositionAngleSubTrackers(GetName(), tracker, targetStrip, positionAngleProvider);
+            var mapTab = targetTracker.mapTab;
+            var strip = base.GetContextMenuStrip(targetTracker);
+            var itemAddPoint = new ToolStripMenuItem("Add point");
+            itemAddPoint.Click += (_, __) => CreateNewPoint(mapTab);
+            strip.Items.Insert(0, itemAddPoint);
+            return strip;
+        }
+
+        void CreateNewPoint(MapTab mapTab)
+        {
+            if (mapTab == null)
+                return;
+            var newPointPos = mapTab.graphics.view.position;
+            if (mapTab.graphics.view.mode == MapView.ViewMode.ThreeDimensional)
+                newPointPos += mapTab.graphics.view.ComputeViewDirection() * 50;
+            positionAngles.Add(PositionAngle.Custom(newPointPos));
         }
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.PointImage;
