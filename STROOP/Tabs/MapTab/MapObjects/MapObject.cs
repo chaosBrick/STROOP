@@ -55,14 +55,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         {
             List<(float x, float y, float z)> points = null;
             if (creationParameters != null)
-                points = ParsingUtilities.ParseTupleList(creationParameters.GetValue(nodeName), vals =>
-                {
-                    if (vals.Length == 2)
-                        return (float.Parse(vals[0]), 0, float.Parse(vals[1]));
-                    else if (vals.Length == 3)
-                        return (float.Parse(vals[0]), float.Parse(vals[1]), float.Parse(vals[2]));
-                    return (0, 0, 0);
-                });
+                points = ParsingUtilities.ParsePointList(creationParameters.GetValue(nodeName));
 
             if (points == null)
             {
@@ -75,7 +68,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 points = MapUtilities.ParsePoints(text, useTriplets);
                 if (creationParameters == null)
                     creationParameters = new ObjectCreateParams();
-                creationParameters.AddValue(nodeName, StringUtilities.Concat(points, p => $"({p.x}, {p.y}, {p.z})"));
+                creationParameters.AddValue(nodeName, ParsingUtilities.CreatePointList(points));
             }
             return points;
         }

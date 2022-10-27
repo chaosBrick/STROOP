@@ -63,7 +63,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 typePositionItem.Click += (_, __) =>
                 {
                     var pos = GetPosition();
-                    var pts = MapUtilities.ParsePoints(DialogUtilities.GetStringFromDialog($"{pos.X} \n{pos.Y} \n{pos.Z}", "Enter position as 3 floats"), true);
+                    var pts = MapUtilities.ParsePoints(DialogUtilities.GetStringFromDialog($"{pos.X}\r\n{pos.Y}\r\n{pos.Z}", "Enter position as 3 floats"), true);
                     if (pts != null)
                         foreach (var pt in pts)
                         {

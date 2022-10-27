@@ -16,11 +16,25 @@ namespace STROOP.Utilities
             foreach (var split in tupleSplits)
             {
                 var startIndex = split.IndexOf('(') + 1;
+                if (startIndex == 0)
+                    continue;
                 var trim = split.Substring(startIndex, split.IndexOf(')') - startIndex);
                 ts.Add(elementConverter(Array.ConvertAll(trim.Split(','), o => o.Trim())));
             }
             return ts;
         }
+
+        public static string CreatePointList(List<(float x, float y , float z)> points) => StringUtilities.Concat(points, p => $"({p.x}, {p.y}, {p.z});");
+
+        public static List<(float, float, float)> ParsePointList(string input) => 
+            ParseTupleList(input, vals =>
+                {
+                    if (vals.Length == 2)
+                        return (float.Parse(vals[0]), 0, float.Parse(vals[1]));
+                    else if (vals.Length == 3)
+                        return (float.Parse(vals[0]), float.Parse(vals[1]), float.Parse(vals[2]));
+                    return (0, 0, 0);
+                });
 
         public static bool TryParseHex(object obj, out uint result)
         {
