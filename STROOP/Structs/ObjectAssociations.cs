@@ -29,6 +29,7 @@ namespace STROOP.Structs
         public Lazy<Image>
             DefaultImage,
             EmptyImage,
+            PointImage,
             MarioImage,
             HudImage,
             DebugImage,

@@ -14,6 +14,7 @@
 
   <MapImage name="Default" path="default.png"/>
   <MapImage name="Empty" path="empty.png"/>
+  <MapImage name="Point" path="point.png"/>
 
   <MapImage name="Mario" path = "Mario.png"/>
   <MapImage name="MarioMap" path = "Mario Top.png"/>
