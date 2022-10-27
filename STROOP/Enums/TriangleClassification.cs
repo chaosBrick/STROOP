@@ -10,8 +10,8 @@ namespace STROOP.Structs
 {
     public enum TriangleClassification
     {
-        Wall,
-        Floor,
-        Ceiling,
+        Floor = 0,
+        Ceiling = 1,
+        Wall = 2,
     }
 }
