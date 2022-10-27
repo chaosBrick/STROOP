@@ -41,7 +41,9 @@
             this.labelMapOptionsBackground = new System.Windows.Forms.Label();
             this.labelViewMode = new System.Windows.Forms.Label();
             this.labelMapOptionsLevel = new System.Windows.Forms.Label();
+            this.buttonMapOptionsSaveTrackerSettings = new System.Windows.Forms.Button();
             this.buttonMapOptionsClearAllTrackers = new System.Windows.Forms.Button();
+            this.buttonMapOptionsLoadTrackerSettings = new System.Windows.Forms.Button();
             this.buttonMapOptionsAddNewTracker = new System.Windows.Forms.Button();
             this.checkBoxMapOptionsScaleIconSizes = new System.Windows.Forms.CheckBox();
             this.checkBoxMapOptionsReverseDragging = new System.Windows.Forms.CheckBox();
@@ -108,8 +110,6 @@
             this.labelMapDataMapName = new System.Windows.Forms.Label();
             this.labelMapDataPuCoordinates = new System.Windows.Forms.Label();
             this.flowLayoutPanelMapTrackers = new STROOP.Tabs.MapTab.MapTrackerFlowLayoutPanel();
-            this.buttonMapOptionsLoadTrackerSettings = new System.Windows.Forms.Button();
-            this.buttonMapOptionsSaveTrackerSettings = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMap)).BeginInit();
             this.splitContainerMap.Panel1.SuspendLayout();
             this.splitContainerMap.SuspendLayout();
@@ -264,7 +264,7 @@
             this.textBoxMapOptionsGlobalIconSize.Name = "textBoxMapOptionsGlobalIconSize";
             this.textBoxMapOptionsGlobalIconSize.Size = new System.Drawing.Size(65, 20);
             this.textBoxMapOptionsGlobalIconSize.TabIndex = 43;
-            this.textBoxMapOptionsGlobalIconSize.Text = "100";
+            this.textBoxMapOptionsGlobalIconSize.Text = "25";
             this.textBoxMapOptionsGlobalIconSize.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // labelMapOptionsGlobalIconSize
@@ -305,6 +305,17 @@
             this.labelMapOptionsLevel.TabIndex = 12;
             this.labelMapOptionsLevel.Text = "Map:";
             // 
+            // buttonMapOptionsSaveTrackerSettings
+            // 
+            this.buttonMapOptionsSaveTrackerSettings.Location = new System.Drawing.Point(243, 35);
+            this.buttonMapOptionsSaveTrackerSettings.Margin = new System.Windows.Forms.Padding(0);
+            this.buttonMapOptionsSaveTrackerSettings.Name = "buttonMapOptionsSaveTrackerSettings";
+            this.buttonMapOptionsSaveTrackerSettings.Size = new System.Drawing.Size(85, 25);
+            this.buttonMapOptionsSaveTrackerSettings.TabIndex = 40;
+            this.buttonMapOptionsSaveTrackerSettings.Text = "Save Settings";
+            this.buttonMapOptionsSaveTrackerSettings.UseVisualStyleBackColor = true;
+            this.buttonMapOptionsSaveTrackerSettings.Click += new System.EventHandler(this.buttonMapOptionsSaveTrackerSettings_Click);
+            // 
             // buttonMapOptionsClearAllTrackers
             // 
             this.buttonMapOptionsClearAllTrackers.Location = new System.Drawing.Point(155, 35);
@@ -314,6 +325,17 @@
             this.buttonMapOptionsClearAllTrackers.TabIndex = 40;
             this.buttonMapOptionsClearAllTrackers.Text = "Clear All Trackers";
             this.buttonMapOptionsClearAllTrackers.UseVisualStyleBackColor = true;
+            // 
+            // buttonMapOptionsLoadTrackerSettings
+            // 
+            this.buttonMapOptionsLoadTrackerSettings.Location = new System.Drawing.Point(243, 7);
+            this.buttonMapOptionsLoadTrackerSettings.Margin = new System.Windows.Forms.Padding(0);
+            this.buttonMapOptionsLoadTrackerSettings.Name = "buttonMapOptionsLoadTrackerSettings";
+            this.buttonMapOptionsLoadTrackerSettings.Size = new System.Drawing.Size(85, 25);
+            this.buttonMapOptionsLoadTrackerSettings.TabIndex = 41;
+            this.buttonMapOptionsLoadTrackerSettings.Text = "Load Settings";
+            this.buttonMapOptionsLoadTrackerSettings.UseVisualStyleBackColor = true;
+            this.buttonMapOptionsLoadTrackerSettings.Click += new System.EventHandler(this.buttonMapOptionsLoadTrackerSettings_Click);
             // 
             // buttonMapOptionsAddNewTracker
             // 
@@ -444,7 +466,7 @@
             this.trackBarMapOptionsGlobalIconSize.Size = new System.Drawing.Size(119, 45);
             this.trackBarMapOptionsGlobalIconSize.TabIndex = 42;
             this.trackBarMapOptionsGlobalIconSize.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.trackBarMapOptionsGlobalIconSize.Value = 100;
+            this.trackBarMapOptionsGlobalIconSize.Value = 25;
             // 
             // tabPageMapControllers
             // 
@@ -1021,28 +1043,6 @@
             this.flowLayoutPanelMapTrackers.Size = new System.Drawing.Size(355, 235);
             this.flowLayoutPanelMapTrackers.TabIndex = 0;
             this.flowLayoutPanelMapTrackers.WrapContents = false;
-            // 
-            // buttonMapOptionsLoadTrackerSettings
-            // 
-            this.buttonMapOptionsLoadTrackerSettings.Location = new System.Drawing.Point(243, 7);
-            this.buttonMapOptionsLoadTrackerSettings.Margin = new System.Windows.Forms.Padding(0);
-            this.buttonMapOptionsLoadTrackerSettings.Name = "buttonMapOptionsLoadTrackerSettings";
-            this.buttonMapOptionsLoadTrackerSettings.Size = new System.Drawing.Size(85, 25);
-            this.buttonMapOptionsLoadTrackerSettings.TabIndex = 41;
-            this.buttonMapOptionsLoadTrackerSettings.Text = "Load Settings";
-            this.buttonMapOptionsLoadTrackerSettings.UseVisualStyleBackColor = true;
-            this.buttonMapOptionsLoadTrackerSettings.Click += new System.EventHandler(this.buttonMapOptionsLoadTrackerSettings_Click);
-            // 
-            // buttonMapOptionsSaveTrackerSettings
-            // 
-            this.buttonMapOptionsSaveTrackerSettings.Location = new System.Drawing.Point(243, 35);
-            this.buttonMapOptionsSaveTrackerSettings.Margin = new System.Windows.Forms.Padding(0);
-            this.buttonMapOptionsSaveTrackerSettings.Name = "buttonMapOptionsSaveTrackerSettings";
-            this.buttonMapOptionsSaveTrackerSettings.Size = new System.Drawing.Size(85, 25);
-            this.buttonMapOptionsSaveTrackerSettings.TabIndex = 40;
-            this.buttonMapOptionsSaveTrackerSettings.Text = "Save Settings";
-            this.buttonMapOptionsSaveTrackerSettings.UseVisualStyleBackColor = true;
-            this.buttonMapOptionsSaveTrackerSettings.Click += new System.EventHandler(this.buttonMapOptionsSaveTrackerSettings_Click);
             // 
             // MapTab
             // 
