@@ -4,6 +4,9 @@ using System.Reflection;
 
 namespace STROOP.Utilities
 {
+    /// <summary>
+    /// Denotes that a static string variable's value shall be initialized with its field name when <see cref="StringUtilities.InitializeDeclaredStrings(Type)"/> is called on its declaring type.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Field)]
     public class DeclaredStringAttribute : Attribute { }
 
