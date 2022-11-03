@@ -23,13 +23,16 @@ namespace STROOP
 
         public static class ViewProperties
         {
+            static ViewProperties() => StringUtilities.InitializeDeclaredStrings(typeof(ViewProperties));
+
+            [DeclaredString]
             public static readonly string
-                useHex = nameof(useHex),
-                invertBool = nameof(invertBool),
-                specialType = nameof(specialType),
-                roundingLimit = nameof(roundingLimit),
-                display = nameof(display),
-                color = nameof(color)
+                useHex,
+                invertBool,
+                specialType,
+                roundingLimit,
+                display,
+                color
                 ;
         }
 
@@ -240,7 +243,7 @@ namespace STROOP
             return result;
         }
 
-        public WatchVariable(WatchVariable.IVariableView view, string baseAddress = nameof(Structs.BaseAddressType.None), uint offset = 0)
+        public WatchVariable(IVariableView view, string baseAddress = nameof(Structs.BaseAddressType.None), uint offset = 0)
         {
             BaseAddressType = baseAddress;
             this.OffsetDefault = offset;
