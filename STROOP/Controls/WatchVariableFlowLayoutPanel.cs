@@ -137,6 +137,7 @@ namespace STROOP.Controls
                 if (KeyboardUtilities.IsCtrlHeld() && args.KeyCode == Keys.F)
                     (FindForm() as StroopMainForm)?.ShowSearchDialog();
             };
+            Click += (_, __) => Focus(); //Why do I have to do this manually?
             getSpecialFuncWatchVariables = () => new[] { PositionAngle.HybridPositionAngle.GenerateBaseVariables };
         }
 
@@ -185,7 +186,7 @@ namespace STROOP.Controls
                 foreach (var watchVarControl in precursors.ConvertAll(precursor => new WatchVariableControl(this, precursor)))
                     _allWatchVarControls.Add(watchVarControl);
 
-                MouseDown += (_, __) => { if (__.Button == MouseButtons.Right) ShowContextMenu(); };
+                base.MouseDown += (_, __) => { if (__.Button == MouseButtons.Right) ShowContextMenu(); };
 
                 int lastSelectedEntry = -1;
                 int lastClicked = -1;
@@ -770,7 +771,7 @@ namespace STROOP.Controls
             List<XElement> elements = DialogUtilities.OpenXmlElements(FileType.StroopVariables);
             if (elements.Count == 0) return;
             VariablePopOutForm form = new VariablePopOutForm();
-            form.Initialize(elements.ConvertAll(element => WatchVariable.ParseXml(element)));
+            form.Initialize(elements.ConvertAndRemoveNull(element => WatchVariable.ParseXml(element)));
             form.ShowForm();
         }
 
