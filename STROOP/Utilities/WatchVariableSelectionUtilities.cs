@@ -63,7 +63,7 @@ namespace STROOP.Structs
                 infoForm.SetText(
                     "Variable Info",
                     "Variable XML",
-                    String.Join("\r\n", vars.ConvertAll(control => control.ToXml(true))));
+                    String.Join("\r\n", vars.ConvertAll(control => control.ToXml())));
                 infoForm.Show();
             };
             itemList.Add(itemShowVariableXml);

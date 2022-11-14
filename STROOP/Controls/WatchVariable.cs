@@ -119,26 +119,6 @@ namespace STROOP
             }
         }
 
-        public abstract class CustomViewData
-        {
-            public readonly GetterFunction getter;
-            public readonly SetterFunction setter;
-            public readonly Type wrapperType;
-            protected CustomViewData(GetterFunction getterFunction, SetterFunction setterFunction, Type wrapperType)
-            {
-                getter = getterFunction;
-                setter = setterFunction;
-                this.wrapperType = wrapperType;
-            }
-        };
-
-        public class CustomViewData<T> : CustomViewData where T : WatchVariableWrapper
-        {
-            public CustomViewData(GetterFunction getterFunction, SetterFunction setterFunction)
-                : base(getterFunction, setterFunction, typeof(T))
-            { }
-        }
-
         public static IVariableView DefaultView(string name, bool isAbsolute, Type effectiveType, int mask = ~0, int shift = ~0)
         {
             return new CustomView(typeof(WatchVariableNumberWrapper))
@@ -222,25 +202,29 @@ namespace STROOP
 
         public static WatchVariable ParseXml(XElement element)
         {
-            /// Watchvariable params
-            string typeName = (element.Attribute(XName.Get("type"))?.Value);
-            string specialType = element.Attribute(XName.Get("specialType"))?.Value;
-            string baseAddressType = element.Attribute(XName.Get("base")).Value;
-            uint? offsetUS = ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("offsetUS"))?.Value);
-            uint? offsetJP = ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("offsetJP"))?.Value);
-            uint? offsetSH = ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("offsetSH"))?.Value);
-            uint? offsetEU = ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("offsetEU"))?.Value);
-            uint? offsetDefault = ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("offset"))?.Value);
-            uint? mask = element.Attribute(XName.Get("mask")) != null ?
-                ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("mask")).Value) : null;
-            int? shift = element.Attribute(XName.Get("shift")) != null ?
-                int.Parse(element.Attribute(XName.Get("shift")).Value) : (int?)null;
-            bool handleMapping = (element.Attribute(XName.Get("handleMapping")) != null) ?
-                bool.Parse(element.Attribute(XName.Get("handleMapping")).Value) : true;
+            switch (element.Name.LocalName)
+            {
+                case "Data":
+                    string typeName = (element.Attribute(XName.Get("type"))?.Value);
+                    string specialType = element.Attribute(XName.Get("specialType"))?.Value;
+                    string baseAddressType = element.Attribute(XName.Get("base")).Value;
+                    uint? offsetUS = ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("offsetUS"))?.Value);
+                    uint? offsetJP = ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("offsetJP"))?.Value);
+                    uint? offsetSH = ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("offsetSH"))?.Value);
+                    uint? offsetEU = ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("offsetEU"))?.Value);
+                    uint? offsetDefault = ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("offset"))?.Value);
+                    uint? mask = element.Attribute(XName.Get("mask")) != null ?
+                        ParsingUtilities.ParseHexNullable(element.Attribute(XName.Get("mask")).Value) : null;
+                    int? shift = element.Attribute(XName.Get("shift")) != null ?
+                        int.Parse(element.Attribute(XName.Get("shift")).Value) : (int?)null;
+                    bool handleMapping = (element.Attribute(XName.Get("handleMapping")) != null) ?
+                        bool.Parse(element.Attribute(XName.Get("handleMapping")).Value) : true;
 
-            var result = new WatchVariable(typeName, baseAddressType, offsetUS, offsetJP, offsetSH, offsetEU, offsetDefault, mask, shift, handleMapping);
-            result.view = new XmlView(result, element);
-            return result;
+                    var result = new WatchVariable(typeName, baseAddressType, offsetUS, offsetJP, offsetSH, offsetEU, offsetDefault, mask, shift, handleMapping);
+                    result.view = new XmlView(result, element);
+                    return result;
+            }
+            return null;
         }
 
         public WatchVariable(IVariableView view, string baseAddress = nameof(Structs.BaseAddressType.None), uint offset = 0)
