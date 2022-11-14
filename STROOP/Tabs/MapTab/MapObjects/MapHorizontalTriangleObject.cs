@@ -16,6 +16,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
     {
         private float? _minHeight;
         private float? _maxHeight;
+        private float? _minNormalY;
+        private float? _maxNormalY;
         protected bool _enableQuarterFrameLandings;
 
         protected MapHorizontalTriangleObject(ObjectCreateParams creationParameters)
@@ -46,6 +48,10 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 pred = PredicateAnd(tri => _minHeight <= tri.GetMaxY(), pred);
             if (_maxHeight != null)
                 pred = PredicateAnd(tri => _maxHeight >= tri.GetMinY(), pred);
+            if (_minNormalY != null)
+                pred = PredicateAnd(tri => _minNormalY <= tri.NormY, pred);
+            if (_maxNormalY != null)
+                pred = PredicateAnd(tri => _maxNormalY >= tri.NormY, pred);
             return pred;
         }
 
@@ -80,43 +86,66 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         protected List<ToolStripMenuItem> GetHorizontalTriangleToolStripMenuItems(MapTracker targetTracker)
         {
-            ToolStripMenuItem itemSetMinHeight = new ToolStripMenuItem("Set Min Height");
-            itemSetMinHeight.Click += (sender, e) =>
+            bool parseFloatNullable(string text, out float? value)
             {
-                string text = DialogUtilities.GetStringFromDialog(labelText: "Enter the min height.");
-                float? minHeightNullable =
-                    text == "" ?
+                value = text == "" ?
                     Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset) :
                     ParsingUtilities.ParseFloatNullable(text);
-                if (minHeightNullable.HasValue)
-                    _minHeight = minHeightNullable.Value;
-            };
+                return value.HasValue;
+            }
+
+            var itemFilters = new ToolStripMenuItem("Filters");
+
+            ToolStripMenuItem itemSetMinHeight = new ToolStripMenuItem("Set Min Height");
+            itemSetMinHeight.Click += (sender, e) => DialogUtilities.UpdateNumberFromDialog(
+                ref _minHeight,
+                labelText: "Enter the min height.",
+                parser: parseFloatNullable);
 
             ToolStripMenuItem itemClearMinHeight = new ToolStripMenuItem("Clear Min Height");
             itemClearMinHeight.Click += (sender, e) => _minHeight = null;
 
             ToolStripMenuItem itemSetMaxHeight = new ToolStripMenuItem("Set Max Height");
-            itemSetMaxHeight.Click += (sender, e) =>
-            {
-                string text = DialogUtilities.GetStringFromDialog(labelText: "Enter the max height.");
-                float? maxHeightNullable =
-                    text == "" ?
-                    Config.Stream.GetSingle(MarioConfig.StructAddress + MarioConfig.YOffset) :
-                    ParsingUtilities.ParseFloatNullable(text);
-                if (maxHeightNullable.HasValue)
-                    _maxHeight = maxHeightNullable.Value;
-            };
+            itemSetMaxHeight.Click += (sender, e) => DialogUtilities.UpdateNumberFromDialog(
+                ref _maxHeight,
+                labelText: "Enter the max height.",
+                parser: parseFloatNullable
+                );
 
             ToolStripMenuItem itemClearMaxHeight = new ToolStripMenuItem("Clear Max Height");
             itemClearMaxHeight.Click += (sender, e) => _maxHeight = null;
 
-            return new List<ToolStripMenuItem>()
-            {
+            ToolStripMenuItem itemSetMinNormalY = new ToolStripMenuItem("Set Min Normal Y");
+            itemSetMinNormalY.Click += (sender, e) => DialogUtilities.UpdateNumberFromDialog(
+                ref _minNormalY,
+                labelText: "Enter the min Normal Y component.",
+                parser: parseFloatNullable
+                );
+
+            ToolStripMenuItem itemClearMinNormalY = new ToolStripMenuItem("Clear Min Normal Y");
+            itemClearMinNormalY.Click += (sender, e) => _minNormalY = null;
+
+            ToolStripMenuItem itemSetMaxNormalY = new ToolStripMenuItem("Set Max Normal Y");
+            itemSetMaxNormalY.Click += (sender, e) => DialogUtilities.UpdateNumberFromDialog(
+                ref _maxNormalY,
+                labelText: "Enter the Max Normal Y component.",
+                parser: parseFloatNullable
+                );
+
+            ToolStripMenuItem itemClearMaxNormalY = new ToolStripMenuItem("Clear Max Normal Y");
+            itemClearMaxNormalY.Click += (sender, e) => _maxNormalY = null;
+
+            itemFilters.DropDownItems.AddRange(new[] {
                 itemSetMinHeight,
                 itemClearMinHeight,
                 itemSetMaxHeight,
                 itemClearMaxHeight,
-            };
+                itemSetMinNormalY,
+                itemClearMinNormalY,
+                itemSetMaxNormalY,
+                itemClearMaxNormalY,
+            });
+            return new List<ToolStripMenuItem>() { itemFilters };
         }
 
         public override (SaveSettings save, LoadSettings load) SettingsSaveLoad => (
