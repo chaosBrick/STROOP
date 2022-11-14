@@ -1,9 +1,12 @@
 Features:
 - Add interacted walls display (modify previous positions tracker?)
+- Add wall seams finder
 
 Internal:
 - Make Models.ObjectDataModel compatible as PositionAngle
 - Simplify MapTracker Settings parsing for basic cases
+- Reduce / eliminate TypeUtilities.cs
+- Generalize ProcessStream GetValue(Type, ...)
 
 Issues / Bugs:
 - Custom Tab WatchVariablePanel controls still exist but do nothing
