@@ -268,7 +268,7 @@ namespace STROOP.Controls
                             continue;
 
                         var c = ctrl.IsSelected ? Color.Blue : ctrl.currentColor;
-                        if (c != Color.FromKnownColor(KnownColor.Control))
+                        if (c != Parent.BackColor)
                             using (var brush = new SolidBrush(c))
                                 g.FillRectangle(brush, x * elementWidth, yCoord, elementWidth, elementHeight);
                     }
@@ -450,7 +450,7 @@ namespace STROOP.Controls
                     }
                 }
 
-                g.Clear(Color.FromKnownColor(KnownColor.Control));
+                g.Clear(Parent.BackColor);
                 DrawGrid();
                 DrawMovingVariables();
 
