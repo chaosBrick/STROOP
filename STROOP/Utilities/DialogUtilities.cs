@@ -166,18 +166,25 @@ namespace STROOP.Utilities
             ref T number,
             string textboxText = "",
             string labelText = "Enter Value:",
-            string buttonText = "OK",
-            Parser<T> parser = null) where T : IConvertible
+            string buttonText = "OK") where T : IConvertible
         {
             var str = GetStringFromDialog(textboxText, labelText, buttonText);
             if (str == null) return;
-            if (parser != null)
-            {
-                if (parser(str, out T result))
-                    number = result;
-            }
-            else if (decimal.TryParse(str, out var dec))
+            if (decimal.TryParse(str, out var dec))
                 number = (T)Convert.ChangeType(dec, typeof(T));
+        }
+        public static void UpdateNumberFromDialog<T>(
+            ref T number,
+            Parser<T> parser,
+            string textboxText = "",
+            string labelText = "Enter Value:",
+            string buttonText = "OK"
+            )
+        {
+            var str = GetStringFromDialog(textboxText, labelText, buttonText);
+            if (str == null) return;
+            if (parser(str, out T result))
+                number = result;
         }
 
         public static string GetStringFromDialog(
