@@ -58,6 +58,9 @@ namespace STROOP.Tabs.MapTab
         Dictionary<uint, MapTracker> semaphoreTrackers = new Dictionary<uint, MapTracker>();
         List<(CheckBox checkBox, MapTracker tracker)> quickSemaphores = new List<(CheckBox checkBox, MapTracker tracker)>();
         Dictionary<string, MapTracker.CreateTracker> newTrackerByName = new Dictionary<string, MapTracker.CreateTracker>();
+        Dictionary<(Type, string), Func<MapTracker>> addNewTrackers = new Dictionary<(Type, string), Func<MapTracker>>();
+
+        public MapTracker AddByCode(Type type, string initializer = null) => addNewTrackers[(type, initializer)]();
 
         public MapTab()
         {
@@ -177,20 +180,24 @@ namespace STROOP.Tabs.MapTab
                             return newObj != null ? new MapTracker(this, creationIdentifier, newObj) : null;
                         };
 
-                    adders[attr.DisplayName] = new Wrapper<(bool, ObjectDescriptionAttribute, Func<ToolStripMenuItem>)>((false, attr, () =>
-                    {
-                        var toolStripItem = new ToolStripMenuItem($"Add Tracker for {attr.DisplayName}");
-                        toolStripItem.Click += (sender, e) =>
+                    Func<MapTracker> addNewTracker = () =>
                         {
                             using (new AccessScope<MapTab>(this))
                             {
                                 var tracker = newObjectFunc(null);
                                 if (tracker != null)
                                     flowLayoutPanelMapTrackers.Controls.Add(tracker);
+                                return tracker;
                             }
                         };
-                        return toolStripItem;
-                    }
+
+                    addNewTrackers[(type, attr.Initializer)] = addNewTracker;
+                    adders[attr.DisplayName] = new Wrapper<(bool, ObjectDescriptionAttribute, Func<ToolStripMenuItem>)>((false, attr, () =>
+                        {
+                            var toolStripItem = new ToolStripMenuItem($"Add Tracker for {attr.DisplayName}");
+                            toolStripItem.Click += (sender, e) => addNewTracker();
+                            return toolStripItem;
+                        }
                     ));
                 }
             }

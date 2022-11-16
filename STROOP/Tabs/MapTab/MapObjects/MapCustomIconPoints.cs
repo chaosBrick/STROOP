@@ -22,10 +22,13 @@ namespace STROOP.Tabs.MapTab.MapObjects
                     () => ((MapCustomIconPoints)parent).positionAngles.Remove(currentPositionAngle)
                     );
             }
-            public override string ToString() => $"Custom Point {currentPositionAngle.position}";
+            public override string ToString() => $"{parent.GetName()} {currentPositionAngle.position}";
         }
 
+        public string name = "Custom Points";
+
         List<PositionAngle> positionAngles = new List<PositionAngle>();
+
         public MapCustomIconPoints() : base(null)
         {
             positionAngleProvider = () => positionAngles;
@@ -34,6 +37,9 @@ namespace STROOP.Tabs.MapTab.MapObjects
             enableDragging = true;
         }
 
+        public void Clear() => positionAngles.Clear();
+        public void AddPoint(Vector3 position) => positionAngles.Add(PositionAngle.Custom(position));
+
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             var mapTab = targetTracker.mapTab;
@@ -41,6 +47,9 @@ namespace STROOP.Tabs.MapTab.MapObjects
             var itemAddPoint = new ToolStripMenuItem("Add point");
             itemAddPoint.Click += (_, __) => CreateNewPoint(mapTab);
             strip.Items.Insert(0, itemAddPoint);
+            var itemName = new ToolStripMenuItem("Set Name");
+            itemName.Click += (_, __) => name = DialogUtilities.GetStringFromDialog(name, "Enter Name") ?? name;
+            strip.Items.Insert(1, itemName);
             return strip;
         }
 
@@ -56,17 +65,19 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.PointImage;
 
-        public override string GetName() => "Custom Points";
+        public override string GetName() => name;
 
         public override (SaveSettings save, LoadSettings load) SettingsSaveLoad =>
         (
             node =>
             {
+                SaveValueNode(node, "Name", name);
                 SaveValueNode(node, "Points", ParsingUtilities.CreatePointList(positionAngles.ConvertAll(_ => ((float)_.X, (float)_.Y, (float)_.Z))));
             }
         ,
             node =>
             {
+                name = LoadValueNode(node, "Name") ?? "Custom Points";
                 positionAngles = new List<PositionAngle>(
                     ParsingUtilities.ParsePointList(LoadValueNode(node, "Points")).ConvertAll(_ => PositionAngle.Custom(new Vector3(_.Item1, _.Item2, _.Item3)))
                     );

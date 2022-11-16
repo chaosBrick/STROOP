@@ -73,6 +73,39 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 };
                 myItem.DropDownItems.Add(typePositionItem);
 
+                var makeReferencePointItem = new ToolStripMenuItem("Make Reference Point...");
+                HashSet<string> existingNames = new HashSet<string>();
+                foreach (var tracker in tab.flowLayoutPanelMapTrackers.EnumerateTrackers())
+                    if (tracker.mapObject is MapCustomIconPoints customPoints)
+                    {
+                        existingNames.Add(customPoints.GetName());
+                        makeReferencePointItem.DropDownItems.AddHandlerToItem(
+                            customPoints.GetName(),
+                            () => customPoints.AddPoint(GetPosition())
+                            );
+                    }
+                makeReferencePointItem.DropDownItems.AddHandlerToItem(
+                    "New Collection",
+                    () =>
+                    {
+                        var attemptName = "Reference";
+                        uint counter = 1;
+                        while (existingNames.Contains(attemptName + (counter == 1 ? "" : counter.ToString())))
+                            counter++;
+                        if (counter > 1)
+                            attemptName += counter;
+                        var tracker = tab.AddByCode(typeof(MapCustomIconPoints));
+                        if (tracker?.mapObject is MapCustomIconPoints customPoints)
+                        {
+                            customPoints.Clear();
+                            customPoints.name = attemptName;
+                            customPoints.enableDragging = false;
+                            customPoints.AddPoint(GetPosition());
+                        }
+                    }
+                    );
+                myItem.DropDownItems.Add(makeReferencePointItem);
+
                 if (tab.graphics.view.mode != MapView.ViewMode.TopDown)
                 {
                     var pivotItem = new ToolStripMenuItem("Make Pivot Point");
