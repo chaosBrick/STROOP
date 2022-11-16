@@ -61,18 +61,6 @@ namespace STROOP.Controls
         private Func<List<uint>> _defaultFixedAddressListGetter;
         public Func<List<uint>> FixedAddressListGetter;
 
-        public static readonly int DEFAULT_VARIABLE_NAME_WIDTH = 120;
-        public static readonly int DEFAULT_VARIABLE_VALUE_WIDTH = 85;
-        public static readonly int DEFAULT_VARIABLE_HEIGHT = 20;
-        public static readonly int DEFAULT_VARIABLE_TEXT_SIZE = 8;
-        public static readonly int DEFAULT_VARIABLE_OFFSET = 4;
-
-        public static int VariableNameWidth = DEFAULT_VARIABLE_NAME_WIDTH;
-        public static int VariableValueWidth = DEFAULT_VARIABLE_VALUE_WIDTH;
-        public static int VariableHeight = DEFAULT_VARIABLE_HEIGHT;
-        public static int VariableTextSize = DEFAULT_VARIABLE_TEXT_SIZE;
-        public static int VariableOffset = DEFAULT_VARIABLE_OFFSET;
-
         public WatchVariableControl(WatchVariablePanel panel, WatchVariable watchVar)
             : this(panel, watchVar, watchVar.view) { }
 

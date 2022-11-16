@@ -47,7 +47,6 @@ namespace STROOP.Tabs
                 _copyType);
             CopyUtilities.AddContextMenuStripFunctions(buttonCopyVars, watchVariablePanelCustom.GetCurrentVariableControls);
 
-            Button buttonClearVars = splitContainerCustomControls.Panel1.Controls["buttonClearVars"] as Button;
             buttonClearVars.Click += (sender, e) => watchVariablePanelCustom.ClearVariables();
             ControlUtilities.AddContextMenuStripFunctions(
                 buttonClearVars,
@@ -63,110 +62,6 @@ namespace STROOP.Tabs
             buttonCustomShowValues.Click += (sender, e) => ShowRecordedValues();
 
             buttonCustomClearValues.Click += (sender, e) => ClearRecordedValues();
-
-            // Panel 2 controls
-
-            Button buttonResetVariableSizeToDefault = splitContainerCustomControls.Panel2.Controls["buttonResetVariableSizeToDefault"] as Button;
-            buttonResetVariableSizeToDefault.Click += (sender, e) =>
-            {
-                WatchVariableControl.VariableNameWidth = WatchVariableControl.DEFAULT_VARIABLE_NAME_WIDTH;
-                WatchVariableControl.VariableValueWidth = WatchVariableControl.DEFAULT_VARIABLE_VALUE_WIDTH;
-                WatchVariableControl.VariableHeight = WatchVariableControl.DEFAULT_VARIABLE_HEIGHT;
-                WatchVariableControl.VariableTextSize = WatchVariableControl.DEFAULT_VARIABLE_TEXT_SIZE;
-                WatchVariableControl.VariableOffset = WatchVariableControl.DEFAULT_VARIABLE_OFFSET;
-            };
-
-            InitializeAddSubtractGetSetFuncionality(
-                buttonVarNameWidthSubtract,
-                buttonVarNameWidthAdd,
-                buttonVarNameWidthGet,
-                buttonVarNameWidthSet,
-                betterTextboxVarNameWidthAddSubtract,
-                betterTextboxVarNameWidthGetSet,
-                (int value) => { WatchVariableControl.VariableNameWidth = value; },
-                () => WatchVariableControl.VariableNameWidth);
-
-            InitializeAddSubtractGetSetFuncionality(
-                buttonVarValueWidthSubtract,
-                buttonVarValueWidthAdd,
-                buttonVarValueWidthGet,
-                buttonVarValueWidthSet,
-                betterTextboxVarValueWidthAddSubtract,
-                betterTextboxVarValueWidthGetSet,
-                (int value) => { WatchVariableControl.VariableValueWidth = value; },
-                () => WatchVariableControl.VariableValueWidth);
-
-            InitializeAddSubtractGetSetFuncionality(
-                buttonVarHeightSubtract,
-                buttonVarHeightAdd,
-                buttonVarHeightGet,
-                buttonVarHeightSet,
-                betterTextboxVarHeightAddSubtract,
-                betterTextboxVarHeightGetSet,
-                (int value) => { WatchVariableControl.VariableHeight = value; },
-                () => WatchVariableControl.VariableHeight);
-
-            InitializeAddSubtractGetSetFuncionality(
-                buttonVarTextSizeSubtract,
-                buttonVarTextSizeAdd,
-                buttonVarTextSizeGet,
-                buttonVarTextSizeSet,
-                betterTextboxVarTextSizeAddSubtract,
-                betterTextboxVarTextSizeGetSet,
-                (int value) => { WatchVariableControl.VariableTextSize = value; },
-                () => WatchVariableControl.VariableTextSize);
-
-            InitializeAddSubtractGetSetFuncionality(
-                buttonVarOffsetSubtract,
-                buttonVarOffsetAdd,
-                buttonVarOffsetGet,
-                buttonVarOffsetSet,
-                betterTextboxVarOffsetAddSubtract,
-                betterTextboxVarOffsetGetSet,
-                (int value) => { WatchVariableControl.VariableOffset = value; },
-                () => WatchVariableControl.VariableOffset);
-        }
-
-        private static void InitializeAddSubtractGetSetFuncionality(
-            Button buttonSubtract,
-            Button buttonAdd,
-            Button buttonGet,
-            Button buttonSet,
-            TextBox textboxAddSubtract,
-            TextBox textboxGetSet,
-            Action<int> setterFunction,
-            Func<int> getterFunction)
-        {
-            buttonSubtract.Click += (sender, e) =>
-            {
-                int? intValueNullable = ParsingUtilities.ParseIntNullable(textboxAddSubtract.Text);
-                if (!intValueNullable.HasValue) return;
-                int intValue = intValueNullable.Value;
-                int newValue = getterFunction() - intValue;
-                setterFunction(newValue);
-            };
-
-            buttonAdd.Click += (sender, e) =>
-            {
-                int? intValueNullable = ParsingUtilities.ParseIntNullable(textboxAddSubtract.Text);
-                if (!intValueNullable.HasValue) return;
-                int intValue = intValueNullable.Value;
-                int newValue = getterFunction() + intValue;
-                setterFunction(newValue);
-            };
-
-            buttonGet.Click += (sender, e) =>
-            {
-                textboxGetSet.Text = getterFunction().ToString();
-            };
-
-            buttonSet.Click += (sender, e) =>
-            {
-                int? intValueNullable = ParsingUtilities.ParseIntNullable(textboxGetSet.Text);
-                if (!intValueNullable.HasValue) return;
-                int intValue = intValueNullable.Value;
-                setterFunction(intValue);
-            };
         }
 
         private void ToggleRecording()
