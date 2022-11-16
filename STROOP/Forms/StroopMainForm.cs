@@ -47,6 +47,11 @@ namespace STROOP
 
         public void ShowSearchDialog()
         {
+            if (!searchVariableDialog.Visible)
+            {
+                searchVariableDialog.StartPosition = FormStartPosition.Manual;
+                searchVariableDialog.Location = PointToScreen(new Point(150, 150));
+            }
             searchVariableDialog.Show();
             searchVariableDialog.Activate();
         }
