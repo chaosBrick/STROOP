@@ -311,7 +311,6 @@ namespace STROOP.Controls
             bool isBKeyHeld = Keyboard.IsKeyDown(Key.B);
             bool isQKeyHeld = Keyboard.IsKeyDown(Key.Q);
             bool isOKeyHeld = Keyboard.IsKeyDown(Key.O);
-            bool isTKeyHeld = Keyboard.IsKeyDown(Key.T);
             bool isMKeyHeld = Keyboard.IsKeyDown(Key.M);
             bool isNKeyHeld = Keyboard.IsKeyDown(Key.N);
             bool isPKeyHeld = Keyboard.IsKeyDown(Key.P);
@@ -333,11 +332,6 @@ namespace STROOP.Controls
             //{
             //    containingPanel.UnselectAllVariables();
             //    AddToTab(Config.CustomManager);
-            //}
-            //else if (isTKeyHeld)
-            //{
-            //    containingPanel.UnselectAllVariables();
-            //    AddToTab(Config.TasManager);
             //}
             //else if (isMKeyHeld)
             //{

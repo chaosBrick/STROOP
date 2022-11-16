@@ -7,13 +7,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
-using System.IO;
 using STROOP.Utilities;
 using STROOP.Structs;
 using STROOP.Managers;
 using STROOP.Extensions;
 using STROOP.Structs.Configurations;
-using STROOP.Controls;
 using STROOP.Forms;
 using STROOP.Models;
 
@@ -171,7 +169,6 @@ namespace STROOP
                     "Download Latest STROOP Release",
                     "Documentation",
                     "Show All Helpful Hints",
-                    "Enable TASer Settings",
                     "Show Image Form",
                     "Show Coin Ring Display Form",
                     "Format Subtitles",
@@ -196,12 +193,6 @@ namespace STROOP
                     () => Process.Start("https://github.com/SM64-TAS-ABC/STROOP/releases/download/vDev/STROOP.zip"),
                     () => Process.Start("https://ukikipedia.net/wiki/STROOP"),
                     () => HelpfulHintUtilities.ShowAllHelpfulHints(),
-                    () =>
-                    {
-                        var tasTab = GetTab<Tabs.TasTab>();
-                        tasTab.EnableTASerSettings();
-                        tabControlMain.SelectedTab = tasTab.Tab;
-                    },
                     () =>
                     {
                         ImageForm imageForm = new ImageForm();

@@ -31,7 +31,6 @@ namespace STROOP.Structs
         HolpMario,
         HolpPoint,
         Trajectory,
-        TAS,
         Point,
         Coin,
         Hacks,

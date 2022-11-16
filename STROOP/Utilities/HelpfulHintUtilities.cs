@@ -41,7 +41,6 @@ namespace STROOP.Structs
                 "Click on a variable while holding H to highlight that variable.",
                 "Click on a variable while holding L to lock that variable.",
                 "Click on a variable while holding S to add that variable to the Custom tab.",
-                "Click on a variable while holding T to add that variable to the TAS tab.",
                 "Click on a variable while holding M to add that variable to the Memory tab.",
                 "Click on a variable while holding P to add that variable to any tab of your choice.",
                 "Click on a variable while holding D to toggle display as hex.",
