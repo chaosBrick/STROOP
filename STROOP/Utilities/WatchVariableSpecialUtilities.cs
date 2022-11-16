@@ -35,8 +35,6 @@ namespace STROOP.Structs
             return (DEFAULT_GETTER, DEFAULT_SETTER);
         }
 
-        private static int _numBinaryMathOperationEntries = 0;
-
         public static WatchVariable.GetterFunction AddAggregateMathOperationEntry(List<WatchVariableControl> controls, AggregateMathOperation operation)
         {
             switch (operation)

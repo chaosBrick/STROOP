@@ -150,7 +150,6 @@ namespace STROOP.Utilities
 
             // Create schema set
             var schemaSet = new XmlSchemaSet() { XmlResolver = new ResourceXmlResolver() };
-            //schemaSet.Add("http://tempuri.org/ReusableTypes.xsd", "ReusableTypes.xsd");
             schemaSet.Add("http://tempuri.org/ObjectAssociationsSchema.xsd", "ObjectAssociationsSchema.xsd");
             schemaSet.Compile();
 

@@ -448,26 +448,6 @@ namespace STROOP.Tabs
 
         private int _globalTimer = 0;
 
-        private void DoTestingCalculations()
-        {
-            uint objAddress = Config.Stream.GetUInt32(CamHackConfig.StructAddress + CamHackConfig.ObjectOffset);
-            if (objAddress == 0) return;
-
-            int currentGlobalTimer = Config.Stream.GetInt32(MiscConfig.GlobalTimerAddress);
-            if (currentGlobalTimer == _globalTimer) return;
-            _globalTimer = currentGlobalTimer;
-
-            uint swooperTargetOffset = 0xFE;
-            ushort swooperTargetAngle = Config.Stream.GetUInt16(objAddress + swooperTargetOffset);
-            ushort cameraAngle = Config.Stream.GetUInt16(CamHackConfig.StructAddress + CamHackConfig.ThetaOffset);
-
-            double angleCap = 1024;
-            ushort newCameraAngle = MoreMath.NormalizeAngleUshort(MoreMath.RotateAngleTowards(cameraAngle, swooperTargetAngle, angleCap));
-            Config.Stream.SetValue(newCameraAngle, CamHackConfig.StructAddress + CamHackConfig.ThetaOffset);
-
-            //Console.WriteLine(currentGlobalTimer.ToString() + ": " + swooperTargetAngle.ToString());
-        }
-
         private CamHackMode getCorrectCamHackMode()
         {
             int cameraMode = Config.Stream.GetInt32(CamHackConfig.StructAddress + CamHackConfig.CameraModeOffset);

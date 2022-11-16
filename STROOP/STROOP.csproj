@@ -209,7 +209,6 @@
     <Compile Include="Enums\CellSelectionType.cs" />
     <Compile Include="Enums\InputDisplayTypeEnum.cs" />
     <Compile Include="Enums\CoinParamsOrder.cs" />
-    <Compile Include="Enums\AddToTabTypeEnum.cs" />
     <Compile Include="Enums\RelativeDirection.cs" />
     <Compile Include="Enums\RomVersionSelection.cs" />
     <Compile Include="Enums\TriangleClassificationExtended.cs" />
@@ -308,9 +307,6 @@
     </Compile>
     <Compile Include="Controls\VisualLinkLineText.cs" />
     <Compile Include="Controls\VisualRegexLinkGenerator.cs" />
-    <Compile Include="Controls\TransparentTextbox.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Controls\BorderedTableLayoutPanel.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -447,7 +443,6 @@
     <Compile Include="Tabs\MapTab\MapObjects\MapCylinderObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapFloorObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapTriangleObject.cs" />
-    <Compile Include="Tabs\MapTab\MapIwerlipsesObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapGridlinesObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapCustomBackgroundObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapLevelCeilingObject.cs" />

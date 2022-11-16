@@ -26,8 +26,6 @@ namespace STROOP.Controls
         public static readonly Color DEFAULT_COLOR = SystemColors.Control;
         public static readonly Color FAILURE_COLOR = Color.Red;
         public static readonly Color ADD_TO_CUSTOM_TAB_COLOR = Color.CornflowerBlue;
-        public static readonly Color REORDER_START_COLOR = Color.DarkGreen;
-        public static readonly Color REORDER_END_COLOR = Color.LightGreen;
         public static readonly Color REORDER_RESET_COLOR = Color.Black;
         public static readonly Color ADD_TO_VAR_HACK_TAB_COLOR = Color.SandyBrown;
         public static readonly Color SELECTED_COLOR = Color.FromArgb(51, 153, 255);
@@ -133,38 +131,7 @@ namespace STROOP.Controls
             }
             ctx.Show(System.Windows.Forms.Cursor.Position);
         }
-
-        private void OnNameTextBoxDoubleClick()
-        {
-            throw new NotImplementedException();
-            //this.Focus();
-            //_nameTextBox.Select(0, 0);
-            //WatchVarWrapper.ShowVarInfo();
-        }
-
-        private void OnNameTextValueKeyDown(System.Windows.Forms.KeyEventArgs e)
-        {
-            throw new NotImplementedException();
-            //if (RenameMode)
-            //{
-            //    if (e.KeyData == Keys.Escape)
-            //    {
-            //        RenameMode = false;
-            //        _nameTextBox.Text = VarName;
-            //        this.Focus();
-            //        return;
-            //    }
-
-            //    if (e.KeyData == Keys.Enter)
-            //    {
-            //        _varName = _nameTextBox.Text;
-            //        RenameMode = false;
-            //        this.Focus();
-            //        return;
-            //    }
-            //}
-        }
-
+        
         public void UpdateControl()
         {
             WatchVarWrapper.UpdateItemCheckStates();
@@ -255,14 +222,6 @@ namespace STROOP.Controls
             return copy;
         }
 
-        private static AddToTabTypeEnum GetAddToTabType()
-        {
-            if (Keyboard.IsKeyDown(Key.A)) return AddToTabTypeEnum.GroupedByVariable;
-            if (Keyboard.IsKeyDown(Key.G)) return AddToTabTypeEnum.GroupedByBaseAddress;
-            if (Keyboard.IsKeyDown(Key.F)) return AddToTabTypeEnum.Fixed;
-            return AddToTabTypeEnum.Regular;
-        }
-
         public void ToggleFixedAddress()
         {
             if (FixedAddressListGetter() == null)
@@ -349,17 +308,7 @@ namespace STROOP.Controls
         public List<string> GetVarInfo() => WatchVarWrapper.GetVarInfo();
 
         public List<Func<object, bool>> GetSetters() => WatchVarWrapper.GetSetters(FixedAddressListGetter());
-
-        public void UnselectText()
-        {
-            //TODO: throw new NotImplementedException();
-        }
-
-        public void StopEditing()
-        {
-            RenameMode = false;
-        }
-
+        
         public override string ToString() => WatchVarWrapper.ToString();
     }
 }

@@ -738,17 +738,8 @@ namespace STROOP.Controls
             foreach (var control in _selectedWatchVarControls)
                 control.IsSelected = false;
             _selectedWatchVarControls.Clear();
-            UnselectText();
         }
-
-        public void UnselectText()
-        {
-            foreach (WatchVariableControl control in _allWatchVarControls)
-            {
-                control.UnselectText();
-            }
-        }
-
+        
         private List<XElement> GetCurrentVarXmlElements(bool useCurrentState = true)
         {
             return GetCurrentVariableControls().ConvertAll(control => control.ToXml(useCurrentState));

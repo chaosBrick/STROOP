@@ -143,12 +143,6 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 Vector3 _a = aProvider?.Invoke() ?? a;
                 Vector3 _b = bProvider?.Invoke() ?? b;
                 List<Vector3> ends = new List<Vector3>();
-                //float[] coords = new[] { float.NaN, 0, 1 };
-                //foreach (var x in coords)
-                //    foreach (var y in coords)
-                //        foreach (var z in coords)
-                //            if (float.IsNaN(x) || float.IsNaN(y) || float.IsNaN(z))
-                //                ends.Add(new Vector3(x, y, z));
                 ends.AddRange(new[] {
                     new Vector3(float.NaN),
                     new Vector3(float.NaN, 0, float.NaN),
