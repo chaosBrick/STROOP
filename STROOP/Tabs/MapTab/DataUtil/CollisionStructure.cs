@@ -184,7 +184,7 @@ namespace STROOP.Tabs.MapTab.DataUtil
             var tris = GetNearbyTriangles(x, z, 0, dynamic);
             foreach (var tri in tris)
                 if (tri.IsPointInsideAndBelowTriangle((short)x, (short)y, (short)z, out var truncatedHeight))
-                    return (tri, tri.GetTruncatedHeightOnTriangle(x, z));
+                    return (tri, truncatedHeight);
             return (null, float.NaN);
         }
 

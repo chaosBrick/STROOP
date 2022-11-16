@@ -409,7 +409,7 @@ namespace STROOP.Models
             int side12 = Side(pX, pZ, v1X, v1Z, v2X, v2Z);
             int side23 = Side(pX, pZ, v2X, v2Z, v3X, v3Z);
             int side31 = Side(pX, pZ, v3X, v3Z, v1X, v1Z);
-            return (side12 < 0 && side23 < 0 && side31 < 0) || (side12 > 0 && side23 > 0 && side31 > 0);
+            return (side12 <= 0 && side23 <= 0 && side31 <= 0) || (side12 >= 0 && side23 >= 0 && side31 >= 0);
         }
 
         public bool IsPointInsideAndBelowTriangle(short shortX, short shortY, short shortZ, out float truncatedHeight)
