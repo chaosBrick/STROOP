@@ -2,13 +2,10 @@
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -20,7 +17,7 @@ namespace STROOP.Utilities
         IEmuRamIO _io;
         public IEmuRamIO IO => _io;
 
-        ConcurrentQueue<double> _fpsTimes = new ConcurrentQueue<double>();
+        List<double> _fpsTimes = new List<double>();
         byte[] _ram;
         bool _lastUpdateBeforePausing = false;
         object _enableLocker = new object();
@@ -571,8 +568,6 @@ namespace STROOP.Utilities
             {
                 frameStopwatch.Restart();
                 Application.DoEvents();
-                //try
-                //{
                 double timeToWait;
                 lock (_mStreamProcess)
                 {
@@ -596,12 +591,9 @@ namespace STROOP.Utilities
                     timeToWait = Math.Max(timeToWait, 0);
 
                     // Calculate Fps
-                    if (_fpsTimes.Count() >= 10)
-                    {
-                        double garbage;
-                        _fpsTimes.TryDequeue(out garbage);
-                    }
-                    _fpsTimes.Enqueue(timePassed + timeToWait);
+                    while (_fpsTimes.Count() >= 10)
+                        _fpsTimes.RemoveAt(0);
+                    _fpsTimes.Add(timePassed + timeToWait);
                     FpsUpdated?.Invoke(this, new EventArgs());
                 }
 
@@ -609,12 +601,6 @@ namespace STROOP.Utilities
                     Thread.Sleep(new TimeSpan((long)(timeToWait * 10000000)));
                 else
                     Thread.Yield();
-                //}
-                //catch (Exception exception)
-                //{
-                //    Debugger.Break();
-                //    MessageBox.Show($"An exception occured in {nameof(ProcessUpdate)}:\n{exception.ToString()}");
-                //}
             }
         }
 
