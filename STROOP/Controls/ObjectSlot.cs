@@ -362,14 +362,14 @@ namespace STROOP
                     {
                         if (count == 2)
                         {
-                            if (floatList[0].HasValue) obj.X = floatList[0].Value;
-                            if (floatList[1].HasValue) obj.Z = floatList[1].Value;
+                            if (floatList[0].HasValue) obj.SetX(floatList[0].Value);
+                            if (floatList[1].HasValue) obj.SetZ(floatList[1].Value);
                         }
                         else
                         {
-                            if (floatList[0].HasValue) obj.X = floatList[0].Value;
-                            if (floatList[1].HasValue) obj.Y = floatList[1].Value;
-                            if (floatList[2].HasValue) obj.Z = floatList[2].Value;
+                            if (floatList[0].HasValue) obj.SetX(floatList[0].Value);
+                            if (floatList[1].HasValue) obj.SetY(floatList[1].Value);
+                            if (floatList[2].HasValue) obj.SetZ(floatList[2].Value);
                         }
                     }
                 });

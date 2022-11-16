@@ -62,8 +62,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             // Models.ObjectDataModel should be accessible as a PositionAngle imo
             if (_nameFilterRegex != null && !_nameFilterRegex.IsMatch(obj.BehaviorAssociation.Name.ToLower()))
                 return false;
-            var thisIsStupid = PositionAngle.Obj(obj.Address);
-            return positionAngleProvider().Any(_ => nearbyFunc(thisIsStupid, _));
+            return positionAngleProvider().Any(_ => nearbyFunc(obj, _));
         }
 
         bool NearbyCylindrical(PositionAngle objPA, PositionAngle refPA)

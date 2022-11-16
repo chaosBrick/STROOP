@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace STROOP.Models
 {
-    public class ObjectDataModel : IUpdatableDataModel
+    public class ObjectDataModel : PositionAngle, IUpdatableDataModel
     {
         const ushort ActiveStatus = 0x0101;
         public uint Address { get; set; }
@@ -21,7 +21,7 @@ namespace STROOP.Models
             get => _isActive;
             set
             {
-                if (Config.Stream.SetValue(value ? ActiveStatus : (ushort) 0, Address + ObjectConfig.ActiveOffset))
+                if (Config.Stream.SetValue(value ? ActiveStatus : (ushort)0, Address + ObjectConfig.ActiveOffset))
                     _isActive = value;
             }
         }
@@ -76,7 +76,7 @@ namespace STROOP.Models
         public ObjectBehaviorAssociation BehaviorAssociation { get; private set; }
 
         private uint BehaviorScriptStart
-        { 
+        {
             get => Config.Stream.GetUInt32(Address + ObjectConfig.BehaviorScriptOffset);
             set => Config.Stream.SetValue(value, Address + ObjectConfig.BehaviorScriptOffset);
         }
@@ -108,36 +108,33 @@ namespace STROOP.Models
         #endregion
         #region Position
         private float _x;
-        public float X
+        public override double X => _x;
+        public override bool SetX(double value)
         {
-            get => _x;
-            set
-            {
-                if (Config.Stream.SetValue(value, Address + ObjectConfig.XOffset))
-                    _x = value;
-            }
+            var success = Config.Stream.SetValue((float)value, Address + ObjectConfig.XOffset);
+            if (success)
+                _x = (float)value;
+            return success;
         }
 
         private float _y;
-        public float Y
+        public override double Y => _y;
+        public override bool SetY(double value)
         {
-            get => _y;
-            set
-            {
-                if (Config.Stream.SetValue(value, Address + ObjectConfig.YOffset))
-                    _y = value;
-            }
+            var success = Config.Stream.SetValue((float)value, Address + ObjectConfig.YOffset);
+            if (success)
+                _y = (float)value;
+            return success;
         }
 
         private float _z;
-        public float Z
+        public override double Z => _z;
+        public override bool SetZ(double value)
         {
-            get => _z;
-            set
-            {
-                if (Config.Stream.SetValue(value, Address + ObjectConfig.ZOffset))
-                    _z = value;
-            }
+            var success = Config.Stream.SetValue((float)value, Address + ObjectConfig.ZOffset);
+            if (success)
+                _z = (float)value;
+            return success;
         }
         private float _homeX;
         public float HomeX
@@ -185,6 +182,9 @@ namespace STROOP.Models
                     _facingYaw = value;
             }
         }
+
+        public override double Angle => FacingYaw;
+
         private ushort _facingPitch;
         public ushort FacingPitch
         {
@@ -275,8 +275,8 @@ namespace STROOP.Models
             long behaviorOffset = (long)AbsoluteBehavior - Config.ObjectAssociations.BehaviorBankStart;
             if (AbsoluteBehavior == 0 || behaviorOffset < 0) // Behavior is 0 or is appears to be stored below the start
                 SegmentedBehavior = 0;
-            else 
-                SegmentedBehavior = 0x13000000 + (uint) behaviorOffset;
+            else
+                SegmentedBehavior = 0x13000000 + (uint)behaviorOffset;
 
             uint behaviorAddress = SegmentedBehavior == 0 ? 0 : RomVersionConfig.SwitchReverseMap(
                 SegmentedBehavior,

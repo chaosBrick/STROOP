@@ -92,7 +92,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         {
             List<ObjectDataModel> objs = Config.StroopMainForm.ObjectSlotsManager.GetLoadedObjectsWithPredicate(predicate);
             return objs.ConvertAll(obj =>
-                    (obj.X, obj.Y, obj.Z,
+                    ((float)obj.X, (float)obj.Y, (float)obj.Z,
                     (float)obj.FacingYaw,
                     Config.ObjectAssociations.GetObjectMapImage(obj.BehaviorCriteria),
                     hoverData.currentPositionAngle != null && obj.Address == PositionAngle.GetObjectAddress(hoverData.currentPositionAngle) ? ObjectUtilities.HoverAlpha() : 1

@@ -111,9 +111,9 @@ namespace STROOP.Utilities
 
             List<PositionAngle> posAngles = new List<PositionAngle> { PositionAngle.Mario };
 
-            float xDestination = objects.Average(o => o.X);
-            float yDestination = objects.Average(o => o.Y);
-            float zDestination = objects.Average(o => o.Z);
+            float xDestination = objects.Average(o => (float)o.X);
+            float yDestination = objects.Average(o => (float)o.Y);
+            float zDestination = objects.Average(o => (float)o.Z);
 
             HandleGotoOffset(ref xDestination, ref yDestination, ref zDestination);
 
@@ -267,8 +267,8 @@ namespace STROOP.Utilities
 
                 if (rotateAroundCenter && yawOffset != 0)
                 {
-                    float centerX = objects.Average(obj => obj.X);
-                    float centerZ = objects.Average(obj => obj.Z);
+                    var centerX = objects.Average(obj => obj.X);
+                    var centerZ = objects.Average(obj => obj.Z);
 
                     foreach (ObjectDataModel obj in objects)
                     {
