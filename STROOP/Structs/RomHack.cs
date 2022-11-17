@@ -81,6 +81,7 @@ namespace STROOP.Structs
             bool success = true;
 
             Status = EnabledStatus.Disabled;
+            _originalMemory.Clear();
 
             using (Config.Stream.Suspend())
             {
@@ -129,19 +130,15 @@ namespace STROOP.Structs
 
         public void UpdateEnabledStatus()
         {
-            Status =  EnabledStatus.Enabled;
+            Status = EnabledStatus.Enabled;
             int i = 0;
             foreach (var address in _payload)
             {
                 var gameMemory = Config.Stream.ReadRam(address.Item1, address.Item2.Length, EndiannessType.Big);
                 if (!address.Item2.SequenceEqual(gameMemory))
                 {
-                    if (_originalMemory.Count <= i)
-                    {
-                        Status = EnabledStatus.Disabled;
-                        return;
-                    }
-                    else if (!_originalMemory[i].Item2.SequenceEqual(gameMemory))
+                    Status = EnabledStatus.Disabled;
+                    if (_originalMemory.Count > i && !_originalMemory[i].Item2.SequenceEqual(gameMemory))
                     {
                         Status = EnabledStatus.Changed;
                         return;
