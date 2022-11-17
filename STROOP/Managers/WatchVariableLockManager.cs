@@ -30,7 +30,7 @@ namespace STROOP.Structs
 
         public static void Update()
         {
-            if (LockConfig.LockingDisabled) return;
+            if (LockConfig.LockingDisabled || _lockList.Count == 0) return;
             using (Config.Stream.Suspend())
             {
                 var removeList = new List<WatchVariable>();
