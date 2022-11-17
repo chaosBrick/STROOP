@@ -20,7 +20,7 @@ namespace STROOP
     public partial class StroopMainForm : Form
     {
         // STROOP VERSION NAME
-        const string _version = "Refactor 0.6.1";
+        const string _version = "Refactor 0.6.2";
 
         DataTable _tableOtherData = new DataTable();
         Dictionary<int, DataRow> _otherDataRowAssoc = new Dictionary<int, DataRow>();
