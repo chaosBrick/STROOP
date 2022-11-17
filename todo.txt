@@ -9,6 +9,5 @@ Internal:
 - Generalize ProcessStream GetValue(Type, ...)
 
 Issues / Bugs:
-- Custom Tab WatchVariablePanel controls still exist but do nothing
 - float + float variable yields double
-- Save vars (implement that again, idiot)
+- Save vars fails to consider composite / state dependent variables (should probably not be done like this)
