@@ -849,6 +849,7 @@
     <Compile Include="Utilities\CopyUtilities.cs" />
     <Compile Include="Utilities\EasingUtilities.cs" />
     <Compile Include="Utilities\EnumUtilities.cs" />
+    <Compile Include="Utilities\ErrorUtilities.cs" />
     <Compile Include="Utilities\FlyingUtilities.cs" />
     <Compile Include="Utilities\FormsUtilities.cs" />
     <Compile Include="Utilities\GeneralUtilities.cs" />

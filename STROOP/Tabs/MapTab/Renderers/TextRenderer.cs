@@ -2,6 +2,8 @@
 using OpenTK;
 using System.Collections.Generic;
 using System.Drawing;
+using System;
+using System.Reflection;
 
 namespace STROOP.Tabs.MapTab.Renderers
 {
@@ -17,12 +19,35 @@ namespace STROOP.Tabs.MapTab.Renderers
         QFontDrawing drawing;
         QFont defaultFont;
         List<TextBlock> primitiveBuffer = new List<TextBlock>();
+        bool textRenderingBroken => defaultFont == null;
 
         public TextRenderer()
         {
             drawing = new QFontDrawing(false, null);
-            var config = new QuickFont.Configuration.QFontBuilderConfiguration();
-            defaultFont = new QFont("Resources/Fonts/dejavu-markup/DejaVuMarkup.ttf", 16, config, FontStyle.Regular);
+            defaultFont = CreateDefaultFont();
+        }
+
+        [System.Runtime.ExceptionServices.HandleProcessCorruptedStateExceptions()]
+        QFont CreateDefaultFont()
+        {
+            try
+            {
+                //Check if freetype6 can be loaded
+                typeof(SharpFont.FT).GetMethod("FT_Init_FreeType", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, new object[] { null });
+                return new QFont(
+                    "Resources/Fonts/dejavu-markup/DejaVuMarkup.ttf",
+                    16,
+                    new QuickFont.Configuration.QFontBuilderConfiguration(),
+                    FontStyle.Regular
+                    );
+            }
+            catch (Exception ex)
+            {
+                string failString = "Text Rendering Initialization failed.\n";
+                System.Windows.Forms.MessageBox.Show($"{failString}{Utilities.ErrorUtilities.SeeLogFileText}");
+                Utilities.ErrorUtilities.WriteErrorLog($"{failString}{ex.ToString()}");
+            }
+            return null;
         }
 
         public void AddText(string text, Vector3 offset, Matrix4 transform, Color color, bool screenSpace = false, QFontAlignment align = QFontAlignment.Centre) =>
@@ -32,6 +57,9 @@ namespace STROOP.Tabs.MapTab.Renderers
         public void AddText(
             (string text, Vector3 offset)[] textBlock, Color color, Matrix4 transform, bool screenSpace = false, QFontAlignment align = QFontAlignment.Centre)
         {
+            if (textRenderingBroken)
+                return;
+
             var prim = new QFontDrawingPrimitive(defaultFont);
             prim.Options.Colour = color;
             foreach (var v in textBlock)
@@ -41,6 +69,9 @@ namespace STROOP.Tabs.MapTab.Renderers
 
         public override void SetDrawCalls(MapGraphics graphics)
         {
+            if (textRenderingBroken)
+                return;
+
             primitiveBuffer.Clear();
             graphics.drawLayers[(int)MapGraphics.DrawLayers.Overlay].Add(() =>
             {

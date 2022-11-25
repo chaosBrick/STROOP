@@ -275,7 +275,7 @@ namespace STROOP.Tabs.MapTab
 
         private void OnPaint()
         {
-            if (Config.Stream == null)
+            if (Config.Stream == null || rendererCollection == null)
                 return;
 
             using (new AccessScope<StroopMainForm>((StroopMainForm)mapTab.FindForm()))
