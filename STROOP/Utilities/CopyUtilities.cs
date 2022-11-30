@@ -45,6 +45,7 @@ namespace STROOP.Utilities
                 "Copy with Names",
                 "Copy as Table",
                 "Copy for Code",
+                "Copy for Bruteforcer json"
             };
         }
 
@@ -60,7 +61,23 @@ namespace STROOP.Utilities
                 () => CopyWithNames(getVars()),
                 () => CopyAsTable(getVars()),
                 () => CopyForCode(getVars()),
+                () => CopyForBruteforcer(getVars()),
             };
+        }
+
+        private static void CopyForBruteforcer(List<WatchVariableControl> controls)
+        {
+            var needsStringEscapeRegex = new System.Text.RegularExpressions.Regex("^[-]?(([0-9]+)|(([0-9]+)\\.([0-9]+)))$");
+            var strBuilder = new System.Text.StringBuilder();
+            strBuilder.AppendLine();
+            foreach (var var in controls)
+            {
+                var valueString = var.GetValue().ToString();
+                if (!needsStringEscapeRegex.IsMatch(valueString))
+                    valueString = $"\"{valueString}\"";
+                strBuilder.AppendLine($"\t\"{var.GetJsonName()}\": {valueString},");
+            }
+            Clipboard.SetText(strBuilder.ToString());
         }
 
         private static void CopyWithSeparator(

@@ -305,6 +305,14 @@ namespace STROOP.Controls
             return null;
         }
 
+        public string GetJsonName()
+        {
+            var explicitJsonName = view.GetValueByKey("jsonName");
+            if (explicitJsonName != null)
+                return explicitJsonName;
+            return $"{VarName}".Replace(' ', '_').ToLower();
+        }
+
         public List<string> GetVarInfo() => WatchVarWrapper.GetVarInfo();
 
         public List<Func<object, bool>> GetSetters() => WatchVarWrapper.GetSetters(FixedAddressListGetter());
