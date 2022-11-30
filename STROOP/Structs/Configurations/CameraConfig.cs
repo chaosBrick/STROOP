@@ -14,6 +14,8 @@ namespace STROOP.Structs.Configurations
         public static readonly uint StructAddressSH = 0x8031EC78;
         public static readonly uint StructAddressEU = 0x8030A7E0;
 
+        public static uint CamStructAddress => Config.Stream.GetUInt32(RomVersionConfig.SwitchMap(0x8033cbd0, 0x8033b860));
+
         public static readonly uint XOffset = 0x184;
         public static readonly uint YOffset = 0x188;
         public static readonly uint ZOffset = 0x18C;

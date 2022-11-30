@@ -23,6 +23,7 @@ namespace STROOP.Structs
             baseAddressGetters[BaseAddressType.MarioObj] = () => new List<uint> { Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress) };
 
             baseAddressGetters[BaseAddressType.Camera] = () => new List<uint> { CameraConfig.StructAddress };
+            baseAddressGetters[BaseAddressType.CameraStruct] = () => new List<uint> { CameraConfig.CamStructAddress };
             baseAddressGetters[BaseAddressType.CameraSettings] = () =>
             {
                 uint a1 = 0x8033B910;

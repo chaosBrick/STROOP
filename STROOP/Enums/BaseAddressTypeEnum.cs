@@ -23,6 +23,7 @@ namespace STROOP.Structs
         Mario,
         MarioObj,
         Camera,
+        CameraStruct,
         CameraSettings,
         File,
         MainSave,
