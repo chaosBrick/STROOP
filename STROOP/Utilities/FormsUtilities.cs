@@ -5,19 +5,20 @@ namespace STROOP.Utilities
 {
     public static class FormsUtilities
     {
-        public static void AddHandlerToItem(this ToolStripItemCollection strip, string key, Action handler)
+        public static ToolStripMenuItem AddHandlerToItem(this ToolStripItemCollection strip, string key, Action handler)
         {
-            ToolStripItem item;
+            ToolStripMenuItem item;
             foreach (ToolStripItem fsjkl in strip)
-                if (fsjkl.Text == key)
+                if (fsjkl is ToolStripMenuItem dadsa && dadsa.Text == key)
                 {
-                    item = fsjkl;
+                    item = dadsa;
                     goto skipNew;
                 }
             item = new ToolStripMenuItem(key);
             strip.Add(item);
             skipNew:
             item.Click += (_, __) => handler();
+            return item;
         }
         
         public static ToolStripMenuItem GetSubItem(this ToolStripItemCollection strip, string key)

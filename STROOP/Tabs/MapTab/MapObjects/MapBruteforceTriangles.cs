@@ -93,7 +93,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         {
             var strip = new ContextMenuStrip();
 
-            strip.Items.AddHandlerToItem("Enable fuckery", () => itemEnableFuckery.Checked = !itemEnableFuckery.Checked);
+            itemEnableFuckery = strip.Items.AddHandlerToItem("Enable fuckery", () => itemEnableFuckery.Checked = !itemEnableFuckery.Checked);
             itemEnableFuckery.Checked = true;
 
             strip.Items.AddHandlerToItem("Copy Bruteforcer json", CopyJson);
