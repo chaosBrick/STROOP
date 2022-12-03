@@ -72,10 +72,15 @@ namespace STROOP.Utilities
             strBuilder.AppendLine();
             foreach (var var in controls)
             {
+                // Skip variables that have no meaning
+                var jsonName = var.GetJsonName();
+                if (jsonName == null)
+                    continue;
+
                 var valueString = var.GetValue().ToString();
                 if (!needsStringEscapeRegex.IsMatch(valueString))
                     valueString = $"\"{valueString}\"";
-                strBuilder.AppendLine($"\t\"{var.GetJsonName()}\": {valueString},");
+                strBuilder.AppendLine($"\t\"{jsonName}\": {valueString},");
             }
             Clipboard.SetText(strBuilder.ToString());
         }

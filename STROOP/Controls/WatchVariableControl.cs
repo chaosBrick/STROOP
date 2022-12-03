@@ -308,6 +308,8 @@ namespace STROOP.Controls
         public string GetJsonName()
         {
             var explicitJsonName = view.GetValueByKey("jsonName");
+            if (explicitJsonName == "")
+                return null;
             if (explicitJsonName != null)
                 return explicitJsonName;
             return $"{VarName}".Replace(' ', '_').ToLower();
