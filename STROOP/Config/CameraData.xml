@@ -123,9 +123,10 @@
   <Data groupList="Bruteforce" type="short" offsetUS="0x8033c848" offsetJP="0x8033b4d8" base="Relative" useHex="true">Camera Movement Flags</Data>
   <Data groupList="Bruteforce" type="short" offsetUS="0x8033c84a" offsetJP="0x8033b4da" base="Relative" useHex="true">Camera Status Flags</Data>
 
-  <Data groupList="Bruteforce" type="byte"  offset="0x0" base="CameraStruct" useHex="true">Camera Mode</Data>
-  <Data groupList="Bruteforce" type="byte"  offset="0x1" base="CameraStruct" useHex="true">Camera Default Mode</Data>
-  <Data groupList="Bruteforce" type="short" offset="0x2" base="CameraStruct">Camera Yaw</Data>
+  <Data groupList="Bruteforce" type="byte"  offset="0x0" base="CameraStruct" useHex="true" jsonName="camera_mode">Camera Mode</Data>
+  <Data groupList="Bruteforce" type="byte"  offset="0x1" base="CameraStruct" useHex="true" jsonName="camera_def_mode">Camera Default Mode</Data>
+  <Data groupList="Bruteforce" type="short" offset="0x2" base="CameraStruct" jsonName="camera_yaw">Camera Yaw</Data>
+  <Data groupList="Bruteforce" type="short" offset="0x3A" base="CameraStruct" jsonName="camera_next_yaw">Camera Next Yaw</Data>
   <Data groupList="Bruteforce" type="byte"  offset="0x30" base="CameraStruct" useHex="true">Camera Cutscene</Data>
 
   <Data groupList="Bruteforce" type="float" offset="0x4" base="CameraStruct" coord="X">Camera Focus X</Data>
@@ -139,4 +140,50 @@
   <Data groupList="Bruteforce" type="float" offset="0x28" base="CameraStruct" coord="X">Camera Area Center X</Data>
   <Data groupList="Bruteforce" type="float" offset="0x2C" base="CameraStruct" coord="Z">Camera Area Center Z</Data>
   
+  <Data groupList="BruteForce" type="short" offset="0x00" base="CameraModeTransition" jsonName="camera_transition_pos_pitch">MT Pos Pitch</Data>
+  <Data groupList="BruteForce" type="short" offset="0x02" base="CameraModeTransition" jsonName="camera_transition_pos_yaw">MT Pos Yaw</Data>
+  <Data groupList="BruteForce" type="float" offset="0x04" base="CameraModeTransition" jsonName="camera_transition_pos_dist">MT Pos Dist</Data>
+  <Data groupList="BruteForce" type="short" offset="0x08" base="CameraModeTransition" jsonName="camera_transition_foc_pitch">MT Foc Pitch</Data>
+  <Data groupList="BruteForce" type="short" offset="0x0A" base="CameraModeTransition" jsonName="camera_transition_foc_yaw">MT Foc Yaw</Data>
+  <Data groupList="BruteForce" type="float" offset="0x0C" base="CameraModeTransition" jsonName="camera_transition_foc_dist">MT Foc Dist</Data>
+  <Data groupList="BruteForce" type="int" offset="0x10" base="CameraModeTransition" jsonName="camera_transition_frames_left">MT Frames Left</Data>
+  <Data groupList="BruteForce" type="float" offset="0x14" base="CameraModeTransition" jsonName="camera_transition_mario_pos_x">MT Mario Pos X</Data>
+  <Data groupList="BruteForce" type="float" offset="0x18" base="CameraModeTransition" jsonName="camera_transition_mario_pos_y">MT Mario Pos Y</Data>
+  <Data groupList="BruteForce" type="float" offset="0x1C" base="CameraModeTransition" jsonName="camera_transition_mario_pos_z">MT Mario Pos Z</Data>
+  
+  <Data groupList="BruteForce" type="short" offset="0x00" base="CameraModeInfo" jsonName="camera_mode_info_new_mode">MI New Mode</Data>
+  <Data groupList="BruteForce" type="short" offset="0x02" base="CameraModeInfo" jsonName="camera_mode_info_last_mode">MI Last Mode</Data>
+  <Data groupList="BruteForce" type="short" offset="0x04" base="CameraModeInfo" jsonName="camera_mode_info_max">MI Max</Data>
+  <Data groupList="BruteForce" type="short" offset="0x06" base="CameraModeInfo" jsonName="camera_mode_info_frame">MI Frame</Data>
+  <Data groupList="BruteForce" type="float" offset="0x08" base="CameraModeInfo" jsonName="camera_mode_info_transition_start_focus_x">MI Start Focus X</Data>
+  <Data groupList="BruteForce" type="float" offset="0x0C" base="CameraModeInfo" jsonName="camera_mode_info_transition_start_focus_y">MI Start Focus Y</Data>
+  <Data groupList="BruteForce" type="float" offset="0x10" base="CameraModeInfo" jsonName="camera_mode_info_transition_start_focus_z">MI Start Focus Z</Data>
+  <Data groupList="BruteForce" type="float" offset="0x14" base="CameraModeInfo" jsonName="camera_mode_info_transition_start_pos_x">MI Start Pos X</Data>
+  <Data groupList="BruteForce" type="float" offset="0x18" base="CameraModeInfo" jsonName="camera_mode_info_transition_start_pos_y">MI Start Pos Y</Data>
+  <Data groupList="BruteForce" type="float" offset="0x1C" base="CameraModeInfo" jsonName="camera_mode_info_transition_start_pos_z">MI Start Pos Z</Data>
+  <Data groupList="BruteForce" type="float" offset="0x20" base="CameraModeInfo" jsonName="camera_mode_info_transition_start_dist">MI Start Dist</Data>
+  <Data groupList="BruteForce" type="short" offset="0x24" base="CameraModeInfo" jsonName="camera_mode_info_transition_start_pitch">MI Start Pitch</Data>
+  <Data groupList="BruteForce" type="short" offset="0x26" base="CameraModeInfo" jsonName="camera_mode_info_transition_start_yaw">MI Start Yaw</Data>
+  <Data groupList="BruteForce" type="float" offset="0x28" base="CameraModeInfo" jsonName="camera_mode_info_transition_end_focus_x">MI End Focus X</Data>
+  <Data groupList="BruteForce" type="float" offset="0x1C" base="CameraModeInfo" jsonName="camera_mode_info_transition_end_focus_y">MI End Focus Y</Data>
+  <Data groupList="BruteForce" type="float" offset="0x30" base="CameraModeInfo" jsonName="camera_mode_info_transition_end_focus_z">MI End Focus Z</Data>
+  <Data groupList="BruteForce" type="float" offset="0x34" base="CameraModeInfo" jsonName="camera_mode_info_transition_end_pos_x">MI End Pos X</Data>
+  <Data groupList="BruteForce" type="float" offset="0x38" base="CameraModeInfo" jsonName="camera_mode_info_transition_end_pos_y">MI End Pos Y</Data>
+  <Data groupList="BruteForce" type="float" offset="0x3C" base="CameraModeInfo" jsonName="camera_mode_info_transition_end_pos_z">MI End Pos Z</Data>
+  <Data groupList="BruteForce" type="float" offset="0x40" base="CameraModeInfo" jsonName="camera_mode_info_transition_end_dist">MI End Dist</Data>
+  <Data groupList="BruteForce" type="short" offset="0x44" base="CameraModeInfo" jsonName="camera_mode_info_transition_end_pitch">MI End Pitch</Data>
+  <Data groupList="BruteForce" type="short" offset="0x46" base="CameraModeInfo" jsonName="camera_mode_info_transition_end_yaw">MI End Yaw</Data>
+  
+  <Data groupList="BruteForce" type="float" offsetUS="0x8033c7d0" offsetJP="0x8033b460" base="Relative" jsonName="camera_castle_entrance_offset_x">Castle Entrance Offset X</Data>
+  <Data groupList="BruteForce" type="float" offsetUS="0x8033c7d4" offsetJP="0x8033b464" base="Relative" jsonName="camera_castle_entrance_offset_y">Castle Entrance Offset X</Data>
+  <Data groupList="BruteForce" type="float" offsetUS="0x8033c7d8" offsetJP="0x8033b468" base="Relative" jsonName="camera_castle_entrance_offset_z">Castle Entrance Offset X</Data>
+
+  <Data groupList="BruteForce" type="short" offsetUS="0x8033c53e" offsetJP="0x8033b1ce" base="Relative" jsonName="camera_state_camera_event">Camera Event</Data>
+  <Data groupList="BruteForce" type="uint" offsetUS="0x8033c540" offsetJP="0x8033b1d0" base="Relative" jsonName="camera_state_usedObj" subclass="Object">Camera Used Obj</Data>
+  
+  <Data groupList="BruteForce" type="short" offsetUS="0x8033c620" offsetJP="0x8033b2b0" base="Relative" jsonName="camera_yaw_after_door_cutscene">Camera Yaw After Door Cutscene</Data>
+  <Data groupList="BruteForce" type="short" offsetUS="0x8033c768" offsetJP="0x8033b3f8" base="Relative" jsonName="camera_c_side_button_yaw">C Side Button Yaw</Data>
+  <Data groupList="BruteForce" type="short" offsetUS="0x8033c770" offsetJP="0x8033b400" base="Relative" jsonName="camera_c_up_camera_pitch">C Up Pitch</Data>
+  <Data groupList="BruteForce" type="short" offsetUS="0x8033c780" offsetJP="0x8033b410" base="Relative" jsonName="camera_cannon_y_offset">Cannon Y Offset</Data>
+
 </VarData>
