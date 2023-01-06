@@ -15,7 +15,7 @@
   <Data type="float" offset="0x19C" base="Camera" coord="X">Camera Target X</Data>
   <Data type="float" offset="0x1A0" base="Camera" coord="Y">Camera Target Y</Data>
   <Data type="float" offset="0x1A4" base="Camera" coord="Z">Camera Target Z</Data>
-  <Data type="ushort" offset="0x1C6" base="Camera" subclass="Angle" yaw="true">Camera Yaw</Data>
+  <Data type="ushort" offset="0x1C6" base="Camera" subclass="Angle" yaw="true" jsonName="">Camera Yaw (?)</Data>
   <Data type="short" offset="0x1C4" base="Camera" subclass="Angle">Camera Pitch</Data>
   <Data type="ushort" offset="0x258" base="Camera" subclass="Angle" yaw="true">Fixed Cent Angle</Data>
   <Data type="ushort" offset="0x1F6" base="Camera" subclass="Angle" yaw="true">Target Cent Angle</Data>

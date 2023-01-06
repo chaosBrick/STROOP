@@ -7,7 +7,8 @@
   <Data groupList="Basic" type="float" offset="0x4C" base="Mario" jsonName="mario_vel_y" coord="Y">Y Speed</Data>
   <Data groupList="Basic" type="float" offset="0x50" base="Mario" jsonName="mario_vel_z" coord="Z">Z Speed</Data>
   <Data groupList="Basic" type="float" offset="0x54" base="Mario" jsonName="mario_h_speed">H Speed</Data>
-  
+
+  <Data groupList="Basic" type="short" offset="0xAE" base="Mario" jsonName="mario_health">Health</Data>
   <Data groupList="Basic" type="uint" offset="0x0C" base="Mario" jsonName="mario_action" useHex="true">Action</Data>
   <Data groupList="Basic" base="None" specialType="ActionDescription" subclass="String">Action Description</Data>
   <Data groupList="Basic" type="uint" offset="0x10" base="Mario" jsonName="mario_previous_action" useHex="true">Previous Action</Data>
@@ -117,10 +118,11 @@
   <Data groupList="Intermediate" type="ushort" offset="0x1E" base="Mario">Squished Timer</Data>
   <Data groupList="Intermediate" type="short" offset="0x1A" base="Mario">Water Shell Timer</Data>
   
-  <Data groupList="Intermediate" type="float" offset="0xBC" base="Mario">Peak Height</Data>
-  <Data groupList="Intermediate" type="float" offset="0x70" base="Mario">Floor Height</Data>
+  <Data groupList="Intermediate" type="float" offset="0xBC" base="Mario" jsonName="mario_peak_height">Peak Height</Data>
+  <Data groupList="Intermediate" type="float" offset="0x70" base="Mario" jsonName="mario_floor_height">Floor Height</Data>
   <Data groupList="Intermediate" base="None" specialType="FallHeight">Fall Height</Data>
   <Data groupList="Advanced" type="float" offset="0xC0" base="Mario">Quicksand Height</Data>
+  <Data groupList="Intermediate" type="short" offset="0x76" base="Mario" color="LightBlue" jsonName="mario_water_level">Water Level</Data>
 
   <Data groupList="Intermediate" type="short" offsetUS="0x80361250" offsetJP="0x8035FEE0" base="Relative">Current Room</Data>
   <Data groupList="Intermediate" type="short" offsetUS="0x8032DD34" offsetJP="0x8032CDD4" offsetSH="0x8030D464" offsetEU="0x802F9F04" base="Relative">Swimming Strength</Data>
