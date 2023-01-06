@@ -118,27 +118,27 @@ namespace STROOP.Controls
 
             WatchVariablePanel target;
 
-            int borderMargin = 2;
+            public int borderMargin { get; private set; } = 2;
             static int elementMarginTopBottom => (int)(uint)SavedSettingsConfig.WatchVarPanelVerticalMargin;
             static int elementMarginLeftRight => (int)(uint)SavedSettingsConfig.WatchVarPanelHorizontalMargin;
-            int elementHeight => (int)(Font.Height + 2 * elementMarginTopBottom);
+            public int elementHeight => (int)(Font.Height + 2 * elementMarginTopBottom);
 
-            int elementNameWidth => (int)(uint)SavedSettingsConfig.WatchVarPanelNameWidth;
-            int elementValueWidth => (int)(uint)SavedSettingsConfig.WatchVarPanelValueWidth;
+            int elementNameWidth => target.elementNameWidth ?? (int)(uint)SavedSettingsConfig.WatchVarPanelNameWidth;
+            int elementValueWidth => target.elementValueWidth ?? (int)(uint)SavedSettingsConfig.WatchVarPanelValueWidth;
             int elementWidth => (int)(elementNameWidth + elementValueWidth);
 
             public int GetMaxRows()
             {
                 var effectiveHeight = target.Height - borderMargin * 2;
                 var totalVariableCount = target.GetCurrentVariableControls().Count;
-                var knolz = effectiveHeight / elementHeight;
+                var knolz = Math.Max(1, effectiveHeight / elementHeight);
                 var numColumnsWithoutScrollbar = totalVariableCount / knolz;
                 if (totalVariableCount % knolz > 0)
                     numColumnsWithoutScrollbar++;
                 if (numColumnsWithoutScrollbar * (SavedSettingsConfig.WatchVarPanelNameWidth + SavedSettingsConfig.WatchVarPanelValueWidth) >
                     target.ClientRectangle.Width - 2 * borderMargin)
                     effectiveHeight -= SystemInformation.HorizontalScrollBarHeight;
-                return effectiveHeight / elementHeight;
+                return Math.Max(1, effectiveHeight / elementHeight); 
             }
 
             public WatchVariablePanelRenderer(WatchVariablePanel target)
@@ -177,13 +177,12 @@ namespace STROOP.Controls
 
                 int maxRows = GetMaxRows();
                 var newRect = new Rectangle(0, 0, ((displayedWatchVars.Count - 1) / maxRows + 1) * elementWidth + borderMargin * 2, maxRows * elementHeight + borderMargin * 2);
-                if (bufferedGraphics == null || Bounds.Width != newRect.Width || Bounds.Height != newRect.Height)
+                if (true || bufferedGraphics == null || Bounds.Width != newRect.Width || Bounds.Height != newRect.Height)
                 {
                     bufferedGraphics?.Dispose();
                     target.HorizontalScroll.Value = 0;
-
                     Bounds = newRect;
-                    bufferedGraphics = BufferedGraphicsManager.Current.Allocate(CreateGraphics(), ClientRectangle);
+                    bufferedGraphics = BufferedGraphicsManager.Current.Allocate(CreateGraphics(), new Rectangle(0, 0, ClientRectangle.Width, ClientRectangle.Height));
                     bufferedGraphics.Graphics.TranslateTransform(borderMargin, borderMargin);
                 }
 

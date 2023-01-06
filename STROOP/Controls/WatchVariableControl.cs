@@ -11,7 +11,6 @@ using System.Xml.Linq;
 
 namespace STROOP.Controls
 {
-
     public partial class WatchVariableControl
     {
         public readonly WatchVariableWrapper WatchVarWrapper;
@@ -303,16 +302,6 @@ namespace STROOP.Controls
             if (WatchVar.view is WatchVariable.XmlView xmlView)
                 return xmlView.GetXml();
             return null;
-        }
-
-        public string GetJsonName()
-        {
-            var explicitJsonName = view.GetValueByKey("jsonName");
-            if (explicitJsonName == "")
-                return null;
-            if (explicitJsonName != null)
-                return explicitJsonName;
-            return $"{VarName}".Replace(' ', '_').ToLower();
         }
 
         public List<string> GetVarInfo() => WatchVarWrapper.GetVarInfo();

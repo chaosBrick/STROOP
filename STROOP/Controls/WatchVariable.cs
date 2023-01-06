@@ -9,6 +9,19 @@ using STROOP.Controls;
 
 namespace STROOP
 {
+    public static class IVariableViewExtensions
+    {
+        public static string GetJsonName(this WatchVariable.IVariableView view)
+        {
+            var explicitJsonName = view.GetValueByKey("jsonName");
+            if (explicitJsonName == "")
+                return null;
+            if (explicitJsonName != null)
+                return explicitJsonName;
+            return $"{view.Name}".Replace(' ', '_').ToLower();
+        }
+    }
+
     public struct WatchVariablePrecursor
     {
         public (WatchVariable var, WatchVariable.IVariableView view) value;
@@ -143,6 +156,7 @@ namespace STROOP
 
         }
 
+        public event Action ValueSet;
         public IVariableView view { get; private set; }
 
         public readonly string MemoryTypeName;
@@ -269,6 +283,8 @@ namespace STROOP
             bool result = view._setterFunction(value, address);
             if (result && locks.TryGetValue(address, out var l))
                 l.value.value = value;
+            if (result)
+                ValueSet?.Invoke();
             return result;
         }
 

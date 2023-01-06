@@ -73,7 +73,6 @@ namespace STROOP.Controls
         public readonly Func<List<WatchVariableControl>> GetSelectedVars;
         public List<ToolStripItem> customContextMenuItems = new List<ToolStripItem>();
 
-
         public delegate IEnumerable<WatchVariable> SpecialFuncWatchVariables(PositionAngle.HybridPositionAngle input);
         public Func<IEnumerable<(string name, SpecialFuncWatchVariables generateVariables)>> getSpecialFuncWatchVariables = null;
 
@@ -85,6 +84,11 @@ namespace STROOP.Controls
         string _dataPath;
         [Category("Data"), Browsable(true)]
         public string DataPath { get { return _dataPath; } set { Initialize(_dataPath = value); } }
+
+        [Category("Layout"), Browsable(true)]
+        public int? elementNameWidth { get; set; } = null;
+        [Category("Layout"), Browsable(true)]
+        public int? elementValueWidth { get; set; } = null;
 
         private List<WatchVariableControl> _allWatchVarControls;
         private List<WatchVariableControl> _shownWatchVarControls;
@@ -654,11 +658,14 @@ namespace STROOP.Controls
             _filteringDropDownItems.ForEach(item => filterVariablesItem.DropDownItems.Add(item));
         }
 
-        public void AddVariable(WatchVariable var, WatchVariable.IVariableView view) =>
-            AddVariables(new[] { (var, view) });
+        public WatchVariableControl AddVariable(WatchVariable var, WatchVariable.IVariableView view) =>
+            AddVariables(new[] { (var, view) }).First();
 
         public IEnumerable<WatchVariableControl> AddVariables(IEnumerable<(WatchVariable var, WatchVariable.IVariableView view)> watchVarControls)
         {
+            if (!initialized)
+                DeferredInitialize();
+
             var lst = new List<WatchVariableControl>();
             foreach (var data in watchVarControls)
             {
@@ -739,7 +746,7 @@ namespace STROOP.Controls
                 control.IsSelected = false;
             _selectedWatchVarControls.Clear();
         }
-        
+
         private List<XElement> GetCurrentVarXmlElements(bool useCurrentState = true)
         {
             return GetCurrentVariableControls().ConvertAll(control => control.ToXml(useCurrentState));
@@ -811,6 +818,8 @@ namespace STROOP.Controls
         }
 
         public bool SetVariableValueByName(string name, object value)
+
+
         {
             WatchVariableControl control = GetCurrentVariableControls().FirstOrDefault(c => c.VarName == name);
             if (control == null) return false;
@@ -865,6 +874,12 @@ namespace STROOP.Controls
             {
                 control.BaseColor = getColor(control);
             }
+        }
+
+        public int GetAutoHeight(int numColumns = 1)
+        {
+            var num = _shownWatchVarControls.Count;
+            return (num + numColumns - 1) / numColumns * renderer.elementHeight + renderer.borderMargin * 2;
         }
     }
 }

@@ -35,7 +35,7 @@ namespace STROOP.Controls
 
         private void AddStringContextMenuStripItems(string specialType)
         {
-            if (specialTypeContextMenuHandlers.TryGetValue(specialType, out editValueHandler))
+            if (specialType != null && specialTypeContextMenuHandlers.TryGetValue(specialType, out editValueHandler))
             {
                 WatchVariableSetting applicableSetting;
                 if (!settingsForSpecials.TryGetValue(specialType, out applicableSetting))
@@ -47,6 +47,18 @@ namespace STROOP.Controls
                         });
                 _watchVarControl.AddSetting(applicableSetting);
             }
+        }
+
+        public void AddContextMenuHandler(string name, Action<string> handler, params string[] options)
+        {
+            var opts = new(string, Func<object>, Func<WatchVariableControl, bool>)[options.Length];
+            for (int i = 0; i < options.Length; i++)
+            {
+                var optionName = options[i];
+                opts[i] = (optionName, () => optionName, ctrl => false);
+            }
+            WatchVariableSetting setting = new WatchVariableSetting(name, (ctrl, obj) => { handler((string)obj); return false; }, opts);
+            _watchVarControl.AddSetting(setting);
         }
 
         protected override void HandleVerification(object value)
