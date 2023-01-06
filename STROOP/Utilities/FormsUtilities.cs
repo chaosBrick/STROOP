@@ -20,7 +20,7 @@ namespace STROOP.Utilities
             item.Click += (_, __) => handler();
             return item;
         }
-        
+
         public static ToolStripMenuItem GetSubItem(this ToolStripItemCollection strip, string key)
         {
             ToolStripMenuItem item;
@@ -47,6 +47,15 @@ namespace STROOP.Utilities
                 };
                 parentStrip.Closing += closeOnce;
             }
+        }
+
+        public static T GetParent<T>(this Control ctrl) where T : Control
+        {
+            if (ctrl.Parent is T parentT)
+                return parentT;
+            else if (ctrl.Parent == null)
+                return null;
+            return ctrl.Parent.GetParent<T>();
         }
     }
 }
