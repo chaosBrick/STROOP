@@ -388,6 +388,29 @@
       <DependentUpon>MainLoadingForm.cs</DependentUpon>
     </Compile>
     <Compile Include="LoadingHandler.cs" />
+    <Compile Include="Tabs\BruteforceTab\BruteforceTab.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Tabs\BruteforceTab\BruteforceTab.Designer.cs">
+      <DependentUpon>BruteforceTab.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tabs\BruteforceTab\Json.cs" />
+    <Compile Include="Tabs\BruteforceTab\Surface.cs" />
+    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\GeneralPurpose.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\GeneralPurpose.Designer.cs">
+      <DependentUpon>GeneralPurpose.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\IMethodController.cs" />
+    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\MethodControllers\RestrictHPosition.cs" />
+    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\ScoringFunc.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\ScoringFunc.Designer.cs">
+      <DependentUpon>ScoringFunc.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tabs\BruteforceTab\ValueGetters.cs" />
     <Compile Include="Tabs\GhostTab\FileWatchers.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -966,6 +989,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Tabs\AreaTab.resx">
       <DependentUpon>AreaTab.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tabs\BruteforceTab\BruteforceTab.resx">
+      <DependentUpon>BruteforceTab.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\GeneralPurpose.resx">
+      <DependentUpon>GeneralPurpose.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\ScoringFunc.resx">
+      <DependentUpon>ScoringFunc.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Tabs\CameraTab.resx">
       <DependentUpon>CameraTab.cs</DependentUpon>
