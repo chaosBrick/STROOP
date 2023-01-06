@@ -67,20 +67,16 @@ namespace STROOP.Utilities
 
         private static void CopyForBruteforcer(List<WatchVariableControl> controls)
         {
-            var needsStringEscapeRegex = new System.Text.RegularExpressions.Regex("^[-]?(([0-9]+)|(([0-9]+)\\.([0-9]+)))$");
             var strBuilder = new System.Text.StringBuilder();
             strBuilder.AppendLine();
             foreach (var var in controls)
             {
                 // Skip variables that have no meaning
-                var jsonName = var.GetJsonName();
+                var jsonName = var.view.GetJsonName();
                 if (jsonName == null)
                     continue;
 
-                var valueString = var.GetValue().ToString();
-                if (!needsStringEscapeRegex.IsMatch(valueString))
-                    valueString = $"\"{valueString}\"";
-                strBuilder.AppendLine($"\t\"{jsonName}\": {valueString},");
+                strBuilder.AppendLine($"\t\"{jsonName}\": {StringUtilities.MakeJsonValue(var.GetValue().ToString())},");
             }
             Clipboard.SetText(strBuilder.ToString());
         }

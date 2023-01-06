@@ -38,7 +38,7 @@ namespace STROOP.Utilities
 
         public static bool TryParseHex(object obj, out uint result)
         {
-            string str = obj.ToString();
+            string str = obj?.ToString() ?? "";
             int prefixPos = str.IndexOf("0x");
             if (prefixPos != -1)
                 str = str.Substring(prefixPos + 2);

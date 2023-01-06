@@ -62,5 +62,14 @@ namespace STROOP.Utilities
                 strings.Add(toString(t));
             return string.Concat(strings);
         }
+
+        static System.Text.RegularExpressions.Regex needsJsonStringEscapeRegex = new System.Text.RegularExpressions.Regex("^[-]?(([0-9]+)|(([0-9]+)\\.([0-9]+)))$");
+        public static string MakeJsonValue(string input)
+        {
+            input = input.Trim(' ', '"');
+            if (!needsJsonStringEscapeRegex.IsMatch(input))
+                return $"\"{input}\"";
+            return input;
+        }
     }
 }

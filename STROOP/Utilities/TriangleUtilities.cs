@@ -359,5 +359,26 @@ namespace STROOP.Utilities
 
             return null;
         }
+
+        public static string ToJsonString(IEnumerable<uint> triangleAddresses)
+        {
+            var triangleAddressList = triangleAddresses.ToList();
+            triangleAddressList.Sort((a, b) => (int)((long)a - b));
+            var strBuilder = new StringBuilder();
+            strBuilder.AppendLine("\n\t[");
+            int i = 0;
+            foreach (var addr in triangleAddressList)
+            {
+                var tri = Models.TriangleDataModel.Create(addr);
+                strBuilder.Append($"\t\t[{tri.X1},\t{tri.Y1},\t{tri.Z1},");
+                strBuilder.Append($"\t{tri.X2},\t{tri.Y2},\t{tri.Z2},");
+                strBuilder.Append($"\t{tri.X3},\t{tri.Y3},\t{tri.Z3},");
+                strBuilder.Append($"\t{tri.SurfaceType}]");
+                if (++i < triangleAddressList.Count)
+                    strBuilder.AppendLine(",");
+            }
+            strBuilder.Append("\n\t]");
+            return strBuilder.ToString();
+        }
     }
 }
