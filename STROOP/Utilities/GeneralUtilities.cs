@@ -11,6 +11,20 @@ namespace STROOP.Utilities
         public Wrapper(T value) { this.value = value; }
     }
 
+    public class EqualityComparer<T> : IEqualityComparer<T>
+    {
+        Func<T, T, bool> equalsFunc;
+        Func<T, int> getHashCodeFunc;
+        public EqualityComparer(Func<T, T, bool> equalsFunc, Func<T, int> getHashCodeFunc = null)
+        {
+            this.equalsFunc = equalsFunc;
+            this.getHashCodeFunc = getHashCodeFunc ?? (_ => _.GetHashCode());
+        }
+        bool IEqualityComparer<T>.Equals(T x, T y) => equalsFunc(x, y);
+
+        int IEqualityComparer<T>.GetHashCode(T obj) => getHashCodeFunc(obj);
+    }
+
     public static class GeneralUtilities
     {
         static Type[] stroopTypes;
@@ -24,6 +38,9 @@ namespace STROOP.Utilities
         {
             stroopTypes = typeof(GeneralUtilities).Assembly.GetTypes();
         }
+
+        public static EqualityComparer<T> GetEqualityComparer<T>(Func<T, T, bool> equalsFunc, Func<T, int> getHashCodeFunc = null)
+            => new EqualityComparer<T>(equalsFunc, getHashCodeFunc);
 
         public static void ExecuteInitializers<T>(params object[] args) where T : InitializerAttribute
         {
