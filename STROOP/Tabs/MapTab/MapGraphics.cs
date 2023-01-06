@@ -114,7 +114,6 @@ namespace STROOP.Tabs.MapTab
         public bool MapViewCenterChangeByPixels = true;
 
         public readonly GLControl glControl;
-        public readonly OpenTK.Graphics.IGraphicsContext context;
         public readonly MapTab mapTab;
         public readonly MapView view;
 
@@ -159,11 +158,12 @@ namespace STROOP.Tabs.MapTab
         public bool IsMouseDown(int button) => mouseDown[button];
 
 
-        public MapGraphics(MapTab mapTab, GLControl glControl, OpenTK.Graphics.IGraphicsContext context)
+        Func<OpenTK.Graphics.IGraphicsContext> getContext;
+        public MapGraphics(MapTab mapTab, GLControl glControl, Func<OpenTK.Graphics.IGraphicsContext> getContext = null)
         {
             this.mapTab = mapTab;
             this.glControl = glControl;
-            this.context = context;
+            this.getContext = getContext;
             view = new MapView();
             drawLayers = new List<Action>[Enum.GetNames(typeof(DrawLayers)).Length];
             for (int i = 0; i < drawLayers.Length; i++)
@@ -184,11 +184,28 @@ namespace STROOP.Tabs.MapTab
             return root.ActiveControl;
         }
 
+
+        List<Action> glInits = new List<Action>();
+        bool doingGLInit = false;
+        void PerformGLInit()
+        {
+            doingGLInit = true;
+            using (new AccessScope<MapTab>(mapTab))
+                foreach (var c in glInits)
+                    c();
+            glInits.Clear();
+            doingGLInit = false;
+        }
+        public void DoGLInit(Action action)
+        {
+            if (doingGLInit)
+                action();
+            else
+                glInits.Add(action);
+        }
+
         public void Load(Func<Renderers.RendererCollection> getRenderers)
         {
-            context.MakeCurrent(glControl.WindowInfo);
-            context.LoadAll();
-
             glControl.Paint += (sender, e) => OnPaint();
 
             glControl.MouseDown += OnMouseDown;
@@ -210,22 +227,26 @@ namespace STROOP.Tabs.MapTab
             glControl.Resize += (_, __) =>
             {
                 if (glControl.Width * glControl.Height > 0)
-                {
-                    DeleteMainSurfaces();
-                    transparencyRenderer.SetDimensions(glControl.Width, glControl.Height);
-                    InitMainSurfaces();
-                }
+                    using (new AccessScope<MapTab>(mapTab))
+                    {
+                        DeleteMainSurfaces();
+                        transparencyRenderer.SetDimensions(glControl.Width, glControl.Height);
+                        InitMainSurfaces();
+                    }
             };
 
-            GL.ClearColor(Color.FromKnownColor(KnownColor.Control));
-            GL.Enable(EnableCap.Texture2D);
-            GL.Enable(EnableCap.Blend);
-            GL.BlendFuncSeparate(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha, BlendingFactorSrc.OneMinusDstAlpha, BlendingFactorDest.One);
-            GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
+            glInits.Add(() =>
+            {
+                GL.ClearColor(Color.FromKnownColor(KnownColor.Control));
+                GL.Enable(EnableCap.Texture2D);
+                GL.Enable(EnableCap.Blend);
+                GL.BlendFuncSeparate(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha, BlendingFactorSrc.OneMinusDstAlpha, BlendingFactorDest.One);
+                GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
 
-            InitMainSurfaces();
+                InitMainSurfaces();
+            });
+
             rendererCollection = getRenderers();
-
             transparencyRenderer = new Renderers.TransparencyRenderer(16, () => mainDepthBuffer, glControl.Width, glControl.Height);
             transparencyRenderer.transparents.Add(objectRenderer.transparent);
             transparencyRenderer.transparents.Add(triangleRenderer.transparent);
@@ -275,6 +296,8 @@ namespace STROOP.Tabs.MapTab
 
         private void OnPaint()
         {
+            PerformGLInit();
+
             if (Config.Stream == null || rendererCollection == null)
                 return;
 
@@ -285,7 +308,7 @@ namespace STROOP.Tabs.MapTab
                 if (glControl.Cursor != cursor)
                     glControl.Cursor = cursor;
 
-                context.MakeCurrent(glControl.WindowInfo);
+                (getContext != null ? getContext() : glControl.Context).MakeCurrent(glControl.WindowInfo);
                 UpdateMapView();
 
                 GL.BindFramebuffer(FramebufferTarget.Framebuffer, mainFrameBuffer);

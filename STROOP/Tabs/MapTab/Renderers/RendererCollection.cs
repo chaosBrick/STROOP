@@ -24,21 +24,24 @@ namespace STROOP.Tabs.MapTab.Renderers
         public RendererCollection()
         {
             renderers.Add(objectRenderer = new SpriteRenderer(MapGraphics.DrawLayers.Objects, 256));
-            objectRenderer.texture = GL.GenTexture();
-            GL.BindTexture(TextureTarget.Texture2DArray, objectRenderer.texture);
+            AccessScope<MapTab>.content.graphics.DoGLInit(() =>
+            {
+                objectRenderer.texture = GL.GenTexture();
+                GL.BindTexture(TextureTarget.Texture2DArray, objectRenderer.texture);
 
-            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.LinearMipmapNearest);
-            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, (int)TextureMagFilter.Linear);
-            GL.TexImage3D(TextureTarget.Texture2DArray,
-                    0,
-                    PixelInternalFormat.Rgba8,
-                    OBJECTS_TEXTURE_SIZE,
-                    OBJECTS_TEXTURE_SIZE,
-                    OBJECTS_TEXTURE_LAYERS,
-                    0,
-                    PixelFormat.Rgba,
-                    PixelType.UnsignedByte,
-                    IntPtr.Zero);
+                GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.LinearMipmapNearest);
+                GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, (int)TextureMagFilter.Linear);
+                GL.TexImage3D(TextureTarget.Texture2DArray,
+                        0,
+                        PixelInternalFormat.Rgba8,
+                        OBJECTS_TEXTURE_SIZE,
+                        OBJECTS_TEXTURE_SIZE,
+                        OBJECTS_TEXTURE_LAYERS,
+                        0,
+                        PixelFormat.Rgba,
+                        PixelType.UnsignedByte,
+                        IntPtr.Zero);
+            });
 
             renderers.Add(triangleRenderer = new TriangleRenderer(0x10000));
             renderers.Add(triangleOverlayRenderer = new TriangleRenderer(0x10000) { drawlayer = MapGraphics.DrawLayers.GeometryOverlay });

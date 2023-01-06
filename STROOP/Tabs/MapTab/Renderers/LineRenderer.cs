@@ -19,20 +19,23 @@ namespace STROOP.Tabs.MapTab.Renderers
 
         public LineRenderer(int numExpectedLines = 1024)
         {
-            shader = GraphicsUtil.GetShaderProgram("Resources/Shaders/Lines.vert.glsl", "Resources/Shaders/Lines.frag.glsl", "Resources/Shaders/Lines.geom.glsl");
-            Init(numExpectedLines * 2);
-            uniform_viewportSize = GL.GetUniformLocation(shader, "viewportSize");
+            AccessScope<MapTab>.content.graphics.DoGLInit(() =>
+            {
+                shader = GraphicsUtil.GetShaderProgram("Resources/Shaders/Lines.vert.glsl", "Resources/Shaders/Lines.frag.glsl", "Resources/Shaders/Lines.geom.glsl");
+                Init(numExpectedLines * 2);
+                uniform_viewportSize = GL.GetUniformLocation(shader, "viewportSize");
 
-            GL.BindVertexArray(vertexArray);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, instanceBuffer);
-            GL.EnableVertexAttribArray(0);
-            GL.EnableVertexAttribArray(1);
-            GL.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, InstanceData.Size, sizeof(float) * 0);
-            GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, InstanceData.Size, sizeof(float) * 4);
+                GL.BindVertexArray(vertexArray);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, instanceBuffer);
+                GL.EnableVertexAttribArray(0);
+                GL.EnableVertexAttribArray(1);
+                GL.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, InstanceData.Size, sizeof(float) * 0);
+                GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, InstanceData.Size, sizeof(float) * 4);
 
-            GL.BindVertexArray(0);
+                GL.BindVertexArray(0);
 
-            UpdateBuffer(numExpectedLines, false);
+                UpdateBuffer(numExpectedLines, false);
+            });
         }
 
         public void Add(Vector3 pos1, Vector3 pos2, Vector4 color, float thickness)

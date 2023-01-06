@@ -90,11 +90,14 @@ namespace STROOP.Tabs.MapTab.Renderers
 
         private SpriteRenderer(int maxExpectedInstances)
         {
-            shader = GetShader();
-            Init(maxExpectedInstances);
-            uniform_sampler = GL.GetUniformLocation(shader, "sampler");
+            AccessScope<MapTab>.content.graphics.DoGLInit(() =>
+            {
+                shader = GetShader();
+                Init(maxExpectedInstances);
+                uniform_sampler = GL.GetUniformLocation(shader, "sampler");
 
-            GenSpriteVAO(vertexArray, instanceBuffer);
+                GenSpriteVAO(vertexArray, instanceBuffer);
+            });
         }
 
         public SpriteRenderer(MapGraphics.DrawLayers layer, int maxExpectedInstances = 128) : this(maxExpectedInstances)

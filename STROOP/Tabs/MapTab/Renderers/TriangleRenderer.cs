@@ -94,27 +94,30 @@ namespace STROOP.Tabs.MapTab.Renderers
         void InitInternal(int maxExpectedTriangles)
         {
             int expectedSize = maxExpectedTriangles * TriangleVertex.Size * 3;
-            vao = GL.GenVertexArray();
-            buffer = GL.GenBuffer();
+            AccessScope<MapTab>.content.graphics.DoGLInit(() =>
+            {
+                vao = GL.GenVertexArray();
+                buffer = GL.GenBuffer();
 
-            GL.BindVertexArray(vao);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)expectedSize, IntPtr.Zero, BufferUsageHint.DynamicDraw);
-            GL.EnableVertexAttribArray(0);
-            GL.EnableVertexAttribArray(1);
-            GL.EnableVertexAttribArray(2);
-            GL.EnableVertexAttribArray(3);
-            GL.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, TriangleVertex.Size, 0);
-            GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, TriangleVertex.Size, sizeof(float) * 4);
-            GL.VertexAttribPointer(2, 4, VertexAttribPointerType.Float, false, TriangleVertex.Size, sizeof(float) * 8);
-            GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, TriangleVertex.Size, sizeof(float) * 12);
+                GL.BindVertexArray(vao);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)expectedSize, IntPtr.Zero, BufferUsageHint.DynamicDraw);
+                GL.EnableVertexAttribArray(0);
+                GL.EnableVertexAttribArray(1);
+                GL.EnableVertexAttribArray(2);
+                GL.EnableVertexAttribArray(3);
+                GL.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, TriangleVertex.Size, 0);
+                GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, TriangleVertex.Size, sizeof(float) * 4);
+                GL.VertexAttribPointer(2, 4, VertexAttribPointerType.Float, false, TriangleVertex.Size, sizeof(float) * 8);
+                GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, TriangleVertex.Size, sizeof(float) * 12);
 
-            GL.BindVertexArray(0);
+                GL.BindVertexArray(0);
 
-            shader = GetShader();
-            uniform_viewProjection = GL.GetUniformLocation(shader, "viewProjection");
-            uniform_pixelsPerUnit = GL.GetUniformLocation(shader, "pixelsPerUnit");
-            uniform_unitDivisor = GL.GetUniformLocation(shader, "unitDivisor");
+                shader = GetShader();
+                uniform_viewProjection = GL.GetUniformLocation(shader, "viewProjection");
+                uniform_pixelsPerUnit = GL.GetUniformLocation(shader, "pixelsPerUnit");
+                uniform_unitDivisor = GL.GetUniformLocation(shader, "unitDivisor");
+            });
 
             dataPtr = Marshal.AllocHGlobal((IntPtr)(bufferSize = expectedSize));
         }

@@ -23,8 +23,11 @@ namespace STROOP.Tabs.MapTab.Renderers
 
         public TextRenderer()
         {
-            drawing = new QFontDrawing(false, null);
-            defaultFont = CreateDefaultFont();
+            AccessScope<MapTab>.content.graphics.DoGLInit(() =>
+            {
+                drawing = new QFontDrawing(false, null);
+                defaultFont = CreateDefaultFont();
+            });
         }
 
         [System.Runtime.ExceptionServices.HandleProcessCorruptedStateExceptions()]

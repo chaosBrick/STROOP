@@ -34,12 +34,16 @@ namespace STROOP.Tabs.MapTab.Renderers
                 ptr = IntPtr.Add(ptr, instanceSize);
             }
         }
+
         protected void Init(int maxExpectedInstances)
         {
-            uniform_viewProjection = GL.GetUniformLocation(shader, "viewProjection");
-            instanceBuffer = GL.GenBuffer();
-            vertexArray = GL.GenVertexArray();
-            UpdateBuffer(maxExpectedInstances, false);
+            AccessScope<MapTab>.content.graphics.DoGLInit(() =>
+            {
+                uniform_viewProjection = GL.GetUniformLocation(shader, "viewProjection");
+                instanceBuffer = GL.GenBuffer();
+                vertexArray = GL.GenVertexArray();
+                UpdateBuffer(maxExpectedInstances, false);
+            });
         }
 
         protected void UpdateBuffer(int maxInstances, bool writeData = true)

@@ -155,34 +155,37 @@ namespace STROOP.Tabs.MapTab.Renderers
         public GeometryRenderer(GeometryData data, int maxExpectedInstances = 256)
         {
             this.data = data;
-            maskShader = GraphicsUtil.GetShaderProgram("Resources/Shaders/Meshes.vert.glsl", "Resources/Shaders/DepthMask.frag.glsl");
-            shader = GraphicsUtil.GetShaderProgram("Resources/Shaders/Meshes.vert.glsl", "Resources/Shaders/Meshes.frag.glsl");
-            Init(maxExpectedInstances);
-
-            GL.BindVertexArray(vertexArray);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, instanceBuffer);
-            for (int i = 0; i <= 4; i++)
+            AccessScope<MapTab>.content.graphics.DoGLInit(() =>
             {
-                GL.EnableVertexAttribArray(i);
-                GL.VertexAttribDivisor(i, 1);
-            }
-            GL.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, MeshInstanceData.Size, sizeof(float) * 0);
-            GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, MeshInstanceData.Size, sizeof(float) * 4);
-            GL.VertexAttribPointer(2, 4, VertexAttribPointerType.Float, false, MeshInstanceData.Size, sizeof(float) * 8);
-            GL.VertexAttribPointer(3, 4, VertexAttribPointerType.Float, false, MeshInstanceData.Size, sizeof(float) * 12);
-            GL.VertexAttribPointer(4, 4, VertexAttribPointerType.Float, false, MeshInstanceData.Size, sizeof(float) * 16);
+                maskShader = GraphicsUtil.GetShaderProgram("Resources/Shaders/Meshes.vert.glsl", "Resources/Shaders/DepthMask.frag.glsl");
+                shader = GraphicsUtil.GetShaderProgram("Resources/Shaders/Meshes.vert.glsl", "Resources/Shaders/Meshes.frag.glsl");
+                Init(maxExpectedInstances);
 
-            meshVertices = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, meshVertices);
-            GL.EnableVertexAttribArray(5);
-            GL.VertexAttribPointer(5, 4, VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(sizeof(float) * 4 * data.vertices.Length), data.vertices, BufferUsageHint.StaticDraw);
+                GL.BindVertexArray(vertexArray);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, instanceBuffer);
+                for (int i = 0; i <= 4; i++)
+                {
+                    GL.EnableVertexAttribArray(i);
+                    GL.VertexAttribDivisor(i, 1);
+                }
+                GL.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, MeshInstanceData.Size, sizeof(float) * 0);
+                GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, MeshInstanceData.Size, sizeof(float) * 4);
+                GL.VertexAttribPointer(2, 4, VertexAttribPointerType.Float, false, MeshInstanceData.Size, sizeof(float) * 8);
+                GL.VertexAttribPointer(3, 4, VertexAttribPointerType.Float, false, MeshInstanceData.Size, sizeof(float) * 12);
+                GL.VertexAttribPointer(4, 4, VertexAttribPointerType.Float, false, MeshInstanceData.Size, sizeof(float) * 16);
 
-            meshIndices = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, meshIndices);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(ushort) * data.indices.Length), data.indices, BufferUsageHint.StaticDraw);
+                meshVertices = GL.GenBuffer();
+                GL.BindBuffer(BufferTarget.ArrayBuffer, meshVertices);
+                GL.EnableVertexAttribArray(5);
+                GL.VertexAttribPointer(5, 4, VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(sizeof(float) * 4 * data.vertices.Length), data.vertices, BufferUsageHint.StaticDraw);
 
-            GL.BindVertexArray(0);
+                meshIndices = GL.GenBuffer();
+                GL.BindBuffer(BufferTarget.ElementArrayBuffer, meshIndices);
+                GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(ushort) * data.indices.Length), data.indices, BufferUsageHint.StaticDraw);
+
+                GL.BindVertexArray(0);
+            });
         }
 
         public void Add(Matrix4 transform, Vector4 color) =>

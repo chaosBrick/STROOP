@@ -17,14 +17,17 @@ namespace STROOP.Tabs.MapTab
 {
     public static class MapUtilities
     {
-        public static int WhiteTexture { get; }
+        public static int WhiteTexture { get; private set; }
         private static readonly byte[] _whiteTexData = new byte[] { 0xFF };
 
         static MapUtilities()
         {
-            WhiteTexture = GL.GenTexture();
-            GL.BindTexture(TextureTarget.Texture2D, WhiteTexture);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, 1, 1, 0, OpenTK.Graphics.OpenGL.PixelFormat.Luminance, PixelType.UnsignedByte, _whiteTexData);
+            AccessScope<MapTab>.content.graphics.DoGLInit(() =>
+            {
+                WhiteTexture = GL.GenTexture();
+                GL.BindTexture(TextureTarget.Texture2D, WhiteTexture);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, 1, 1, 0, OpenTK.Graphics.OpenGL.PixelFormat.Luminance, PixelType.UnsignedByte, _whiteTexData);
+            });
         }
 
         public static List<TriangleDataModel> GetTriangles(uint triAddresses)

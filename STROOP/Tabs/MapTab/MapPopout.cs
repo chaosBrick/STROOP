@@ -18,7 +18,7 @@ namespace STROOP.Tabs.MapTab
             glControl.Bounds = ClientRectangle;
             glControl.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top | AnchorStyles.Bottom;
             Controls.Add(glControl);
-            graphics = new MapGraphics(tab, glControl, tab.graphics.context);
+            graphics = new MapGraphics(tab, glControl, () => tab.graphics.glControl.Context);
             graphics.MapViewAngleValue = tab.graphics.MapViewAngleValue;
             graphics.MapViewScaleValue = tab.graphics.MapViewScaleValue;
             graphics.view.position = tab.graphics.view.position;

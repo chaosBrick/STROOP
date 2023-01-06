@@ -32,55 +32,58 @@ namespace STROOP.Tabs.MapTab.Renderers
         public TransparencyRenderer(int maxDepthComplexity, Func<int> originalDepthGetter, int initialWidth, int initialHeight)
         {
             this.originalDepthGetter = originalDepthGetter;
-            shader = GraphicsUtil.GetShaderProgram("Resources/Shaders/Sprites.vert.glsl", "Resources/Shaders/BlendTransparency.frag.glsl");
-            Init(1);
-            SpriteRenderer.GenSpriteVAO(vertexArray, instanceBuffer);
-            instances.Add(new SpriteRenderer.InstanceData() { transform = Matrix4.CreateScale(2), textureIndex = 0 });
-            UpdateBuffer(instances.Count);
-
-            maskFBO = GL.GenFramebuffer();
-            colorBuffer = GL.GenTexture();
-
-            canStencil = true;
-            //Generate the Framebuffer for creating the masks front to back
-            tryMakeMaskFBO:
-            maskFBO = GL.GenFramebuffer();
-            stencilBuffer = GL.GenRenderbuffer();
-            renderTexture = GL.GenTexture();
-            renderFBO = GL.GenFramebuffer();
-
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, renderFBO);
-            GL.FramebufferTexture(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, renderTexture, 0);
-            GL.DrawBuffers(1, new[] { DrawBuffersEnum.ColorAttachment0 });
-
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-
-            SetMaxDepthComplexity(maxDepthComplexity);
-
-            SetDimensions(initialWidth, initialHeight);
-
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, maskFBO);
-            GL.FramebufferTexture(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, maskTexture[0], 0);
-            if (canStencil)
-                GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.StencilAttachment, RenderbufferTarget.Renderbuffer, stencilBuffer);
-            GL.DrawBuffer(DrawBufferMode.None);
-
-            FramebufferErrorCode error;
-            if ((error = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer)) != FramebufferErrorCode.FramebufferComplete)
+            AccessScope<MapTab>.content.graphics.DoGLInit(() =>
             {
-                GL.DeleteFramebuffer(maskFBO);
-                if (!canStencil)
-                    throw new NotSupportedException("Transparency rendering doesn't work on this system.");
-                canStencil = false;
-                goto tryMakeMaskFBO;
-            }
+                shader = GraphicsUtil.GetShaderProgram("Resources/Shaders/Sprites.vert.glsl", "Resources/Shaders/BlendTransparency.frag.glsl");
+                Init(1);
+                SpriteRenderer.GenSpriteVAO(vertexArray, instanceBuffer);
+                instances.Add(new SpriteRenderer.InstanceData() { transform = Matrix4.CreateScale(2), textureIndex = 0 });
+                UpdateBuffer(instances.Count);
 
-            if ((error = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer)) != FramebufferErrorCode.FramebufferComplete)
-            {
-                throw null;
-            }
+                maskFBO = GL.GenFramebuffer();
+                colorBuffer = GL.GenTexture();
 
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+                canStencil = true;
+                //Generate the Framebuffer for creating the masks front to back
+                tryMakeMaskFBO:
+                maskFBO = GL.GenFramebuffer();
+                stencilBuffer = GL.GenRenderbuffer();
+                renderTexture = GL.GenTexture();
+                renderFBO = GL.GenFramebuffer();
+
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, renderFBO);
+                GL.FramebufferTexture(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, renderTexture, 0);
+                GL.DrawBuffers(1, new[] { DrawBuffersEnum.ColorAttachment0 });
+
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+
+                SetMaxDepthComplexity(maxDepthComplexity);
+
+                SetDimensions(initialWidth, initialHeight);
+
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, maskFBO);
+                GL.FramebufferTexture(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, maskTexture[0], 0);
+                if (canStencil)
+                    GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.StencilAttachment, RenderbufferTarget.Renderbuffer, stencilBuffer);
+                GL.DrawBuffer(DrawBufferMode.None);
+
+                FramebufferErrorCode error;
+                if ((error = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer)) != FramebufferErrorCode.FramebufferComplete)
+                {
+                    GL.DeleteFramebuffer(maskFBO);
+                    if (!canStencil)
+                        throw new NotSupportedException("Transparency rendering doesn't work on this system.");
+                    canStencil = false;
+                    goto tryMakeMaskFBO;
+                }
+
+                if ((error = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer)) != FramebufferErrorCode.FramebufferComplete)
+                {
+                    throw null;
+                }
+
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            });
         }
 
         public void SetMaxDepthComplexity(int complexity)
@@ -100,20 +103,23 @@ namespace STROOP.Tabs.MapTab.Renderers
         {
             this.width = width;
             this.height = height;
-            GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, stencilBuffer);
-            GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferStorage.StencilIndex1, width, height);
-
-            GL.BindTexture(TextureTarget.Texture2D, renderTexture);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba16f, width, height, 0, PixelFormat.Rgba, PixelType.HalfFloat, IntPtr.Zero);
-
-            for (int i = 0; i < maskTexture.Length; i++)
+            AccessScope<MapTab>.content.graphics.DoGLInit(() =>
             {
-                GL.BindTexture(TextureTarget.Texture2D, maskTexture[i]);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.DepthComponent32f, width, height, 0, PixelFormat.DepthComponent, PixelType.Float, IntPtr.Zero);
+                GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, stencilBuffer);
+                GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferStorage.StencilIndex1, width, height);
 
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
-            }
+                GL.BindTexture(TextureTarget.Texture2D, renderTexture);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba16f, width, height, 0, PixelFormat.Rgba, PixelType.HalfFloat, IntPtr.Zero);
+
+                for (int i = 0; i < maskTexture.Length; i++)
+                {
+                    GL.BindTexture(TextureTarget.Texture2D, maskTexture[i]);
+                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.DepthComponent32f, width, height, 0, PixelFormat.DepthComponent, PixelType.Float, IntPtr.Zero);
+
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+                }
+            });
         }
 
         public void CleanUp()

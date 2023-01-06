@@ -103,17 +103,20 @@ namespace STROOP.Tabs.MapTab
             glControlMap2D.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
             glControlMap2D.Location = new Point(0, 0);
             parentControl.Controls.Add(glControlMap2D);
-            graphics = new MapGraphics(this, glControlMap2D, glControlMap2D.Context);
-            graphics.Load(() => new Renderers.RendererCollection());
+            graphics = new MapGraphics(this, glControlMap2D);
             _isLoaded2D = true;
 
-            InitializeControls();
+            using (new AccessScope<MapTab>(this))
+            {
+                graphics.Load(() => new Renderers.RendererCollection());
+                InitializeControls();
 
-            comboBoxViewMode.SelectedIndex = 0;
-            if (!System.IO.File.Exists(DEFAULT_TRACKER_FILE))
-                flowLayoutPanelMapTrackers.Controls.Clear();
-            else
-                LoadTrackerConfigAndDisplay(DEFAULT_TRACKER_FILE);
+                comboBoxViewMode.SelectedIndex = 0;
+                if (!System.IO.File.Exists(DEFAULT_TRACKER_FILE))
+                    flowLayoutPanelMapTrackers.Controls.Clear();
+                else
+                    LoadTrackerConfigAndDisplay(DEFAULT_TRACKER_FILE);
+            }
             RequireGeometryUpdate();
         }
 
