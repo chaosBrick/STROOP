@@ -69,25 +69,9 @@ namespace STROOP.Tabs.MapTab.MapObjects
             Color = Color.Gray;
         }
 
-        void CopyJson()
-        {
-            var knock = triangleAddresses.ToList();
-            knock.Sort((a, b) => (int)((long)a - b));
-            var strBuilder = new System.Text.StringBuilder();
-            strBuilder.AppendLine("\n\t[");
-            int i = 0;
-            foreach (var addr in knock)
-            {
-                var tri = Models.TriangleDataModel.Create(addr);
-                strBuilder.Append($"\t\t[{tri.X1},\t{tri.Y1},\t{tri.Z1},");
-                strBuilder.Append($"\t{tri.X2},\t{tri.Y2},\t{tri.Z2},");
-                strBuilder.Append($"\t{tri.X3},\t{tri.Y3},\t{tri.Z3}]");
-                if (++i < knock.Count)
-                    strBuilder.AppendLine(",");
-            }
-            strBuilder.AppendLine("\n\t]");
-            Clipboard.SetText(strBuilder.ToString());
-        }
+        void CopyJson() => Clipboard.SetText(GetJsonString() + "\n");
+
+        public string GetJsonString() => TriangleUtilities.ToJsonString(triangleAddresses);
 
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
