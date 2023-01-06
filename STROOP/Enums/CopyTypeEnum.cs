@@ -16,5 +16,6 @@ namespace STROOP.Structs
         CopyWithNames,
         CopyAsTable,
         CopyForCode,
+        CopyForBruteforcerJson,
     }
 }
