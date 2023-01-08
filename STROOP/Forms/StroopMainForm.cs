@@ -576,9 +576,12 @@ namespace STROOP
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             base.OnFormClosing(e);
-            Config.Stream.OnUpdate -= OnUpdate;
-            Config.Stream.OnDisconnect -= _sm64Stream_OnDisconnect;
-            Config.Stream.WarnReadonlyOff -= _sm64Stream_WarnReadonlyOff;
+            if (Config.Stream != null)
+            {
+                Config.Stream.OnUpdate -= OnUpdate;
+                Config.Stream.OnDisconnect -= _sm64Stream_OnDisconnect;
+                Config.Stream.WarnReadonlyOff -= _sm64Stream_WarnReadonlyOff;
+            }
             if (isMainForm)
             {
                 if (Config.Stream != null)
