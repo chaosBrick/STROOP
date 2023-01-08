@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using STROOP.Controls;
 using System.Diagnostics;
+using System.Xml.Linq;
 
 using AutomaticParameterGetters = System.Collections.Generic.Dictionary<STROOP.Tabs.BruteforceTab.ValueGetters.GetterFuncs, System.Collections.Generic.HashSet<string>>;
 
@@ -13,7 +14,7 @@ namespace STROOP.Tabs.BruteforceTab
 {
     public partial class BruteforceTab : STROOPTab
     {
-        const string BRUTEFORCER_PATH = "../../../../../BruteForce-stuff/sm64_bruteforcers/binaries";
+        static string BRUTEFORCER_PATH = "Bruteforcers";
         static readonly string[] variableSourceFiles = { "MarioData.xml", "CameraData.xml", "ActionsData.xml" };
         static Dictionary<string, Func<string>> jsonTexts = new Dictionary<string, Func<string>>();
         static Dictionary<string, string> variableKeepTexts = new Dictionary<string, string>();
@@ -31,6 +32,13 @@ namespace STROOP.Tabs.BruteforceTab
             ["string"] = typeof(WatchVariableStringWrapper),
             ["Boolean"] = typeof(WatchVariableBooleanWrapper),
         };
+
+        [InitializeConfigParser]
+        static void InitConfig() => XmlConfigParser.AddConfigParser("BruteforcerModulesPath", ParseBruteforcerModdulesPath);
+        static void ParseBruteforcerModdulesPath(XElement node)
+        {
+            BRUTEFORCER_PATH = node.Attribute("path").Value;
+        }
 
         static BruteforceTab()
         {

@@ -29,4 +29,6 @@
   <GhostFileWatchers>
 	<FileWatcher path="recordghost.lua"/>
   </GhostFileWatchers>
+  
+  <BruteforcerModulesPath path="Bruteforcers"/>
 </Config>
