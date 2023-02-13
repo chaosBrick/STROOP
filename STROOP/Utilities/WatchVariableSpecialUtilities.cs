@@ -2503,6 +2503,35 @@ namespace STROOP.Structs
             ,
                 DEFAULT_SETTER));
 
+            dictionary.Add("WallHugAngleAway",
+                ((uint triAddress) =>
+                {
+                    PositionAngle marioPos = PositionAngle.Mario;
+                    double uphillAngle = GetTriangleUphillAngle(triAddress);
+                    double angleDiff = marioPos.Angle - uphillAngle;
+                    int angleDiffShort = MoreMath.NormalizeAngleShort(angleDiff);
+                    int angleDiffAbs = Math.Abs(angleDiffShort);
+                    int angleAway = angleDiffAbs - (0x8000 - 0x5555);
+                    return angleAway;
+                }
+            ,
+                (double angleAway, uint triAddress) =>
+                {
+                    PositionAngle marioPos = PositionAngle.Mario;
+                    double uphillAngle = GetTriangleUphillAngle(triAddress);
+                    double oldAngleDiff = marioPos.Angle - uphillAngle;
+                    int oldAngleDiffShort = MoreMath.NormalizeAngleShort(oldAngleDiff);
+                    int signMultiplier = oldAngleDiffShort >= 0 ? 1 : -1;
+
+                    double angleDiffAbs = angleAway + 0x5555;
+                    double angleDiff = angleDiffAbs * signMultiplier;
+                    double marioAngleDouble = uphillAngle + angleDiff;
+                    ushort marioAngleUShort = MoreMath.NormalizeAngleUshort(marioAngleDouble);
+
+                    return Config.Stream.SetValue(marioAngleUShort, MarioConfig.StructAddress + MarioConfig.FacingYawOffset);
+                }
+            ));
+
             dictionary.Add("DistanceAboveFloor",
                 ((uint dummy) =>
                 {
