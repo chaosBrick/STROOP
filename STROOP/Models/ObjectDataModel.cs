@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace STROOP.Models
 {
-    public class ObjectDataModel : PositionAngle, IUpdatableDataModel
+    public class ObjectDataModel : PositionAngle, PositionAngle.IHoldsObjectAddress, IUpdatableDataModel
     {
         const ushort ActiveStatus = 0x0101;
         public uint Address { get; set; }
@@ -334,5 +334,7 @@ namespace STROOP.Models
         {
             return BehaviorAssociation.Name + " " + HexUtilities.FormatValue(Address);
         }
+
+        uint IHoldsObjectAddress.GetAddress() => Address;
     }
 }
