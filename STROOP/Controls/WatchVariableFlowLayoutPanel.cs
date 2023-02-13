@@ -818,12 +818,22 @@ namespace STROOP.Controls
         }
 
         public bool SetVariableValueByName(string name, object value)
-
-
         {
             WatchVariableControl control = GetCurrentVariableControls().FirstOrDefault(c => c.VarName == name);
             if (control == null) return false;
             return control.SetValue(value);
+        }
+
+        public List<object>[] GetVariableValuesByName(params string[] names)
+        {
+            var result = new List<object>[names.Length];
+            foreach (var var in GetCurrentVariableControls())
+            {
+                var id = Array.IndexOf(names, var.VarName);
+                if (id != -1)
+                    result[id] = var.GetValues();
+            }
+            return result;
         }
 
         public void UpdatePanel()
