@@ -88,24 +88,32 @@
   <Data groupList="Bruteforce" type="short" offsetUS="0x8033c688" offsetJP="0x8033b318" base="Relative" useHex="true">Camera 2nd Rotate Flags</Data>
   <Data groupList="Bruteforce" type="short" offsetUS="0x8033c68e" offsetJP="0x8033b31e" base="Relative" useHex="true">Camera C Buttons Pressed</Data>
 
-  <Data groupList="Bruteforce" type="float" offsetUS="0x8033c698" offsetJP="0x8033b328" base="Relative" coord="X" jsonName="camera_lakitu_cur_focus_x">Lakitu Current Focus X</Data>
-  <Data groupList="Bruteforce" type="float" offsetUS="0x8033c69C" offsetJP="0x8033b32C" base="Relative" coord="Y" jsonName="camera_lakitu_cur_focus_y">Lakitu Current Focus Y</Data>
-  <Data groupList="Bruteforce" type="float" offsetUS="0x8033c6A0" offsetJP="0x8033b330" base="Relative" coord="Z" jsonName="camera_lakitu_cur_focus_z">Lakitu Current Focus Z</Data>
+  <Data groupList="Bruteforce" type="float" offset="0x00" base="LakituStruct" coord="X" jsonName="camera_lakitu_cur_focus_x">Lakitu Current Focus X</Data>
+  <Data groupList="Bruteforce" type="float" offset="0x04" base="LakituStruct" coord="Y" jsonName="camera_lakitu_cur_focus_y">Lakitu Current Focus Y</Data>
+  <Data groupList="Bruteforce" type="float" offset="0x08" base="LakituStruct" coord="Z" jsonName="camera_lakitu_cur_focus_z">Lakitu Current Focus Z</Data>
 
-  <Data groupList="Bruteforce" type="float" offsetUS="0x8033c6A4" offsetJP="0x8033b334" base="Relative" coord="X" jsonName="camera_lakitu_cur_pos_x">Lakitu Current Pos X</Data>
-  <Data groupList="Bruteforce" type="float" offsetUS="0x8033c6A8" offsetJP="0x8033b338" base="Relative" coord="Y" jsonName="camera_lakitu_cur_pos_y">Lakitu Current Pos Y</Data>
-  <Data groupList="Bruteforce" type="float" offsetUS="0x8033c6AC" offsetJP="0x8033b33C" base="Relative" coord="Z" jsonName="camera_lakitu_cur_pos_z">Lakitu Current Pos Z</Data>
+  <Data groupList="Bruteforce" type="float" offset="0x0C" base="LakituStruct" coord="X" jsonName="camera_lakitu_cur_pos_x">Lakitu Current Pos X</Data>
+  <Data groupList="Bruteforce" type="float" offset="0x10" base="LakituStruct" coord="Y" jsonName="camera_lakitu_cur_pos_y">Lakitu Current Pos Y</Data>
+  <Data groupList="Bruteforce" type="float" offset="0x14" base="LakituStruct" coord="Z" jsonName="camera_lakitu_cur_pos_z">Lakitu Current Pos Z</Data>
 
-  <Data groupList="Bruteforce" type="float" offsetUS="0x8033c6B0" offsetJP="0x8033b340" base="Relative" coord="X" jsonName="camera_lakitu_goal_focus_x">Lakitu Goal Focus X</Data>
-  <Data groupList="Bruteforce" type="float" offsetUS="0x8033c6B4" offsetJP="0x8033b344" base="Relative" coord="Y" jsonName="camera_lakitu_goal_focus_y">Lakitu Goal Focus Y</Data>
-  <Data groupList="Bruteforce" type="float" offsetUS="0x8033c6B8" offsetJP="0x8033b348" base="Relative" coord="Z" jsonName="camera_lakitu_goal_focus_z">Lakitu Goal Focus Z</Data>
+  <Data groupList="Bruteforce" type="float" offset="0x18" base="LakituStruct" coord="X" jsonName="camera_lakitu_goal_focus_x">Lakitu Goal Focus X</Data>
+  <Data groupList="Bruteforce" type="float" offset="0x1C" base="LakituStruct" coord="Y" jsonName="camera_lakitu_goal_focus_y">Lakitu Goal Focus Y</Data>
+  <Data groupList="Bruteforce" type="float" offset="0x20" base="LakituStruct" coord="Z" jsonName="camera_lakitu_goal_focus_z">Lakitu Goal Focus Z</Data>
 
-  <Data groupList="Bruteforce" type="float" offsetUS="0x8033c6BC" offsetJP="0x8033b34C" base="Relative" coord="X" jsonName="camera_lakitu_goal_pos_x">Lakitu Goal Pos X</Data>
-  <Data groupList="Bruteforce" type="float" offsetUS="0x8033c6C0" offsetJP="0x8033b350" base="Relative" coord="Y" jsonName="camera_lakitu_goal_pos_y">Lakitu Goal Pos Y</Data>
-  <Data groupList="Bruteforce" type="float" offsetUS="0x8033c6C4" offsetJP="0x8033b354" base="Relative" coord="Z" jsonName="camera_lakitu_goal_pos_z">Lakitu Goal Pos Z</Data>
+  <Data groupList="Bruteforce" type="float" offset="0x24" base="LakituStruct" coord="X" jsonName="camera_lakitu_goal_pos_x">Lakitu Goal Pos X</Data>
+  <Data groupList="Bruteforce" type="float" offset="0x28" base="LakituStruct" coord="Y" jsonName="camera_lakitu_goal_pos_y">Lakitu Goal Pos Y</Data>
+  <Data groupList="Bruteforce" type="float" offset="0x2C" base="LakituStruct" coord="Z" jsonName="camera_lakitu_goal_pos_z">Lakitu Goal Pos Z</Data>
+  
+  <Data groupList="Bruteforce" type="short" offset="0x7C" base="LakituStruct" coord="Z" jsonName="camera_lakitu_yaw">Lakitu Yaw</Data>
+  <Data groupList="Bruteforce" type="short" offset="0x7E" base="LakituStruct" coord="Z" jsonName="camera_lakitu_next_yaw">Lakitu Yaw</Data>
 
-  <Data groupList="Bruteforce" type="byte" offsetUS="0x8033c6D4" offsetJP="0x8033b364" base="Relative" jsonName="camera_lakitu_mode">Lakitu Mode</Data>
-  <Data groupList="Bruteforce" type="byte" offsetUS="0x8033c6D5" offsetJP="0x8033b365" base="Relative" jsonName="camera_lakitu_def_mode">Lakitu Default Mode</Data>
+  <Data groupList="Bruteforce" type="byte" offset="0x3C" base="LakituStruct" jsonName="camera_lakitu_mode">Lakitu Mode</Data>
+  <Data groupList="Bruteforce" type="byte" offset="0x3D" base="LakituStruct" jsonName="camera_lakitu_def_mode">Lakitu Default Mode</Data>
+  
+  <Data groupList="Bruteforce" type="float" offset="0xA4" base="LakituStruct" jsonName="camera_lakitu_foc_hspeed">Lakitu Foc H-Speed</Data>
+  <Data groupList="Bruteforce" type="float" offset="0xA8" base="LakituStruct" jsonName="camera_lakitu_foc_vspeed">Lakitu Foc V-Speed</Data>
+  <Data groupList="Bruteforce" type="float" offset="0xAC" base="LakituStruct" jsonName="camera_lakitu_pos_hspeed">Lakitu Pos H-Speed</Data>
+  <Data groupList="Bruteforce" type="float" offset="0xB0" base="LakituStruct" jsonName="camera_lakitu_pos_vspeed">Lakitu Pos V-Speed</Data>
 
   <Data groupList="Bruteforce" type="short" offsetUS="0x8033c75a" offsetJP="0x8033b3ea" base="Relative">Camera Area Yaw</Data>
   <Data groupList="Bruteforce" type="short" offsetUS="0x8033c75c" offsetJP="0x8033b3ec" base="Relative">Camera Area Yaw Change</Data>
