@@ -28,12 +28,13 @@ namespace STROOP.Tabs.MapTab.DataUtil
         {
             this.positionAngleProvider = positionAngleProvider;
             this.filter = filter;
+            itemIncludePrediction.Checked = true;
+            Update();
         }
 
         public void AddContextMenuItems(ToolStripItemCollection target)
         {
             itemIncludePrediction.Click += (_, __) => itemIncludePrediction.Checked = !itemIncludePrediction.Checked;
-            itemIncludePrediction.Checked = true;
             target.Add(itemIncludePrediction);
         }
 
