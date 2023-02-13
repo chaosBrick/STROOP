@@ -30,7 +30,7 @@ namespace STROOP.Tabs.BruteforceTab
             ["f32"] = typeof(WatchVariableNumberWrapper),
             ["f64"] = typeof(WatchVariableNumberWrapper),
             ["string"] = typeof(WatchVariableStringWrapper),
-            ["Boolean"] = typeof(WatchVariableBooleanWrapper),
+            ["boolean"] = typeof(WatchVariableBooleanWrapper),
         };
 
         [InitializeConfigParser]
