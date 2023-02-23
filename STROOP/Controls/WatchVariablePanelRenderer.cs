@@ -177,7 +177,7 @@ namespace STROOP.Controls
 
                 int maxRows = GetMaxRows();
                 var newRect = new Rectangle(0, 0, ((displayedWatchVars.Count - 1) / maxRows + 1) * elementWidth + borderMargin * 2, maxRows * elementHeight + borderMargin * 2);
-                if (true || bufferedGraphics == null || Bounds.Width != newRect.Width || Bounds.Height != newRect.Height)
+                if (bufferedGraphics == null || Bounds.Width != newRect.Width || Bounds.Height != newRect.Height)
                 {
                     bufferedGraphics?.Dispose();
                     target.HorizontalScroll.Value = 0;
