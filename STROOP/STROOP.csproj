@@ -194,7 +194,7 @@
     </Compile>
     <Compile Include="Controls\WatchVariableAddressWrapper.cs" />
     <Compile Include="Controls\WatchVariablePanelRenderer.cs">
-      <SubType>Component</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\WatchVariableSetting.cs" />
     <Compile Include="Controls\WatchVariableTriangleWrapper.cs" />
@@ -363,7 +363,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\WatchVariableFlowLayoutPanel.cs">
-      <SubType>Component</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\RichTextBoxEx.cs">
       <SubType>Component</SubType>

@@ -13,7 +13,7 @@ using System.Windows.Input;
 
 namespace STROOP.Controls
 {
-    public partial class WatchVariablePanel : Panel
+    public partial class WatchVariablePanel : UserControl
     {
         public delegate void CustomDraw(Graphics g, Rectangle rect);
 
@@ -70,6 +70,8 @@ namespace STROOP.Controls
             });
         }
 
+        static volatile WatchVariablePanel activePanel = null;
+
         public readonly Func<List<WatchVariableControl>> GetSelectedVars;
         public List<ToolStripItem> customContextMenuItems = new List<ToolStripItem>();
 
@@ -90,8 +92,10 @@ namespace STROOP.Controls
         [Category("Layout"), Browsable(true)]
         public int? elementValueWidth { get; set; } = null;
 
+        public bool IsSelected => activePanel == this;
+
         private List<WatchVariableControl> _allWatchVarControls;
-        private List<WatchVariableControl> _shownWatchVarControls;
+        private SortedSet<WatchVariableControl> _shownWatchVarControls;
         private List<WatchVariableControl> _hiddenSearchResults = new List<WatchVariableControl>();
         private List<string> _allGroups;
         private List<string> _initialVisibleGroups;
@@ -141,8 +145,9 @@ namespace STROOP.Controls
                 if (KeyboardUtilities.IsCtrlHeld() && args.KeyCode == Keys.F)
                     (FindForm() as StroopMainForm)?.ShowSearchDialog();
             };
-            Click += (_, __) => Focus(); //Why do I have to do this manually?
+            Click += (_, __) => FocusVariablePanel(); //Why do I have to do this manually?
             getSpecialFuncWatchVariables = () => new[] { PositionAngle.HybridPositionAngle.GenerateBaseVariables };
+            UpdateSortOption(WatchVariableControl.SortByPriority);
         }
 
         protected override void OnScroll(ScrollEventArgs se)
@@ -151,15 +156,20 @@ namespace STROOP.Controls
             renderer.Draw();
         }
 
-        bool hasGroups = false;
+        void FocusVariablePanel()
+        {
+            Focus();
+            activePanel = this;
+        }
 
+        bool hasGroupsSet = false;
         public void SetGroups(
             List<string> allVariableGroupsNullable,
             List<string> visibleVariableGroupsNullable)
         {
             if (Program.IsVisualStudioHostProcess()) return;
 
-            hasGroups = true;
+            hasGroupsSet = true;
             DeferActionToUpdate(nameof(SetGroups), () =>
             {
                 _allGroups = allVariableGroupsNullable != null ? new List<string>(allVariableGroupsNullable) : new List<string>();
@@ -227,17 +237,14 @@ namespace STROOP.Controls
                     {
                         if (__.Button == MouseButtons.Left)
                         {
-                            foreach (var toBeRemoved in _reorderingWatchVarControls)
-                            {
-                                if (_shownWatchVarControls.IndexOf(toBeRemoved) < index)
-                                    index--;
-                                _shownWatchVarControls.Remove(toBeRemoved);
-                            }
-                            if (index < 0)
-                                index = _shownWatchVarControls.Count;
-                            else if (index > _shownWatchVarControls.Count)
-                                index = _shownWatchVarControls.Count;
-                            _shownWatchVarControls.InsertRange(index, _reorderingWatchVarControls);
+                            var dings = new List<WatchVariableControl>();
+                            foreach (var ctrl in _shownWatchVarControls)
+                                if (!_reorderingWatchVarControls.Contains(ctrl))
+                                    dings.Add(ctrl);
+                            dings.AddRange(_reorderingWatchVarControls);
+                            _shownWatchVarControls.Clear();
+                            foreach (var ding in dings)
+                                _shownWatchVarControls.Add(ding);
                             lastSelectedEntry = -1;
                         }
                         _reorderingWatchVarControls.Clear();
@@ -292,18 +299,31 @@ namespace STROOP.Controls
                     if (!shiftHeld || _selectedWatchVarControls.Count == 0)
                         if (var != null && var.IsSelected)
                             lastSelectedEntry = index;
-
-                    Focus();
+                    FocusVariablePanel();
                 };
 
                 _allGroups.AddRange(new List<string>(new[] { VariableGroup.Custom }));
                 _initialVisibleGroups.AddRange(new List<string>(new[] { VariableGroup.Custom }));
                 _visibleGroups.AddRange(new List<string>(new[] { VariableGroup.Custom }));
-                if (!hasGroups)
+                if (!hasGroupsSet)
                     UpdateControlsBasedOnFilters();
 
                 ResumeLayout();
             });
+        }
+
+        public void UpdateSortOption(WatchVariableControl.SortVariables newSortOption)
+        {
+            _shownWatchVarControls = new SortedSet<WatchVariableControl>(new OrderComparer<WatchVariableControl>((a, b) =>
+            {
+                // Hack to allow duplicate entries, will break Remove(key) and IndexOfKey(key)
+                var result = newSortOption(a, b);
+                if (result == 0)
+                    return 1;
+                return result;
+            }));
+            foreach (var shownVar in _allWatchVarControls.Where(_ => ShouldShow(_)))
+                _shownWatchVarControls.Add(shownVar);
         }
 
         private void OnVariableClick(List<WatchVariableControl> watchVars)
@@ -504,7 +524,6 @@ namespace STROOP.Controls
                 };
             }
 
-
             ToolStripMenuItem addRelativeVariablesItem = null, removePointVariableItem = null;
             var getSpecialFuncVars = getSpecialFuncWatchVariables?.Invoke() ?? null;
             var specificsCount = getSpecialFuncVars?.Count() ?? 0;
@@ -635,13 +654,9 @@ namespace STROOP.Controls
             // Toggle visibility if no visibility is provided
             bool newVisibility = newVisibilityNullable ?? !_visibleGroups.Contains(varGroup);
             if (newVisibility) // change to visible
-            {
                 _visibleGroups.Add(varGroup);
-            }
             else // change to hidden
-            {
                 _visibleGroups.Remove(varGroup);
-            }
             UpdateControlsBasedOnFilters();
             UpdateFilterItemCheckedStatuses();
         }
@@ -651,14 +666,14 @@ namespace STROOP.Controls
             if (_allGroups.Count != _filteringDropDownItems.Count) throw new ArgumentOutOfRangeException();
 
             for (int i = 0; i < _allGroups.Count; i++)
-            {
                 _filteringDropDownItems[i].Checked = _visibleGroups.Contains(_allGroups[i]);
-            }
         }
 
         private void UpdateControlsBasedOnFilters()
         {
-            _shownWatchVarControls = _allWatchVarControls.Where(_ => ShouldShow(_)).ToList();
+            _shownWatchVarControls.Clear();
+            foreach (var shownVar in _allWatchVarControls.Where(_ => ShouldShow(_)))
+                _shownWatchVarControls.Add(shownVar);
 
             filterVariablesItem.DropDownItems.Clear();
             _filteringDropDownItems = _allGroups.ConvertAll(varGroup => CreateFilterItem(varGroup));
@@ -706,10 +721,7 @@ namespace STROOP.Controls
             RemoveVariables(watchVarControls);
         }
 
-        public void ShowOnlyVariableGroup(string visibleVarGroup)
-        {
-            ShowOnlyVariableGroups(new List<string>() { visibleVarGroup });
-        }
+        public void ShowOnlyVariableGroup(string visibleVarGroup) => ShowOnlyVariableGroups(new List<string>() { visibleVarGroup });
 
         public void ShowOnlyVariableGroups(List<string> visibleVarGroups)
         {
@@ -755,10 +767,8 @@ namespace STROOP.Controls
             _selectedWatchVarControls.Clear();
         }
 
-        private List<XElement> GetCurrentVarXmlElements(bool useCurrentState = true)
-        {
-            return GetCurrentVariableControls().ConvertAll(control => control.ToXml(useCurrentState));
-        }
+        private List<XElement> GetCurrentVarXmlElements(bool useCurrentState = true) =>
+            GetCurrentVariableControls().ConvertAll(control => control.ToXml(useCurrentState));
 
         public void OpenVariables()
         {
@@ -793,8 +803,7 @@ namespace STROOP.Controls
 
         public void SaveVariables(string fileName = null)
         {
-            DialogUtilities.SaveXmlElements(
-                FileType.StroopVariables, "VarData", GetCurrentVarXmlElements(), fileName);
+            DialogUtilities.SaveXmlElements(FileType.StroopVariables, "VarData", GetCurrentVarXmlElements(), fileName);
         }
 
         public List<WatchVariableControl> GetCurrentVariableControls()
@@ -810,20 +819,13 @@ namespace STROOP.Controls
         }
 
 
-        public List<object> GetCurrentVariableValues(bool useRounding = false, bool handleFormatting = true)
-        {
-            return GetCurrentVariableControls().ConvertAll(control => control.GetValue(useRounding, handleFormatting));
-        }
+        public List<object> GetCurrentVariableValues(bool useRounding = false, bool handleFormatting = true) =>
+            GetCurrentVariableControls().ConvertAll(control => control.GetValue(useRounding, handleFormatting));
 
-        public List<string> GetCurrentVariableNames()
-        {
-            return GetCurrentVariableControls().ConvertAll(control => control.VarName);
-        }
+        public List<string> GetCurrentVariableNames() => GetCurrentVariableControls().ConvertAll(control => control.VarName);
 
-        public List<(string, object)> GetCurrentVariableNamesAndValues(bool useRounding = false, bool handleFormatting = true)
-        {
-            return GetCurrentVariableControls().ConvertAll(control => (control.VarName, control.GetValue(useRounding, handleFormatting)));
-        }
+        public List<(string, object)> GetCurrentVariableNamesAndValues(bool useRounding = false, bool handleFormatting = true) =>
+            GetCurrentVariableControls().ConvertAll(control => (control.VarName, control.GetValue(useRounding, handleFormatting)));
 
         public bool SetVariableValueByName(string name, object value)
         {
@@ -875,7 +877,7 @@ namespace STROOP.Controls
 
         private bool ShouldShow(WatchVariableControl watchVarControl)
         {
-            if (!hasGroups || watchVarControl.alwaysVisible)
+            if (!hasGroupsSet || watchVarControl.alwaysVisible)
                 return true;
             return watchVarControl.BelongsToAnyGroupOrHasNoGroup(_visibleGroups);
         }
@@ -889,15 +891,10 @@ namespace STROOP.Controls
         public void ColorVarsUsingFunction(Func<WatchVariableControl, Color> getColor)
         {
             foreach (WatchVariableControl control in _allWatchVarControls)
-            {
                 control.BaseColor = getColor(control);
-            }
         }
 
-        public int GetAutoHeight(int numColumns = 1)
-        {
-            var num = _shownWatchVarControls.Count;
-            return (num + numColumns - 1) / numColumns * renderer.elementHeight + renderer.borderMargin * 2;
-        }
+        public int GetAutoHeight(int numColumns = 1) =>
+            (_shownWatchVarControls.Count + numColumns - 1) / numColumns * renderer.elementHeight + renderer.borderMargin * 2;
     }
 }

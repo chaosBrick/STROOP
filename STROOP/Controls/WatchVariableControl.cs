@@ -13,14 +13,11 @@ namespace STROOP.Controls
 {
     public partial class WatchVariableControl
     {
-        public readonly WatchVariableWrapper WatchVarWrapper;
-        public readonly List<string> GroupList;
+        public delegate int SortVariables(WatchVariableControl a, WatchVariableControl b);
 
-        public WatchVariable WatchVar => WatchVarWrapper.WatchVar;
-        public WatchVariable.IVariableView view;
-
-        // Parent control
-        private readonly WatchVariablePanel containingPanel;
+        public static SortVariables SortNone = (a, b) => 0;
+        public static SortVariables SortByPriority = (a, b) => b.WatchVar.view.DislpayPriority.CompareTo(a.WatchVar.view.DislpayPriority);
+        public static SortVariables SortByName = (a, b) => a.VarName.CompareTo(b.VarName);
 
         public static readonly Color DEFAULT_COLOR = SystemColors.Control;
         public static readonly Color FAILURE_COLOR = Color.Red;
@@ -29,6 +26,15 @@ namespace STROOP.Controls
         public static readonly Color ADD_TO_VAR_HACK_TAB_COLOR = Color.SandyBrown;
         public static readonly Color SELECTED_COLOR = Color.FromArgb(51, 153, 255);
         private static readonly int FLASH_DURATION_MS = 1000;
+
+        public readonly WatchVariableWrapper WatchVarWrapper;
+        public readonly List<string> GroupList;
+
+        public WatchVariable WatchVar => WatchVarWrapper.WatchVar;
+        public WatchVariable.IVariableView view;
+
+        // Parent control
+        public readonly WatchVariablePanel containingPanel;
 
         private readonly Color _initialBaseColor;
         private Color _baseColor;
@@ -53,7 +59,8 @@ namespace STROOP.Controls
 
         public bool alwaysVisible;
 
-        public bool IsSelected { get; set; }
+        bool _isSelected;
+        public bool IsSelected { get { return _isSelected && containingPanel.IsSelected; } set { _isSelected = value; } }
 
         private Func<List<uint>> _defaultFixedAddressListGetter;
         public Func<List<uint>> FixedAddressListGetter;
@@ -130,7 +137,7 @@ namespace STROOP.Controls
             }
             ctx.Show(System.Windows.Forms.Cursor.Position);
         }
-        
+
         public void UpdateControl()
         {
             WatchVarWrapper.UpdateItemCheckStates();
@@ -145,10 +152,7 @@ namespace STROOP.Controls
                 DateTime currentTime = DateTime.Now;
                 double timeSinceFlashStart = currentTime.Subtract(_flashStartTime).TotalMilliseconds;
                 if (timeSinceFlashStart < FLASH_DURATION_MS)
-                {
-                    currentColor = ColorUtilities.InterpolateColor(
-                        _flashColor, selectedOrBaseColor, timeSinceFlashStart / FLASH_DURATION_MS);
-                }
+                    currentColor = ColorUtilities.InterpolateColor(_flashColor, selectedOrBaseColor, timeSinceFlashStart / FLASH_DURATION_MS);
                 else
                 {
                     currentColor = selectedOrBaseColor;
@@ -156,9 +160,7 @@ namespace STROOP.Controls
                 }
             }
             else
-            {
                 currentColor = selectedOrBaseColor;
-            }
         }
 
         public void FlashColor(Color color)
@@ -307,7 +309,7 @@ namespace STROOP.Controls
         public List<string> GetVarInfo() => WatchVarWrapper.GetVarInfo();
 
         public List<Func<object, bool>> GetSetters() => WatchVarWrapper.GetSetters(FixedAddressListGetter());
-        
+
         public override string ToString() => WatchVarWrapper.ToString();
     }
 }
