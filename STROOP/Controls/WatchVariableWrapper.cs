@@ -59,6 +59,7 @@ namespace STROOP.Controls
         protected readonly WatchVariableControl _watchVarControl;
 
         public virtual WatchVariablePanel.CustomDraw CustomDrawOperation => null;
+        public virtual bool DoubleClickToEdit => true;
 
         protected WatchVariableWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl)
         {

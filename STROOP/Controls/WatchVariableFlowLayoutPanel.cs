@@ -202,9 +202,17 @@ namespace STROOP.Controls
                         if (clickedName)
                             selected.WatchVarWrapper.ShowVarInfo();
                         else if (lastClicked != -1)
-                            selected.WatchVarWrapper.Edit(renderer, renderer.GetVariableControlBounds(lastClicked));
+                            if (selected.WatchVarWrapper.DoubleClickToEdit)
+                                selected.WatchVarWrapper.Edit(renderer, renderer.GetVariableControlBounds(lastClicked));
                         break;
                     }
+                };
+                renderer.Click += (_, __) =>
+                {
+                    if (lastClicked != -1)
+                        foreach (var selected in _selectedWatchVarControls)
+                            if (!selected.WatchVarWrapper.DoubleClickToEdit)
+                                selected.WatchVarWrapper.Edit(renderer, renderer.GetVariableControlBounds(lastClicked));
                 };
                 renderer.MouseDown += (_, __) =>
                 {

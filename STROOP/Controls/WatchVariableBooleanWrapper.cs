@@ -22,6 +22,8 @@ namespace STROOP.Controls
             ("Don't display as Inverted", () => false, WrapperProperty<WatchVariableBooleanWrapper>(wr => !wr._displayAsInverted))
             );
 
+        public override bool DoubleClickToEdit => !_displayAsCheckbox;
+
         private bool _displayAsCheckbox;
         private bool _displayAsInverted;
 
