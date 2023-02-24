@@ -58,6 +58,7 @@ namespace STROOP
             bool SetValueByKey(string key, object value);
             string GetValueByKey(string key);
             Type GetWrapperType();
+            int DislpayPriority { get; }
         }
 
         public class CustomView : IVariableView
@@ -68,6 +69,10 @@ namespace STROOP
             public SetterFunction _setterFunction { get; set; }
             public string Color { set { SetValueByKey(ViewProperties.color, value); } }
             public string Display { set { SetValueByKey(ViewProperties.display, value); } }
+            public int DislpayPriority { get; }
+
+            public CustomView() : this(0) { }
+            public CustomView(int displayPriority) { this.DislpayPriority = displayPriority; }
 
             Dictionary<string, string> keyedValues = new Dictionary<string, string>();
             public CustomView(Type wrapperType) { this.wrapperType = wrapperType; }
@@ -89,15 +94,14 @@ namespace STROOP
         public class XmlView : IVariableView
         {
             public Action OnDelete { get; set; }
+            public string Name { get; private set; }
+            public GetterFunction _getterFunction { get; private set; }
+            public SetterFunction _setterFunction { get; private set; }
+            int IVariableView.DislpayPriority => 0;
+
             readonly WatchVariable watchVariable;
             readonly string wrapper;
             readonly XElement xElement;
-            public string Name { get; private set; }
-
-            public XElement GetXml() => xElement;
-
-            public GetterFunction _getterFunction { get; private set; }
-            public SetterFunction _setterFunction { get; private set; }
 
             public XmlView(WatchVariable watchVariable, XElement element)
             {
@@ -130,6 +134,8 @@ namespace STROOP
                 xElement.SetAttributeValue(XName.Get(key), value.ToString());
                 return true;
             }
+
+            public XElement GetXml() => xElement;
         }
 
         public static IVariableView DefaultView(string name, bool isAbsolute, Type effectiveType, int mask = ~0, int shift = ~0)
