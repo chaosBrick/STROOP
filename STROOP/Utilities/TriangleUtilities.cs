@@ -360,25 +360,60 @@ namespace STROOP.Utilities
             return null;
         }
 
+        static string TriangleSourcesToJsonString<T>(IEnumerable<T> triangleSources, Func<T, TriangleDataModel> sourceToTriangle)
+        {
+            var strBuilder = new StringBuilder();
+            strBuilder.AppendLine("\n\t[");
+
+            int longestX = 0, longestY = 0, longestZ = 0, longestType = 0;
+            void UpdateLongest(ref int longestValue, int newValue) { longestValue = Math.Max(longestValue, newValue.ToString().Length); };
+            string PadNumber(int longest, int number)
+            {
+                var strA = number.ToString();
+                return new string(' ', longest - strA.Length) + strA;
+            }
+            foreach (var triSource in triangleSources)
+            {
+                var tri = sourceToTriangle(triSource);
+                UpdateLongest(ref longestX, tri.X1);
+                UpdateLongest(ref longestX, tri.X2);
+                UpdateLongest(ref longestX, tri.X3);
+                UpdateLongest(ref longestY, tri.Y1);
+                UpdateLongest(ref longestY, tri.Y2);
+                UpdateLongest(ref longestY, tri.Y3);
+                UpdateLongest(ref longestZ, tri.Z1);
+                UpdateLongest(ref longestZ, tri.Z2);
+                UpdateLongest(ref longestZ, tri.Z3);
+                UpdateLongest(ref longestType, tri.SurfaceType);
+            }
+
+            foreach (var triSource in triangleSources)
+            {
+                var tri = sourceToTriangle(triSource);
+                strBuilder.Append($"\t\t[{PadNumber(longestX, tri.X1)}, {PadNumber(longestY, tri.Y1)}, {PadNumber(longestZ, tri.Z1)},");
+                strBuilder.Append($" {PadNumber(longestX, tri.X2)}, {PadNumber(longestY, tri.Y2)}, {PadNumber(longestZ, tri.Z2)},");
+                strBuilder.Append($" {PadNumber(longestX, tri.X3)}, {PadNumber(longestY, tri.Y3)}, {PadNumber(longestZ, tri.Z3)},");
+                strBuilder.Append($" {PadNumber(longestType, tri.SurfaceType)}]");
+                strBuilder.AppendLine(",");
+            }
+            var removeEnd = $",{Environment.NewLine}";
+            strBuilder.Remove(strBuilder.Length - removeEnd.Length, removeEnd.Length);
+            strBuilder.Append("\n\t]");
+            return strBuilder.ToString();
+        }
+
         public static string ToJsonString(IEnumerable<uint> triangleAddresses)
         {
             var triangleAddressList = triangleAddresses.ToList();
             triangleAddressList.Sort((a, b) => (int)((long)a - b));
-            var strBuilder = new StringBuilder();
-            strBuilder.AppendLine("\n\t[");
-            int i = 0;
-            foreach (var addr in triangleAddressList)
-            {
-                var tri = Models.TriangleDataModel.Create(addr);
-                strBuilder.Append($"\t\t[{tri.X1},\t{tri.Y1},\t{tri.Z1},");
-                strBuilder.Append($"\t{tri.X2},\t{tri.Y2},\t{tri.Z2},");
-                strBuilder.Append($"\t{tri.X3},\t{tri.Y3},\t{tri.Z3},");
-                strBuilder.Append($"\t{tri.SurfaceType}]");
-                if (++i < triangleAddressList.Count)
-                    strBuilder.AppendLine(",");
-            }
-            strBuilder.Append("\n\t]");
-            return strBuilder.ToString();
+            return TriangleSourcesToJsonString(triangleAddresses, addr => TriangleDataModel.Create(addr));
+        }
+
+        public static string ToJsonString(IEnumerable<TriangleDataModel> triangles)
+        {
+            var lst = triangles.ToList();
+            lst.Sort((a, b) => (int)((long)a.Address - b.Address));
+            return TriangleSourcesToJsonString(lst, t => t);
         }
     }
 }
