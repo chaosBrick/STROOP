@@ -92,20 +92,18 @@ namespace STROOP.Controls
                         textBox.Parent.Focus();
                     }
                 };
-                EventHandler asf = null;
-                asf = (_, e) =>
+                EventHandler HandleLostFocus = null;
+                HandleLostFocus = (_, e) =>
                 {
                     if (updateValue)
                         SetValue(textBox.Text);
-                    textBox.Parent.LostFocus -= asf;
+                    textBox.LostFocus -= HandleLostFocus;
                     textBox.Parent.Controls.Remove(textBox);
                     textBox.Dispose();
                 };
 
-                textBox.LostFocus += asf;
-
+                textBox.LostFocus += HandleLostFocus;
                 parent.Controls.Add(textBox);
-                textBox.Parent.LostFocus += asf;
                 textBox.Focus();
             }
         }
