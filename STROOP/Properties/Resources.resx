@@ -238,4 +238,10 @@
   <data name="checkbox_unchecked" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\EmbeddedResources\checkbox-unchecked.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="dropdown_box" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\EmbeddedResources\dropdown-box.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="dropdown_box_hover" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\EmbeddedResources\dropdown-box-hover.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

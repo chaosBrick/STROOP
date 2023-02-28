@@ -199,6 +199,7 @@
     <Compile Include="Controls\WatchVariablePanelRenderer.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Controls\WatchVariableSelectionWrapper.cs" />
     <Compile Include="Controls\WatchVariableSetting.cs" />
     <Compile Include="Controls\WatchVariableTriangleWrapper.cs" />
     <Compile Include="Controls\WatchVariableStringWrapper.cs" />
@@ -1473,6 +1474,8 @@
     <None Include="EmbeddedResources\checkbox-checked.png" />
     <None Include="EmbeddedResources\checkbox-indeterminate.png" />
     <None Include="EmbeddedResources\checkbox-unchecked.png" />
+    <None Include="EmbeddedResources\dropdown-box-hover.png" />
+    <None Include="EmbeddedResources\dropdown-box.png" />
     <Content Include="icon.ico" />
     <Content Include="Licenses.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

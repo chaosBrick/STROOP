@@ -123,6 +123,26 @@ namespace STROOP.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap dropdown_box {
+            get {
+                object obj = ResourceManager.GetObject("dropdown_box", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap dropdown_box_hover {
+            get {
+                object obj = ResourceManager.GetObject("dropdown_box_hover", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap image_clockwise {
             get {
                 object obj = ResourceManager.GetObject("image_clockwise", resourceCulture);
