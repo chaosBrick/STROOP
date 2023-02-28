@@ -95,7 +95,7 @@ namespace STROOP.Controls
         public bool IsSelected => activePanel == this;
 
         private List<WatchVariableControl> _allWatchVarControls;
-        private SortedSet<WatchVariableControl> _shownWatchVarControls;
+        private SortedList<WatchVariableControl> _shownWatchVarControls;
         private List<WatchVariableControl> _hiddenSearchResults = new List<WatchVariableControl>();
         private List<string> _allGroups;
         private List<string> _initialVisibleGroups;
@@ -314,14 +314,7 @@ namespace STROOP.Controls
 
         public void UpdateSortOption(WatchVariableControl.SortVariables newSortOption)
         {
-            _shownWatchVarControls = new SortedSet<WatchVariableControl>(new OrderComparer<WatchVariableControl>((a, b) =>
-            {
-                // Hack to allow duplicate entries, will break Remove(key) and IndexOfKey(key)
-                var result = newSortOption(a, b);
-                if (result == 0)
-                    return 1;
-                return result;
-            }));
+            _shownWatchVarControls = new SortedList<WatchVariableControl>((a, b) => newSortOption(a, b));
             foreach (var shownVar in _allWatchVarControls.Where(_ => ShouldShow(_)))
                 _shownWatchVarControls.Add(shownVar);
         }
@@ -856,7 +849,7 @@ namespace STROOP.Controls
             var searchForm = (FindForm() as StroopMainForm)?.searchVariableDialog ?? null;
             _hiddenSearchResults.Clear();
             var shownVars = new HashSet<WatchVariableControl>(_shownWatchVarControls);
-            var removeLater = new List<WatchVariableControl>();
+            var removeLater = new HashSet<WatchVariableControl>();
             foreach (var v in _allWatchVarControls)
             {
                 if (!shownVars.Contains(v))
@@ -869,8 +862,8 @@ namespace STROOP.Controls
                 else if (!ShouldShow(v))
                     removeLater.Add(v);
             }
-            foreach (var r in removeLater)
-                _shownWatchVarControls.Remove(r);
+            foreach (var toBeRemoved in removeLater)
+                _shownWatchVarControls.Remove(toBeRemoved);
             GetCurrentVariableControls().ForEach(watchVarControl => watchVarControl.UpdateControl());
             renderer.Draw();
         }
