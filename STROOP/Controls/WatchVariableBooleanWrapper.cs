@@ -1,6 +1,7 @@
 ﻿using STROOP.Utilities;
 using System.Windows.Forms;
 using System.Drawing;
+using System;
 
 namespace STROOP.Controls
 {
@@ -46,6 +47,12 @@ namespace STROOP.Controls
         }
 
         public override WatchVariablePanel.CustomDraw CustomDrawOperation => _displayAsCheckbox ? DrawCheckbox : (WatchVariablePanel.CustomDraw)null;
+
+        protected override void HandleVerification(object value)
+        {
+            if (!typeof(bool).IsAssignableFrom(value.GetType())&& !STROOP.Structs.TypeUtilities.IsNumber(value))
+                throw new ArgumentOutOfRangeException(value + " is not a boolean value");
+        }
 
         public override void Edit(Control parent, Rectangle bounds)
         {
