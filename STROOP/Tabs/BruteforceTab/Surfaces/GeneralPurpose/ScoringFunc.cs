@@ -10,13 +10,13 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
 {
     public partial class ScoringFunc : UserControl
     {
-        static Dictionary<string, Type> baueMirWas = new Dictionary<string, Type>();
+        static Dictionary<string, Type> stringToControllerType = new Dictionary<string, Type>();
         static ScoringFunc()
         {
             foreach (var t in typeof(ScoringFunc).Assembly.GetTypes())
                 if (t.GetInterfaces().Any(i => i.FullName == typeof(IMethodController).FullName))
                     if (t.GetConstructor(new Type[0]) != null)
-                        baueMirWas[t.Name] = t;
+                        stringToControllerType[t.Name] = t;
         }
 
         static (int x, int y) GetChildBounds(Control parent)
@@ -31,56 +31,59 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
         }
 
         bool expanded = false;
-        int panelControllersHeightMargin;
-        int hiddenBottom;
-        GeneralPurpose.ScoringFuncPrecursor ding;
+        int collapsedHeight;
+        GeneralPurpose.ScoringFuncPrecursor precursor;
 
         public ScoringFunc()
         {
             InitializeComponent();
             BackColor = Color.AliceBlue;
-            groupBoxControllers.BackColor = Color.Transparent;
-            panelControllersHeightMargin = groupBoxControllers.Height - panelControllers.Height;
-            hiddenBottom = groupBoxControllers.Height;
 
             Controls.Remove(watchVariablePanelParameters);
             RecalculateSize();
+            collapsedHeight = Height;
         }
 
-        public void Init(GeneralPurpose.ScoringFuncPrecursor ding)
+        public void Init(GeneralPurpose.ScoringFuncPrecursor precursor, Action UpdateStateFunc)
         {
-            this.ding = ding;
+            this.precursor = precursor;
             watchVariablePanelParameters.ClearVariables();
-            labelName.Text = ding.name;
+            labelName.Text = precursor.name;
             variablePanelBaseValues.AddVariables(
                 new WatchVariable.IVariableView[] {
                     new WatchVariable.CustomView(typeof(Controls.WatchVariableNumberWrapper))
                     {
                         Name = "weight",
-                        _getterFunction = (_) => ding.weight,
-                        _setterFunction = (value, addr) => { ding.weight = Convert.ToDouble(value); return true; }
+                        _getterFunction = (_) => precursor.weight,
+                        _setterFunction = (value, addr) => { precursor.weight = Convert.ToDouble(value); return true; }
                     },
                     new WatchVariable.CustomView(typeof(Controls.WatchVariableNumberWrapper))
                     {
                         Name = "frame",
-                        _getterFunction = (_) => ding.frame,
-                        _setterFunction = (value, addr) => { ding.frame = Convert.ToUInt32(value); return true; }
+                        _getterFunction = (_) => precursor.frame,
+                        _setterFunction = (value, addr) => { precursor.frame = Convert.ToUInt32(value); return true; }
                     }
                     }.Select(_ => (new WatchVariable(_), _))
                 );
             var ctrls = watchVariablePanelParameters.AddVariables(
-                ding.parameters.Select(kvp =>
+                precursor.parameterDefinitions.Select(kvp =>
                 {
-                    object o = 0;
+                    string key = kvp.Key.name;
+                    var backingType = BruteforceTab.backingTypes[kvp.Value];
+                    if (precursor.parameterValues.TryGetValue(key, out var uncastedValue))
+                        precursor.parameterValues[key] = Convert.ChangeType(uncastedValue, backingType);
+                    else
+                        precursor.parameterValues[key] = Activator.CreateInstance(backingType);
                     var newWatchVar = new WatchVariable(new WatchVariable.CustomView(BruteforceTab.wrapperTypes[kvp.Value])
                     {
                         Name = kvp.Key.name,
-                        _getterFunction = _ => o,
-                        _setterFunction = (value, _) => { o = value; return true; }
-                    });
+                        _getterFunction = _ => precursor.parameterValues[key],
+                        _setterFunction = (value, _) => { precursor.parameterValues[key] = value; return true; }
+                    }, backingType);
+                    newWatchVar.ValueSet += UpdateStateFunc;
                     return (newWatchVar, newWatchVar.view);
                 }));
-            if (baueMirWas.TryGetValue(ding.name, out var controllerType))
+            if (stringToControllerType.TryGetValue(precursor.name, out var controllerType))
             {
                 var ctrl = (IMethodController)Activator.CreateInstance(controllerType);
                 ctrl.SetTargetFunc(this);
@@ -103,11 +106,9 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             {
                 pbExpand.Image = Properties.Resources.image_down;
                 Controls.Add(watchVariablePanelParameters);
-                var (x, y) = GetChildBounds(panelControllers);
-                groupBoxControllers.Height = Math.Max(hiddenBottom, y + panelControllersHeightMargin);
 
                 watchVariablePanelParameters.Height = watchVariablePanelParameters.GetAutoHeight();
-                watchVariablePanelParameters.Top = groupBoxControllers.Bottom + groupBoxControllers.Margin.Bottom + watchVariablePanelParameters.Margin.Top;
+                watchVariablePanelParameters.Top = collapsedHeight + watchVariablePanelParameters.Margin.Top;
                 var bottom = watchVariablePanelParameters.Bottom + watchVariablePanelParameters.Margin.Bottom;
                 Height = bottom;
             }
@@ -115,20 +116,11 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             {
                 pbExpand.Image = pbExpand.InitialImage;
                 Controls.Remove(watchVariablePanelParameters);
-                groupBoxControllers.Height = hiddenBottom;
-                var bottom = groupBoxControllers.Bottom + groupBoxControllers.Margin.Bottom;
-                Height = bottom;
+                Height = collapsedHeight;
             }
             watchVariablePanelParameters.Anchor |= AnchorStyles.Bottom;
             watchVariablePanelParameters.Anchor &= ~AnchorStyles.Top;
             ResumeLayout();
-        }
-
-        private void pbExpand_Click(object sender, EventArgs e) => SetExpanded(!expanded);
-
-        private void pbRemove_Click(object sender, EventArgs e)
-        {
-            this.GetParent<GeneralPurpose>().RemoveMethod(this);
         }
 
         public string GetJson()
@@ -139,21 +131,25 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             var strBuilder = new StringBuilder();
 
             strBuilder.AppendLine($"{tabs0}{{");
-            strBuilder.AppendLine($"{tabs1}\"func\": \"{ding.name}\",");
-            strBuilder.AppendLine($"{tabs1}\"weight\": {ding.weight},");
-            strBuilder.AppendLine($"{tabs1}\"frame\": {ding.frame},");
+            strBuilder.AppendLine($"{tabs1}\"func\": \"{precursor.name}\",");
+            strBuilder.AppendLine($"{tabs1}\"weight\": {precursor.weight},");
+            strBuilder.AppendLine($"{tabs1}\"frame\": {precursor.frame},");
             strBuilder.AppendLine($"{tabs1}\"params\": {{");
             var first = true;
-            foreach (var kdsaaaaaa in watchVariablePanelParameters.GetCurrentVariableNamesAndValues())
+            foreach (var parameterValue in precursor.parameterValues)
             {
                 if (!first)
                     strBuilder.AppendLine(",");
                 first = false;
-                strBuilder.Append($"{tabs2}\"{kdsaaaaaa.Item1}\": {StringUtilities.MakeJsonValue(kdsaaaaaa.Item2.ToString())}");
+                strBuilder.Append($"{tabs2}\"{parameterValue.Key}\": {StringUtilities.MakeJsonValue(parameterValue.Value.ToString())}");
             }
             strBuilder.AppendLine($"\n{tabs1}}}");
             strBuilder.Append($"{tabs0}}}");
             return strBuilder.ToString();
         }
+
+        private void pbExpand_Click(object sender, EventArgs e) => SetExpanded(!expanded);
+
+        private void pbRemove_Click(object sender, EventArgs e) => this.GetParent<GeneralPurpose>().RemoveMethod(this);
     }
 }

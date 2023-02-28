@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Globalization;
+using STROOP.Controls;
 
 namespace STROOP.Utilities
 {
@@ -70,6 +72,28 @@ namespace STROOP.Utilities
             if (!needsJsonStringEscapeRegex.IsMatch(input))
                 return $"\"{input}\"";
             return input;
+        }
+
+        public static object GetJsonValue(Type variableWrapperType, string valueString)
+        {
+            var str = valueString.Trim('"');
+            double numberValue = 0;
+            if (variableWrapperType != typeof(WatchVariableStringWrapper))
+            {
+                bool set = true;
+                if (str.StartsWith("0x"))
+                {
+                    if (set = long.TryParse(str.Substring(2, str.Length - 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var hexValue))
+                        numberValue = hexValue;
+                }
+                else
+                    set = double.TryParse(str, out numberValue);
+                if (set)
+                    return numberValue;
+            }
+            else
+                return valueString;
+            return 0;
         }
     }
 }

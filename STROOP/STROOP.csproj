@@ -408,6 +408,12 @@
     </Compile>
     <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\IMethodController.cs" />
     <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\MethodControllers\RestrictHPosition.cs" />
+    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\Perturbator.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\Perturbator.Designer.cs">
+      <DependentUpon>Perturbator.cs</DependentUpon>
+    </Compile>
     <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\ScoringFunc.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -1001,6 +1007,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\GeneralPurpose.resx">
       <DependentUpon>GeneralPurpose.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\Perturbator.resx">
+      <DependentUpon>Perturbator.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\ScoringFunc.resx">
       <DependentUpon>ScoringFunc.cs</DependentUpon>

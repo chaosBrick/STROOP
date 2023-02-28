@@ -59,9 +59,11 @@
             // 
             // txtJsonOutput
             // 
+            this.txtJsonOutput.AcceptsTab = true;
             this.txtJsonOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtJsonOutput.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtJsonOutput.Location = new System.Drawing.Point(3, 173);
             this.txtJsonOutput.Name = "txtJsonOutput";
             this.txtJsonOutput.Size = new System.Drawing.Size(525, 258);
@@ -74,6 +76,8 @@
             | System.Windows.Forms.AnchorStyles.Left)));
             this.watchVariablePanelParams.AutoScroll = true;
             this.watchVariablePanelParams.DataPath = null;
+            this.watchVariablePanelParams.elementNameWidth = null;
+            this.watchVariablePanelParams.elementValueWidth = 130;
             this.watchVariablePanelParams.Location = new System.Drawing.Point(100, 24);
             this.watchVariablePanelParams.Name = "watchVariablePanelParams";
             this.watchVariablePanelParams.Size = new System.Drawing.Size(267, 436);
@@ -121,9 +125,11 @@
             // 
             // txtManualConfig
             // 
+            this.txtManualConfig.AcceptsTab = true;
             this.txtManualConfig.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtManualConfig.Font = new System.Drawing.Font("Courier New", 8.25F);
             this.txtManualConfig.Location = new System.Drawing.Point(6, 20);
             this.txtManualConfig.Name = "txtManualConfig";
             this.txtManualConfig.Size = new System.Drawing.Size(522, 134);

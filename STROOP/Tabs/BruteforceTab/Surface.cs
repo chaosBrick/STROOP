@@ -12,7 +12,7 @@ namespace STROOP.Tabs.BruteforceTab
 
     public class Surface : UserControl
     {
-        protected BruteforceTab SCHNITZEL => this.GetParent<BruteforceTab>();
+        protected BruteforceTab parentTab => this.GetParent<BruteforceTab>();
 
         protected Surface()
         {
@@ -28,5 +28,7 @@ namespace STROOP.Tabs.BruteforceTab
         }
 
         public virtual string GetParameter(string parameterName) => "";
+
+        public virtual void InitJson() { }
     }
 }

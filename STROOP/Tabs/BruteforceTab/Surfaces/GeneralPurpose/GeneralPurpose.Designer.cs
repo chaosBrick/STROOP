@@ -28,8 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.flowPanelScoring = new System.Windows.Forms.FlowLayoutPanel();
+            this.flowPanelScoring = new STROOP.Controls.ReorderFlowLayoutPanel();
             this.btnAddMethod = new System.Windows.Forms.Button();
+            this.btnAddPerturbator = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // flowPanelScoring
@@ -38,6 +39,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.flowPanelScoring.AutoScroll = true;
+            this.flowPanelScoring.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.flowPanelScoring.Location = new System.Drawing.Point(133, 3);
             this.flowPanelScoring.Name = "flowPanelScoring";
             this.flowPanelScoring.Size = new System.Drawing.Size(639, 394);
@@ -53,10 +55,21 @@
             this.btnAddMethod.UseVisualStyleBackColor = true;
             this.btnAddMethod.Click += new System.EventHandler(this.btnAddMethod_Click);
             // 
+            // btnAddPerturbator
+            // 
+            this.btnAddPerturbator.Location = new System.Drawing.Point(3, 32);
+            this.btnAddPerturbator.Name = "btnAddPerturbator";
+            this.btnAddPerturbator.Size = new System.Drawing.Size(124, 23);
+            this.btnAddPerturbator.TabIndex = 2;
+            this.btnAddPerturbator.Text = "Add Perturbator";
+            this.btnAddPerturbator.UseVisualStyleBackColor = true;
+            this.btnAddPerturbator.Click += new System.EventHandler(this.btnAddPerturbator_Click);
+            // 
             // GeneralPurpose
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.btnAddPerturbator);
             this.Controls.Add(this.flowPanelScoring);
             this.Controls.Add(this.btnAddMethod);
             this.Name = "GeneralPurpose";
@@ -67,7 +80,8 @@
 
         #endregion
 
-        private System.Windows.Forms.FlowLayoutPanel flowPanelScoring;
+        private STROOP.Controls.ReorderFlowLayoutPanel flowPanelScoring;
         private System.Windows.Forms.Button btnAddMethod;
+        private System.Windows.Forms.Button btnAddPerturbator;
     }
 }

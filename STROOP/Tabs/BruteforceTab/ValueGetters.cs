@@ -14,7 +14,7 @@ namespace STROOP.Tabs.BruteforceTab
     {
         public class GetterFuncs
         {
-            public readonly Dictionary<string, Func<(string, Func<string, string>)>> dic;
+            public readonly GetterFuncsDic dic;
             public GetterFuncs(string displayName, GetterFuncsDic dic) { this.displayName = displayName; this.dic = dic; }
             public string displayName;
         }
@@ -34,6 +34,8 @@ namespace STROOP.Tabs.BruteforceTab
                     ["All Level Triangles"] = () => ("All Level Triangles", GetLevelTriangles)
                 }),
 
+                [(null, "dynamic_tris")] = GetDynamicTriangles,
+
                 [(null, "environment_regions")] = new GetterFuncs("Environment Boxes", new GetterFuncsDic
                 {
                     ["From Area"] = () => ("From Area", GetEnvironmentRegions)
@@ -45,10 +47,11 @@ namespace STROOP.Tabs.BruteforceTab
                 [("fp_gwk", "gwk_angle")] = GetFPGwkVars,
 
                 [("general_purpose", "scoring_methods")] = GetSurfaceVars,
+                [("general_purpose", "perturbators")] = GetSurfaceVars,
             };
         }
 
-        static GetterFuncs GetSurfaceVars = new GetterFuncs(null, new GetterFuncsDic { ["From Surface"] = () => ("From Surface", GetScoringFuncs )});
+        static GetterFuncs GetSurfaceVars = new GetterFuncs(null, new GetterFuncsDic { ["From Surface"] = () => ("From Surface", GetScoringFuncs) });
 
         static string GetScoringFuncs(string inputName) => AccessScope<BruteforceTab>.content.surface?.GetParameter(inputName) ?? "\"\"";
 
@@ -80,6 +83,24 @@ namespace STROOP.Tabs.BruteforceTab
         }
 
         static string GetLevelTriangles(string inputName) => TriangleUtilities.ToJsonString(TriangleUtilities.GetLevelTriangleAddresses());
+
+        static GetterFuncs GetDynamicTriangles = new GetterFuncs("Dynamic Triangles", new GetterFuncsDic
+        {
+            ["From Objects..."] = () =>
+            {
+                var slots = ParsingUtilities.ParseIntList(DialogUtilities.GetStringFromDialog(labelText: "Enter the object slot numbers:"));
+                return (
+                    $"Slots [{string.Concat(slots.Where((int? slot) => slot != null).Select(slot => slot.Value.ToString() + ";").ToArray())}]",
+                    var =>
+                    {
+                        var triangles = new List<Models.TriangleDataModel>();
+                        foreach (var slot in slots)
+                            triangles.AddRange(new MapTab.DataUtil.ObjectTrianglePrediction(() => new PositionAngle[] { Config.ObjectSlotsManager.ObjectSlots[slot.Value - 1].CurrentObject }, _ => true).GetTriangles());
+                        return TriangleUtilities.ToJsonString(triangles);
+                    }
+                );
+            }
+        });
 
         static GetterFuncs GetFPGwkVars = new GetterFuncs("Gwk Triangle", new GetterFuncsDic
         {

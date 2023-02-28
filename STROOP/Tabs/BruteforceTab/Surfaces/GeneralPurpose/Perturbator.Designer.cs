@@ -1,6 +1,6 @@
 ﻿namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
 {
-    partial class ScoringFunc
+    partial class Perturbator
     {
         /// <summary> 
         /// Erforderliche Designervariable.
@@ -31,7 +31,6 @@
             this.pbExpand = new System.Windows.Forms.PictureBox();
             this.pbRemove = new System.Windows.Forms.PictureBox();
             this.labelName = new System.Windows.Forms.Label();
-            this.variablePanelBaseValues = new STROOP.Controls.WatchVariablePanel();
             this.watchVariablePanelParameters = new STROOP.Controls.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.pbExpand)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbRemove)).BeginInit();
@@ -66,21 +65,9 @@
             this.labelName.AutoSize = true;
             this.labelName.Location = new System.Drawing.Point(3, 3);
             this.labelName.Name = "labelName";
-            this.labelName.Size = new System.Drawing.Size(79, 13);
+            this.labelName.Size = new System.Drawing.Size(59, 13);
             this.labelName.TabIndex = 3;
-            this.labelName.Text = "Function Name";
-            // 
-            // variablePanelBaseValues
-            // 
-            this.variablePanelBaseValues.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.variablePanelBaseValues.AutoScroll = true;
-            this.variablePanelBaseValues.DataPath = null;
-            this.variablePanelBaseValues.elementNameWidth = 40;
-            this.variablePanelBaseValues.elementValueWidth = 50;
-            this.variablePanelBaseValues.Location = new System.Drawing.Point(125, 0);
-            this.variablePanelBaseValues.Name = "variablePanelBaseValues";
-            this.variablePanelBaseValues.Size = new System.Drawing.Size(188, 21);
-            this.variablePanelBaseValues.TabIndex = 0;
+            this.labelName.Text = "Perturbator";
             // 
             // watchVariablePanelParameters
             // 
@@ -94,17 +81,16 @@
             this.watchVariablePanelParameters.Size = new System.Drawing.Size(366, 224);
             this.watchVariablePanelParameters.TabIndex = 2;
             // 
-            // ScoringFunc
+            // Perturbator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.variablePanelBaseValues);
             this.Controls.Add(this.pbRemove);
             this.Controls.Add(this.pbExpand);
             this.Controls.Add(this.labelName);
             this.Controls.Add(this.watchVariablePanelParameters);
             this.Margin = new System.Windows.Forms.Padding(0);
-            this.Name = "ScoringFunc";
+            this.Name = "Perturbator";
             this.Size = new System.Drawing.Size(366, 243);
             ((System.ComponentModel.ISupportInitialize)(this.pbExpand)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbRemove)).EndInit();
@@ -119,6 +105,5 @@
         private System.Windows.Forms.PictureBox pbRemove;
         private System.Windows.Forms.Label labelName;
         public Controls.WatchVariablePanel watchVariablePanelParameters;
-        private Controls.WatchVariablePanel variablePanelBaseValues;
     }
 }

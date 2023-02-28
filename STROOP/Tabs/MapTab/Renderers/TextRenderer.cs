@@ -86,8 +86,6 @@ namespace STROOP.Tabs.MapTab.Renderers
                         knack *= graphics.ViewMatrix;
                     else
                         primitive.primitive.Options.LockToPixel = true;
-                    if (graphics.view.mode == MapView.ViewMode.TopDown)
-                        knack = Matrix4.CreateScale(1, -1, 1) * knack;
                     primitive.primitive.ModelViewMatrix = knack;
                     drawing.DrawingPrimitives.Add(primitive.primitive);
                 }

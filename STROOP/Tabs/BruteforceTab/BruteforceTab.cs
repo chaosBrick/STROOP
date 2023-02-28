@@ -7,6 +7,7 @@ using System.Linq;
 using STROOP.Controls;
 using System.Diagnostics;
 using System.Xml.Linq;
+using System.Globalization;
 
 using AutomaticParameterGetters = System.Collections.Generic.Dictionary<STROOP.Tabs.BruteforceTab.ValueGetters.GetterFuncs, System.Collections.Generic.HashSet<string>>;
 
@@ -16,10 +17,8 @@ namespace STROOP.Tabs.BruteforceTab
     {
         static string BRUTEFORCER_PATH = "Bruteforcers";
         static readonly string[] variableSourceFiles = { "MarioData.xml", "CameraData.xml", "ActionsData.xml" };
-        static Dictionary<string, Func<string>> jsonTexts = new Dictionary<string, Func<string>>();
-        static Dictionary<string, string> variableKeepTexts = new Dictionary<string, string>();
-        static IEnumerable<(Type type, SurfaceAttribute attribute)> funkyTypes;
-        public static Dictionary<string, Type> wrapperTypes = new Dictionary<string, Type>()
+        static IEnumerable<(Type type, SurfaceAttribute attribute)> moduleTypes;
+        public static readonly Dictionary<string, Type> wrapperTypes = new Dictionary<string, Type>()
         {
             ["u32"] = typeof(WatchVariableNumberWrapper),
             ["s32"] = typeof(WatchVariableNumberWrapper),
@@ -31,6 +30,20 @@ namespace STROOP.Tabs.BruteforceTab
             ["f64"] = typeof(WatchVariableNumberWrapper),
             ["string"] = typeof(WatchVariableStringWrapper),
             ["boolean"] = typeof(WatchVariableBooleanWrapper),
+        };
+
+        public static readonly Dictionary<string, Type> backingTypes = new Dictionary<string, Type>()
+        {
+            ["u32"] = typeof(uint),
+            ["s32"] = typeof(int),
+            ["u16"] = typeof(ushort),
+            ["s16"] = typeof(short),
+            ["u8"] = typeof(byte),
+            ["s8"] = typeof(sbyte),
+            ["f32"] = typeof(float),
+            ["f64"] = typeof(double),
+            ["string"] = typeof(string),
+            ["boolean"] = typeof(bool),
         };
 
         [InitializeConfigParser]
@@ -49,8 +62,11 @@ namespace STROOP.Tabs.BruteforceTab
                     if (attrObj is SurfaceAttribute attr)
                     { lst.Add((t, attr)); break; }
                 }
-            funkyTypes = lst;
+            moduleTypes = lst;
         }
+
+        Dictionary<string, Func<string>> jsonTexts = new Dictionary<string, Func<string>>();
+        Dictionary<string, string> variableKeepObjects = new Dictionary<string, string>();
 
         public string modulePath { get; private set; }
         public Surface surface { get; private set; }
@@ -68,6 +84,12 @@ namespace STROOP.Tabs.BruteforceTab
         public BruteforceTab()
         {
             InitializeComponent();
+            var tabStops = new int[16];
+            for (int i = 0; i < tabStops.Length; i++)
+                tabStops[i] = i * 16;
+            txtJsonOutput.SelectionTabs = tabStops;
+            txtManualConfig.SelectionTabs = tabStops;
+
             foreach (var varSrc in variableSourceFiles)
                 watchVariables.AddRange(XmlConfigParser.OpenWatchVariableControlPrecursors($"Config/{varSrc}"));
 
@@ -93,11 +115,19 @@ namespace STROOP.Tabs.BruteforceTab
             };
         }
 
+        public string GetJsonText(string key)
+        {
+            if (variableKeepObjects.TryGetValue(key, out var result))
+                return result;
+            return null;
+        }
+
         void SetM64(string fileName)
         {
             m64File = fileName;
             labelM64.Text = Path.GetFileName(m64File);
-            File.Copy(m64File, $"{modulePath}/tmp.m64", true);
+            if (fileName != Path.GetFullPath($"{modulePath}/tmp.m64"))
+                File.Copy(m64File, $"{modulePath}/tmp.m64", true);
             watchVariablePanelParams.SetVariableValueByName("m64_input", "tmp.m64");
         }
 
@@ -174,13 +204,15 @@ namespace STROOP.Tabs.BruteforceTab
                 {
                     var variableName = fns.Key.displayName;
                     string o = "Keep";
-                    var newWatchVar = new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableStringWrapper))
+                    var newWatchVar = new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableSelectionWrapper))
                     {
                         Name = variableName,
                         _getterFunction = _ => o,
                         _setterFunction = (value, _) => { o = (string)value; return true; }
                     });
-                    var result = watchVariablePanelParams.AddVariable(newWatchVar, newWatchVar.view);
+                    var watchVarControl = watchVariablePanelParams.AddVariable(newWatchVar, newWatchVar.view);
+                    var wrapper = (WatchVariableSelectionWrapper)watchVarControl.WatchVarWrapper;
+
                     var options = new string[fns.Key.dic.Count + 1];
                     int i = 0;
                     foreach (var ksdda in fns.Key.dic)
@@ -190,7 +222,7 @@ namespace STROOP.Tabs.BruteforceTab
                     {
                         Func<string, string> fn = var =>
                         {
-                            if (variableKeepTexts.TryGetValue(var, out var text))
+                            if (variableKeepObjects.TryGetValue(var, out var text))
                                 return text;
                             return "0";
                         };
@@ -209,14 +241,11 @@ namespace STROOP.Tabs.BruteforceTab
                             return keepTextBuilder.ToString();
                         };
                     }
-                    ((WatchVariableStringWrapper)result.WatchVarWrapper).AddContextMenuHandler(
-                        "Set to",
-                        selectedStr =>
-                        {
-                            SetSelected(selectedStr);
-                            UpdateState();
-                        },
-                        options);
+                    foreach (var option_it in options)
+                    {
+                        var option_cap = option_it;
+                        wrapper.options.Add((option_cap, () => { SetSelected(option_cap); UpdateState(); return option_cap; }));
+                    }
                     SetSelected("[Keep]");
                 }
         }
@@ -246,7 +275,7 @@ namespace STROOP.Tabs.BruteforceTab
 
         void InitSurface(string moduleName)
         {
-            foreach (var t in funkyTypes)
+            foreach (var t in moduleTypes)
                 if (t.attribute.moduleName == moduleName)
                 {
                     surface = (Surface)Activator.CreateInstance(t.type);
@@ -255,6 +284,7 @@ namespace STROOP.Tabs.BruteforceTab
                         ctrl.Dispose();
                     tabSurface.Controls.Clear();
                     tabSurface.Controls.Add(surface);
+                    surface.InitJson();
                     tabSurface.ResumeLayout();
                     break;
                 }
@@ -283,8 +313,9 @@ namespace STROOP.Tabs.BruteforceTab
             btnRun.Enabled = true;
         }
 
-        void UpdateState()
+        public void UpdateState()
         {
+            needsUpdateState = false;
             using (new AccessScope<BruteforceTab>(this))
             {
                 var strBuilder = new System.Text.StringBuilder();
@@ -294,6 +325,16 @@ namespace STROOP.Tabs.BruteforceTab
                 jsonTexts["bfState"] = () => text;
                 WriteJson();
             }
+        }
+
+        bool needsUpdateState = false;
+        public void DeferUpdateState() => needsUpdateState = true;
+
+        public override void Update(bool active)
+        {
+            base.Update(active);
+            if (active && needsUpdateState)
+                UpdateState();
         }
 
         private void btnLoadModule_Click(object sender, EventArgs e)
@@ -311,7 +352,6 @@ namespace STROOP.Tabs.BruteforceTab
             jsonTexts["knownState"] = () => knownState;
 
             UpdateState();
-            WriteJson();
         }
 
         private void ReadJson(string fileName)
@@ -327,27 +367,11 @@ namespace STROOP.Tabs.BruteforceTab
                 foreach (var targetVariable in parameterVariables) // If any of the controllable variables match, set them
                     if (targetVariable.view.GetJsonName() == kvp.Key)
                     {
-                        var str = kvp.Value.Trim();
-                        double numberValue = 0;
-                        if (targetVariable.view.GetWrapperType() != typeof(WatchVariableStringWrapper))
-                        {
-                            bool set = true;
-                            if (str.StartsWith("0x"))
-                            {
-                                if (set = long.TryParse(str.Substring(2, str.Length - 2), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out var lValue))
-                                    numberValue = lValue;
-                            }
-                            else
-                                set = double.TryParse(str, out numberValue);
-                            if (set)
-                                targetVariable?.SetValue(numberValue);
-                        }
-                        else
-                            targetVariable?.SetValue(kvp.Value);
+                        targetVariable.SetValue(StringUtilities.GetJsonValue(targetVariable.view.GetWrapperType(), kvp.Value) ?? 0);
                         goto skipNew;
                     }
                 if (!watchVariables.Any(_ => _.view.GetJsonName() == kvp.Key))
-                    variableKeepTexts[kvp.Key] = kvp.Value;
+                    variableKeepObjects[kvp.Key] = kvp.Value;
                 skipNew:;
             }
         }
@@ -381,7 +405,7 @@ namespace STROOP.Tabs.BruteforceTab
                 File.WriteAllText(configFile, txtJsonOutput.Text);
                 var i = new ProcessStartInfo();
                 i.FileName = $"{modulePath}/main.exe";
-                i.Arguments = $" --file=tmp.json --outputmode=sequence";
+                i.Arguments = $" --file=tmp.json --outputmode=m64_and_sequence";
                 i.UseShellExecute = false;
                 i.WorkingDirectory = modulePath;
                 bfProcess = Process.Start(i);
@@ -417,7 +441,11 @@ namespace STROOP.Tabs.BruteforceTab
             var dlg = new OpenFileDialog();
             dlg.Filter = "json files (*.json)|*.json";
             if (dlg.ShowDialog() == DialogResult.OK)
+            {
                 ReadJson(dlg.FileName);
+                surface?.InitJson();
+                UpdateState();
+            }
         }
     }
 }
