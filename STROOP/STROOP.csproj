@@ -168,6 +168,9 @@
     <Compile Include="Controls\CoinRingDisplayPanel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\ReorderFlowLayoutPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\TrackBarEx.cs">
       <SubType>Component</SubType>
     </Compile>
