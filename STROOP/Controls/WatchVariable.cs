@@ -168,7 +168,6 @@ namespace STROOP
         public readonly string MemoryTypeName;
         public readonly Type MemoryType;
         public readonly int? ByteCount;
-        public readonly int? NibbleCount;
         public readonly bool? SignedType;
 
         public readonly string BaseAddressType;
@@ -183,6 +182,7 @@ namespace STROOP
         public readonly int? Shift;
         public readonly bool HandleMapping;
 
+        public int? NibbleCount => ByteCount.HasValue ? (int?)(ByteCount.Value * 2) : null;
         public bool IsSpecial { get => MemoryType == null; }
         public bool UseAbsoluteAddressing { get => BaseAddressType == Structs.BaseAddressType.Absolute; }
 
@@ -254,6 +254,13 @@ namespace STROOP
             this.view = view;
         }
 
+        public WatchVariable(IVariableView view, Type backingType)
+        {
+            this.view = view;
+            BaseAddressType = Structs.BaseAddressType.None;
+            ByteCount = System.Runtime.InteropServices.Marshal.SizeOf(backingType);
+        }
+
         private WatchVariable(string memoryTypeName, string baseAddressType,
             uint? offsetUS, uint? offsetJP, uint? offsetSH, uint? offsetEU, uint? offsetDefault, uint? mask, int? shift, bool handleMapping)
         {
@@ -273,7 +280,6 @@ namespace STROOP
             MemoryTypeName = memoryTypeName;
             MemoryType = memoryTypeName == null ? null : TypeUtilities.StringToType[MemoryTypeName];
             ByteCount = memoryTypeName == null ? (int?)null : TypeUtilities.TypeSize[MemoryType];
-            NibbleCount = memoryTypeName == null ? (int?)null : TypeUtilities.TypeSize[MemoryType] * 2;
             SignedType = memoryTypeName == null ? (bool?)null : TypeUtilities.TypeSign[MemoryType];
 
             Mask = mask;
