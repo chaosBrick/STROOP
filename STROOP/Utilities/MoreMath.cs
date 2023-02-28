@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using OpenTK;
 
 namespace STROOP.Utilities
 {
@@ -16,6 +17,11 @@ namespace STROOP.Utilities
             if (value == 0 || double.IsNaN(value)) return 0;
             return value > 0 ? 1 : -1;
         }
+
+        public static Vector2 Min(Vector2 min, Vector2 @new) => new Vector2(Math.Min(min.X, @new.X), Math.Min(min.Y, @new.Y));
+        public static Vector2 Max(Vector2 max, Vector2 @new) => new Vector2(Math.Max(max.X, @new.X), Math.Max(max.Y, @new.Y));
+        public static Vector3 Min(Vector3 min, Vector3 @new) => new Vector3(Math.Min(min.X, @new.X), Math.Min(min.Y, @new.Y), Math.Min(min.Z, @new.Z));
+        public static Vector3 Max(Vector3 max, Vector3 @new) => new Vector3(Math.Max(max.X, @new.X), Math.Max(max.Y, @new.Y), Math.Max(max.Z, @new.Z));
 
         public static int Min(params int[] values)
         {
@@ -558,7 +564,7 @@ namespace STROOP.Utilities
             double newRadius = Math.Max(oldRadius + radiusChange, 0);
             double newTheta = NonNegativeModulus(oldTheta + thetaChangeAngleUnits, 65536);
             double newPhi = Clamp(NormalizeAngleDoubleSigned(oldPhi) + phiChangeAngleUnits, -16384, 16384);
-         
+
             return SphericalToEuler_AngleUnits(newRadius, newTheta, newPhi);
         }
 
