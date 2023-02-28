@@ -25,19 +25,21 @@ namespace STROOP.Tabs.BruteforceTab
         public static JsonObject GetJsonObject(string input, ref int cursor)
         {
             int cursorAtStart = cursor;
-            var valueBuilder = new StringBuilder(input.Length);
+            int lastValueStart = -1;
             var keyBuilder = new StringBuilder(input.Length);
             bool inString = false;
             bool escape = false;
-            bool expectKey = true;
             var arrayStack = 0;
+
+            string GetValueString(int curseYou) => input.Substring(lastValueStart, curseYou - lastValueStart).Trim();
+            string GetKeyString() => keyBuilder.ToString().Trim().Trim('"');
 
             JsonObject newObject = new JsonObject();
             for (; cursor < input.Length; cursor++)
             {
                 var c = input[cursor];
-                var currentBuilder = (expectKey ? keyBuilder : valueBuilder);
-                currentBuilder.Append(c);
+                if (lastValueStart == -1)
+                    keyBuilder.Append(c);
                 if (c == '\\')
                 {
                     escape = true;
@@ -56,35 +58,33 @@ namespace STROOP.Tabs.BruteforceTab
                             if (!inString)
                             {
                                 cursor++;
-                                newObject.AddObject(keyBuilder.ToString(), GetJsonObject(input, ref cursor));
+                                newObject.AddObject(GetKeyString(), GetJsonObject(input, ref cursor));
                             }
                             break;
                         case '}':
                             if (!inString)
                             {
-                                currentBuilder.Remove(currentBuilder.Length - 1, 1);
+                                var valueString = GetValueString(cursor);
                                 if (keyBuilder.Length > 0)
-                                    newObject.AddValue(keyBuilder.ToString().Trim().Trim('"'), valueBuilder.ToString());
-                                newObject.sourceString = "{" + input.Substring(cursorAtStart, cursor - cursorAtStart + 1);
+                                    newObject.AddValue(GetKeyString(), valueString);
+                                newObject.sourceString = valueString;
                                 return newObject;
                             }
                             break;
                         case ':':
                             if (!inString)
                             {
-                                currentBuilder.Remove(currentBuilder.Length - 1, 1);
-                                expectKey = false;
-                                valueBuilder.Clear();
+                                keyBuilder.Remove(keyBuilder.Length - 1, 1);
+                                lastValueStart = cursor + 1;
                             }
                             else
-                                currentBuilder.Append(c);
+                                keyBuilder.Append(c);
                             break;
                         case ',':
                             if (!inString && arrayStack == 0)
                             {
-                                currentBuilder.Remove(currentBuilder.Length - 1, 1);
-                                expectKey = true;
-                                newObject.AddValue(keyBuilder.ToString().Trim().Trim('"'), valueBuilder.ToString());
+                                newObject.AddValue(GetKeyString(), GetValueString(cursor));
+                                lastValueStart = -1;
                                 keyBuilder.Clear();
                             }
                             break;
