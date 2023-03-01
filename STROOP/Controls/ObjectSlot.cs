@@ -211,9 +211,7 @@ namespace STROOP
         public BehaviorCriteria Behavior => _behavior;
 
         bool _isActive = false;
-
-        private bool IsHovering;
-
+        
         public override string Text => _text;
         Color _textColor
         {
@@ -235,7 +233,6 @@ namespace STROOP
             this.MouseUp += (s, e) => { _mouseState = _mouseEnteredState; UpdateColors(); };
             this.MouseEnter += (s, e) =>
             {
-                IsHovering = true;
                 _manager.HoveredObjectAddress = CurrentObject?.Address;
                 _mouseEnteredState = MouseStateType.Over;
                 _mouseState = MouseStateType.Over;
@@ -243,7 +240,6 @@ namespace STROOP
             };
             this.MouseLeave += (s, e) =>
             {
-                IsHovering = false;
                 _manager.HoveredObjectAddress = null;
                 _mouseEnteredState = MouseStateType.None;
                 _mouseState = MouseStateType.None;

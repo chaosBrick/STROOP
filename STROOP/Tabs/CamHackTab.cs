@@ -446,8 +446,6 @@ namespace STROOP.Tabs
             }
         }
 
-        private int _globalTimer = 0;
-
         private CamHackMode getCorrectCamHackMode()
         {
             int cameraMode = Config.Stream.GetInt32(CamHackConfig.StructAddress + CamHackConfig.CameraModeOffset);

@@ -73,11 +73,7 @@ namespace STROOP.Controls
         protected const bool DEFAULT_DISPLAY_AS_HEX = false;
         protected const bool DEFAULT_USE_CHECKBOX = false;
         protected const bool DEFAULT_IS_YAW = false;
-
-        private ToolStripSeparator _separatorCoordinates;
-        private ToolStripMenuItem _itemCopyCoordinates;
-        private ToolStripMenuItem _itemPasteCoordinates;
-
+        
         private static readonly int MAX_ROUNDING_LIMIT = 10;
 
         private readonly int _defaultRoundingLimit;
