@@ -59,8 +59,12 @@ namespace STROOP.Tabs.MapTab
         List<(CheckBox checkBox, MapTracker tracker)> quickSemaphores = new List<(CheckBox checkBox, MapTracker tracker)>();
         Dictionary<string, MapTracker.CreateTracker> newTrackerByName = new Dictionary<string, MapTracker.CreateTracker>();
         Dictionary<(Type, string), Func<MapTracker>> addNewTrackers = new Dictionary<(Type, string), Func<MapTracker>>();
+        HashSet<MapTracker> externalTrackers = new HashSet<MapTracker>();
 
-        public MapTracker AddByCode(Type type, string initializer = null) => addNewTrackers[(type, initializer)]();
+        private HashSet<uint> _selection = new HashSet<uint>();
+        HashSet<uint> trackedAddresses = new HashSet<uint>();
+
+        public override HashSet<uint> selection => _selection;
 
         public MapTab()
         {
@@ -68,8 +72,17 @@ namespace STROOP.Tabs.MapTab
             if (Program.IsVisualStudioHostProcess()) return;
         }
 
-        private HashSet<uint> _selection = new HashSet<uint>();
-        public override HashSet<uint> selection => _selection;
+        public MapTracker AddByCode(Type type, string initializer = null) => addNewTrackers[(type, initializer)]();
+
+        public MapTracker AddExternal(MapObject obj)
+        {
+            var tracker = new MapTracker(this, null, obj);
+            flowLayoutPanelMapTrackers.Controls.Add(tracker);
+            externalTrackers.Add(tracker);
+            return tracker;
+        }
+
+        public void AddSubTracker(MapTracker obj) => flowLayoutPanelMapTrackers.Controls.Add(obj);
 
         public override Action<IEnumerable<ObjectSlot>> objectSlotsClicked => objectSlots =>
         {
@@ -89,7 +102,8 @@ namespace STROOP.Tabs.MapTab
             }
         };
 
-        HashSet<uint> trackedAddresses = new HashSet<uint>();
+        public IEnumerable<MapTracker> EnumerateTrackers() => flowLayoutPanelMapTrackers.EnumerateTrackers();
+
         public bool TracksObject(uint address) => IsActiveTab && trackedAddresses.Contains(address);
 
         public override string GetDisplayName() => "Map";
@@ -119,6 +133,8 @@ namespace STROOP.Tabs.MapTab
             }
             RequireGeometryUpdate();
         }
+
+        public void DrawOn2DControl(MapGraphics graphics) => flowLayoutPanelMapTrackers.DrawOn2DControl(graphics);
 
         public MapLayout GetMapLayout(object mapLayoutChoice = null) =>
             (mapLayoutChoice ?? comboBoxMapOptionsLevel.SelectedItem) as MapLayout ?? MapAssociations.GetBestMap();
@@ -823,10 +839,12 @@ namespace STROOP.Tabs.MapTab
             if (LoadTrackerConfig(trackerFile, out var loadedTrackers))
             {
                 foreach (var ctrl in flowLayoutPanelMapTrackers.Controls)
-                    if (ctrl is MapTracker tracker)
+                    if (ctrl is MapTracker tracker && !externalTrackers.Contains(ctrl))
                         tracker.CleanUp();
                 flowLayoutPanelMapTrackers.Controls.Clear();
                 foreach (var tracker in loadedTrackers)
+                    flowLayoutPanelMapTrackers.Controls.Add(tracker);
+                foreach (var tracker in externalTrackers)
                     flowLayoutPanelMapTrackers.Controls.Add(tracker);
             }
             else

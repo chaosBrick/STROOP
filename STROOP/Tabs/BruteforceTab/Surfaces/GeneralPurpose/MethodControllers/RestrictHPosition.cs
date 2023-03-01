@@ -8,8 +8,7 @@ using STROOP.Utilities;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
 {
-    [ObjectDescription("RestrictHPosition", "Bruteforce")]
-    class RestrictHPositionMapElement : MapTab.MapObjects.MapObject
+    public class RestrictHPositionMapElement : MapTab.MapObjects.MapObject, ITrackerMethodMapObject<RestrictHPosition>
     {
         class HoverData : IHoverData
         {
@@ -123,6 +122,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
             foreach (var ctrl in parent.parameterPanel.GetCurrentVariableControls())
                 ctrl.WatchVar.ValueSet += updateFromControl;
             updateFromControl();
+            tracker.ConfirmRemoveFromMap = ConfirmDeleteScoringFunc;
         }
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.ArrowImage;
@@ -158,39 +158,24 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
             parent.parameterPanel.SetVariableValueByName("d", (double)d);
             ignoreWatchVarUpdate = false;
         }
+
+        bool ConfirmDeleteScoringFunc()
+        {
+            var dlgResult = MessageBox.Show(
+                "This tracker belongs to a bruteforcing scoring function.\n" +
+                "Removing the tracker will also remove its associated scoring function.\n" +
+                "Do you wish to continue?", "Confirm Deletion", MessageBoxButtons.YesNo);
+            var delete = dlgResult == DialogResult.Yes;
+            if (delete)
+                parent.target.DeleteSelf();
+            return delete;
+        }
     }
 
-    public class RestrictHPosition : IMethodController
+    public class RestrictHPosition : TrackerMethodControllerBase<RestrictHPositionMapElement, RestrictHPosition>
     {
-        RestrictHPositionMapElement tracker;
-        ScoringFunc target;
-        public Controls.WatchVariablePanel parameterPanel => target.watchVariablePanelParameters;
-
         public int? GetFuncIndex() => (target.Parent as Controls.ReorderFlowLayoutPanel)?.Controls.GetChildIndex(target);
 
-        void IMethodController.SetTargetFunc(ScoringFunc target)
-        {
-            this.target = target;
-            var var = new WatchVariable(new WatchVariable.CustomView(1)
-            {
-                Name = "Adjust on Map",
-                wrapperType = typeof(Controls.WatchVariableSelectionWrapper),
-                _getterFunction = _ => null,
-                _setterFunction = (_, __) => false
-            });
-
-            var mapTab = AccessScope<StroopMainForm>.content.GetTab<MapTab.MapTab>();
-            mapTab.UpdateOrInitialize(true);
-            tracker = (RestrictHPositionMapElement)mapTab.AddByCode(typeof(RestrictHPositionMapElement)).mapObject;
-            tracker.SetParent(this);
-
-            var ctrl = (Controls.WatchVariableSelectionWrapper)parameterPanel.AddVariable(var, var.view).WatchVarWrapper;
-            ctrl.options.Add(("Go to Map Tab", () =>
-            {
-                AccessScope<StroopMainForm>.content.SwitchTab(mapTab);
-                return null;
-            }
-            ));
-        }
+        protected override RestrictHPositionMapElement CreateTracker() => new RestrictHPositionMapElement();
     }
 }

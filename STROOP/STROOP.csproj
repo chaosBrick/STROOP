@@ -407,7 +407,9 @@
       <DependentUpon>GeneralPurpose.cs</DependentUpon>
     </Compile>
     <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\IMethodController.cs" />
+    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\MethodControllers\ITrackerMethodMapObject.cs" />
     <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\MethodControllers\RestrictHPosition.cs" />
+    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\MethodControllers\TrackerMethodControllerBase.cs" />
     <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\Perturbator.cs">
       <SubType>UserControl</SubType>
     </Compile>

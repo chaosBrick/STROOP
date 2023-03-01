@@ -148,8 +148,10 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             return strBuilder.ToString();
         }
 
+        public void DeleteSelf() => this.GetParent<GeneralPurpose>()?.RemoveMethod(this);
+
         private void pbExpand_Click(object sender, EventArgs e) => SetExpanded(!expanded);
 
-        private void pbRemove_Click(object sender, EventArgs e) => this.GetParent<GeneralPurpose>().RemoveMethod(this);
+        private void pbRemove_Click(object sender, EventArgs e) => DeleteSelf();
     }
 }

@@ -76,7 +76,7 @@ namespace STROOP.Tabs.BruteforceTab
             MapTab.MapTab tab = AccessScope<StroopMainForm>.content.GetTab<MapTab.MapTab>();
             if (tab == null)
                 return "";
-            foreach (var tracker in tab.flowLayoutPanelMapTrackers.EnumerateTrackers())
+            foreach (var tracker in tab.EnumerateTrackers())
                 if (tracker.mapObject is MapTab.MapObjects.MapBruteforceTriangles trisObject)
                     return trisObject.GetJsonString();
             return "";

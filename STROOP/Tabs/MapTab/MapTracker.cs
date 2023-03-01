@@ -33,6 +33,7 @@ namespace STROOP.Tabs.MapTab
 
         public delegate void RemovedFromMapEventHandler();
         public event RemovedFromMapEventHandler RemovedFromMap;
+        public Func<bool> ConfirmRemoveFromMap;
 
         public IEnumerable<MapTracker> EnumerateChildTrackers()
         {
@@ -50,8 +51,10 @@ namespace STROOP.Tabs.MapTab
 
         public void RemoveFromMap()
         {
+            if (!(ConfirmRemoveFromMap?.Invoke() ?? true))
+                return;
             CleanUp();
-            mapTab.flowLayoutPanelMapTrackers.Controls.Remove(this);
+            this.GetParent<MapTrackerFlowLayoutPanel>().Controls.Remove(this);
             RemovedFromMap?.Invoke();
         }
 
@@ -160,7 +163,7 @@ namespace STROOP.Tabs.MapTab
         {
             CreateTracker createTracker = creationParameters => new MapTracker(this, identifier, newObjFunc(creationParameters));
             createChildTrackers[identifier] = createTracker;
-            return () => target.flowLayoutPanelMapTrackers.Controls.Add(createTracker(null));
+            return () => target.AddSubTracker(createTracker(null));
         }
 
         public void SaveChildTrackers(System.Xml.XmlNode node)
@@ -325,14 +328,14 @@ namespace STROOP.Tabs.MapTab
         {
             int numMoves = KeyboardUtilities.GetCurrentlyInputtedNumber() ?? 1;
             if (KeyboardUtilities.IsCtrlHeld()) numMoves = 0;
-            mapTab.flowLayoutPanelMapTrackers.MoveUpControl(this, numMoves);
+            this.GetParent<MapTrackerFlowLayoutPanel>().MoveUpControl(this, numMoves);
         }
 
         private void pictureBoxDownArrow_Click(object sender, EventArgs e)
         {
             int numMoves = KeyboardUtilities.GetCurrentlyInputtedNumber() ?? 1;
             if (KeyboardUtilities.IsCtrlHeld()) numMoves = 0;
-            mapTab.flowLayoutPanelMapTrackers.MoveDownControl(this, numMoves);
+            this.GetParent<MapTrackerFlowLayoutPanel>().MoveDownControl(this, numMoves);
         }
 
         public void SetGlobalIconSize(float size)

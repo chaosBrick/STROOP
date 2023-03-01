@@ -321,7 +321,7 @@ namespace STROOP.Tabs.MapTab
                 foreach (var renderer in rendererCollection.renderers)
                     renderer.SetDrawCalls(this);
                 transparencyRenderer.SetDrawCalls(this);
-                mapTab.flowLayoutPanelMapTrackers.DrawOn2DControl(this);
+                mapTab.DrawOn2DControl(this);
                 drawLayers[(int)DrawLayers.Objects].Insert(0, rendererCollection.UpdateObjectMap);
 
                 if (levelTrianglesFor3DMap == null || mapTab.NeedsGeometryRefresh())

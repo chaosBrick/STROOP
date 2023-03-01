@@ -75,7 +75,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
                 var makeReferencePointItem = new ToolStripMenuItem("Make Reference Point...");
                 HashSet<string> existingNames = new HashSet<string>();
-                foreach (var tracker in tab.flowLayoutPanelMapTrackers.EnumerateTrackers())
+                foreach (var tracker in tab.EnumerateTrackers())
                     if (tracker.mapObject is MapCustomIconPoints customPoints)
                     {
                         existingNames.Add(customPoints.GetName());
