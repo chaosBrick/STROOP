@@ -287,6 +287,17 @@ namespace STROOP
             HandleMapping = handleMapping;
         }
 
+        public T GetValueAs<T>()
+        {
+            var values = GetValues();
+            if (values.Count == 0)
+                return default(T);
+            var result = Convert.ChangeType(values[0], typeof(T));
+            if (result == null)
+                return default(T);
+            return (T)result;
+        }
+
         public List<object> GetValues(List<uint> addresses = null) =>
             GetAddressList(addresses).ConvertAll(address => view._getterFunction(address)).ToList();
 
