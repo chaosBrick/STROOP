@@ -839,6 +839,18 @@ namespace STROOP.Controls
             return result;
         }
 
+        public WatchVariable[] GetWatchVariablesByName(params string[] names)
+        {
+            var result = new WatchVariable[names.Length];
+            foreach (var var in _allWatchVarControls)
+            {
+                var index = Array.IndexOf(names, var.WatchVar.view.Name);
+                if (index != -1)
+                    result[index] = var.WatchVar;
+            }
+            return result;
+        }
+
         public void UpdatePanel()
         {
             if (SavedSettingsConfig.WatchVarPanelFontOverride.value != null)
