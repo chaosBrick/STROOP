@@ -135,6 +135,8 @@ namespace STROOP.Tabs.MapTab
                 SetColor(null);
                 SetOutlineColor(null);
 
+                mapObject.SizeChanged += () => UpdateSizeControls(mapObject.Size);
+
                 textBoxSize.AddEnterAction(() => textBoxSize_EnterAction());
                 trackBarSize.AddManualChangeAction(() => trackBarSize_ValueChanged());
                 textBoxOpacity.AddEnterAction(() => textBoxOpacity_EnterAction());
@@ -235,6 +237,11 @@ namespace STROOP.Tabs.MapTab
             float size = sizeNullable ?? mapObject.Size;
             if (updateMapObjs)
                 mapObject.Size = size;
+            UpdateSizeControls(size);
+        }
+
+        void UpdateSizeControls(float size)
+        {
             textBoxSize.SubmitText(size.ToString());
             trackBarSize.StartChangingByCode();
             ControlUtilities.SetTrackBarValueCapped(trackBarSize, size);

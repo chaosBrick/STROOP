@@ -111,7 +111,10 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         public PositionAngleProvider positionAngleProvider { get; protected set; } = NoPositionAngles;
 
-        public float Size = 25;
+        public event Action SizeChanged;
+        float _Size = 25;
+        public float Size { get { return _Size; } set { _Size = value; SizeChanged?.Invoke(); } }
+
         public double Opacity = 1;
         public byte OpacityByte
         {
