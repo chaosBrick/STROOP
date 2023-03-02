@@ -8,7 +8,7 @@ using STROOP.Utilities;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
 {
-    public class RestrictHPositionMapElement : MapTab.MapObjects.MapObject, ITrackerMethodMapObject<RestrictHPosition>
+    class RestrictHPositionMapElement : MapTab.MapObjects.MapObject, ITrackerMethodMapObject<RestrictHPosition>
     {
         class HoverData : IHoverData
         {
@@ -122,7 +122,6 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
             foreach (var ctrl in parent.parameterPanel.GetCurrentVariableControls())
                 ctrl.WatchVar.ValueSet += updateFromControl;
             updateFromControl();
-            tracker.ConfirmRemoveFromMap = ConfirmDeleteScoringFunc;
         }
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.ArrowImage;
@@ -142,9 +141,13 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
                 var yaw = MoreMath.RadiansToAngleUnits(Math.Atan2(direction.X, direction.Z));
                 var b = arrowBase(graphics);
                 graphics.lineRenderer.AddArrow(b.X, b.Y, b.Z, len / graphics.MapViewScaleValue, (float)yaw, 20 / graphics.MapViewScaleValue, color, OutlineWidth);
-                Vector3 knock = Vector3.TransformPosition(arrowTip, graphics.ViewMatrix);
-                knock.Z = 0;
-                graphics.textRenderer.AddText(new[] { ($"RestrictHPosition ({parent.GetFuncIndex()?.ToString() ?? "-"})", Vector3.Zero) }, OutlineColor, Matrix4.CreateScale(1.0f / graphics.glControl.Height) * Matrix4.CreateTranslation(knock), true);
+                Vector3 screenSpacePos = Vector3.TransformPosition(arrowTip, graphics.ViewMatrix);
+                screenSpacePos.Z = 0;
+                graphics.textRenderer.AddText(
+                    new[] { ($"RestrictHPosition ({parent.GetFuncIndex()?.ToString() ?? "-"})", Vector3.Zero) },
+                    OutlineColor, 
+                    Matrix4.CreateScale(1.0f / graphics.glControl.Height) * Matrix4.CreateTranslation(screenSpacePos),
+                    true);
             });
         }
         protected override void DrawOrthogonal(MapGraphics graphics) => DrawTopDown(graphics);
@@ -158,24 +161,10 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
             parent.parameterPanel.SetVariableValueByName("d", (double)d);
             ignoreWatchVarUpdate = false;
         }
-
-        bool ConfirmDeleteScoringFunc()
-        {
-            var dlgResult = MessageBox.Show(
-                "This tracker belongs to a bruteforcing scoring function.\n" +
-                "Removing the tracker will also remove its associated scoring function.\n" +
-                "Do you wish to continue?", "Confirm Deletion", MessageBoxButtons.YesNo);
-            var delete = dlgResult == DialogResult.Yes;
-            if (delete)
-                parent.target.DeleteSelf();
-            return delete;
-        }
     }
 
-    public class RestrictHPosition : TrackerMethodControllerBase<RestrictHPositionMapElement, RestrictHPosition>
+    class RestrictHPosition : TrackerMethodControllerBase<RestrictHPositionMapElement, RestrictHPosition>
     {
-        public int? GetFuncIndex() => (target.Parent as Controls.ReorderFlowLayoutPanel)?.Controls.GetChildIndex(target);
-
         protected override RestrictHPositionMapElement CreateTracker() => new RestrictHPositionMapElement();
     }
 }

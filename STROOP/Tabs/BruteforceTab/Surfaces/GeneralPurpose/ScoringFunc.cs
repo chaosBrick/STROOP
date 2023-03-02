@@ -5,6 +5,7 @@ using System.Linq;
 using STROOP.Utilities;
 using System.Collections.Generic;
 using System.Text;
+using System.Reflection;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
 {
@@ -15,7 +16,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
         {
             foreach (var t in typeof(ScoringFunc).Assembly.GetTypes())
                 if (t.GetInterfaces().Any(i => i.FullName == typeof(IMethodController).FullName))
-                    if (t.GetConstructor(new Type[0]) != null)
+                    if (t.GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, new Type[0], null) != null)
                         stringToControllerType[t.Name] = t;
         }
 
