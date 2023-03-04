@@ -1,4 +1,5 @@
 ﻿using System.Windows.Forms;
+using STROOP.Utilities;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
 {
@@ -46,11 +47,18 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
 
         bool ConfirmDeleteScoringFunc()
         {
-            var dlgResult = MessageBox.Show(
-                "This tracker belongs to a bruteforcing scoring function.\n" +
-                "Removing the tracker will also remove its associated scoring function.\n" +
-                "Do you wish to continue?", "Confirm Deletion", MessageBoxButtons.YesNo);
-            var delete = dlgResult == DialogResult.Yes;
+            bool delete;
+            if (!mapObject.tracker.GetParent<STROOPTab>().IsActiveTab)
+                delete = true;
+            else
+            {
+                var dlgResult = MessageBox.Show(
+                    "This tracker belongs to a bruteforcing scoring function.\n" +
+                    "Removing the tracker will also remove its associated scoring function.\n" +
+                    "Do you wish to continue?", "Confirm Deletion", MessageBoxButtons.YesNo);
+                delete = dlgResult == DialogResult.Yes;
+            }
+
             if (delete)
                 target.DeleteSelf();
             return delete;
