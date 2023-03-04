@@ -891,6 +891,7 @@
     <Compile Include="Utilities\FlyingUtilities.cs" />
     <Compile Include="Utilities\FormsUtilities.cs" />
     <Compile Include="Utilities\GeneralUtilities.cs" />
+    <Compile Include="Utilities\IgnoreScope.cs" />
     <Compile Include="Utilities\InGameFunctionCall.cs" />
     <Compile Include="Utilities\MathOperationUtilities.cs" />
     <Compile Include="Calculators\WallDisplacementCalculator.cs" />
