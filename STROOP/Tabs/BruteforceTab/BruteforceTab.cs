@@ -75,7 +75,7 @@ namespace STROOP.Tabs.BruteforceTab
         }
 
         Dictionary<string, Func<string>> jsonTexts = new Dictionary<string, Func<string>>();
-        Dictionary<string, string> variableKeepObjects = new Dictionary<string, string>();
+        Dictionary<string, JsonNode> variableKeepObjects = new Dictionary<string, JsonNode>();
 
         public string modulePath { get; private set; }
         public Surface surface { get; private set; }
@@ -125,7 +125,7 @@ namespace STROOP.Tabs.BruteforceTab
             };
         }
 
-        public string GetJsonText(string key)
+        public JsonNode GetJsonText(string key)
         {
             if (variableKeepObjects.TryGetValue(key, out var result))
                 return result;
@@ -232,8 +232,8 @@ namespace STROOP.Tabs.BruteforceTab
                     {
                         Func<string, string> fn = var =>
                         {
-                            if (variableKeepObjects.TryGetValue(var, out var text))
-                                return text;
+                            if (variableKeepObjects.TryGetValue(var, out var node))
+                                return node.sourceString;
                             return "0";
                         };
                         if (selectedStr != "[Keep]")
@@ -396,30 +396,32 @@ namespace STROOP.Tabs.BruteforceTab
             UpdateState();
         }
 
+        IgnoreScope ignoreWrite = new IgnoreScope();
         private void ReadJson(string fileName)
         {
             if (!File.Exists(fileName))
                 return;
             var knaw = File.ReadAllText(fileName);
-            int cursor = 1;
-            var rootObj = JsonObject.GetJsonObject(knaw, ref cursor);
-
-            foreach (var kvp in rootObj.valueStrings)
-            {
-                foreach (var targetVariable in parameterVariables) // If any of the controllable variables match, set them
-                    if (targetVariable.view.GetJsonName() == kvp.Key)
-                    {
-                        targetVariable.SetValue(StringUtilities.GetJsonValue(targetVariable.view.GetWrapperType(), kvp.Value) ?? 0);
-                        goto skipNew;
-                    }
-                if (!watchVariables.Any(_ => _.view.GetJsonName() == kvp.Key))
-                    variableKeepObjects[kvp.Key] = kvp.Value;
-                skipNew:;
-            }
+            var rootObj = JsonNode.ParseJsonObject(knaw);
+            using (ignoreWrite.New())
+                foreach (var kvp in rootObj.values)
+                {
+                    foreach (var targetVariable in parameterVariables) // If any of the controllable variables match, set them
+                        if (targetVariable.view.GetJsonName() == kvp.Key)
+                        {
+                            targetVariable.SetValue(StringUtilities.GetJsonValue(targetVariable.view.GetWrapperType(), kvp.Value.valueObject.ToString()) ?? 0);
+                            goto skipNew;
+                        }
+                    if (!watchVariables.Any(_ => _.view.GetJsonName() == kvp.Key))
+                        variableKeepObjects[kvp.Key] = kvp.Value;
+                    skipNew:;
+                }
         }
 
         private void WriteJson()
         {
+            if (ignoreWrite)
+                return;
             txtJsonOutput.Clear();
             var strBuilder = new System.Text.StringBuilder();
             strBuilder.AppendLine("{");

@@ -78,7 +78,7 @@ namespace STROOP.Utilities
         {
             var str = valueString.Trim('"');
             double numberValue = 0;
-            if (variableWrapperType != typeof(WatchVariableStringWrapper))
+            if (typeof(WatchVariableNumberWrapper).IsAssignableFrom(variableWrapperType))
             {
                 bool set = true;
                 if (str.StartsWith("0x"))

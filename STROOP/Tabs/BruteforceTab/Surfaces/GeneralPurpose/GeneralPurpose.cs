@@ -189,46 +189,53 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
 
             flowPanelScoring.SuspendLayout();
             flowPanelScoring.Controls.Clear();
-            string scoringJson = parentTab.GetJsonText("scoring_methods");
-            int cur = 0;
-            var json = JsonObject.GetJsonObject(scoringJson, ref cur);
-            foreach (var obj in json.valueObjects)
-            {
-                if (obj.Value.valueStrings.TryGetValue("func", out var funcName) && scoringFuncsByName.TryGetValue(funcName.Trim('"'), out var precursorPreset))
+            var scoringJson = parentTab.GetJsonText("scoring_methods") as JsonNodeArray;
+            if (scoringJson != null)
+                foreach (var node in scoringJson.values)
                 {
-                    // Scoring Function
-                    var precursor = new ScoringFuncPrecursor(precursorPreset);
-                    if (obj.Value.valueStrings.TryGetValue("weight", out var weightString) && double.TryParse(weightString, out var weight))
-                        precursor.weight = weight;
-                    else
-                        precursor.weight = 1;
-
-                    if (obj.Value.valueObjects.TryGetValue("params", out var parametersNode))
-                        foreach (var n in parametersNode.valueStrings)
-                            precursor.parameterValues[n.Key] = StringUtilities.GetJsonValue(precursor.GetParameterWrapperType(n.Key), n.Value);
-                    AddMethod(precursor, parentTab.DeferUpdateState);
-                }
-                else if (obj.Value.valueStrings.TryGetValue("max_perturbation", out var maxPerturbationString))
-                {
-                    // Perturbator
-                    numPerturbators++;
-                    var perturbator = new Perturbator();
-                    foreach (var v in obj.Value.valueStrings)
+                    var obj = node as JsonNodeObject;
+                    if (obj == null)
+                        continue; // Ignore non-objects
+                    if (obj.TryGetValue<JsonNodeString>("func", out var funcNode)
+                        && scoringFuncsByName.TryGetValue(funcNode.value.Trim('"') ?? "", out var precursorPreset))
                     {
-                        object value = null;
-                        if (v.Key == "perturbation_chance")
-                        {
-                            if (float.TryParse(v.Value, out var floatValue))
-                                value = floatValue;
-                        }
+                        // Scoring Function
+                        var precursor = new ScoringFuncPrecursor(precursorPreset);
+                        if (obj.TryGetValue<JsonNodeNumber>("weight", out var weightNode))
+                            precursor.weight = weightNode.valueDouble ?? 1.0;
                         else
-                            if (int.TryParse(v.Value, out var intValue))
-                            value = intValue;
-                        if (value != null)
-                            perturbator.SetValue(v.Key, value);
+                            precursor.weight = 1.0;
+
+                        if (obj.TryGetValue<JsonNodeObject>("params", out var parametersNode))
+                            foreach (var n in parametersNode.values)
+                            {
+                                if (n.Value is JsonNodeString stringNode)
+                                    precursor.parameterValues[n.Key] = StringUtilities.GetJsonValue(precursor.GetParameterWrapperType(n.Key), stringNode.value);
+                                else
+                                    precursor.parameterValues[n.Key] = n.Value.valueObject;
+                            }
+                        AddMethod(precursor, parentTab.DeferUpdateState);
                     }
                 }
-            }
+
+            var perturbatorJson = parentTab.GetJsonText("perturbators") as JsonNodeArray;
+            if (perturbatorJson != null)
+                foreach (var node in perturbatorJson.values)
+                {
+                    var obj = node as JsonNodeObject;
+                    if (obj == null)
+                        continue; // Ignore non-objects
+                    numPerturbators++;
+                    var perturbator = new Perturbator();
+                    if (obj.TryGetValue<JsonNodeNumber>("perturbation_chance", out var perturbationChance))
+                        perturbator.SetValue("perturbation_chance", perturbationChance.valueDouble);
+                    if (obj.TryGetValue<JsonNodeNumber>("max_perturbation", out var maxPerturbation))
+                        perturbator.SetValue("max_perturbation", maxPerturbation.valueLong);
+                    if (obj.TryGetValue<JsonNodeNumber>("min_frame", out var minFrame))
+                        perturbator.SetValue("min_frame", minFrame.valueLong);
+                    if (obj.TryGetValue<JsonNodeNumber>("max_frame", out var maxFrame))
+                        perturbator.SetValue("max_frame", minFrame.valueLong);
+                }
 
             // If no perturbators were in the configuration, add a default one
             if (numPerturbators == 0)
