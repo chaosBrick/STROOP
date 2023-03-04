@@ -387,8 +387,10 @@ namespace STROOP.Utilities
                 UpdateLongest(ref longestType, tri.SurfaceType);
             }
 
+            bool hasEntries = false;
             foreach (var triSource in triangleSources)
             {
+                hasEntries = true;
                 var tri = sourceToTriangle(triSource);
                 strBuilder.Append($"\t\t[{PadNumber(longestX, tri.X1)}, {PadNumber(longestY, tri.Y1)}, {PadNumber(longestZ, tri.Z1)},");
                 strBuilder.Append($" {PadNumber(longestX, tri.X2)}, {PadNumber(longestY, tri.Y2)}, {PadNumber(longestZ, tri.Z2)},");
@@ -397,7 +399,8 @@ namespace STROOP.Utilities
                 strBuilder.AppendLine(",");
             }
             var removeEnd = $",{Environment.NewLine}";
-            strBuilder.Remove(strBuilder.Length - removeEnd.Length, removeEnd.Length);
+            if (hasEntries)
+                strBuilder.Remove(strBuilder.Length - removeEnd.Length, removeEnd.Length);
             strBuilder.Append("\n\t]");
             return strBuilder.ToString();
         }
