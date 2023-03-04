@@ -7,7 +7,7 @@ using System.Linq;
 using STROOP.Controls;
 using System.Diagnostics;
 using System.Xml.Linq;
-using System.Globalization;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 using AutomaticParameterGetters = System.Collections.Generic.Dictionary<STROOP.Tabs.BruteforceTab.ValueGetters.GetterFuncs, System.Collections.Generic.HashSet<string>>;
 
@@ -46,11 +46,20 @@ namespace STROOP.Tabs.BruteforceTab
             ["boolean"] = typeof(bool),
         };
 
+        static XElement configNode = null;
         [InitializeConfigParser]
         static void InitConfig() => XmlConfigParser.AddConfigParser("BruteforcerModulesPath", ParseBruteforcerModdulesPath);
         static void ParseBruteforcerModdulesPath(XElement node)
         {
+            configNode = node;
             BRUTEFORCER_PATH = node.Attribute("path").Value;
+        }
+        static void SaveBruteforcerModulePath()
+        {
+            if (configNode == null)
+                Program.config.Root.Add(configNode = new XElement(XName.Get("BruteforcerModulesPath")));
+            configNode.SetAttributeValue(XName.Get("path"), BRUTEFORCER_PATH);
+            configNode.Document.Save(Program.CONFIG_FILE_NAME);
         }
 
         static BruteforceTab()
@@ -81,6 +90,14 @@ namespace STROOP.Tabs.BruteforceTab
 
         ContextMenuStrip moduleStrip;
 
+        IEnumerable<string> GetBruteforcerModulePaths()
+        {
+            if (Directory.Exists(BRUTEFORCER_PATH))
+                foreach (var name in Directory.GetDirectories(BRUTEFORCER_PATH))
+                    if (File.Exists($"{name}/main.exe"))
+                        yield return name;
+        }
+
         public BruteforceTab()
         {
             InitializeComponent();
@@ -93,13 +110,6 @@ namespace STROOP.Tabs.BruteforceTab
             foreach (var varSrc in variableSourceFiles)
                 watchVariables.AddRange(XmlConfigParser.OpenWatchVariableControlPrecursors($"Config/{varSrc}"));
 
-            moduleStrip = new ContextMenuStrip();
-            foreach (var bf_it in Directory.GetDirectories(BRUTEFORCER_PATH))
-                if (File.Exists($"{bf_it}/main.exe"))
-                {
-                    var bf = bf_it;
-                    moduleStrip.Items.AddHandlerToItem(bf.Substring(BRUTEFORCER_PATH.Length + 1), () => { LoadModule(bf); ChooseM64(); });
-                }
             this.AllowDrop = true;
             txtJsonOutput.AllowDrop = true;
             txtJsonOutput.DragOver += (object sender, DragEventArgs e) =>
@@ -339,7 +349,39 @@ namespace STROOP.Tabs.BruteforceTab
 
         private void btnLoadModule_Click(object sender, EventArgs e)
         {
-            moduleStrip.Show(Cursor.Position);
+            var clickPosition = Cursor.Position;
+            moduleStrip = new ContextMenuStrip();
+            var bruteforcerModules = GetBruteforcerModulePaths().ToList();
+            if (bruteforcerModules.Count == 0)
+            {
+                if (MessageBox.Show($"No bruteforcer modules have been found at{Environment.NewLine}" +
+                    $"\"{BRUTEFORCER_PATH}\"{Environment.NewLine}" +
+                    $"Do you want to locate your modules directory now?{Environment.NewLine}" +
+                    "(This should be the \"binaries\" directory from the sm64_bruteforcers repository)",
+                    "No bruteforcer modules found",
+                    MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    var dlg = new CommonOpenFileDialog();
+                    dlg.IsFolderPicker = true;
+                    if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
+                    {
+                        BRUTEFORCER_PATH = dlg.FileName;
+                        SaveBruteforcerModulePath();
+                        bruteforcerModules = GetBruteforcerModulePaths().ToList();
+                    }
+                }
+            }
+
+            if (bruteforcerModules.Count == 0)
+                moduleStrip.Items.Add(new ToolStripMenuItem("No modules available") { Enabled = false });
+            else
+                foreach (var bf_it in Directory.GetDirectories(BRUTEFORCER_PATH))
+                    if (File.Exists($"{bf_it}/main.exe"))
+                    {
+                        var bf = bf_it;
+                        moduleStrip.Items.AddHandlerToItem(bf.Substring(BRUTEFORCER_PATH.Length + 1), () => { LoadModule(bf); ChooseM64(); });
+                    }
+            moduleStrip.Show(clickPosition);
         }
 
         private void btnApplyKnownStates_Click(object sender, EventArgs e)
