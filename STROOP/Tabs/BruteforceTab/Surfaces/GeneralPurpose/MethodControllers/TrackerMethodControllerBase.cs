@@ -55,5 +55,10 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
                 target.DeleteSelf();
             return delete;
         }
+
+        void IMethodController.Remove()
+        {
+            mapObject?.tracker?.RemoveFromMap();
+        }
     }
 }

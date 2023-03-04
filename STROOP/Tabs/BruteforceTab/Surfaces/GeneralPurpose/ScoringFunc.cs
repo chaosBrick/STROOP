@@ -34,6 +34,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
         bool expanded = false;
         int collapsedHeight;
         GeneralPurpose.ScoringFuncPrecursor precursor;
+        IMethodController controller;
 
         public ScoringFunc()
         {
@@ -86,8 +87,8 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                 }));
             if (stringToControllerType.TryGetValue(precursor.name, out var controllerType))
             {
-                var ctrl = (IMethodController)Activator.CreateInstance(controllerType);
-                ctrl.SetTargetFunc(this);
+                controller = (IMethodController)Activator.CreateInstance(controllerType);
+                controller.SetTargetFunc(this);
             }
         }
 
@@ -153,6 +154,10 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
 
         private void pbExpand_Click(object sender, EventArgs e) => SetExpanded(!expanded);
 
-        private void pbRemove_Click(object sender, EventArgs e) => DeleteSelf();
+        private void pbRemove_Click(object sender, EventArgs e)
+        {
+            controller.Remove();
+            DeleteSelf();
+        }
     }
 }
