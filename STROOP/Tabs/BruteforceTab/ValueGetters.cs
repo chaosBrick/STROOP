@@ -95,7 +95,8 @@ namespace STROOP.Tabs.BruteforceTab
                     {
                         var triangles = new List<Models.TriangleDataModel>();
                         foreach (var slot in slots)
-                            triangles.AddRange(new MapTab.DataUtil.ObjectTrianglePrediction(() => new PositionAngle[] { Config.ObjectSlotsManager.ObjectSlots[slot.Value - 1].CurrentObject }, _ => true).GetTriangles());
+                            if (slot > 0 && slot <= Config.ObjectSlotsManager.ObjectSlots.Count)
+                                triangles.AddRange(new MapTab.DataUtil.ObjectTrianglePrediction(() => new PositionAngle[] { Config.ObjectSlotsManager.ObjectSlots[slot.Value - 1].CurrentObject }, _ => true).GetTriangles());
                         return TriangleUtilities.ToJsonString(triangles);
                     }
                 );
