@@ -2,6 +2,15 @@ Features:
 - Add interacted walls display (modify previous positions tracker?)
 - Add wall seams finder
 
+Bruteforcing:
+- remove warning deleting bruteforcing tracker when choosing new module
+- add "invert" option for XZRadial stuff, i.e. avoid hitbox? (Could use negative values instead)
+	- need to update failure case for negative numbers but nothing else
+- add option to "disable" scoring func
+- add default option for "last frame" scoring func thing somehow
+- default new CheckAction "action" to Mario's current action in STROOP / mupen
+- implement scoring by global timer value? (Can access this in STROOP, unlike m64 count)
+
 Internal:
 - Make Models.ObjectDataModel compatible as PositionAngle
 - Simplify MapTracker Settings parsing for basic cases
