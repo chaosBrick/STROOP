@@ -437,37 +437,45 @@ namespace STROOP.Tabs.BruteforceTab
             txtJsonOutput.Text = $"{str.Substring(0, str.LastIndexOf(','))}\n}}";
         }
 
-        private void SaveConfig(string fileName) => File.WriteAllText(fileName, txtJsonOutput.Text);
+        private void SaveConfig(string fileName)
+        {
+            UpdateState();
+            File.WriteAllText(fileName, txtJsonOutput.Text);
+        }
+
+        private void Run()
+        {
+            btnRun.Text = "Stop";
+            UpdateState();
+            var configFile = $"{modulePath}/tmp.json";
+            File.WriteAllText(configFile, txtJsonOutput.Text);
+            var i = new ProcessStartInfo();
+            i.FileName = $"{modulePath}/main.exe";
+            i.Arguments = $" --file=tmp.json --outputmode=m64_and_sequence";
+            i.UseShellExecute = false;
+            i.WorkingDirectory = modulePath;
+            bfProcess = Process.Start(i);
+            new System.Threading.Tasks.Task(() =>
+            {
+                bfProcess.WaitForExit();
+                Invoke((Action)Stop);
+            }).Start();
+        }
+
+        private void Stop()
+        {
+            btnRun.Text = "Run!";
+            if (!bfProcess?.HasExited ?? false)
+                bfProcess.Kill();
+            bfProcess = null;
+        }
 
         private void btnRun_Click(object sender, EventArgs e)
         {
             if (bfProcess == null)
-            {
-                btnRun.Text = "Stop";
-                WriteJson();
-                var configFile = $"{modulePath}/tmp.json";
-                File.WriteAllText(configFile, txtJsonOutput.Text);
-                var i = new ProcessStartInfo();
-                i.FileName = $"{modulePath}/main.exe";
-                i.Arguments = $" --file=tmp.json --outputmode=m64_and_sequence";
-                i.UseShellExecute = false;
-                i.WorkingDirectory = modulePath;
-                bfProcess = Process.Start(i);
-                bfProcess.Exited += bfProcessExit;
-            }
+                Run();
             else
-            {
-                btnRun.Text = "Run!";
-                if (!bfProcess.HasExited)
-                    bfProcess.Kill();
-                bfProcess = null;
-            }
-        }
-
-        void bfProcessExit(object sender, EventArgs e)
-        {
-            btnRun.Text = "Run!";
-            bfProcess = null;
+                Stop();
         }
 
         private void btnChooseM64_Click(object sender, EventArgs e) => ChooseM64();
