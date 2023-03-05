@@ -208,6 +208,10 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                             precursor.weight = weightNode.valueDouble ?? 1.0;
                         else
                             precursor.weight = 1.0;
+                        if (obj.TryGetValue<JsonNodeNumber>("frame", out var frameNode))
+                            precursor.frame = (uint)(frameNode.valueLong ?? 30);
+                        else
+                            precursor.weight = 30;
 
                         if (obj.TryGetValue<JsonNodeObject>("params", out var parametersNode))
                             foreach (var n in parametersNode.values)
