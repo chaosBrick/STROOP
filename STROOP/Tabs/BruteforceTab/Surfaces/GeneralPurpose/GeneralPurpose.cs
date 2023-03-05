@@ -126,9 +126,8 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
 
         void AddPerturbator(Perturbator perturbator)
         {
-            var ctrl = new Perturbator();
-            ctrl.Init();
-            flowPanelScoring.Controls.Add(ctrl);
+            perturbator.Init();
+            flowPanelScoring.Controls.Add(perturbator);
         }
 
         public void RemoveMethod(ScoringFunc ctrl) => flowPanelScoring.Controls.Remove(ctrl);
@@ -241,7 +240,8 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                     if (obj.TryGetValue<JsonNodeNumber>("min_frame", out var minFrame))
                         perturbator.SetValue("min_frame", minFrame.valueLong);
                     if (obj.TryGetValue<JsonNodeNumber>("max_frame", out var maxFrame))
-                        perturbator.SetValue("max_frame", minFrame.valueLong);
+                        perturbator.SetValue("max_frame", maxFrame.valueLong);
+                    AddPerturbator(perturbator);
                 }
 
             // If no perturbators were in the configuration, add a default one
