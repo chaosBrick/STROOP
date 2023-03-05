@@ -188,6 +188,10 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             int numPerturbators = 0;
 
             flowPanelScoring.SuspendLayout();
+            foreach (var ctrl in flowPanelScoring.Controls)
+                if (ctrl is ScoringFunc scoringFunc)
+                    scoringFunc.DeleteSelf();
+
             flowPanelScoring.Controls.Clear();
             var scoringJson = parentTab.GetJsonText("scoring_methods") as JsonNodeArray;
             if (scoringJson != null)
@@ -199,7 +203,6 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                     if (obj.TryGetValue<JsonNodeString>("func", out var funcNode)
                         && scoringFuncsByName.TryGetValue(funcNode.value.Trim('"') ?? "", out var precursorPreset))
                     {
-                        // Scoring Function
                         var precursor = new ScoringFuncPrecursor(precursorPreset);
                         if (obj.TryGetValue<JsonNodeNumber>("weight", out var weightNode))
                             precursor.weight = weightNode.valueDouble ?? 1.0;

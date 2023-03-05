@@ -60,7 +60,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
             }
 
             if (delete)
-                target.DeleteSelf();
+                target.DeleteFromMap();
             return delete;
         }
 

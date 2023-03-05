@@ -54,7 +54,7 @@ namespace STROOP.Tabs.MapTab
             if (!(ConfirmRemoveFromMap?.Invoke() ?? true))
                 return;
             CleanUp();
-            this.GetParent<MapTrackerFlowLayoutPanel>().Controls.Remove(this);
+            this.GetParent<MapTrackerFlowLayoutPanel>()?.Controls.Remove(this);
             RemovedFromMap?.Invoke();
         }
 
