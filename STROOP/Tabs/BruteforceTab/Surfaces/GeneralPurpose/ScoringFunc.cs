@@ -31,6 +31,17 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             return (x, y);
         }
 
+        bool _muted = false;
+        public bool muted
+        {
+            get => _muted && AccessScope<BruteforceTab.UnmuteScoringFuncs>.content == null;
+            set
+            {
+                _muted = value;
+                pbMute.Image = _muted ? Properties.Resources.checkbox_unchecked : pbMute.InitialImage;
+            }
+        }
+
         bool expanded = false;
         int collapsedHeight;
         GeneralPurpose.ScoringFuncPrecursor precursor;
@@ -127,6 +138,9 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
 
         public string GetJson()
         {
+            if (muted)
+                return null;
+
             var tabs0 = new string('\t', 2);
             var tabs1 = new string('\t', 3);
             var tabs2 = new string('\t', 4);

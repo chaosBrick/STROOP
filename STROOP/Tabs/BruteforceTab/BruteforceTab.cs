@@ -15,6 +15,8 @@ namespace STROOP.Tabs.BruteforceTab
 {
     public partial class BruteforceTab : STROOPTab
     {
+        public class UnmuteScoringFuncs { }
+
         static string BRUTEFORCER_PATH = "Bruteforcers";
         static readonly string[] variableSourceFiles = { "MarioData.xml", "CameraData.xml", "ActionsData.xml" };
         static IEnumerable<(Type type, SurfaceAttribute attribute)> moduleTypes;
@@ -439,7 +441,8 @@ namespace STROOP.Tabs.BruteforceTab
 
         private void SaveConfig(string fileName)
         {
-            UpdateState();
+            using (new AccessScope<UnmuteScoringFuncs>(new UnmuteScoringFuncs()))
+                UpdateState();
             File.WriteAllText(fileName, txtJsonOutput.Text);
         }
 
