@@ -62,22 +62,28 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             this.precursor = precursor;
             watchVariablePanelParameters.ClearVariables();
             labelName.Text = precursor.name;
-            variablePanelBaseValues.AddVariables(
-                new WatchVariable.IVariableView[] {
+
+            variablePanelBaseValues.AddVariable(new WatchVariable(
                     new WatchVariable.CustomView(typeof(Controls.WatchVariableNumberWrapper))
                     {
                         Name = "weight",
                         _getterFunction = (_) => precursor.weight,
                         _setterFunction = (value, addr) => { precursor.weight = Convert.ToDouble(value); return true; }
-                    },
-                    new WatchVariable.CustomView(typeof(Controls.WatchVariableNumberWrapper))
-                    {
-                        Name = "frame",
-                        _getterFunction = (_) => precursor.frame,
-                        _setterFunction = (value, addr) => { precursor.frame = Convert.ToUInt32(value); return true; }
-                    }
-                    }.Select(_ => (new WatchVariable(_), _))
-                );
+                    }));
+
+            var wrapper = (Controls.WatchVariableSelectionWrapper<Controls.WatchVariableNumberWrapper>)variablePanelBaseValues.AddVariable(
+                new WatchVariable(
+                new WatchVariable.CustomView(typeof(Controls.WatchVariableSelectionWrapper<Controls.WatchVariableNumberWrapper>))
+                {
+                    Name = "frame",
+                    _getterFunction = (_) => precursor.frame,
+                    _setterFunction = (value, addr) => { precursor.frame = Convert.ToUInt32(value); return true; }
+                }))
+                .WatchVarWrapper;
+            wrapper.DisplaySingleOption = false;
+            wrapper.options.Add(("last", AccessScope<BruteforceTab>.content?.GetManualValue<object>("m64_end") ?? (() => null)));
+            wrapper.SelectOption(0);
+
             var ctrls = watchVariablePanelParameters.AddVariables(
                 precursor.parameterDefinitions.Select(kvp =>
                 {
@@ -87,7 +93,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                         precursor.parameterValues[key] = Convert.ChangeType(uncastedValue, backingType);
                     else
                         precursor.parameterValues[key] = Activator.CreateInstance(backingType);
-                    var newWatchVar = new WatchVariable(new WatchVariable.CustomView(BruteforceTab.wrapperTypes[kvp.Value])
+                    var newWatchVar = new WatchVariable(new WatchVariable.CustomView(BruteforceTab.fallbackWrapperTypes[kvp.Value])
                     {
                         Name = kvp.Key.name,
                         _getterFunction = _ => precursor.parameterValues[key],

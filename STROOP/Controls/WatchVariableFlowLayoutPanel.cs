@@ -212,8 +212,7 @@ namespace STROOP.Controls
                         if (clickedName)
                             selected.WatchVarWrapper.ShowVarInfo();
                         else if (lastClicked != -1)
-                            if (selected.WatchVarWrapper.DoubleClickToEdit)
-                                selected.WatchVarWrapper.Edit(renderer, renderer.GetVariableControlBounds(lastClicked));
+                            selected.WatchVarWrapper.DoubleClick(renderer, renderer.GetVariableControlBounds(lastClicked));
                         break;
                     }
                 };
@@ -221,8 +220,7 @@ namespace STROOP.Controls
                 {
                     if (lastClicked != -1)
                         foreach (var selected in _selectedWatchVarControls)
-                            if (!selected.WatchVarWrapper.DoubleClickToEdit)
-                                selected.WatchVarWrapper.Edit(renderer, renderer.GetVariableControlBounds(lastClicked));
+                            selected.WatchVarWrapper.SingleClick(renderer, renderer.GetVariableControlBounds(lastClicked));
                 };
                 renderer.MouseDown += (_, __) =>
                 {
@@ -674,6 +672,9 @@ namespace STROOP.Controls
             _filteringDropDownItems.ForEach(item => filterVariablesItem.DropDownItems.Add(item));
         }
 
+        public WatchVariableControl AddVariable(WatchVariable var) =>
+            AddVariables(new[] { (var, var.view) }).First();
+
         public WatchVariableControl AddVariable(WatchVariable var, WatchVariable.IVariableView view) =>
             AddVariables(new[] { (var, view) }).First();
 
@@ -839,14 +840,17 @@ namespace STROOP.Controls
             return result;
         }
 
-        public WatchVariable[] GetWatchVariablesByName(params string[] names)
+        public WatchVariable[] GetWatchVariablesByName(params string[] names) =>
+            GetWatchVariableControlsByName(names).Select(x => x?.WatchVar ?? null).ToArray();
+
+        public WatchVariableControl[] GetWatchVariableControlsByName(params string[] names)
         {
-            var result = new WatchVariable[names.Length];
+            var result = new WatchVariableControl[names.Length];
             foreach (var var in _allWatchVarControls)
             {
                 var index = Array.IndexOf(names, var.WatchVar.view.Name);
                 if (index != -1)
-                    result[index] = var.WatchVar;
+                    result[index] = var;
             }
             return result;
         }

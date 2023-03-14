@@ -27,7 +27,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
 
             public Type GetParameterWrapperType(string name)
             {
-                if (parameterDefinitions.TryGetValue(new Identifier { name = name }, out var typeString) && BruteforceTab.wrapperTypes.TryGetValue(typeString, out var type))
+                if (parameterDefinitions.TryGetValue(new Identifier { name = name }, out var typeString) && BruteforceTab.fallbackWrapperTypes.TryGetValue(typeString, out var type))
                     return type;
                 return null;
             }
@@ -210,7 +210,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                         if (obj.TryGetValue<JsonNodeNumber>("frame", out var frameNode))
                             precursor.frame = (uint)(frameNode.valueLong ?? 30);
                         else
-                            precursor.weight = 30;
+                            precursor.frame = 30;
 
                         if (obj.TryGetValue<JsonNodeObject>("params", out var parametersNode))
                             foreach (var n in parametersNode.values)

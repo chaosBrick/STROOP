@@ -18,7 +18,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
             var var = new WatchVariable(new WatchVariable.CustomView(1)
             {
                 Name = "Adjust on Map",
-                wrapperType = typeof(Controls.WatchVariableSelectionWrapper),
+                wrapperType = typeof(Controls.WatchVariableSelectionWrapper<Controls.WatchVariableStringWrapper>),
                 _getterFunction = _ => null,
                 _setterFunction = (_, __) => false
             });
@@ -30,7 +30,8 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
             mapObject.SetParent((ControllerType)this);
             target.Disposed += (_, __) => mapObject.tracker.RemoveFromMap();
 
-            var ctrl = (Controls.WatchVariableSelectionWrapper)parameterPanel.AddVariable(var, var.view).WatchVarWrapper;
+            var ctrl = (Controls.WatchVariableSelectionWrapper<Controls.WatchVariableStringWrapper>)parameterPanel.AddVariable(var, var.view).WatchVarWrapper;
+            ctrl.DisplaySingleOption = true;
             ctrl.options.Add(("Go to Map Tab", () =>
             {
                 AccessScope<StroopMainForm>.content.SwitchTab(mapTab);

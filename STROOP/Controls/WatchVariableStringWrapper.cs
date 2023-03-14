@@ -1,6 +1,7 @@
 ﻿using STROOP.Forms;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace STROOP.Controls
@@ -68,9 +69,10 @@ namespace STROOP.Controls
                 throw new ArgumentOutOfRangeException(value + " is not a string");
         }
 
-        public override void Edit(Control parent, System.Drawing.Rectangle bounds)
+        public override void DoubleClick(Control parent, Rectangle bounds) => Edit(parent, bounds);
+
+        public virtual void Edit(Control parent, Rectangle bounds)
         {
-            base.Edit(parent, bounds);
             if (editValueHandler != null)
                 editValueHandler();
             else

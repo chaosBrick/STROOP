@@ -17,10 +17,26 @@ namespace STROOP.Tabs.BruteforceTab
     {
         public class UnmuteScoringFuncs { }
 
+        class WatchVariableQuarterstepWrapper : WatchVariableSelectionWrapper<WatchVariableNumberWrapper>
+        {
+            public WatchVariableQuarterstepWrapper(WatchVariable var, WatchVariableControl control) : base(var, control)
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    var i_cap = i;
+                    options.Add(($"QS {i_cap + 1} intended", () => i_cap * 4 + 0));
+                    options.Add(($"QS {i_cap + 1} wall1", () => i_cap * 4 + 1));
+                    options.Add(($"QS {i_cap + 1} wall2", () => i_cap * 4 + 2));
+                    options.Add(($"QS {i_cap + 1} final", () => i_cap * 4 + 3));
+                }
+                this.SetValue(4 * 4 - 1);
+            }
+        }
+
         static string BRUTEFORCER_PATH = "Bruteforcers";
         static readonly string[] variableSourceFiles = { "MarioData.xml", "CameraData.xml", "ActionsData.xml" };
         static IEnumerable<(Type type, SurfaceAttribute attribute)> moduleTypes;
-        public static readonly Dictionary<string, Type> wrapperTypes = new Dictionary<string, Type>()
+        public static readonly Dictionary<string, Type> fallbackWrapperTypes = new Dictionary<string, Type>()
         {
             ["u32"] = typeof(WatchVariableNumberWrapper),
             ["s32"] = typeof(WatchVariableNumberWrapper),
@@ -32,6 +48,7 @@ namespace STROOP.Tabs.BruteforceTab
             ["f64"] = typeof(WatchVariableNumberWrapper),
             ["string"] = typeof(WatchVariableStringWrapper),
             ["boolean"] = typeof(WatchVariableBooleanWrapper),
+            ["quarterstep"] = typeof(WatchVariableQuarterstepWrapper),
         };
 
         public static readonly Dictionary<string, Type> backingTypes = new Dictionary<string, Type>()
@@ -46,6 +63,7 @@ namespace STROOP.Tabs.BruteforceTab
             ["f64"] = typeof(double),
             ["string"] = typeof(string),
             ["boolean"] = typeof(bool),
+            ["quarterstep"] = typeof(byte),
         };
 
         static XElement configNode = null;
@@ -87,8 +105,8 @@ namespace STROOP.Tabs.BruteforceTab
         Process bfProcess;
         Dictionary<string, Func<string>> stateGetters = new Dictionary<string, Func<string>>();
         Dictionary<string, Func<string>> parameterGetters = new Dictionary<string, Func<string>>();
-        List<WatchVariable> watchVariables = new List<WatchVariable>();
-        List<WatchVariable> parameterVariables = new List<WatchVariable>();
+        List<WatchVariable> knownStateVariables = new List<WatchVariable>();
+        List<WatchVariable> manualParameterVariables = new List<WatchVariable>();
 
         ContextMenuStrip moduleStrip;
 
@@ -110,7 +128,7 @@ namespace STROOP.Tabs.BruteforceTab
             txtManualConfig.SelectionTabs = tabStops;
 
             foreach (var varSrc in variableSourceFiles)
-                watchVariables.AddRange(XmlConfigParser.OpenWatchVariableControlPrecursors($"Config/{varSrc}"));
+                knownStateVariables.AddRange(XmlConfigParser.OpenWatchVariableControlPrecursors($"Config/{varSrc}"));
 
             this.AllowDrop = true;
             txtJsonOutput.AllowDrop = true;
@@ -125,6 +143,17 @@ namespace STROOP.Tabs.BruteforceTab
                 if (fileName.EndsWith(".json"))
                     ReadJson(filePath);
             };
+        }
+
+        public Func<T> GetManualValue<T>(string key)
+        {
+            foreach (var manualParameterVar_it in manualParameterVariables)
+                if (manualParameterVar_it.view.Name == key)
+                {
+                    var manualParameterVar_cap = manualParameterVar_it;
+                    return () => manualParameterVar_cap.GetValueAs<T>();
+                }
+            return () => default(T);
         }
 
         public JsonNode GetJsonText(string key)
@@ -171,7 +200,7 @@ namespace STROOP.Tabs.BruteforceTab
         void InitStateGetters()
         {
             foreach (var v in variables)
-                foreach (var watchVar_it in watchVariables)
+                foreach (var watchVar_it in knownStateVariables)
                 {
                     var watchVar = watchVar_it;
                     var jsonName = watchVar.view.GetJsonName();
@@ -216,14 +245,14 @@ namespace STROOP.Tabs.BruteforceTab
                 {
                     var variableName = fns.Key.displayName;
                     string o = "Keep";
-                    var newWatchVar = new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableSelectionWrapper))
+                    var newWatchVar = new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableSelectionWrapper<WatchVariableStringWrapper>))
                     {
                         Name = variableName,
                         _getterFunction = _ => o,
                         _setterFunction = (value, _) => { o = (string)value; return true; }
                     });
                     var watchVarControl = watchVariablePanelParams.AddVariable(newWatchVar, newWatchVar.view);
-                    var wrapper = (WatchVariableSelectionWrapper)watchVarControl.WatchVarWrapper;
+                    var wrapper = (WatchVariableSelectionWrapper<WatchVariableStringWrapper>)watchVarControl.WatchVarWrapper;
 
                     var options = new string[fns.Key.dic.Count + 1];
                     int i = 0;
@@ -268,7 +297,7 @@ namespace STROOP.Tabs.BruteforceTab
             {
                 if (!stateGetters.ContainsKey(v.Key)
                     && !ValueGetters.valueGetters.ContainsKey((moduleName, v.Key))
-                    && wrapperTypes.TryGetValue(v.Value, out var wrapperType))
+                    && fallbackWrapperTypes.TryGetValue(v.Value, out var wrapperType))
                 {
                     object o = 0;
                     var newWatchVar = new WatchVariable(new WatchVariable.CustomView(wrapperType)
@@ -277,7 +306,7 @@ namespace STROOP.Tabs.BruteforceTab
                         _getterFunction = _ => o,
                         _setterFunction = (value, _) => { o = value; return true; }
                     });
-                    parameterVariables.Add(newWatchVar);
+                    manualParameterVariables.Add(newWatchVar);
                     newWatchVar.ValueSet += UpdateState;
                     watchVariablePanelParams.AddVariable(newWatchVar, newWatchVar.view);
                     parameterGetters[v.Key] = () => StringUtilities.MakeJsonValue(newWatchVar.GetValues().FirstOrDefault()?.ToString() ?? "0");
@@ -307,7 +336,7 @@ namespace STROOP.Tabs.BruteforceTab
             this.modulePath = modulePath;
             string moduleName = Path.GetFileNameWithoutExtension(modulePath);
             watchVariablePanelParams.ClearVariables();
-            parameterVariables.Clear();
+            manualParameterVariables.Clear();
             jsonTexts.Clear();
 
             variables = new Dictionary<string, string>();
@@ -319,7 +348,8 @@ namespace STROOP.Tabs.BruteforceTab
             ReadJson($"{modulePath}/configuration.json");
             InitAutomaticParameterGetters(automaticParameterGetters);
 
-            InitSurface(moduleName);
+            using (new AccessScope<BruteforceTab>(this))
+                InitSurface(moduleName);
 
             UpdateState();
             btnRun.Enabled = true;
@@ -408,13 +438,13 @@ namespace STROOP.Tabs.BruteforceTab
             using (ignoreWrite.New())
                 foreach (var kvp in rootObj.values)
                 {
-                    foreach (var targetVariable in parameterVariables) // If any of the controllable variables match, set them
+                    foreach (var targetVariable in manualParameterVariables) // If any of the controllable variables match, set them
                         if (targetVariable.view.GetJsonName() == kvp.Key)
                         {
                             targetVariable.SetValue(StringUtilities.GetJsonValue(targetVariable.view.GetWrapperType(), kvp.Value.valueObject.ToString()) ?? 0);
                             goto skipNew;
                         }
-                    if (!watchVariables.Any(_ => _.view.GetJsonName() == kvp.Key))
+                    if (!knownStateVariables.Any(_ => _.view.GetJsonName() == kvp.Key))
                         variableKeepObjects[kvp.Key] = kvp.Value;
                     skipNew:;
                 }
