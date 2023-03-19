@@ -72,7 +72,7 @@ namespace STROOP.Tabs.MapTab.Renderers
 
         List<Triangle> triangles = new List<Triangle>();
 
-        int uniform_viewProjection, uniform_pixelsPerUnit, uniform_unitDivisor;
+        int uniform_viewProjection, uniform_pixelsPerUnit, uniform_unitShift;
         protected virtual int GetShader() => GraphicsUtil.GetShaderProgram(
                 "Resources/Shaders/Triangles.vert.glsl",
                 "Resources/Shaders/Triangles.frag.glsl",
@@ -116,7 +116,7 @@ namespace STROOP.Tabs.MapTab.Renderers
                 shader = GetShader();
                 uniform_viewProjection = GL.GetUniformLocation(shader, "viewProjection");
                 uniform_pixelsPerUnit = GL.GetUniformLocation(shader, "pixelsPerUnit");
-                uniform_unitDivisor = GL.GetUniformLocation(shader, "unitDivisor");
+                uniform_unitShift = GL.GetUniformLocation(shader, "unitShift");
             });
 
             dataPtr = Marshal.AllocHGlobal((IntPtr)(bufferSize = expectedSize));
@@ -150,8 +150,7 @@ namespace STROOP.Tabs.MapTab.Renderers
             var mat = graphics.ViewMatrix;
             GL.UniformMatrix4(GL.GetUniformLocation(program, "viewProjection"), false, ref mat);
             GL.Uniform2(uniform_pixelsPerUnit, ref pixelsPerUnit);
-            float unitDivisor = Structs.Configurations.SpecialConfig.ExtBoundariesScale;
-            GL.Uniform1(uniform_unitDivisor, unitDivisor);
+            GL.Uniform1(uniform_unitShift, (uint)Structs.Configurations.SpecialConfig.ExtBoundariesShift);
 
             GL.Uniform2(GL.GetUniformLocation(program, "gridOffset"), new Vector2(0)); // new Vector2(-3, -3));
 

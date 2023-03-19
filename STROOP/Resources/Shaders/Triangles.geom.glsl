@@ -1,7 +1,7 @@
 ﻿#version 330 core
 
 uniform mat4 viewProjection;
-uniform float unitDivisor;
+uniform uint unitShift;
 
 const vec3 barycentric[3] = vec3[](
 	vec3(1, 0, 0),
@@ -29,7 +29,7 @@ vec4 TranslateToInflate(float x1, float z1, float x2, float z2)
 {
 	float xDiff = (x2 - x1);
 	float zDiff = (z2 - z1);
-	float f = unitDivisor * -2.0f / sqrt(xDiff * xDiff + zDiff * zDiff) * gs_worldPosition_showunits[0].w;
+	float f = float(1 << unitShift )* -2.0f / sqrt(xDiff * xDiff + zDiff * zDiff) * gs_worldPosition_showunits[0].w;
 	xDiff *= f;
 	zDiff *= f;
 	return vec4(x1 + zDiff, z1 - xDiff, x2 + zDiff, z2 - xDiff);
