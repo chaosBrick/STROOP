@@ -49,7 +49,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
         bool ConfirmDeleteScoringFunc()
         {
             bool delete;
-            if (!mapObject.tracker.GetParent<STROOPTab>().IsActiveTab)
+            if (!mapObject.tracker.GetParent<STROOPTab>()?.IsActiveTab ?? true)
                 delete = true;
             else
             {
