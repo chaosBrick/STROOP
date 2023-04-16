@@ -57,7 +57,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             collapsedHeight = Height;
         }
 
-        public void Init(GeneralPurpose.ScoringFuncPrecursor precursor, Action UpdateStateFunc)
+        public void Init(GeneralPurpose.ScoringFuncPrecursor precursor, BruteforceTab bruteforceTab)
         {
             this.precursor = precursor;
             watchVariablePanelParameters.ClearVariables();
@@ -81,8 +81,13 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                 }))
                 .WatchVarWrapper;
             wrapper.DisplaySingleOption = false;
-            wrapper.options.Add(("last", AccessScope<BruteforceTab>.content?.GetManualValue<object>("m64_end") ?? (() => null)));
-            wrapper.SelectOption(0);
+
+            Func<object> endFrameValue = bruteforceTab.GetManualValue<object>("m64_end", () => wrapper.UpdateOption(0));
+            if (endFrameValue != null)
+            {
+                wrapper.options.Add(("last", endFrameValue));
+                wrapper.SelectOption(0);
+            }
 
             var ctrls = watchVariablePanelParameters.AddVariables(
                 precursor.parameterDefinitions.Select(kvp =>
@@ -99,7 +104,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                         _getterFunction = _ => precursor.parameterValues[key],
                         _setterFunction = (value, _) => { precursor.parameterValues[key] = value; return true; }
                     }, backingType);
-                    newWatchVar.ValueSet += UpdateStateFunc;
+                    newWatchVar.ValueSet += bruteforceTab.DeferUpdateState;
                     return (newWatchVar, newWatchVar.view);
                 }));
             if (stringToControllerType.TryGetValue(precursor.name, out var controllerType))

@@ -145,12 +145,13 @@ namespace STROOP.Tabs.BruteforceTab
             };
         }
 
-        public Func<T> GetManualValue<T>(string key)
+        public Func<T> GetManualValue<T>(string key, Action onValueChange)
         {
             foreach (var manualParameterVar_it in manualParameterVariables)
                 if (manualParameterVar_it.view.Name == key)
                 {
                     var manualParameterVar_cap = manualParameterVar_it;
+                    manualParameterVar_cap.ValueSet += onValueChange;
                     return () => manualParameterVar_cap.GetValueAs<T>();
                 }
             return () => default(T);

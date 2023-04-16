@@ -65,6 +65,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                         comment = true;
                         rd.Read();
                     }
+
                     switch (c)
                     {
                         case ':':
@@ -117,10 +118,10 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             };
         }
 
-        void AddMethod(ScoringFuncPrecursor meth, Action UpdateStateFunc)
+        void AddMethod(ScoringFuncPrecursor meth, BruteforceTab tab)
         {
             var ctrl = new ScoringFunc();
-            ctrl.Init(meth, UpdateStateFunc);
+            ctrl.Init(meth, tab);
             flowPanelScoring.Controls.Add(ctrl);
         }
 
@@ -171,7 +172,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             foreach (var scoringFunc in scoringFuncsByName)
             {
                 var precursor = scoringFunc.Value;
-                ctr.Items.AddHandlerToItem(precursor.name, () => AddMethod(new ScoringFuncPrecursor(precursor), parentTab.DeferUpdateState));
+                ctr.Items.AddHandlerToItem(precursor.name, () => AddMethod(new ScoringFuncPrecursor(precursor), parentTab));
             }
             ctr.Show(Cursor.Position);
         }
@@ -220,7 +221,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                                 else
                                     precursor.parameterValues[n.Key] = n.Value.valueObject;
                             }
-                        AddMethod(precursor, parentTab.DeferUpdateState);
+                        AddMethod(precursor, parentTab);
                     }
                 }
 

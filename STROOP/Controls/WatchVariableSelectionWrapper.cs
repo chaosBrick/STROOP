@@ -121,5 +121,13 @@ namespace STROOP.Controls
         }
 
         public void SelectOption(int index) => SetOption(options[index]);
+        public void UpdateOption(int index)
+        {
+            if (selectedOption.Equals(options[index]))
+            {
+                SetValue(selectedOption.getter());
+                selectedOption = options[index];
+            }
+        }
     }
 }
