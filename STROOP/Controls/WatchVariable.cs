@@ -301,7 +301,7 @@ namespace STROOP
         public List<object> GetValues(List<uint> addresses = null) =>
             GetAddressList(addresses).ConvertAll(address => view._getterFunction(address)).ToList();
 
-        private bool SetValueYes(uint address, object value)
+        private bool SetValueInternal(uint address, object value)
         {
             bool result = view._setterFunction(value, address);
             if (result && locks.TryGetValue(address, out var l))
@@ -320,7 +320,7 @@ namespace STROOP
             bool success = true;
             using (Config.Stream.Suspend())
             {
-                success = addressList.ConvertAll(address => SetValueYes(address, value))
+                success = addressList.ConvertAll(address => SetValueInternal(address, value))
                     .Aggregate(true, (b1, b2) => b1 && b2);
             }
 
@@ -339,7 +339,7 @@ namespace STROOP
                 for (int i = 0; i < minCount; i++)
                 {
                     if (values[i] == null) continue;
-                    success &= SetValueYes(addressList[i], values[i]);
+                    success &= SetValueInternal(addressList[i], values[i]);
                 }
             }
 
