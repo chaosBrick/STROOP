@@ -187,11 +187,11 @@ namespace STROOP.Tabs.BruteforceTab
                 while (!rd.EndOfStream)
                 {
                     var line = rd.ReadLine().Trim();
-                    if (line.Length > 0 && !line.StartsWith("//"))
+                    if (line.Length > 0 && !line.StartsWith("//") && !line.StartsWith("\""))
                     {
                         var split = line.Split(' ');
                         if (split.Length == 2)
-                            variables.Add(split[1].Trim(), split[0].Trim());
+                            variables.Add(split[1].Trim().Trim(';'), split[0].Trim());
                     }
                 }
             }
