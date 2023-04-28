@@ -118,16 +118,16 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             };
         }
 
-        void AddMethod(ScoringFuncPrecursor meth, BruteforceTab tab)
+        void AddMethod(ScoringFuncPrecursor meth)
         {
             var ctrl = new ScoringFunc();
-            ctrl.Init(meth, tab);
+            ctrl.Init(meth, parentTab);
             flowPanelScoring.Controls.Add(ctrl);
         }
 
         void AddPerturbator(Perturbator perturbator)
         {
-            perturbator.Init();
+            perturbator.Init(parentTab);
             flowPanelScoring.Controls.Add(perturbator);
         }
 
@@ -172,7 +172,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             foreach (var scoringFunc in scoringFuncsByName)
             {
                 var precursor = scoringFunc.Value;
-                ctr.Items.AddHandlerToItem(precursor.name, () => AddMethod(new ScoringFuncPrecursor(precursor), parentTab));
+                ctr.Items.AddHandlerToItem(precursor.name, () => AddMethod(new ScoringFuncPrecursor(precursor)));
             }
             ctr.Show(Cursor.Position);
         }
@@ -221,7 +221,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                                 else
                                     precursor.parameterValues[n.Key] = n.Value.valueObject;
                             }
-                        AddMethod(precursor, parentTab);
+                        AddMethod(precursor);
                     }
                 }
 
@@ -247,7 +247,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
 
             // If no perturbators were in the configuration, add a default one
             if (numPerturbators == 0)
-                flowPanelScoring.Controls.Add(new Perturbator());
+                AddPerturbator(new Perturbator());
             flowPanelScoring.ResumeLayout();
         }
     }

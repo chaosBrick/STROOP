@@ -34,7 +34,7 @@ namespace STROOP.Tabs.BruteforceTab
         }
 
         static string BRUTEFORCER_PATH = "Bruteforcers";
-        static readonly string[] variableSourceFiles = { "MarioData.xml", "CameraData.xml", "ActionsData.xml" };
+        static readonly string[] variableSourceFiles = { "MarioData.xml", "CameraData.xml", "ActionsData.xml", "MiscData.xml" };
         static IEnumerable<(Type type, SurfaceAttribute attribute)> moduleTypes;
         public static readonly Dictionary<string, Type> fallbackWrapperTypes = new Dictionary<string, Type>()
         {
@@ -100,13 +100,15 @@ namespace STROOP.Tabs.BruteforceTab
         public string modulePath { get; private set; }
         public Surface surface { get; private set; }
 
-        Dictionary<string, string> variables;
+        Dictionary<string, (string modifier, string name)> variables;
         string m64File;
-        Process bfProcess;
+        volatile Process bfProcess;
         Dictionary<string, Func<string>> stateGetters = new Dictionary<string, Func<string>>();
         Dictionary<string, Func<string>> parameterGetters = new Dictionary<string, Func<string>>();
+        Dictionary<string, Func<string>> controlStateGetters = new Dictionary<string, Func<string>>();
         List<WatchVariable> knownStateVariables = new List<WatchVariable>();
         List<WatchVariable> manualParameterVariables = new List<WatchVariable>();
+        Queue<string> outputLines = new Queue<string>();
 
         ContextMenuStrip moduleStrip;
 
@@ -191,8 +193,8 @@ namespace STROOP.Tabs.BruteforceTab
                     if (line.Length > 0 && !line.StartsWith("//") && !line.StartsWith("\""))
                     {
                         var split = line.Split(' ');
-                        if (split.Length == 2)
-                            variables.Add(split[1].Trim().Trim(';'), split[0].Trim());
+                        if (split.Length == 3)
+                            variables.Add(split[2].Trim().Trim(';'), (split[0].Trim(), split[1].Trim()));
                     }
                 }
             }
@@ -226,7 +228,10 @@ namespace STROOP.Tabs.BruteforceTab
                     if (fns.displayName == null)
                     { // null indicates this shall be the only available option
                         var vKey = v.Key;
-                        parameterGetters[vKey] = () => fns.dic.FirstOrDefault().Value().Item2(vKey);
+                        Func<string> fn = () => fns.dic.FirstOrDefault().Value().Item2(vKey);
+                        parameterGetters[vKey] = fn;
+                        if (v.Value.modifier == "control")
+                            controlStateGetters[vKey] = fn;
                     }
                     else
                     {
@@ -298,7 +303,7 @@ namespace STROOP.Tabs.BruteforceTab
             {
                 if (!stateGetters.ContainsKey(v.Key)
                     && !ValueGetters.valueGetters.ContainsKey((moduleName, v.Key))
-                    && fallbackWrapperTypes.TryGetValue(v.Value, out var wrapperType))
+                    && fallbackWrapperTypes.TryGetValue(v.Value.name, out var wrapperType))
                 {
                     object o = 0;
                     var newWatchVar = new WatchVariable(new WatchVariable.CustomView(wrapperType)
@@ -309,8 +314,15 @@ namespace STROOP.Tabs.BruteforceTab
                     });
                     manualParameterVariables.Add(newWatchVar);
                     newWatchVar.ValueSet += UpdateState;
-                    watchVariablePanelParams.AddVariable(newWatchVar, newWatchVar.view);
-                    parameterGetters[v.Key] = () => StringUtilities.MakeJsonValue(newWatchVar.GetValues().FirstOrDefault()?.ToString() ?? "0");
+                    var ctrl = watchVariablePanelParams.AddVariable(newWatchVar, newWatchVar.view);
+                    Func<string> fn = () => StringUtilities.MakeJsonValue(newWatchVar.GetValues().FirstOrDefault()?.ToString() ?? "0");
+                    if (v.Value.modifier == "control")
+                    {
+                        controlStateGetters[v.Key] = fn;
+                        ctrl.BaseColor = ColorUtilities.GetColorFromString("Yellow");
+                        newWatchVar.ValueSet += UpdateControlState;
+                    }
+                    parameterGetters[v.Key] = fn;
                 }
             }
         }
@@ -338,9 +350,10 @@ namespace STROOP.Tabs.BruteforceTab
             string moduleName = Path.GetFileNameWithoutExtension(modulePath);
             watchVariablePanelParams.ClearVariables();
             manualParameterVariables.Clear();
+            controlStateGetters.Clear();
             jsonTexts.Clear();
 
-            variables = new Dictionary<string, string>();
+            variables = new Dictionary<string, (string, string)>();
 
             ReadStateDefinition();
             InitStateGetters();
@@ -373,11 +386,39 @@ namespace STROOP.Tabs.BruteforceTab
         bool needsUpdateState = false;
         public void DeferUpdateState() => needsUpdateState = true;
 
+
+        bool needsUpdateControlState = false;
+        public void DeferUpdateControlState() => needsUpdateControlState = true;
+        void UpdateControlState()
+        {
+            if (bfProcess == null)
+                return;
+            needsUpdateControlState = false;
+            using (new AccessScope<BruteforceTab>(this))
+            {
+                var strBuilder = new System.Text.StringBuilder();
+                strBuilder.AppendLine("{");
+                foreach (var kvp in controlStateGetters)
+                    strBuilder.AppendLine($"\t\"{kvp.Key}\": {kvp.Value()}, ");
+
+                strBuilder.Remove(strBuilder.Length - 4, 4); // Remove last ',' and linebreak
+                strBuilder.AppendLine("\n}");
+                var text = strBuilder.ToString().Replace('\n', ' ').Replace('\r', ' ');
+                bfProcess?.StandardInput.WriteLine(text);
+                bfProcess?.StandardInput.Flush();
+            }
+        }
+
         public override void Update(bool active)
         {
             base.Update(active);
-            if (active && needsUpdateState)
-                UpdateState();
+            if (active)
+            {
+                if (needsUpdateState)
+                    UpdateState();
+                if (needsUpdateControlState)
+                    UpdateControlState();
+            }
         }
 
         private void btnLoadModule_Click(object sender, EventArgs e)
@@ -434,8 +475,7 @@ namespace STROOP.Tabs.BruteforceTab
         {
             if (!File.Exists(fileName))
                 return;
-            var knaw = File.ReadAllText(fileName);
-            var rootObj = JsonNode.ParseJsonObject(knaw);
+            var rootObj = JsonNode.ParseJsonObject(File.ReadAllText(fileName));
             using (ignoreWrite.New())
                 foreach (var kvp in rootObj.values)
                 {
@@ -488,20 +528,40 @@ namespace STROOP.Tabs.BruteforceTab
             i.Arguments = $" --file=tmp.json --outputmode=m64_and_sequence";
             i.UseShellExecute = false;
             i.WorkingDirectory = modulePath;
+            i.CreateNoWindow = true;
+            i.RedirectStandardOutput = true;
+            i.RedirectStandardInput = true;
+            i.RedirectStandardError = true;
+
             bfProcess = Process.Start(i);
+
             new System.Threading.Tasks.Task(() =>
             {
-                bfProcess.WaitForExit();
+                bfProcess?.WaitForExit();
                 Invoke((Action)Stop);
             }).Start();
+
+            bfProcess.OutputDataReceived += (_, e) =>
+            {
+                outputLines.Enqueue(e.Data);
+                if (outputLines.Count > 30)
+                    outputLines.Dequeue();
+                var strBuilder = new System.Text.StringBuilder();
+                foreach (var line in outputLines)
+                    strBuilder.AppendLine(line);
+                Action doThis = () => txtOutput.Text = strBuilder.ToString();
+                txtOutput.Invoke(doThis);
+            };
+
+            bfProcess.BeginOutputReadLine();
         }
 
         private void Stop()
         {
-            btnRun.Text = "Run!";
             if (!bfProcess?.HasExited ?? false)
                 bfProcess.Kill();
             bfProcess = null;
+            btnRun.Text = "Run!";
         }
 
         private void btnRun_Click(object sender, EventArgs e)

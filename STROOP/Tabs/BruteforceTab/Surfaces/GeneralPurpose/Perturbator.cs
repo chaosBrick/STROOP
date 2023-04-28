@@ -40,13 +40,11 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             Controls.Remove(watchVariablePanelParameters);
             RecalculateSize();
             collapsedHeight = Height;
-
-            Init();
         }
 
         public void SetValue(string key, object value) => parameterValues[key] = value;
 
-        public void Init()
+        public void Init(BruteforceTab bruteforceTab)
         {
             watchVariablePanelParameters.ClearVariables();
             labelName.Text = "Perturbator";
@@ -62,7 +60,11 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                     _setterFunction = (value, addr) => { parameterValues[key_cap] = value; return true; }
                 };
             }
-            watchVariablePanelParameters.AddVariables(variableViews.Select(_ => (new WatchVariable(_), _)));
+            watchVariablePanelParameters.AddVariables(variableViews.Select(_ => {
+                var result = new WatchVariable(_);
+                result.ValueSet += bruteforceTab.DeferUpdateControlState;
+                return (result, _);
+            }));
         }
 
         void RecalculateSize()
