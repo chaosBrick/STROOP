@@ -8,6 +8,7 @@ using STROOP.Controls;
 using System.Diagnostics;
 using System.Xml.Linq;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Text;
 
 using AutomaticParameterGetters = System.Collections.Generic.Dictionary<STROOP.Tabs.BruteforceTab.ValueGetters.GetterFuncs, System.Collections.Generic.HashSet<string>>;
 
@@ -106,9 +107,12 @@ namespace STROOP.Tabs.BruteforceTab
         Dictionary<string, Func<string>> stateGetters = new Dictionary<string, Func<string>>();
         Dictionary<string, Func<string>> parameterGetters = new Dictionary<string, Func<string>>();
         Dictionary<string, Func<string>> controlStateGetters = new Dictionary<string, Func<string>>();
+        Dictionary<string, string> docs = new Dictionary<string, string>();
         List<WatchVariable> knownStateVariables = new List<WatchVariable>();
         List<WatchVariable> manualParameterVariables = new List<WatchVariable>();
         Queue<string> outputLines = new Queue<string>();
+        WatchVariableControl hoveringWatchVarControl;
+        ToolTip documentationToolTip;
 
         ContextMenuStrip moduleStrip;
 
@@ -123,6 +127,7 @@ namespace STROOP.Tabs.BruteforceTab
         public BruteforceTab()
         {
             InitializeComponent();
+            documentationToolTip = new ToolTip();
             var tabStops = new int[16];
             for (int i = 0; i < tabStops.Length; i++)
                 tabStops[i] = i * 16;
@@ -187,14 +192,35 @@ namespace STROOP.Tabs.BruteforceTab
         {
             using (var rd = new StreamReader($"{modulePath}/state_definitions.txt"))
             {
+                string comment = null;
                 while (!rd.EndOfStream)
                 {
-                    var line = rd.ReadLine().Trim();
-                    if (line.Length > 0 && !line.StartsWith("//") && !line.StartsWith("\""))
+                    if ((char)rd.Peek() == '"')
                     {
-                        var split = line.Split(' ');
-                        if (split.Length == 3)
-                            variables.Add(split[2].Trim().Trim(';'), (split[0].Trim(), split[1].Trim()));
+                        rd.Read();
+                        var commentBuilder = new StringBuilder();
+                        char next;
+                        while (!rd.EndOfStream && (next = (char)rd.Read()) != '"')
+                            commentBuilder.Append(next);
+                        comment = commentBuilder.ToString();
+                        while (!rd.EndOfStream && (char)rd.Read() != '\n') ;
+                    }
+                    else
+                    {
+                        var line = rd.ReadLine().Trim();
+                        if (line.Length > 0 && !line.StartsWith("//"))
+                        {
+                            var split = line.Split(' ');
+                            if (split.Length == 3)
+                            {
+                                var varName = split[2].Trim().Trim(';');
+                                variables.Add(varName, (split[0].Trim(), split[1].Trim()));
+
+                                if (comment != null)
+                                    docs[varName] = comment;
+                            }
+                        }
+                        comment = null;
                     }
                 }
             }
@@ -235,6 +261,8 @@ namespace STROOP.Tabs.BruteforceTab
                     }
                     else
                     {
+                        if (docs.TryGetValue(v.Key, out var doc))
+                            docs[fns.displayName] = doc;
                         HashSet<string> set;
                         if (!automaticParameterGetters.TryGetValue(fns, out set))
                             automaticParameterGetters[fns] = set = new HashSet<string>();
@@ -282,7 +310,7 @@ namespace STROOP.Tabs.BruteforceTab
                         newWatchVar.SetValue(selectedStr);
                         jsonTexts[variableName] = () =>
                         {
-                            var keepTextBuilder = new System.Text.StringBuilder();
+                            var keepTextBuilder = new StringBuilder();
                             foreach (var var in fns.Value)
                                 keepTextBuilder.AppendLine($"\t\"{var}\": {fn(var)},");
                             return keepTextBuilder.ToString();
@@ -351,6 +379,7 @@ namespace STROOP.Tabs.BruteforceTab
             watchVariablePanelParams.ClearVariables();
             manualParameterVariables.Clear();
             controlStateGetters.Clear();
+            docs.Clear();
             jsonTexts.Clear();
 
             variables = new Dictionary<string, (string, string)>();
@@ -409,6 +438,7 @@ namespace STROOP.Tabs.BruteforceTab
             }
         }
 
+        DateTime hoverBegin;
         public override void Update(bool active)
         {
             base.Update(active);
@@ -418,6 +448,23 @@ namespace STROOP.Tabs.BruteforceTab
                     UpdateState();
                 if (needsUpdateControlState)
                     UpdateControlState();
+                var wwads = watchVariablePanelParams.GetVariableControlAtPoint(Cursor.Position);
+                if (wwads != hoveringWatchVarControl)
+                {
+                    hoveringWatchVarControl = wwads;
+                    hoverBegin = DateTime.Now;
+                    documentationToolTip.Hide(FindForm());
+                    documentationToolTip.Active = false;
+                }
+                else if (wwads != null && (DateTime.Now - hoverBegin).TotalSeconds >= 1)
+                    if (docs.TryGetValue(wwads.VarName, out var doc))
+                    {
+                        if (!documentationToolTip.Active)
+                        {
+                            documentationToolTip.Active = true;
+                            documentationToolTip.Show(doc, FindForm(), FindForm().PointToClient(Cursor.Position));
+                        }
+                    }
             }
         }
 
@@ -460,7 +507,7 @@ namespace STROOP.Tabs.BruteforceTab
 
         private void btnApplyKnownStates_Click(object sender, EventArgs e)
         {
-            var strBuilder = new System.Text.StringBuilder();
+            var strBuilder = new StringBuilder();
             foreach (var v in variables)
                 if (stateGetters.TryGetValue(v.Key, out var getter))
                     strBuilder.AppendLine($"\t\"{v.Key}\": {StringUtilities.MakeJsonValue(getter())},");
@@ -496,7 +543,7 @@ namespace STROOP.Tabs.BruteforceTab
             if (ignoreWrite)
                 return;
             txtJsonOutput.Clear();
-            var strBuilder = new System.Text.StringBuilder();
+            var strBuilder = new StringBuilder();
             strBuilder.AppendLine("{");
 
             strBuilder.Append(txtManualConfig.Text);
@@ -546,7 +593,7 @@ namespace STROOP.Tabs.BruteforceTab
                 outputLines.Enqueue(e.Data);
                 if (outputLines.Count > 30)
                     outputLines.Dequeue();
-                var strBuilder = new System.Text.StringBuilder();
+                var strBuilder = new StringBuilder();
                 foreach (var line in outputLines)
                     strBuilder.AppendLine(line);
                 Action doThis = () => txtOutput.Text = strBuilder.ToString();

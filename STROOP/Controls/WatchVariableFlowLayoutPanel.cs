@@ -310,6 +310,13 @@ namespace STROOP.Controls
             });
         }
 
+        public WatchVariableControl GetVariableControlAtPoint(Point screenSpacePoint)
+        {
+
+            (int index, var var, var _select) = renderer.GetVariableAt(PointToClient(screenSpacePoint));
+            return var;
+        }
+
         public void UpdateSortOption(WatchVariableControl.SortVariables newSortOption)
         {
             _shownWatchVarControls = new SortedList<WatchVariableControl>((a, b) => newSortOption(a, b));
