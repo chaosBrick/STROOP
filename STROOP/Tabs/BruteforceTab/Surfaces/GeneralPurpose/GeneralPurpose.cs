@@ -14,7 +14,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             public class Identifier
             {
                 public string name;
-                public string comment;
+                public string documentation;
             }
 
             public string name = "<undefined>";
@@ -64,6 +64,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                     {
                         comment = true;
                         rd.Read();
+                        continue;
                     }
 
                     switch (c)
@@ -75,18 +76,22 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                             tokenBuilder.Clear();
                             break;
                         case '\n':
-                            if (comment)
-                                lastIdentifier.comment = tokenBuilder.ToString();
+                            if (comment && lastIdentifier != null)
+                                lastIdentifier.documentation = tokenBuilder.ToString();
                             comment = false;
                             tokenBuilder.Clear();
                             lastTokens.Clear();
                             goto case ' ';
+                        case '\t':
                         case ' ':
                             if (tokenBuilder.Length > 0)
-                            {
-                                lastTokens.Push(tokenBuilder.ToString());
-                                tokenBuilder.Clear();
-                            }
+                                if (comment)
+                                    tokenBuilder.Append(c);
+                                else
+                                {
+                                    lastTokens.Push(tokenBuilder.ToString());
+                                    tokenBuilder.Clear();
+                                }
                             break;
                         case ';':
                             var nameToken = tokenBuilder.ToString();

@@ -1,15 +1,14 @@
-﻿using System;
-using System.IO;
-using System.Windows.Forms;
-using STROOP.Utilities;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using STROOP.Controls;
+using STROOP.Utilities;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Xml.Linq;
-using Microsoft.WindowsAPICodePack.Dialogs;
+using System.IO;
+using System.Linq;
 using System.Text;
-
+using System.Windows.Forms;
+using System.Xml.Linq;
 using AutomaticParameterGetters = System.Collections.Generic.Dictionary<STROOP.Tabs.BruteforceTab.ValueGetters.GetterFuncs, System.Collections.Generic.HashSet<string>>;
 
 namespace STROOP.Tabs.BruteforceTab
@@ -100,6 +99,7 @@ namespace STROOP.Tabs.BruteforceTab
 
         public string modulePath { get; private set; }
         public Surface surface { get; private set; }
+        public event Action Updating;
 
         Dictionary<string, (string modifier, string name)> variables;
         string m64File;
@@ -171,7 +171,60 @@ namespace STROOP.Tabs.BruteforceTab
             return null;
         }
 
-        void SetM64(string fileName)
+        bool needsUpdateState = false;
+        public void DeferUpdateState() => needsUpdateState = true;
+
+        bool needsUpdateControlState = false;
+        public void DeferUpdateControlState() => needsUpdateControlState = true;
+
+        DateTime hoverBegin;
+        public override void Update(bool active)
+        {
+            base.Update(active);
+            if (active)
+            {
+                if (needsUpdateState)
+                    UpdateState();
+                if (needsUpdateControlState)
+                    UpdateControlState();
+                var newHoveringWatchVarControl = watchVariablePanelParams.hoveringWatchVariableControl;
+                if (newHoveringWatchVarControl != hoveringWatchVarControl)
+                {
+                    hoveringWatchVarControl = newHoveringWatchVarControl;
+                    hoverBegin = DateTime.Now;
+                    documentationToolTip.Hide(FindForm());
+                    documentationToolTip.Active = false;
+                }
+                else if (newHoveringWatchVarControl != null && (DateTime.Now - hoverBegin).TotalSeconds >= 1 && docs.TryGetValue(newHoveringWatchVarControl.VarName, out var doc) && !documentationToolTip.Active)
+                {
+                    documentationToolTip.Active = true;
+                    documentationToolTip.Show(doc, FindForm(), FindForm().PointToClient(Cursor.Position));
+                }
+                Updating?.Invoke();
+            }
+        }
+
+        private void UpdateControlState()
+        {
+            if (bfProcess == null)
+                return;
+            needsUpdateControlState = false;
+            using (new AccessScope<BruteforceTab>(this))
+            {
+                var strBuilder = new System.Text.StringBuilder();
+                strBuilder.AppendLine("{");
+                foreach (var kvp in controlStateGetters)
+                    strBuilder.AppendLine($"\t\"{kvp.Key}\": {kvp.Value()}, ");
+
+                strBuilder.Remove(strBuilder.Length - 4, 4); // Remove last ',' and linebreak
+                strBuilder.AppendLine("\n}");
+                var text = strBuilder.ToString().Replace('\n', ' ').Replace('\r', ' ');
+                bfProcess?.StandardInput.WriteLine(text);
+                bfProcess?.StandardInput.Flush();
+            }
+        }
+
+        private void SetM64(string fileName)
         {
             m64File = fileName;
             labelM64.Text = Path.GetFileName(m64File);
@@ -180,7 +233,7 @@ namespace STROOP.Tabs.BruteforceTab
             watchVariablePanelParams.SetVariableValueByName("m64_input", "tmp.m64");
         }
 
-        void ChooseM64()
+        private void ChooseM64()
         {
             var ofd = new OpenFileDialog();
             ofd.Filter = ".m64 files (*.m64)|*.m64";
@@ -188,7 +241,7 @@ namespace STROOP.Tabs.BruteforceTab
                 SetM64(ofd.FileName);
         }
 
-        void ReadStateDefinition()
+        private void ReadStateDefinition()
         {
             using (var rd = new StreamReader($"{modulePath}/state_definitions.txt"))
             {
@@ -226,7 +279,7 @@ namespace STROOP.Tabs.BruteforceTab
             }
         }
 
-        void InitStateGetters()
+        private void InitStateGetters()
         {
             foreach (var v in variables)
                 foreach (var watchVar_it in knownStateVariables)
@@ -243,7 +296,7 @@ namespace STROOP.Tabs.BruteforceTab
                 }
         }
 
-        void FindAutomaticParameterGetters(string moduleName, out AutomaticParameterGetters automaticParameterGetters)
+        private void FindAutomaticParameterGetters(string moduleName, out AutomaticParameterGetters automaticParameterGetters)
         {
             automaticParameterGetters = new Dictionary<ValueGetters.GetterFuncs, HashSet<string>>();
 
@@ -272,7 +325,7 @@ namespace STROOP.Tabs.BruteforceTab
             }
         }
 
-        void InitAutomaticParameterGetters(AutomaticParameterGetters automaticParameterGetters)
+        private void InitAutomaticParameterGetters(AutomaticParameterGetters automaticParameterGetters)
         {
             foreach (var fns in automaticParameterGetters)
                 if (fns.Key.displayName != null)
@@ -325,7 +378,7 @@ namespace STROOP.Tabs.BruteforceTab
                 }
         }
 
-        void FindManualParameters(string moduleName)
+        private void FindManualParameters(string moduleName)
         {
             foreach (var v in variables)
             {
@@ -355,7 +408,7 @@ namespace STROOP.Tabs.BruteforceTab
             }
         }
 
-        void InitSurface(string moduleName)
+        private void InitSurface(string moduleName)
         {
             foreach (var t in moduleTypes)
                 if (t.attribute.moduleName == moduleName)
@@ -372,7 +425,7 @@ namespace STROOP.Tabs.BruteforceTab
                 }
         }
 
-        void LoadModule(string modulePath)
+        private void LoadModule(string modulePath)
         {
             this.modulePath = modulePath;
             string moduleName = Path.GetFileNameWithoutExtension(modulePath);
@@ -412,100 +465,7 @@ namespace STROOP.Tabs.BruteforceTab
             }
         }
 
-        bool needsUpdateState = false;
-        public void DeferUpdateState() => needsUpdateState = true;
-
-
-        bool needsUpdateControlState = false;
-        public void DeferUpdateControlState() => needsUpdateControlState = true;
-        void UpdateControlState()
-        {
-            if (bfProcess == null)
-                return;
-            needsUpdateControlState = false;
-            using (new AccessScope<BruteforceTab>(this))
-            {
-                var strBuilder = new System.Text.StringBuilder();
-                strBuilder.AppendLine("{");
-                foreach (var kvp in controlStateGetters)
-                    strBuilder.AppendLine($"\t\"{kvp.Key}\": {kvp.Value()}, ");
-
-                strBuilder.Remove(strBuilder.Length - 4, 4); // Remove last ',' and linebreak
-                strBuilder.AppendLine("\n}");
-                var text = strBuilder.ToString().Replace('\n', ' ').Replace('\r', ' ');
-                bfProcess?.StandardInput.WriteLine(text);
-                bfProcess?.StandardInput.Flush();
-            }
-        }
-
-        DateTime hoverBegin;
-        public override void Update(bool active)
-        {
-            base.Update(active);
-            if (active)
-            {
-                if (needsUpdateState)
-                    UpdateState();
-                if (needsUpdateControlState)
-                    UpdateControlState();
-                var wwads = watchVariablePanelParams.GetVariableControlAtPoint(Cursor.Position);
-                if (wwads != hoveringWatchVarControl)
-                {
-                    hoveringWatchVarControl = wwads;
-                    hoverBegin = DateTime.Now;
-                    documentationToolTip.Hide(FindForm());
-                    documentationToolTip.Active = false;
-                }
-                else if (wwads != null && (DateTime.Now - hoverBegin).TotalSeconds >= 1)
-                    if (docs.TryGetValue(wwads.VarName, out var doc))
-                    {
-                        if (!documentationToolTip.Active)
-                        {
-                            documentationToolTip.Active = true;
-                            documentationToolTip.Show(doc, FindForm(), FindForm().PointToClient(Cursor.Position));
-                        }
-                    }
-            }
-        }
-
-        private void btnLoadModule_Click(object sender, EventArgs e)
-        {
-            var clickPosition = Cursor.Position;
-            moduleStrip = new ContextMenuStrip();
-            var bruteforcerModules = GetBruteforcerModulePaths().ToList();
-            if (bruteforcerModules.Count == 0)
-            {
-                if (MessageBox.Show($"No bruteforcer modules have been found at{Environment.NewLine}" +
-                    $"\"{BRUTEFORCER_PATH}\"{Environment.NewLine}" +
-                    $"Do you want to locate your modules directory now?{Environment.NewLine}" +
-                    "(This should be the \"binaries\" directory from the sm64_bruteforcers repository)",
-                    "No bruteforcer modules found",
-                    MessageBoxButtons.YesNo) == DialogResult.Yes)
-                {
-                    var dlg = new CommonOpenFileDialog();
-                    dlg.IsFolderPicker = true;
-                    if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
-                    {
-                        BRUTEFORCER_PATH = dlg.FileName;
-                        SaveBruteforcerModulePath();
-                        bruteforcerModules = GetBruteforcerModulePaths().ToList();
-                    }
-                }
-            }
-
-            if (bruteforcerModules.Count == 0)
-                moduleStrip.Items.Add(new ToolStripMenuItem("No modules available") { Enabled = false });
-            else
-                foreach (var bf_it in Directory.GetDirectories(BRUTEFORCER_PATH))
-                    if (File.Exists($"{bf_it}/main.exe"))
-                    {
-                        var bf = bf_it;
-                        moduleStrip.Items.AddHandlerToItem(bf.Substring(BRUTEFORCER_PATH.Length + 1), () => { LoadModule(bf); ChooseM64(); });
-                    }
-            moduleStrip.Show(clickPosition);
-        }
-
-        private void btnApplyKnownStates_Click(object sender, EventArgs e)
+        private void ApplyKnownState()
         {
             var strBuilder = new StringBuilder();
             foreach (var v in variables)
@@ -513,8 +473,6 @@ namespace STROOP.Tabs.BruteforceTab
                     strBuilder.AppendLine($"\t\"{v.Key}\": {StringUtilities.MakeJsonValue(getter())},");
             var knownState = strBuilder.ToString();
             jsonTexts["knownState"] = () => knownState;
-
-            UpdateState();
         }
 
         IgnoreScope ignoreWrite = new IgnoreScope();
@@ -564,12 +522,8 @@ namespace STROOP.Tabs.BruteforceTab
             File.WriteAllText(fileName, txtJsonOutput.Text);
         }
 
-        private void Run()
+        private void SpawnProcess()
         {
-            btnRun.Text = "Stop";
-            UpdateState();
-            var configFile = $"{modulePath}/tmp.json";
-            File.WriteAllText(configFile, txtJsonOutput.Text);
             var i = new ProcessStartInfo();
             i.FileName = $"{modulePath}/main.exe";
             i.Arguments = $" --file=tmp.json --outputmode=m64_and_sequence";
@@ -603,6 +557,15 @@ namespace STROOP.Tabs.BruteforceTab
             bfProcess.BeginOutputReadLine();
         }
 
+        private void Run()
+        {
+            btnRun.Text = "Stop";
+            UpdateState();
+            var configFile = $"{modulePath}/tmp.json";
+            File.WriteAllText(configFile, txtJsonOutput.Text);
+            SpawnProcess();
+        }
+
         private void Stop()
         {
             if (!bfProcess?.HasExited ?? false)
@@ -611,6 +574,51 @@ namespace STROOP.Tabs.BruteforceTab
             btnRun.Text = "Run!";
         }
 
+        private void btnApplyKnownStates_Click(object sender, EventArgs e)
+        {
+            ApplyKnownState();
+            UpdateState();
+        }
+
+        private void btnLoadModule_Click(object sender, EventArgs e)
+        {
+            var clickPosition = Cursor.Position;
+            moduleStrip = new ContextMenuStrip();
+            var bruteforcerModules = GetBruteforcerModulePaths().ToList();
+            if (bruteforcerModules.Count == 0)
+            {
+                if (MessageBox.Show($"No bruteforcer modules have been found at{Environment.NewLine}" +
+                    $"\"{BRUTEFORCER_PATH}\"{Environment.NewLine}" +
+                    $"Do you want to locate your modules directory now?{Environment.NewLine}" +
+                    "(This should be the \"binaries\" directory from the sm64_bruteforcers repository)",
+                    "No bruteforcer modules found",
+                    MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    var dlg = new CommonOpenFileDialog();
+                    dlg.IsFolderPicker = true;
+                    if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
+                    {
+                        BRUTEFORCER_PATH = dlg.FileName;
+                        SaveBruteforcerModulePath();
+                        bruteforcerModules = GetBruteforcerModulePaths().ToList();
+                    }
+                }
+            }
+
+            if (bruteforcerModules.Count == 0)
+                moduleStrip.Items.Add(new ToolStripMenuItem("No modules available") { Enabled = false });
+            else
+                foreach (var bf_it in Directory.GetDirectories(BRUTEFORCER_PATH))
+                    if (File.Exists($"{bf_it}/main.exe"))
+                    {
+                        var bf = bf_it;
+                        moduleStrip.Items.AddHandlerToItem(bf.Substring(BRUTEFORCER_PATH.Length + 1), () => { LoadModule(bf); ChooseM64(); });
+                    }
+            moduleStrip.Show(clickPosition);
+        }
+
+        private void btnChooseM64_Click(object sender, EventArgs e) => ChooseM64();
+
         private void btnRun_Click(object sender, EventArgs e)
         {
             if (bfProcess == null)
@@ -618,8 +626,6 @@ namespace STROOP.Tabs.BruteforceTab
             else
                 Stop();
         }
-
-        private void btnChooseM64_Click(object sender, EventArgs e) => ChooseM64();
 
         private void btnSaveConfig_Click(object sender, EventArgs e)
         {

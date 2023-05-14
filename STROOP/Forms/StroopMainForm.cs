@@ -22,6 +22,8 @@ namespace STROOP
         // STROOP VERSION NAME
         const string _version = "Refactor 0.6.2";
 
+        public event Action Updating;
+
         DataTable _tableOtherData = new DataTable();
         Dictionary<int, DataRow> _otherDataRowAssoc = new Dictionary<int, DataRow>();
         Dictionary<Type, Tabs.STROOPTab> tabsByType = new Dictionary<Type, Tabs.STROOPTab>();
@@ -322,6 +324,7 @@ namespace STROOP
 
                 WatchVariableLockManager.Update();
                 TriangleDataModel.ClearCache();
+                Updating?.Invoke();
             }
         }
 

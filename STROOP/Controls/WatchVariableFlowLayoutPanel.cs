@@ -109,6 +109,9 @@ namespace STROOP.Controls
 
         WatchVariablePanelRenderer renderer;
 
+        public WatchVariableControl hoveringWatchVariableControl => renderer.GetVariableAt(renderer.PointToClient(System.Windows.Forms.Cursor.Position)).ctrl;
+        
+
         public new event System.Windows.Forms.MouseEventHandler MouseDown
         {
             add { renderer.MouseDown += value; }
@@ -308,13 +311,6 @@ namespace STROOP.Controls
 
                 ResumeLayout();
             });
-        }
-
-        public WatchVariableControl GetVariableControlAtPoint(Point screenSpacePoint)
-        {
-
-            (int index, var var, var _select) = renderer.GetVariableAt(PointToClient(screenSpacePoint));
-            return var;
         }
 
         public void UpdateSortOption(WatchVariableControl.SortVariables newSortOption)

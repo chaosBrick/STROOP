@@ -6,6 +6,7 @@ using STROOP.Utilities;
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
+using STROOP.Controls;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
 {
@@ -46,15 +47,43 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
         int collapsedHeight;
         GeneralPurpose.ScoringFuncPrecursor precursor;
         IMethodController controller;
+        ToolTip documentationToolTip;
+        Dictionary<string, string> docs = new Dictionary<string, string>()
+        {
+            ["weight"] = "The value to multiply the result of the scoring function by.\nNegative values are allowed and usually invert the effect of the function.",
+            ["frame"] = "The 1-indexed frame number in the m64 to apply the scoring function on. 'last' will always be equal to m64_end.",
+        };
 
         public ScoringFunc()
         {
             InitializeComponent();
             BackColor = Color.AliceBlue;
+            documentationToolTip = new ToolTip();
+            documentationToolTip.ShowAlways = true;
 
             Controls.Remove(watchVariablePanelParameters);
             RecalculateSize();
             collapsedHeight = Height;
+        }
+
+        DateTime hoverBegin;
+        WatchVariableControl hoveringWatchVarControl;
+        void UpdateTooltip()
+        {
+            var newHoveringWatchVarControl = expanded ? watchVariablePanelParameters.hoveringWatchVariableControl : null;
+            newHoveringWatchVarControl = newHoveringWatchVarControl ?? variablePanelBaseValues.hoveringWatchVariableControl;
+            if (newHoveringWatchVarControl != hoveringWatchVarControl)
+            {
+                hoveringWatchVarControl = newHoveringWatchVarControl;
+                hoverBegin = DateTime.Now;
+                documentationToolTip.Hide(FindForm());
+                documentationToolTip.Active = false;
+            }
+            else if (newHoveringWatchVarControl != null && (DateTime.Now - hoverBegin).TotalSeconds >= 1 && docs.TryGetValue(newHoveringWatchVarControl.VarName, out var doc) && !documentationToolTip.Active)
+            {
+                documentationToolTip.Active = true;
+                documentationToolTip.Show(doc, FindForm(), FindForm().PointToClient(Cursor.Position));
+            }
         }
 
         public void Init(GeneralPurpose.ScoringFuncPrecursor precursor, BruteforceTab bruteforceTab)
@@ -62,18 +91,20 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             this.precursor = precursor;
             watchVariablePanelParameters.ClearVariables();
             labelName.Text = precursor.name;
+            bruteforceTab.Updating += UpdateTooltip;
+            Disposed += (_, __) => bruteforceTab.Updating -= UpdateTooltip;
 
             variablePanelBaseValues.AddVariable(new WatchVariable(
-                    new WatchVariable.CustomView(typeof(Controls.WatchVariableNumberWrapper))
+                    new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
                     {
                         Name = "weight",
                         _getterFunction = (_) => precursor.weight,
                         _setterFunction = (value, addr) => { precursor.weight = Convert.ToDouble(value); return true; }
                     }));
 
-            var wrapper = (Controls.WatchVariableSelectionWrapper<Controls.WatchVariableNumberWrapper>)variablePanelBaseValues.AddVariable(
+            var wrapper = (WatchVariableSelectionWrapper<WatchVariableNumberWrapper>)variablePanelBaseValues.AddVariable(
                 new WatchVariable(
-                new WatchVariable.CustomView(typeof(Controls.WatchVariableSelectionWrapper<Controls.WatchVariableNumberWrapper>))
+                new WatchVariable.CustomView(typeof(WatchVariableSelectionWrapper<WatchVariableNumberWrapper>))
                 {
                     Name = "frame",
                     _getterFunction = (_) => precursor.frame,
@@ -92,6 +123,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             var ctrls = watchVariablePanelParameters.AddVariables(
                 precursor.parameterDefinitions.Select(kvp =>
                 {
+                    docs[kvp.Key.name] = kvp.Key.documentation;
                     string key = kvp.Key.name;
                     var backingType = BruteforceTab.backingTypes[kvp.Value];
                     if (precursor.parameterValues.TryGetValue(key, out var uncastedValue))
