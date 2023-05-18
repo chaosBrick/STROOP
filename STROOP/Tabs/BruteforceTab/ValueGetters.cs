@@ -2,37 +2,55 @@
 using STROOP.Utilities;
 using System;
 using System.Linq;
-
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
 
-using GetterFuncsDic = System.Collections.Generic.Dictionary<string, System.Func<(string, System.Func<string, string>)>>;
+using GetterFuncsDic = System.Collections.Generic.Dictionary<string, System.Func<STROOP.Tabs.BruteforceTab.ValueGetters.Option>>;
 
 namespace STROOP.Tabs.BruteforceTab
 {
     static class ValueGetters
     {
+        public class Option
+        {
+            public readonly string optionName;
+            public readonly Func<string, string> moduleVariableGetter;
+            public Option(string watchVariableName, Func<string, string> moduleVariableGetter)
+            {
+                this.optionName = watchVariableName;
+                this.moduleVariableGetter = moduleVariableGetter;
+            }
+            public static implicit operator Option((string watchVariableName, Func<string, string> func) val) => new Option(val.watchVariableName, val.func);
+        }
+
         public class GetterFuncs
         {
             public readonly GetterFuncsDic dic;
-            public GetterFuncs(string displayName, GetterFuncsDic dic) { this.displayName = displayName; this.dic = dic; }
-            public string displayName;
+            public GetterFuncs(string displayName, GetterFuncsDic dic, Option defaultOption = null)
+            {
+                this.displayName = displayName;
+                this.dic = dic;
+                this.defaultOption = defaultOption;
+            }
+            public readonly string displayName;
+            public readonly Option defaultOption;
         }
 
-        public static Dictionary<(string, string), GetterFuncs> valueGetters;
+        public static Dictionary<(string moduleName, string variableName), GetterFuncs> valueGetters;
         static ValueGetters()
         {
-            valueGetters = new Dictionary<(string, string), GetterFuncs>(
-            GeneralUtilities.GetEqualityComparer<(string, string)>(
-                (x, y) => x.Item2 == y.Item2 && (x.Item1 == null || y.Item1 == null || x.Item1 == y.Item1),
-                obj => obj.Item2.GetHashCode())
+            valueGetters = new Dictionary<(string moduleName, string variableName), GetterFuncs>(
+            GeneralUtilities.GetEqualityComparer<(string moduleName, string variableName)>(
+                (x, y) => x.variableName == y.variableName && (x.moduleName == null || y.moduleName == null || x.moduleName == y.moduleName),
+                obj => obj.variableName.GetHashCode())
             )
             {
                 [(null, "static_tris")] = new GetterFuncs("Static Triangles", new GetterFuncsDic
                 {
                     ["From Map Tracker"] = () => ("From Map Tracker", GetTrackedTriangles),
                     ["All Level Triangles"] = () => ("All Level Triangles", GetLevelTriangles)
-                }),
+                }, ("All Level Triangles", GetLevelTriangles)
+                ),
 
                 [(null, "dynamic_tris")] = GetDynamicTriangles,
 

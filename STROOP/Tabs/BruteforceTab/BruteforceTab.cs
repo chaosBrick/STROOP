@@ -322,7 +322,7 @@ namespace STROOP.Tabs.BruteforceTab
                     if (fns.displayName == null)
                     { // null indicates this shall be the only available option
                         var vKey = v.Key;
-                        Func<string> fn = () => fns.dic.FirstOrDefault().Value().Item2(vKey);
+                        Func<string> fn = () => fns.dic.FirstOrDefault().Value().moduleVariableGetter(vKey);
                         parameterGetters[vKey] = fn;
                         if (v.Value.modifier == "control")
                             controlStateGetters[vKey] = fn;
@@ -361,6 +361,19 @@ namespace STROOP.Tabs.BruteforceTab
                     foreach (var ksdda in fns.Key.dic)
                         options[i++] = ksdda.Key;
                     options[options.Length - 1] = "[Keep]";
+
+                    void SetConcreteOption(ValueGetters.Option option)
+                    {
+                        newWatchVar.SetValue(option.optionName);
+                        jsonTexts[variableName] = () =>
+                        {
+                            var keepTextBuilder = new StringBuilder();
+                            foreach (var var in fns.Value)
+                                keepTextBuilder.AppendLine($"\t\"{var}\": {option.moduleVariableGetter(var)},");
+                            return keepTextBuilder.ToString();
+                        };
+                    }
+
                     void SetSelected(string selectedStr)
                     {
                         Func<string, string> fn = var =>
@@ -371,18 +384,11 @@ namespace STROOP.Tabs.BruteforceTab
                         };
                         if (selectedStr != "[Keep]")
                         {
-                            var method = fns.Key.dic[selectedStr]();
-                            fn = method.Item2;
-                            selectedStr = method.Item1;
+                            var option = fns.Key.dic[selectedStr]();
+                            fn = option.moduleVariableGetter;
+                            selectedStr = option.optionName;
                         }
-                        newWatchVar.SetValue(selectedStr);
-                        jsonTexts[variableName] = () =>
-                        {
-                            var keepTextBuilder = new StringBuilder();
-                            foreach (var var in fns.Value)
-                                keepTextBuilder.AppendLine($"\t\"{var}\": {fn(var)},");
-                            return keepTextBuilder.ToString();
-                        };
+                        SetConcreteOption((selectedStr, fn));
                     }
                     foreach (var option_it in options)
                     {
@@ -390,6 +396,8 @@ namespace STROOP.Tabs.BruteforceTab
                         wrapper.options.Add((option_cap, () => { SetSelected(option_cap); UpdateState(); return option_cap; }));
                     }
                     SetSelected("[Keep]");
+                    if (fns.Key.defaultOption != null)
+                        SetConcreteOption(fns.Key.defaultOption);
                 }
         }
 
