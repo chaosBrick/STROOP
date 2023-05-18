@@ -135,6 +135,6 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
 
     class XZRadialLimit : TrackerMethodControllerBase<XZRadialLimitMapObject, XZRadialLimit>
     {
-        protected override XZRadialLimitMapObject CreateTracker() => new XZRadialLimitMapObject();
+        protected override XZRadialLimitMapObject CreateMapObject() => new XZRadialLimitMapObject();
     }
 }

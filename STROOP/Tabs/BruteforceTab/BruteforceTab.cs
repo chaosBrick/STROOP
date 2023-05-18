@@ -94,13 +94,13 @@ namespace STROOP.Tabs.BruteforceTab
             moduleTypes = lst;
         }
 
-        Dictionary<string, Func<string>> jsonTexts = new Dictionary<string, Func<string>>();
-        Dictionary<string, JsonNode> variableKeepObjects = new Dictionary<string, JsonNode>();
 
         public string modulePath { get; private set; }
         public Surface surface { get; private set; }
         public event Action Updating;
 
+        Dictionary<string, Func<string>> jsonTexts = new Dictionary<string, Func<string>>();
+        Dictionary<string, JsonNode> variableKeepObjects = new Dictionary<string, JsonNode>();
         Dictionary<string, (string modifier, string name)> variables;
         string m64File;
         volatile Process bfProcess;
@@ -113,8 +113,12 @@ namespace STROOP.Tabs.BruteforceTab
         Queue<string> outputLines = new Queue<string>();
         WatchVariableControl hoveringWatchVarControl;
         ToolTip documentationToolTip;
-
         ContextMenuStrip moduleStrip;
+        DateTime hoverBegin;
+
+        IgnoreScope ignoreWrite = new IgnoreScope();
+        bool needsUpdateState = false;
+        bool needsUpdateControlState = false;
 
         IEnumerable<string> GetBruteforcerModulePaths()
         {
@@ -152,16 +156,16 @@ namespace STROOP.Tabs.BruteforceTab
             };
         }
 
-        public Func<T> GetManualValue<T>(string key, Action onValueChange)
+        public (Func<T> getValue, Action unregister) GetManualValue<T>(string key, Action onValueChange)
         {
             foreach (var manualParameterVar_it in manualParameterVariables)
                 if (manualParameterVar_it.view.Name == key)
                 {
                     var manualParameterVar_cap = manualParameterVar_it;
                     manualParameterVar_cap.ValueSet += onValueChange;
-                    return () => manualParameterVar_cap.GetValueAs<T>();
+                    return (() => manualParameterVar_cap.GetValueAs<T>(), () => manualParameterVar_cap.ValueSet -= onValueChange);
                 }
-            return () => default(T);
+            return (null, () => { });
         }
 
         public JsonNode GetJsonText(string key)
@@ -171,13 +175,24 @@ namespace STROOP.Tabs.BruteforceTab
             return null;
         }
 
-        bool needsUpdateState = false;
         public void DeferUpdateState() => needsUpdateState = true;
 
-        bool needsUpdateControlState = false;
         public void DeferUpdateControlState() => needsUpdateControlState = true;
 
-        DateTime hoverBegin;
+        public void UpdateState()
+        {
+            needsUpdateState = false;
+            using (new AccessScope<BruteforceTab>(this))
+            {
+                var strBuilder = new System.Text.StringBuilder();
+                foreach (var kvp in parameterGetters)
+                    strBuilder.AppendLine($"\t\"{kvp.Key}\": {kvp.Value()}, ");
+                var text = strBuilder.ToString();
+                jsonTexts["bfState"] = () => text;
+                WriteJson();
+            }
+        }
+
         public override void Update(bool active)
         {
             base.Update(active);
@@ -410,6 +425,8 @@ namespace STROOP.Tabs.BruteforceTab
 
         private void InitSurface(string moduleName)
         {
+            surface?.Cleanup();
+            surface?.Dispose();
             foreach (var t in moduleTypes)
                 if (t.attribute.moduleName == moduleName)
                 {
@@ -451,20 +468,6 @@ namespace STROOP.Tabs.BruteforceTab
             btnRun.Enabled = true;
         }
 
-        public void UpdateState()
-        {
-            needsUpdateState = false;
-            using (new AccessScope<BruteforceTab>(this))
-            {
-                var strBuilder = new System.Text.StringBuilder();
-                foreach (var kvp in parameterGetters)
-                    strBuilder.AppendLine($"\t\"{kvp.Key}\": {kvp.Value()}, ");
-                var text = strBuilder.ToString();
-                jsonTexts["bfState"] = () => text;
-                WriteJson();
-            }
-        }
-
         private void ApplyKnownState()
         {
             var strBuilder = new StringBuilder();
@@ -475,7 +478,6 @@ namespace STROOP.Tabs.BruteforceTab
             jsonTexts["knownState"] = () => knownState;
         }
 
-        IgnoreScope ignoreWrite = new IgnoreScope();
         private void ReadJson(string fileName)
         {
             if (!File.Exists(fileName))
@@ -522,6 +524,7 @@ namespace STROOP.Tabs.BruteforceTab
             File.WriteAllText(fileName, txtJsonOutput.Text);
         }
 
+        // TODO(Important): Attach spawned thread with a job object
         private void SpawnProcess()
         {
             var i = new ProcessStartInfo();
@@ -641,6 +644,7 @@ namespace STROOP.Tabs.BruteforceTab
             dlg.Filter = "json files (*.json)|*.json";
             if (dlg.ShowDialog() == DialogResult.OK)
             {
+                surface?.Cleanup();
                 ReadJson(dlg.FileName);
                 surface?.InitJson();
                 UpdateState();

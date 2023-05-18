@@ -473,9 +473,13 @@ namespace STROOP.Controls
             {
                 location.X -= borderMargin;
                 location.Y -= borderMargin;
+                if (location.X < 0 || location.Y < 0)
+                    return (-1, null, false);
                 var x = location.X / elementWidth;
                 var y = location.Y / elementHeight;
                 int maxRows = GetMaxRows();
+                if (y >= maxRows)
+                    return (-1, null, false);
                 int index = x * maxRows + y;
                 if (index < 0)
                     return (0, null, false);

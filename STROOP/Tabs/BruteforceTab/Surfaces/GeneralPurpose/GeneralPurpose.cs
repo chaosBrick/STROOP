@@ -136,9 +136,33 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             flowPanelScoring.Controls.Add(perturbator);
         }
 
-        public void RemoveMethod(ScoringFunc ctrl) => flowPanelScoring.Controls.Remove(ctrl);
+        public void RemoveMethod(ScoringFunc ctrl)
+        {
+            flowPanelScoring.Controls.Remove(ctrl);
+            ctrl.DeleteFromMap();
+            ctrl.Dispose();
+        }
 
-        public void RemovePerturbator(Perturbator ctrl) => flowPanelScoring.Controls.Remove(ctrl);
+        public void RemovePerturbator(Perturbator ctrl)
+        {
+            flowPanelScoring.Controls.Remove(ctrl);
+            ctrl.Dispose();
+        }
+        private void btnAddMethod_Click(object sender, EventArgs e)
+        {
+            var ctr = new ContextMenuStrip();
+            foreach (var scoringFunc in scoringFuncsByName)
+            {
+                var precursor = scoringFunc.Value;
+                ctr.Items.AddHandlerToItem(precursor.name, () => AddMethod(new ScoringFuncPrecursor(precursor)));
+            }
+            ctr.Show(Cursor.Position);
+        }
+
+        private void btnAddPerturbator_Click(object sender, EventArgs e)
+        {
+            AddPerturbator(new Perturbator());
+        }
 
         public override string GetParameter(string parameterName)
         {
@@ -171,33 +195,11 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             return base.GetParameter(parameterName);
         }
 
-        private void btnAddMethod_Click(object sender, EventArgs e)
-        {
-            var ctr = new ContextMenuStrip();
-            foreach (var scoringFunc in scoringFuncsByName)
-            {
-                var precursor = scoringFunc.Value;
-                ctr.Items.AddHandlerToItem(precursor.name, () => AddMethod(new ScoringFuncPrecursor(precursor)));
-            }
-            ctr.Show(Cursor.Position);
-        }
-
-        private void btnAddPerturbator_Click(object sender, EventArgs e)
-        {
-            AddPerturbator(new Perturbator());
-        }
-
         public override void InitJson()
         {
             base.InitJson();
             int numPerturbators = 0;
 
-            flowPanelScoring.SuspendLayout();
-            foreach (var ctrl in flowPanelScoring.Controls)
-                if (ctrl is ScoringFunc scoringFunc)
-                    scoringFunc.DeleteSelf();
-
-            flowPanelScoring.Controls.Clear();
             var scoringJson = parentTab.GetJsonText("scoring_methods") as JsonNodeArray;
             if (scoringJson != null)
                 foreach (var node in scoringJson.values)
@@ -254,6 +256,19 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             if (numPerturbators == 0)
                 AddPerturbator(new Perturbator());
             flowPanelScoring.ResumeLayout();
+        }
+
+        public override void Cleanup()
+        {
+            base.Cleanup();
+            var allControls = new List<Control>();
+            foreach (Control ctrl in flowPanelScoring.Controls)
+                allControls.Add(ctrl);
+            foreach (var ctrl in allControls)
+                if (ctrl is ScoringFunc scoringFunc)
+                    RemoveMethod(scoringFunc);
+                else if (ctrl is Perturbator perturbator)
+                    RemovePerturbator(perturbator);
         }
     }
 }

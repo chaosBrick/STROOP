@@ -32,7 +32,7 @@ namespace STROOP.Tabs.MapTab
         Dictionary<string, CreateTracker> createChildTrackers = new Dictionary<string, CreateTracker>();
 
         public delegate void RemovedFromMapEventHandler();
-        public event RemovedFromMapEventHandler RemovedFromMap;
+        public event RemovedFromMapEventHandler Killed;
         public Func<bool> ConfirmRemoveFromMap;
 
         public IEnumerable<MapTracker> EnumerateChildTrackers()
@@ -46,16 +46,17 @@ namespace STROOP.Tabs.MapTab
         {
             this.parentTracker = parentTracker;
             parentTracker.childTrackers.Add(this);
-            parentTracker.RemovedFromMap += RemoveFromMap;
+            parentTracker.Killed += Kill;
         }
 
-        public void RemoveFromMap()
+        public void Kill()
         {
             if (!(ConfirmRemoveFromMap?.Invoke() ?? true))
                 return;
             CleanUp();
-            this.GetParent<MapTrackerFlowLayoutPanel>()?.Controls.Remove(this);
-            RemovedFromMap?.Invoke();
+            mapTab.RemoveTracker(this);
+            Killed?.Invoke();
+            Dispose();
         }
 
         public MapTracker(MapTab mapTab, string creationIdentifier, MapObject mapObject)
@@ -322,7 +323,7 @@ namespace STROOP.Tabs.MapTab
 
         private void pictureBoxRedX_Click(object sender, EventArgs e)
         {
-            RemoveFromMap();
+            Kill();
         }
 
         private void pictureBoxEye_Click(object sender, EventArgs e)

@@ -68,6 +68,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
 
         DateTime hoverBegin;
         WatchVariableControl hoveringWatchVarControl;
+
         void UpdateTooltip()
         {
             var newHoveringWatchVarControl = expanded ? watchVariablePanelParameters.hoveringWatchVariableControl : null;
@@ -113,7 +114,8 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                 .WatchVarWrapper;
             wrapper.DisplaySingleOption = false;
 
-            Func<object> endFrameValue = bruteforceTab.GetManualValue<object>("m64_end", () => wrapper.UpdateOption(0));
+            (Func<object> endFrameValue, Action unregister) = bruteforceTab.GetManualValue<object>("m64_end", () => wrapper.UpdateOption(0));
+            Disposed += (_, __) => unregister();
             if (endFrameValue != null)
             {
                 wrapper.options.Add(("last", endFrameValue));
@@ -207,12 +209,16 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             return strBuilder.ToString();
         }
 
-        public void DeleteFromMap() => this.GetParent<GeneralPurpose>()?.RemoveMethod(this);
+        public void DeleteSelf() => this.GetParent<GeneralPurpose>()?.RemoveMethod(this);
 
-        public void DeleteSelf()
+        bool deleting = false;
+        public void DeleteFromMap()
         {
+            if (deleting)
+                return;
+            deleting = true;
             controller?.Remove();
-            DeleteFromMap();
+            DeleteSelf();
         }
 
         private void pbExpand_Click(object sender, EventArgs e) => SetExpanded(!expanded);

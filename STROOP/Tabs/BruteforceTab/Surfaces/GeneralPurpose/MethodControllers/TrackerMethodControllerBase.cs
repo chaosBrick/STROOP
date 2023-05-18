@@ -25,10 +25,11 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
 
             var mapTab = AccessScope<StroopMainForm>.content.GetTab<MapTab.MapTab>();
             mapTab.UpdateOrInitialize(true);
-            mapObject = CreateTracker();
-            mapTab.AddExternal(mapObject);
+            mapObject = CreateMapObject();
+            var tracker = mapTab.AddExternal(mapObject);
             mapObject.SetParent((ControllerType)this);
-            target.Disposed += (_, __) => mapObject.tracker.RemoveFromMap();
+            target.Disposed += (_, __) => mapObject.tracker.Kill();
+            tracker.Disposed += (_, __) => target.DeleteSelf();
 
             var ctrl = (Controls.WatchVariableSelectionWrapper<Controls.WatchVariableStringWrapper>)parameterPanel.AddVariable(var, var.view).WatchVarWrapper;
             ctrl.DisplaySingleOption = true;
@@ -42,7 +43,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
             mapObject.tracker.ConfirmRemoveFromMap = ConfirmDeleteScoringFunc;
         }
 
-        protected abstract MapObjectType CreateTracker();
+        protected abstract MapObjectType CreateMapObject();
 
         public int? GetFuncIndex() => (target.Parent as Controls.ReorderFlowLayoutPanel)?.Controls.GetChildIndex(target);
 
@@ -60,14 +61,12 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
                 delete = dlgResult == DialogResult.Yes;
             }
 
-            if (delete)
-                target.DeleteFromMap();
             return delete;
         }
 
         void IMethodController.Remove()
         {
-            mapObject?.tracker?.RemoveFromMap();
+            mapObject?.tracker?.Kill();
         }
     }
 }
