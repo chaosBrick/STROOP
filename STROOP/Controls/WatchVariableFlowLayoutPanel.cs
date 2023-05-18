@@ -148,7 +148,7 @@ namespace STROOP.Controls
                 if (KeyboardUtilities.IsCtrlHeld() && args.KeyCode == Keys.F)
                     (FindForm() as StroopMainForm)?.ShowSearchDialog();
             };
-            Click += (_, __) => FocusVariablePanel(); //Why do I have to do this manually?
+            Click += (_, __) => FocusVariablePanel();
             getSpecialFuncWatchVariables = () => new[] { PositionAngle.HybridPositionAngle.GenerateBaseVariables };
             UpdateSortOption(WatchVariableControl.SortByPriority);
         }
@@ -161,7 +161,6 @@ namespace STROOP.Controls
 
         void FocusVariablePanel()
         {
-            Focus();
             activePanel = this;
         }
 
@@ -225,6 +224,7 @@ namespace STROOP.Controls
                         foreach (var selected in _selectedWatchVarControls)
                             selected.WatchVarWrapper.SingleClick(renderer, renderer.GetVariableControlBounds(lastClicked));
                 };
+
                 renderer.MouseDown += (_, __) =>
                 {
                     (int index, var var, var _select) = renderer.GetVariableAt(__.Location);
