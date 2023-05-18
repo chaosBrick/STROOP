@@ -233,8 +233,8 @@ namespace STROOP.Tabs.BruteforceTab
 
                 strBuilder.Remove(strBuilder.Length - 4, 4); // Remove last ',' and linebreak
                 strBuilder.AppendLine("\n}");
-                var text = strBuilder.ToString().Replace('\n', ' ').Replace('\r', ' ');
-                bfProcess?.StandardInput.WriteLine(text);
+                var text = strBuilder.ToString() + "\0";
+                bfProcess?.StandardInput.Write(text);
                 bfProcess?.StandardInput.Flush();
             }
         }
