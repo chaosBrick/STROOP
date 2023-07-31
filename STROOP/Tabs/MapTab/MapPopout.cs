@@ -22,7 +22,11 @@ namespace STROOP.Tabs.MapTab
             graphics.MapViewAngleValue = tab.graphics.MapViewAngleValue;
             graphics.MapViewScaleValue = tab.graphics.MapViewScaleValue;
             graphics.view.position = tab.graphics.view.position;
-            Shown += (_, __) => graphics.Load(() => tab.graphics.rendererCollection);
+            Shown += (_, __) =>
+            {
+                using (new AccessScope<MapTab>(tab))
+                    graphics.Load(() => tab.graphics.rendererCollection);
+            };
         }
 
         public void Redraw() => glControl.Invalidate();
