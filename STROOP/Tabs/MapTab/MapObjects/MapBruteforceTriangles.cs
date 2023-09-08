@@ -5,7 +5,6 @@ using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using OpenTK;
 using System.Windows.Forms;
-using System.Linq;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {
@@ -14,11 +13,11 @@ namespace STROOP.Tabs.MapTab.MapObjects
     {
         HashSet<uint> triangleAddresses = new HashSet<uint>();
 
-        class hd : IHoverData
+        class HoverData : IHoverData
         {
             bool? lastAdded = null;
             MapBruteforceTriangles parent;
-            public hd(MapBruteforceTriangles parent)
+            public HoverData(MapBruteforceTriangles parent)
             {
                 this.parent = parent;
             }
@@ -42,7 +41,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
             void IHoverData.LeftClick(Vector3 position)
             {
-                if (!parent.enableFuckery)
+                if (!parent.enableSelection)
                 {
                     lastAdded = null;
                     return;
@@ -59,13 +58,13 @@ namespace STROOP.Tabs.MapTab.MapObjects
             void IHoverData.RightClick(Vector3 position) { }
         }
 
-        hd hoverData;
-        ToolStripMenuItem itemEnableFuckery;
-        bool enableFuckery => itemEnableFuckery.Checked;
+        HoverData hoverData;
+        ToolStripMenuItem itemEnableSelection;
+        bool enableSelection => itemEnableSelection.Checked;
 
         public MapBruteforceTriangles()
         {
-            hoverData = new hd(this);
+            hoverData = new HoverData(this);
             Color = Color.Gray;
         }
 
@@ -77,15 +76,15 @@ namespace STROOP.Tabs.MapTab.MapObjects
         {
             var strip = new ContextMenuStrip();
 
-            itemEnableFuckery = strip.Items.AddHandlerToItem("Enable fuckery", () => itemEnableFuckery.Checked = !itemEnableFuckery.Checked);
-            itemEnableFuckery.Checked = true;
+            itemEnableSelection = strip.Items.AddHandlerToItem("Selection mode", () => itemEnableSelection.Checked = !itemEnableSelection.Checked);
+            itemEnableSelection.Checked = true;
 
             strip.Items.AddHandlerToItem("Copy Bruteforcer json", CopyJson);
 
             return strip;
         }
 
-        public override IHoverData GetHoverData(MapGraphics graphics, ref Vector3 position) => enableFuckery ? hoverData : null;
+        public override IHoverData GetHoverData(MapGraphics graphics, ref Vector3 position) => enableSelection ? hoverData : null;
 
         protected override void Draw3D(MapGraphics graphics)
         {

@@ -26,7 +26,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 
@@ -34,7 +33,7 @@ public class SigScanSharp
 {
     private IntPtr g_hProcess { get; set; }
     private byte[] g_arrModuleBuffer { get; set; }
-    private ulong g_lpModuleBase { get; set; }
+    private IntPtr g_lpModuleBase { get; set; }
 
     private Dictionary<string, string> g_dictStringPatterns { get; }
 
@@ -47,13 +46,13 @@ public class SigScanSharp
     [System.Runtime.ExceptionServices.HandleProcessCorruptedStateExceptions]
     public bool SelectModule(ProcessModule targetModule)
     {
-        g_lpModuleBase = (ulong)targetModule.BaseAddress;
+        g_lpModuleBase = targetModule.BaseAddress;
         g_arrModuleBuffer = new byte[targetModule.ModuleMemorySize];
 
         g_dictStringPatterns.Clear();
         try
         {
-            return Win32.ReadProcessMemory(g_hProcess, g_lpModuleBase, g_arrModuleBuffer, targetModule.ModuleMemorySize);
+            return Win32.ReadProcessMemory(g_hProcess, g_lpModuleBase, g_arrModuleBuffer, (IntPtr)targetModule.ModuleMemorySize);
         }
         catch (AccessViolationException)
         {
@@ -80,9 +79,9 @@ public class SigScanSharp
         return true;
     }
 
-    public ulong FindPattern(byte[] arrPattern, out long lTime)
+    public IntPtr FindPattern(byte[] arrPattern, out long lTime)
     {
-        if (g_arrModuleBuffer == null || g_lpModuleBase == 0)
+        if (g_arrModuleBuffer == null || g_lpModuleBase == IntPtr.Zero)
             throw new Exception("Selected module is null");
 
         Stopwatch stopwatch = Stopwatch.StartNew();
@@ -95,48 +94,12 @@ public class SigScanSharp
             if (PatternCheck(nModuleIndex, arrPattern))
             {
                 lTime = stopwatch.ElapsedMilliseconds;
-                return g_lpModuleBase + (ulong)nModuleIndex;
+                return IntPtr.Add(g_lpModuleBase, nModuleIndex);
             }
         }
 
         lTime = stopwatch.ElapsedMilliseconds;
-        return 0;
-    }
-    public Dictionary<string, ulong> FindPatterns(out long lTime)
-    {
-        if (g_arrModuleBuffer == null || g_lpModuleBase == 0)
-            throw new Exception("Selected module is null");
-
-        Stopwatch stopwatch = Stopwatch.StartNew();
-
-        byte[][] arrBytePatterns = new byte[g_dictStringPatterns.Count][];
-        ulong[] arrResult = new ulong[g_dictStringPatterns.Count];
-
-        // PARSE PATTERNS
-        for (int nIndex = 0; nIndex < g_dictStringPatterns.Count; nIndex++)
-            arrBytePatterns[nIndex] = ParsePatternString(g_dictStringPatterns.ElementAt(nIndex).Value);
-
-        // SCAN FOR PATTERNS
-        for (int nModuleIndex = 0; nModuleIndex < g_arrModuleBuffer.Length; nModuleIndex++)
-        {
-            for (int nPatternIndex = 0; nPatternIndex < arrBytePatterns.Length; nPatternIndex++)
-            {
-                if (arrResult[nPatternIndex] != 0)
-                    continue;
-
-                if (this.PatternCheck(nModuleIndex, arrBytePatterns[nPatternIndex]))
-                    arrResult[nPatternIndex] = g_lpModuleBase + (ulong)nModuleIndex;
-            }
-        }
-
-        Dictionary<string, ulong> dictResultFormatted = new Dictionary<string, ulong>();
-
-        // FORMAT PATTERNS
-        for (int nPatternIndex = 0; nPatternIndex < arrBytePatterns.Length; nPatternIndex++)
-            dictResultFormatted[g_dictStringPatterns.ElementAt(nPatternIndex).Key] = arrResult[nPatternIndex];
-
-        lTime = stopwatch.ElapsedMilliseconds;
-        return dictResultFormatted;
+        return IntPtr.Zero;
     }
 
     private byte[] ParsePatternString(string szPattern)
@@ -152,6 +115,6 @@ public class SigScanSharp
     private static class Win32
     {
         [DllImport("kernel32.dll")]
-        public static extern bool ReadProcessMemory(IntPtr hProcess, ulong lpBaseAddress, byte[] lpBuffer, int dwSize, int lpNumberOfBytesRead = 0);
+        public static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, IntPtr dwSize, IntPtr lpNumberOfBytesRead = default(IntPtr));
     }
 }

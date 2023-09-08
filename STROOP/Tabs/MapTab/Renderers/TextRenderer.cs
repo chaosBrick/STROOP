@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System;
 using System.Reflection;
+using STROOP.Utilities;
 
 namespace STROOP.Tabs.MapTab.Renderers
 {

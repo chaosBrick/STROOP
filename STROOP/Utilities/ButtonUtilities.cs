@@ -927,7 +927,7 @@ namespace STROOP.Utilities
                     break;
 
                 default:
-                    throw new Exception("There are only 3 vertices in a triangle. You are an idiot :).");
+                    throw new Exception("There are only 3 vertices in a triangle.");
             }
 
             if (_useMisalignmentOffset)

@@ -34,13 +34,13 @@ namespace STROOP
 
 
             StroopMainForm mainForm;
-            InitializeShit(out mainForm);
+            Initialize(out mainForm);
 
             LoadingHandler.CloseForm();
             Application.Run(mainForm);
         }
 
-        static void InitializeShit(out StroopMainForm mainForm)
+        static void Initialize(out StroopMainForm mainForm)
         {
             StroopMainForm tmpMainForm = null;
             LoadingHandler.LoadingForm.RunLoadingTasks(
@@ -87,9 +87,6 @@ namespace STROOP
                 ("Initialize Main Form",
                 () => tmpMainForm = new StroopMainForm(true)
             )
-            //    ("Creating Managers",
-            //    () => Config.InjectionManager = new InjectionManager(_scriptParser, optionsTab.checkBoxUseRomHack);
-            //)
             );
             mainForm = tmpMainForm;
         }

@@ -1,7 +1,7 @@
 ﻿using OpenTK;
-using OpenTK.Graphics;
 using System;
 using System.Windows.Forms;
+using STROOP.Utilities;
 
 namespace STROOP.Tabs.MapTab
 {
