@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
+using STROOP.Tabs.BruteforceTab.BF_Utilities;
 
 using GetterFuncsDic = System.Collections.Generic.Dictionary<string, System.Func<STROOP.Tabs.BruteforceTab.ValueGetters.Option>>;
 
@@ -57,7 +58,7 @@ namespace STROOP.Tabs.BruteforceTab
                 [(null, "environment_regions")] = new GetterFuncs("Environment Boxes", new GetterFuncsDic
                 {
                     ["From Area"] = () => ("From Area", GetEnvironmentRegions)
-                }),
+                }, ("From Area", GetEnvironmentRegions)),
 
                 [("fp_gwk", "plane_nx")] = GetFPGwkVars,
                 [("fp_gwk", "plane_nz")] = GetFPGwkVars,
@@ -66,11 +67,73 @@ namespace STROOP.Tabs.BruteforceTab
 
                 [("general_purpose", "scoring_methods")] = GetSurfaceVars,
                 [("general_purpose", "perturbators")] = GetSurfaceVars,
+                [("general_purpose", "behavior_scripts")] = GetObjectsVars,
+                [("general_purpose", "object_states")] = GetObjectsVars,
+                [("general_purpose", "dynamic_object_tris")] = GetObjectsVars,
             };
         }
 
-        static GetterFuncs GetSurfaceVars = new GetterFuncs(null, new GetterFuncsDic { ["From Surface"] = () => ("From Surface", GetScoringFuncs) });
 
+        static string GetObjectState(int slot, uint[] behaviorScriptArray)
+        {
+            var obj = Config.ObjectSlotsManager.ObjectSlots[slot - 1].CurrentObject;
+            var rawData = new uint[0x50];
+            for (uint i = 0; i < rawData.Length; i++)
+                rawData[i] = Config.Stream.GetUInt32(obj.Address + 0x88 + i * 4);
+            return $@"
+        {{
+            ""raw_data"": [{string.Join(", ", rawData.Select(x => $"\"0x{x.ToString("X8")}\""))}],
+            ""hitbox_height"": {Config.Stream.GetSingle(obj.Address + 0x1FC)}
+        }}";
+        }
+
+        static Func<string, string> GetObjectData(IEnumerable<int> slots) => (string inputName) =>
+        {
+            var usedBehaviorScriptPtrSet = new HashSet<uint>();
+            foreach (var slot in slots)
+                usedBehaviorScriptPtrSet.Add(Config.ObjectSlotsManager.ObjectSlots[slot - 1].CurrentObject.AbsoluteBehavior);
+            var behaviorScriptPtrArray = usedBehaviorScriptPtrSet.ToArray();
+
+            if (inputName == "object_states")
+                return $"[{string.Join(", ", slots.Select(x => GetObjectState(x, behaviorScriptPtrArray)))}]";
+
+
+            var usedBehaviorScripts = new uint[behaviorScriptPtrArray.Length][];
+            var collisionPointerSet = new HashSet<uint>();
+            for (int i = 0; i < behaviorScriptPtrArray.Length; i++)
+            {
+                usedBehaviorScripts[i] = BF_ObjectUtilities.GetAndUnrollBehaviorScript(behaviorScriptPtrArray[i], out var segmentedCollisionPtr);
+                if (segmentedCollisionPtr.HasValue)
+                    collisionPointerSet.Add(segmentedCollisionPtr.Value);
+            }
+
+            switch (inputName)
+            {
+                case "behavior_scripts":
+                    return $"[{string.Join(", ", usedBehaviorScripts.Select(x => $"[{string.Join(", ", x.Select(y => $"\"0x{y.ToString("X8")}\""))}]"))}]";
+
+                case "dynamic_object_tris":
+                    return $"[{string.Join(", ", collisionPointerSet.Select(x => BF_ObjectUtilities.GetObjectCollisionOverride(x)))}]";
+                default:
+                    throw new InvalidOperationException("unreachable");
+            }
+        };
+
+        static GetterFuncs GetObjectsVars = new GetterFuncs("Object data", new GetterFuncsDic
+        {
+            ["From slots"] = () =>
+            {
+                var slots = ParsingUtilities.ParseIntList(DialogUtilities.GetStringFromDialog(labelText: "Enter the object slot numbers:"));
+                if (!slots.Any())
+                    return ("Nothing", inputName => inputName == "behavior_scripts" ? "[]" : "{}");
+                return (
+                        $"Slots [{string.Concat(slots.Where((int? slot) => slot != null).Select(slot => slot.Value.ToString() + ";").ToArray())}]",
+                        GetObjectData(slots.Where(x => x.HasValue).Select(x => x.Value))
+                    );
+            }
+        });
+
+        static GetterFuncs GetSurfaceVars = new GetterFuncs(null, new GetterFuncsDic { ["From Surface"] = () => ("From Surface", GetScoringFuncs) });
         static string GetScoringFuncs(string inputName) => AccessScope<BruteforceTab>.content.surface?.GetParameter(inputName) ?? "\"\"";
 
         static string GetEnvironmentRegions(string inputName)

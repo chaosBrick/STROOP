@@ -424,6 +424,7 @@
     <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\ScoringFunc.Designer.cs">
       <DependentUpon>ScoringFunc.cs</DependentUpon>
     </Compile>
+    <Compile Include="Tabs\BruteforceTab\BF_Utilities\BF_ObjectUtilities.cs" />
     <Compile Include="Tabs\BruteforceTab\ValueGetters.cs" />
     <Compile Include="Tabs\GhostTab\FileWatchers.cs">
       <SubType>UserControl</SubType>

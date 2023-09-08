@@ -168,6 +168,17 @@ namespace STROOP.Tabs.BruteforceTab
             return (null, () => { });
         }
 
+        public Func<T> GetManualValue<T>(string key)
+        {
+            foreach (var manualParameterVar_it in manualParameterVariables)
+                if (manualParameterVar_it.view.Name == key)
+                {
+                    var manualParameterVar_cap = manualParameterVar_it;
+                    return () => manualParameterVar_cap.GetValueAs<T>();
+                }
+            return null;
+        }
+
         public JsonNode GetJsonText(string key)
         {
             if (variableKeepObjects.TryGetValue(key, out var result))
