@@ -63,7 +63,6 @@ namespace STROOP.Structs.Configurations
         public static SavedVariable<bool> ExcludeDustForClosestObject = new SavedVariable<bool>("Exclude Dut for Closest Object", true);
         public static SavedVariable<bool> UseMisalignmentOffsetForDistanceToLine = new SavedVariable<bool>("Use Misalignment Offset For Distance To Line", true);
         public static SavedVariable<bool> DontRoundValuesToZero = new SavedVariable<bool>("Don't Round Values to 0", false);
-        public static SavedVariable<bool> DisplayAsHexUsesMemory = new SavedVariable<bool>("Display as Hex Uses Memory", false);
         public static SavedVariable<bool> NeutralizeTrianglesWith0x15 = new SavedVariable<bool>("Neutralize Triangles with 0x15", true);
 
         public static short NeutralizeTriangleValue(bool? use0x15Nullable = null)

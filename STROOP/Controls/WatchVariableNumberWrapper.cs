@@ -71,7 +71,7 @@ namespace STROOP.Controls
         protected const bool DEFAULT_DISPLAY_AS_HEX = false;
         protected const bool DEFAULT_USE_CHECKBOX = false;
         protected const bool DEFAULT_IS_YAW = false;
-        
+
         private static readonly int MAX_ROUNDING_LIMIT = 10;
 
         private readonly int _defaultRoundingLimit;
@@ -158,9 +158,7 @@ namespace STROOP.Controls
         protected object HandleHexDisplaying(object value)
         {
             if (!DisplayAsHex()) return value;
-            return SavedSettingsConfig.DisplayAsHexUsesMemory
-                ? HexUtilities.FormatMemory(value, GetHexDigitCount(), true)
-                : HexUtilities.FormatValue(value, GetHexDigitCount(), true);
+            return HexUtilities.FormatValue(value, GetHexDigitCount(), true);
         }
 
         protected object HandleHexUndisplaying(object value)
@@ -168,17 +166,8 @@ namespace STROOP.Controls
             string stringValue = value?.ToString() ?? "";
             if (stringValue.Length < 2 || stringValue.Substring(0, 2) != "0x") return value;
 
-            if (SavedSettingsConfig.DisplayAsHexUsesMemory)
-            {
-                Type type = WatchVar.MemoryType ?? typeof(uint);
-                object obj = TypeUtilities.ConvertBytes(type, stringValue, false);
-                if (obj != null) return obj;
-            }
-            else
-            {
-                uint? parsed = ParsingUtilities.ParseHexNullable(stringValue);
-                if (parsed != null) return parsed.Value;
-            }
+            uint? parsed = ParsingUtilities.ParseHexNullable(stringValue);
+            if (parsed != null) return parsed.Value;
             return value;
         }
 
@@ -189,7 +178,7 @@ namespace STROOP.Controls
         public override void ToggleDisplayAsHex(bool? displayAsHexNullable = null)
         {
             bool displayAsHex = displayAsHexNullable ?? !_displayAsHex;
-           _displayAsHex = displayAsHex;
+            _displayAsHex = displayAsHex;
         }
 
         protected object HandleNumberConversion(object value)
