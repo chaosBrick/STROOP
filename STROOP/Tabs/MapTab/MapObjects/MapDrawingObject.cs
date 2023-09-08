@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using STROOP.Structs.Configurations;
-using STROOP.Structs;
 using System.Windows.Forms;
 using OpenTK;
 

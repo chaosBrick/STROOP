@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using ICSharpCode.AvalonEdit.Rendering;
 
 namespace STROOP.Controls
 {
     class VisualRegexLinkGenerator : VisualLineElementGenerator
-    { 
+    {
         public event EventHandler<string> LinkClick;
 
         private Regex _regex;

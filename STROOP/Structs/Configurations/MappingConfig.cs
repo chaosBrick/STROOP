@@ -1,11 +1,7 @@
-﻿using STROOP.Controls;
-using STROOP.Managers;
-using STROOP.Utilities;
+﻿using STROOP.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace STROOP.Structs.Configurations
@@ -108,9 +104,9 @@ namespace STROOP.Structs.Configurations
          */
         public static IEnumerable<(WatchVariable, WatchVariable.IVariableView)> GetVariables()
         {
-            if (mappingCurrent == null) return new (WatchVariable, WatchVariable.IVariableView)[0];
+            if (mappingCurrent == null) return new(WatchVariable, WatchVariable.IVariableView)[0];
 
-            var controls = new List<(WatchVariable, WatchVariable.IVariableView)> ();
+            var controls = new List<(WatchVariable, WatchVariable.IVariableView)>();
             foreach (uint address in mappingCurrent.Keys)
             {
                 string stringValue = mappingCurrent[address];

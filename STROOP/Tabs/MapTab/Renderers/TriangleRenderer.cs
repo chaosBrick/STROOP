@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using STROOP.Utilities;
 
-
 namespace STROOP.Tabs.MapTab.Renderers
 {
     public class TriangleRenderer : Renderer

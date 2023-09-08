@@ -1,12 +1,10 @@
 ﻿using STROOP.Structs;
-using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using System.Windows.Input;
 using System.Xml.Linq;
 
 namespace STROOP.Controls

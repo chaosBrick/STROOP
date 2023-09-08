@@ -5,7 +5,6 @@ using STROOP.Structs.Configurations;
 using System.Collections.Generic;
 using System.Linq;
 
-
 namespace STROOP.Tabs
 {
     public partial class WarpTab : STROOPTab

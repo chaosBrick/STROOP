@@ -1,35 +1,12 @@
-﻿using STROOP.Forms;
-using STROOP.Structs;
-using STROOP.Structs.Configurations;
+﻿using STROOP.Structs.Configurations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace STROOP.Utilities
 {
     public static class InGameTrigUtilities
     {
-        //private static readonly List<float> sineData = XmlConfigParser.OpenSineData();
-        //private static readonly List<ushort> arcSineData = XmlConfigParser.OpenArcSineData();
-
-        /*
-        public static float InGameSine(int value)
-        {
-            int truncatedValue = MoreMath.NormalizeAngleTruncated(value);
-            int index = truncatedValue / 16;
-            return sineData[index];
-        }
-
-        public static float InGameCosine(int value)
-        {
-            int truncatedValue = MoreMath.NormalizeAngleTruncated(value);
-            int index = truncatedValue / 16;
-            return sineData[index + 1024];
-        }
-        */
-
         private static List<int> _inGameAngles = null;
 
         public static List<int> GetInGameAngles()
@@ -120,11 +97,6 @@ namespace STROOP.Utilities
 
         private static ushort InGameATanLookup(float yComp, float xComp)
         {
-            //  if f14 == 0:
-            //     return short(0x8038b000)
-            //  else:
-            //      return short(0x8038b000+2*int( (f12/f14)*1024.0 + 0.5)) # with +0.5 this is normal rounding, not towards zero
-
             uint offset;
             if (xComp == 0)
                 offset = 0;
@@ -133,8 +105,6 @@ namespace STROOP.Utilities
 
             uint address = MappingConfig.HandleMapping(0x8038B000);
             return Config.Stream.GetUInt16(address + offset);
-            //int index = (int)(offset / 2);
-            //return arcSineData[index];
         }
     }
 }

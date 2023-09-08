@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using OpenTK;
 using STROOP.Structs.Configurations;
-using STROOP.Structs;
 using STROOP.Utilities;
 using System.Windows.Forms;
 
@@ -45,7 +44,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
         protected override ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             var _contextMenuStrip = base.GetContextMenuStrip(targetTracker);
-            
+
             ToolStripMenuItem itemSetHorizontalExpanse = new ToolStripMenuItem("[3D] Set horizontal expanse");
             itemSetHorizontalExpanse.Click += (sender, e) =>
             {

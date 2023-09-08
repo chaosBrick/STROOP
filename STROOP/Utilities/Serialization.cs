@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Drawing;
 
-
 namespace STROOP.Utilities
 {
     static public class FontSerializationHelper

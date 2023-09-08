@@ -1,7 +1,6 @@
 ﻿using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 using System;
-using System.Windows.Forms;
 
 namespace STROOP.Controls
 {

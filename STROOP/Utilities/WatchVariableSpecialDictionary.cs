@@ -1,11 +1,6 @@
-﻿using STROOP.Managers;
-using STROOP.Models;
-using STROOP.Structs.Configurations;
-using STROOP.Utilities;
+﻿using STROOP.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using STROOP.Controls;
 
 namespace STROOP.Structs
 {
@@ -21,7 +16,7 @@ namespace STROOP.Structs
         public bool TryGetValue(string key, out (WatchVariable.GetterFunction, WatchVariable.SetterFunction) getterSetter) =>
             _dictionary.TryGetValue(key, out getterSetter);
 
-        
+
         public void Add(string key, (WatchVariable.GetterFunction, WatchVariable.SetterFunction) value)
         {
             _dictionary[key] = value;

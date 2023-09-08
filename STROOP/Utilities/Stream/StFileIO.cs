@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using STROOP.Structs;
 using ICSharpCode.SharpZipLib.GZip;
 using System.IO;
-using STROOP.Structs.Configurations;
 using System.Diagnostics;
 
 namespace STROOP.Utilities

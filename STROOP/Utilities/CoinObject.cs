@@ -1,11 +1,6 @@
-﻿using STROOP.Models;
-using STROOP.Structs;
-using STROOP.Structs.Configurations;
+﻿using STROOP.Structs;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace STROOP.Utilities
 {

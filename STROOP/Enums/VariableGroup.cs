@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace STROOP.Structs
+﻿namespace STROOP.Structs
 {
     public static class VariableGroup
     {

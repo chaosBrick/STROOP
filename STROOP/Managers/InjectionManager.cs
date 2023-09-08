@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using STROOP.Utilities;
 using STROOP.Structs;
 using System.Windows.Forms;
-using STROOP.Extensions;
 using STROOP.Structs.Configurations;
 
 namespace STROOP.Managers

@@ -1,15 +1,4 @@
-﻿using STROOP.Extensions;
-using STROOP.Managers;
-using STROOP.Models;
-using STROOP.Structs;
-using STROOP.Structs.Configurations;
-using STROOP.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Windows.Forms;
+﻿using STROOP.Utilities;
 
 namespace STROOP.Controls
 {

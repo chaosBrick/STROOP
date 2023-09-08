@@ -11,7 +11,7 @@ using STROOP.Forms;
 namespace STROOP.Tabs.MapTab.MapObjects
 {
     [ObjectDescription("Level Floor Triangles", "Triangles")]
-    public class MapLevelFloorObject : MapFloorObject, MapLevelTriangleObjectI
+    public class MapLevelFloorObject : MapFloorObject, IMapLevelTriangleObject
     {
         readonly List<TriangleDataModel> _tris = new List<TriangleDataModel>();
         private bool _removeCurrentTri;

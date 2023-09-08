@@ -8,7 +8,6 @@ using STROOP.Structs;
 using OpenTK;
 using System.Windows.Forms;
 
-
 namespace STROOP.Tabs.MapTab.MapObjects
 {
     public class MapPathObject : MapObject

@@ -1,7 +1,6 @@
 ﻿using STROOP.Tabs.MapTab;
 using STROOP.Models;
 using STROOP.Structs;
-using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 using System;
 using System.Collections.Generic;
@@ -12,12 +11,12 @@ namespace STROOP.Forms
 {
     public partial class TriangleListForm : Form
     {
-        private readonly MapLevelTriangleObjectI _levelTriangleObject;
+        private readonly IMapLevelTriangleObject _levelTriangleObject;
         private readonly List<uint> _triAddressList;
         private long _lastRemoveTime;
 
         public TriangleListForm(
-            MapLevelTriangleObjectI levelTriangleObject,
+            IMapLevelTriangleObject levelTriangleObject,
             TriangleClassification classification,
             List<uint> triAddressList)
         {

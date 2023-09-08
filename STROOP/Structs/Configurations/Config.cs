@@ -1,10 +1,8 @@
-﻿using STROOP.Forms;
-using STROOP.Managers;
- using STROOP.Utilities;
+﻿using STROOP.Managers;
+using STROOP.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using STROOP.Tabs.MapTab;
 
 namespace STROOP.Structs.Configurations
 {
@@ -19,7 +17,7 @@ namespace STROOP.Structs.Configurations
         public static StroopMainForm StroopMainForm => AccessScope<StroopMainForm>.content;
         public static TabControlEx TabControlMain;
         public static Label DebugText;
-        
+
         public static ObjectSlotsManager ObjectSlotsManager => StroopMainForm.ObjectSlotsManager;
         public static InjectionManager InjectionManager;
 

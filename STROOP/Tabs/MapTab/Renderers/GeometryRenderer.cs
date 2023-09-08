@@ -1,7 +1,6 @@
 ﻿using System;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
-using System.Collections.Generic;
 using STROOP.Utilities;
 
 namespace STROOP.Tabs.MapTab.Renderers

@@ -3,7 +3,6 @@ using System.Net;
 using System.IO;
 using System.Threading.Tasks;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 
 namespace STROOP.Tabs.MapTab
 {

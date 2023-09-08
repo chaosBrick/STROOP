@@ -1,11 +1,4 @@
-﻿using STROOP.Structs;
-using STROOP.Structs.Configurations;
-using STROOP.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace STROOP.Models
 {

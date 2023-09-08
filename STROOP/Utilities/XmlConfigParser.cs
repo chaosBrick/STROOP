@@ -10,7 +10,6 @@ using System.Drawing;
 using STROOP.Extensions;
 using System.Xml;
 using STROOP.Structs.Configurations;
-using STROOP.Controls;
 using STROOP.Tabs.MapTab;
 
 

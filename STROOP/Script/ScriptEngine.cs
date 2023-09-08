@@ -1,4 +1,6 @@
-﻿using System;
+﻿// grabbed from https://stackoverflow.com/questions/4744105/parse-and-execute-js-by-c-sharp
+
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;

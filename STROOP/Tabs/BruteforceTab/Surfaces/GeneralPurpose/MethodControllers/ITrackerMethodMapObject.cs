@@ -1,5 +1,4 @@
-﻿
-namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
+﻿namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
 {
     public interface ITrackerMethodMapObject<T>
     {

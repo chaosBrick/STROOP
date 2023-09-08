@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
-using STROOP.Structs.Configurations;
 
 namespace STROOP.Tabs.MapTab
 {

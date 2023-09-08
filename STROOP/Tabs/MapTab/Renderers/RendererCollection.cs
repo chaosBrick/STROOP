@@ -6,7 +6,6 @@ using STROOP.Utilities;
 
 namespace STROOP.Tabs.MapTab.Renderers
 {
-
     public class RendererCollection
     {
         const int OBJECTS_TEXTURE_SIZE = 256;

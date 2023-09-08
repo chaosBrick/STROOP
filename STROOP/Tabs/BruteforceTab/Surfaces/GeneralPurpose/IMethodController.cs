@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
+﻿namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
 {
     interface IMethodController
     {

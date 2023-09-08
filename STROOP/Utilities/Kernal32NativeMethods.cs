@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace STROOP.Utilities
 {
@@ -27,19 +23,19 @@ namespace STROOP.Utilities
         [Flags]
         public enum ProcessAccess : int
         {
-            VM_OPERATION                        = 0x0008,
-            VM_READ                             = 0x0010,
-            VM_WRITE                            = 0x0020,
-            PROCESS_QUERY_LIMITED_INFORMATION   = 0x1000,
-            SUSPEND_RESUME                      = 0x0800,
+            VM_OPERATION = 0x0008,
+            VM_READ = 0x0010,
+            VM_WRITE = 0x0020,
+            PROCESS_QUERY_LIMITED_INFORMATION = 0x1000,
+            SUSPEND_RESUME = 0x0800,
         }
 
         [Flags]
         public enum MemoryType : uint
         {
-            MEM_IMAGE       = 0x1000000,
-            MEM_MAPPED      = 0x40000,
-            MEM_PRIVATE     = 0x20000
+            MEM_IMAGE = 0x1000000,
+            MEM_MAPPED = 0x40000,
+            MEM_PRIVATE = 0x20000
         }
 
         [StructLayout(LayoutKind.Sequential)]

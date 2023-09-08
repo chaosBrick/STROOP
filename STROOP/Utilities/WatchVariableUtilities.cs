@@ -1,7 +1,6 @@
 ﻿using STROOP.Structs.Configurations;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using STROOP.Utilities;
 
 namespace STROOP.Structs
