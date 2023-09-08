@@ -1,12 +1,12 @@
 ﻿
-
 using System;
 using System.Drawing;
-using STROOP.Tabs.MapTab;
-using System.Collections.Generic;
-using STROOP.Structs.Configurations;
-using OpenTK;
 using System.Windows.Forms;
+using System.Collections.Generic;
+using OpenTK;
+using STROOP.Tabs.MapTab;
+using STROOP.Structs.Configurations;
+using STROOP.Utilities;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
 {
@@ -37,13 +37,14 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
         XZRadialLimit parent;
         float x, z;
         WatchVariable[] vars;
-        bool ignoreWatchVarUpdate = false;
+        IgnoreScope ignoreUpdates = new IgnoreScope();
 
         public XZRadialLimitMapObject() : base(null) { hover = new HoverData(this); }
 
         public override Lazy<Image> GetInternalImage() => Config.ObjectAssociations.CylinderImage;
 
         public override string GetName() => "XZRadialLimit";
+
 
         public void SetParent(XZRadialLimit parent)
         {
@@ -52,7 +53,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
             vars = parent.parameterPanel.GetWatchVariablesByName("x", "z", "dist", "approach");
             Action updateFromControl = () =>
             {
-                if (ignoreWatchVarUpdate)
+                if (ignoreUpdates)
                     return;
                 x = vars[0].GetValueAs<float>();
                 z = vars[1].GetValueAs<float>();
@@ -60,16 +61,22 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
             };
             foreach (var var in vars)
                 var.ValueSet += updateFromControl;
+            SizeChanged += () =>
+            {
+                using (ignoreUpdates.New())
+                    vars[2].SetValue(Size);
+            };
             updateFromControl();
         }
 
         void UpdateVars()
         {
-            ignoreWatchVarUpdate = true;
-            vars[0].SetValue(x);
-            vars[1].SetValue(z);
-            vars[2].SetValue(Size);
-            ignoreWatchVarUpdate = false;
+            using (ignoreUpdates.New())
+            {
+                vars[0].SetValue(x);
+                vars[1].SetValue(z);
+                vars[2].SetValue(Size);
+            }
         }
 
         public override IHoverData GetHoverData(MapGraphics graphics, ref Vector3 position)
@@ -128,6 +135,6 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
 
     class XZRadialLimit : TrackerMethodControllerBase<XZRadialLimitMapObject, XZRadialLimit>
     {
-        protected override XZRadialLimitMapObject CreateTracker() => new XZRadialLimitMapObject();
+        protected override XZRadialLimitMapObject CreateMapObject() => new XZRadialLimitMapObject();
     }
 }

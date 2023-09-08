@@ -1,4 +1,5 @@
 ﻿using System.Windows.Forms;
+using STROOP.Utilities;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
 {
@@ -17,19 +18,21 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
             var var = new WatchVariable(new WatchVariable.CustomView(1)
             {
                 Name = "Adjust on Map",
-                wrapperType = typeof(Controls.WatchVariableSelectionWrapper),
+                wrapperType = typeof(Controls.WatchVariableSelectionWrapper<Controls.WatchVariableStringWrapper>),
                 _getterFunction = _ => null,
                 _setterFunction = (_, __) => false
             });
 
             var mapTab = AccessScope<StroopMainForm>.content.GetTab<MapTab.MapTab>();
             mapTab.UpdateOrInitialize(true);
-            mapObject = CreateTracker();
-            mapTab.AddExternal(mapObject);
+            mapObject = CreateMapObject();
+            var tracker = mapTab.AddExternal(mapObject);
             mapObject.SetParent((ControllerType)this);
-            target.Disposed += (_, __) => mapObject.tracker.RemoveFromMap();
+            target.Disposed += (_, __) => mapObject.tracker.Kill();
+            tracker.Disposed += (_, __) => target.DeleteSelf();
 
-            var ctrl = (Controls.WatchVariableSelectionWrapper)parameterPanel.AddVariable(var, var.view).WatchVarWrapper;
+            var ctrl = (Controls.WatchVariableSelectionWrapper<Controls.WatchVariableStringWrapper>)parameterPanel.AddVariable(var, var.view).WatchVarWrapper;
+            ctrl.DisplaySingleOption = true;
             ctrl.options.Add(("Go to Map Tab", () =>
             {
                 AccessScope<StroopMainForm>.content.SwitchTab(mapTab);
@@ -40,20 +43,30 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
             mapObject.tracker.ConfirmRemoveFromMap = ConfirmDeleteScoringFunc;
         }
 
-        protected abstract MapObjectType CreateTracker();
+        protected abstract MapObjectType CreateMapObject();
 
         public int? GetFuncIndex() => (target.Parent as Controls.ReorderFlowLayoutPanel)?.Controls.GetChildIndex(target);
 
         bool ConfirmDeleteScoringFunc()
         {
-            var dlgResult = MessageBox.Show(
-                "This tracker belongs to a bruteforcing scoring function.\n" +
-                "Removing the tracker will also remove its associated scoring function.\n" +
-                "Do you wish to continue?", "Confirm Deletion", MessageBoxButtons.YesNo);
-            var delete = dlgResult == DialogResult.Yes;
-            if (delete)
-                target.DeleteSelf();
+            bool delete;
+            if (!mapObject.tracker.GetParent<STROOPTab>()?.IsActiveTab ?? true)
+                delete = true;
+            else
+            {
+                var dlgResult = MessageBox.Show(
+                    "This tracker belongs to a bruteforcing scoring function.\n" +
+                    "Removing the tracker will also remove its associated scoring function.\n" +
+                    "Do you wish to continue?", "Confirm Deletion", MessageBoxButtons.YesNo);
+                delete = dlgResult == DialogResult.Yes;
+            }
+
             return delete;
+        }
+
+        void IMethodController.Remove()
+        {
+            mapObject?.tracker?.Kill();
         }
     }
 }

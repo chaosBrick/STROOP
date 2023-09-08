@@ -33,8 +33,10 @@
             this.labelName = new System.Windows.Forms.Label();
             this.variablePanelBaseValues = new STROOP.Controls.WatchVariablePanel();
             this.watchVariablePanelParameters = new STROOP.Controls.WatchVariablePanel();
+            this.pbMute = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.pbExpand)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbRemove)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbMute)).BeginInit();
             this.SuspendLayout();
             // 
             // pbExpand
@@ -77,7 +79,7 @@
             this.variablePanelBaseValues.DataPath = null;
             this.variablePanelBaseValues.elementNameWidth = 40;
             this.variablePanelBaseValues.elementValueWidth = 50;
-            this.variablePanelBaseValues.Location = new System.Drawing.Point(125, 0);
+            this.variablePanelBaseValues.Location = new System.Drawing.Point(99, 0);
             this.variablePanelBaseValues.Name = "variablePanelBaseValues";
             this.variablePanelBaseValues.Size = new System.Drawing.Size(188, 21);
             this.variablePanelBaseValues.TabIndex = 0;
@@ -94,12 +96,25 @@
             this.watchVariablePanelParameters.Size = new System.Drawing.Size(366, 224);
             this.watchVariablePanelParameters.TabIndex = 2;
             // 
+            // pbMute
+            // 
+            this.pbMute.Image = global::STROOP.Properties.Resources.checkbox_checked;
+            this.pbMute.InitialImage = global::STROOP.Properties.Resources.checkbox_checked;
+            this.pbMute.Location = new System.Drawing.Point(293, 0);
+            this.pbMute.Name = "pbMute";
+            this.pbMute.Size = new System.Drawing.Size(20, 21);
+            this.pbMute.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbMute.TabIndex = 0;
+            this.pbMute.TabStop = false;
+            this.pbMute.Click += new System.EventHandler(this.pbMute_Click);
+            // 
             // ScoringFunc
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.variablePanelBaseValues);
             this.Controls.Add(this.pbRemove);
+            this.Controls.Add(this.pbMute);
             this.Controls.Add(this.pbExpand);
             this.Controls.Add(this.labelName);
             this.Controls.Add(this.watchVariablePanelParameters);
@@ -108,6 +123,7 @@
             this.Size = new System.Drawing.Size(366, 243);
             ((System.ComponentModel.ISupportInitialize)(this.pbExpand)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbRemove)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbMute)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -120,5 +136,6 @@
         private System.Windows.Forms.Label labelName;
         public Controls.WatchVariablePanel watchVariablePanelParameters;
         private Controls.WatchVariablePanel variablePanelBaseValues;
+        private System.Windows.Forms.PictureBox pbMute;
     }
 }

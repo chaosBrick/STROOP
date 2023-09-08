@@ -30,5 +30,7 @@ namespace STROOP.Tabs.BruteforceTab
         public virtual string GetParameter(string parameterName) => "";
 
         public virtual void InitJson() { }
+
+        public virtual void Cleanup() { }
     }
 }

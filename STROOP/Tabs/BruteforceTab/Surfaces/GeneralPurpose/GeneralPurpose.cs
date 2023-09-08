@@ -14,7 +14,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             public class Identifier
             {
                 public string name;
-                public string comment;
+                public string documentation;
             }
 
             public string name = "<undefined>";
@@ -27,7 +27,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
 
             public Type GetParameterWrapperType(string name)
             {
-                if (parameterDefinitions.TryGetValue(new Identifier { name = name }, out var typeString) && BruteforceTab.wrapperTypes.TryGetValue(typeString, out var type))
+                if (parameterDefinitions.TryGetValue(new Identifier { name = name }, out var typeString) && BruteforceTab.fallbackWrapperTypes.TryGetValue(typeString, out var type))
                     return type;
                 return null;
             }
@@ -64,7 +64,9 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                     {
                         comment = true;
                         rd.Read();
+                        continue;
                     }
+
                     switch (c)
                     {
                         case ':':
@@ -74,18 +76,22 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                             tokenBuilder.Clear();
                             break;
                         case '\n':
-                            if (comment)
-                                lastIdentifier.comment = tokenBuilder.ToString();
+                            if (comment && lastIdentifier != null)
+                                lastIdentifier.documentation = tokenBuilder.ToString();
                             comment = false;
                             tokenBuilder.Clear();
                             lastTokens.Clear();
                             goto case ' ';
+                        case '\t':
                         case ' ':
                             if (tokenBuilder.Length > 0)
-                            {
-                                lastTokens.Push(tokenBuilder.ToString());
-                                tokenBuilder.Clear();
-                            }
+                                if (comment)
+                                    tokenBuilder.Append(c);
+                                else
+                                {
+                                    lastTokens.Push(tokenBuilder.ToString());
+                                    tokenBuilder.Clear();
+                                }
                             break;
                         case ';':
                             var nameToken = tokenBuilder.ToString();
@@ -117,23 +123,46 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             };
         }
 
-        void AddMethod(ScoringFuncPrecursor meth, Action UpdateStateFunc)
+        void AddMethod(ScoringFuncPrecursor meth)
         {
             var ctrl = new ScoringFunc();
-            ctrl.Init(meth, UpdateStateFunc);
+            ctrl.Init(meth, parentTab);
             flowPanelScoring.Controls.Add(ctrl);
         }
 
         void AddPerturbator(Perturbator perturbator)
         {
-            var ctrl = new Perturbator();
-            ctrl.Init();
-            flowPanelScoring.Controls.Add(ctrl);
+            perturbator.Init(parentTab);
+            flowPanelScoring.Controls.Add(perturbator);
         }
 
-        public void RemoveMethod(ScoringFunc ctrl) => flowPanelScoring.Controls.Remove(ctrl);
+        public void RemoveMethod(ScoringFunc ctrl)
+        {
+            flowPanelScoring.Controls.Remove(ctrl);
+            ctrl.DeleteFromMap();
+            ctrl.Dispose();
+        }
 
-        public void RemovePerturbator(Perturbator ctrl) => flowPanelScoring.Controls.Remove(ctrl);
+        public void RemovePerturbator(Perturbator ctrl)
+        {
+            flowPanelScoring.Controls.Remove(ctrl);
+            ctrl.Dispose();
+        }
+        private void btnAddMethod_Click(object sender, EventArgs e)
+        {
+            var ctr = new ContextMenuStrip();
+            foreach (var scoringFunc in scoringFuncsByName)
+            {
+                var precursor = scoringFunc.Value;
+                ctr.Items.AddHandlerToItem(precursor.name, () => AddMethod(new ScoringFuncPrecursor(precursor)));
+            }
+            ctr.Show(Cursor.Position);
+        }
+
+        private void btnAddPerturbator_Click(object sender, EventArgs e)
+        {
+            AddPerturbator(new Perturbator());
+        }
 
         public override string GetParameter(string parameterName)
         {
@@ -166,74 +195,80 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             return base.GetParameter(parameterName);
         }
 
-        private void btnAddMethod_Click(object sender, EventArgs e)
-        {
-            var ctr = new ContextMenuStrip();
-            foreach (var scoringFunc in scoringFuncsByName)
-            {
-                var precursor = scoringFunc.Value;
-                ctr.Items.AddHandlerToItem(precursor.name, () => AddMethod(new ScoringFuncPrecursor(precursor), parentTab.DeferUpdateState));
-            }
-            ctr.Show(Cursor.Position);
-        }
-
-        private void btnAddPerturbator_Click(object sender, EventArgs e)
-        {
-            AddPerturbator(new Perturbator());
-        }
-
         public override void InitJson()
         {
             base.InitJson();
             int numPerturbators = 0;
 
-            flowPanelScoring.SuspendLayout();
-            flowPanelScoring.Controls.Clear();
-            string scoringJson = parentTab.GetJsonText("scoring_methods");
-            int cur = 0;
-            var json = JsonObject.GetJsonObject(scoringJson, ref cur);
-            foreach (var obj in json.valueObjects)
-            {
-                if (obj.Value.valueStrings.TryGetValue("func", out var funcName) && scoringFuncsByName.TryGetValue(funcName.Trim('"'), out var precursorPreset))
+            var scoringJson = parentTab.GetJsonText("scoring_methods") as JsonNodeArray;
+            if (scoringJson != null)
+                foreach (var node in scoringJson.values)
                 {
-                    // Scoring Function
-                    var precursor = new ScoringFuncPrecursor(precursorPreset);
-                    if (obj.Value.valueStrings.TryGetValue("weight", out var weightString) && double.TryParse(weightString, out var weight))
-                        precursor.weight = weight;
-                    else
-                        precursor.weight = 1;
-
-                    if (obj.Value.valueObjects.TryGetValue("params", out var parametersNode))
-                        foreach (var n in parametersNode.valueStrings)
-                            precursor.parameterValues[n.Key] = StringUtilities.GetJsonValue(precursor.GetParameterWrapperType(n.Key), n.Value);
-                    AddMethod(precursor, parentTab.DeferUpdateState);
-                }
-                else if (obj.Value.valueStrings.TryGetValue("max_perturbation", out var maxPerturbationString))
-                {
-                    // Perturbator
-                    numPerturbators++;
-                    var perturbator = new Perturbator();
-                    foreach (var v in obj.Value.valueStrings)
+                    var obj = node as JsonNodeObject;
+                    if (obj == null)
+                        continue; // Ignore non-objects
+                    if (obj.TryGetValue<JsonNodeString>("func", out var funcNode)
+                        && scoringFuncsByName.TryGetValue(funcNode.value.Trim('"') ?? "", out var precursorPreset))
                     {
-                        object value = null;
-                        if (v.Key == "perturbation_chance")
-                        {
-                            if (float.TryParse(v.Value, out var floatValue))
-                                value = floatValue;
-                        }
+                        var precursor = new ScoringFuncPrecursor(precursorPreset);
+                        if (obj.TryGetValue<JsonNodeNumber>("weight", out var weightNode))
+                            precursor.weight = weightNode.valueDouble ?? 1.0;
                         else
-                            if (int.TryParse(v.Value, out var intValue))
-                            value = intValue;
-                        if (value != null)
-                            perturbator.SetValue(v.Key, value);
+                            precursor.weight = 1.0;
+                        if (obj.TryGetValue<JsonNodeNumber>("frame", out var frameNode))
+                            precursor.frame = (uint)(frameNode.valueLong ?? 30);
+                        else
+                            precursor.frame = 30;
+
+                        if (obj.TryGetValue<JsonNodeObject>("params", out var parametersNode))
+                            foreach (var n in parametersNode.values)
+                            {
+                                if (n.Value is JsonNodeString stringNode)
+                                    precursor.parameterValues[n.Key] = StringUtilities.GetJsonValue(precursor.GetParameterWrapperType(n.Key), stringNode.value);
+                                else
+                                    precursor.parameterValues[n.Key] = n.Value.valueObject;
+                            }
+                        AddMethod(precursor);
                     }
                 }
-            }
+
+            var perturbatorJson = parentTab.GetJsonText("perturbators") as JsonNodeArray;
+            if (perturbatorJson != null)
+                foreach (var node in perturbatorJson.values)
+                {
+                    var obj = node as JsonNodeObject;
+                    if (obj == null)
+                        continue; // Ignore non-objects
+                    numPerturbators++;
+                    var perturbator = new Perturbator();
+                    if (obj.TryGetValue<JsonNodeNumber>("perturbation_chance", out var perturbationChance))
+                        perturbator.SetValue("perturbation_chance", perturbationChance.valueDouble);
+                    if (obj.TryGetValue<JsonNodeNumber>("max_perturbation", out var maxPerturbation))
+                        perturbator.SetValue("max_perturbation", maxPerturbation.valueLong);
+                    if (obj.TryGetValue<JsonNodeNumber>("min_frame", out var minFrame))
+                        perturbator.SetValue("min_frame", minFrame.valueLong);
+                    if (obj.TryGetValue<JsonNodeNumber>("max_frame", out var maxFrame))
+                        perturbator.SetValue("max_frame", maxFrame.valueLong);
+                    AddPerturbator(perturbator);
+                }
 
             // If no perturbators were in the configuration, add a default one
             if (numPerturbators == 0)
-                flowPanelScoring.Controls.Add(new Perturbator());
+                AddPerturbator(new Perturbator());
             flowPanelScoring.ResumeLayout();
+        }
+
+        public override void Cleanup()
+        {
+            base.Cleanup();
+            var allControls = new List<Control>();
+            foreach (Control ctrl in flowPanelScoring.Controls)
+                allControls.Add(ctrl);
+            foreach (var ctrl in allControls)
+                if (ctrl is ScoringFunc scoringFunc)
+                    RemoveMethod(scoringFunc);
+                else if (ctrl is Perturbator perturbator)
+                    RemovePerturbator(perturbator);
         }
     }
 }

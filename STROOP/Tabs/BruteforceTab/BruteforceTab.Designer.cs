@@ -43,8 +43,12 @@
             this.tabData = new System.Windows.Forms.TabControl();
             this.tabJson = new System.Windows.Forms.TabPage();
             this.tabSurface = new System.Windows.Forms.TabPage();
+            this.tabSession = new System.Windows.Forms.TabPage();
+            this.txtOutput = new System.Windows.Forms.RichTextBox();
+            this.labelOutput = new System.Windows.Forms.Label();
             this.tabData.SuspendLayout();
             this.tabJson.SuspendLayout();
+            this.tabSession.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnLoadModule
@@ -183,6 +187,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tabData.Controls.Add(this.tabJson);
             this.tabData.Controls.Add(this.tabSurface);
+            this.tabData.Controls.Add(this.tabSession);
             this.tabData.Location = new System.Drawing.Point(373, 3);
             this.tabData.Name = "tabData";
             this.tabData.SelectedIndex = 0;
@@ -213,6 +218,38 @@
             this.tabSurface.Text = "Surface";
             this.tabSurface.UseVisualStyleBackColor = true;
             // 
+            // tabSession
+            // 
+            this.tabSession.Controls.Add(this.labelOutput);
+            this.tabSession.Controls.Add(this.txtOutput);
+            this.tabSession.Location = new System.Drawing.Point(4, 22);
+            this.tabSession.Name = "tabSession";
+            this.tabSession.Size = new System.Drawing.Size(531, 434);
+            this.tabSession.TabIndex = 2;
+            this.tabSession.Text = "Session";
+            this.tabSession.UseVisualStyleBackColor = true;
+            // 
+            // txtOutput
+            // 
+            this.txtOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtOutput.Location = new System.Drawing.Point(3, 28);
+            this.txtOutput.Name = "txtOutput";
+            this.txtOutput.ReadOnly = true;
+            this.txtOutput.Size = new System.Drawing.Size(525, 404);
+            this.txtOutput.TabIndex = 0;
+            this.txtOutput.Text = "";
+            // 
+            // labelOutput
+            // 
+            this.labelOutput.AutoSize = true;
+            this.labelOutput.Location = new System.Drawing.Point(3, 9);
+            this.labelOutput.Name = "labelOutput";
+            this.labelOutput.Size = new System.Drawing.Size(94, 13);
+            this.labelOutput.TabIndex = 1;
+            this.labelOutput.Text = "Bruteforcer Output";
+            // 
             // BruteforceTab
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -230,6 +267,8 @@
             this.tabData.ResumeLayout(false);
             this.tabJson.ResumeLayout(false);
             this.tabJson.PerformLayout();
+            this.tabSession.ResumeLayout(false);
+            this.tabSession.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -252,5 +291,8 @@
         private System.Windows.Forms.TabControl tabData;
         private System.Windows.Forms.TabPage tabJson;
         private System.Windows.Forms.TabPage tabSurface;
+        private System.Windows.Forms.TabPage tabSession;
+        private System.Windows.Forms.Label labelOutput;
+        private System.Windows.Forms.RichTextBox txtOutput;
     }
 }

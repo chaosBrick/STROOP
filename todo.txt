@@ -2,6 +2,11 @@ Features:
 - Add interacted walls display (modify previous positions tracker?)
 - Add wall seams finder
 
+Bruteforcing:
+- add "invert" option for XZRadial stuff, i.e. avoid hitbox? (Could use negative values instead)
+	- need to update failure case for negative numbers but nothing else
+- implement scoring by global timer value? (Can access this in STROOP, unlike m64 count)
+
 Internal:
 - Make Models.ObjectDataModel compatible as PositionAngle
 - Simplify MapTracker Settings parsing for basic cases

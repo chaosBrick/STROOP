@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>STROOP</RootNamespace>
     <AssemblyName>STROOP</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -407,6 +407,7 @@
       <DependentUpon>GeneralPurpose.cs</DependentUpon>
     </Compile>
     <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\IMethodController.cs" />
+    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\MethodControllers\CheckAction.cs" />
     <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\MethodControllers\ITrackerMethodMapObject.cs" />
     <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\MethodControllers\RestrictHPosition.cs" />
     <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\MethodControllers\TrackerMethodControllerBase.cs" />
@@ -423,6 +424,7 @@
     <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\ScoringFunc.Designer.cs">
       <DependentUpon>ScoringFunc.cs</DependentUpon>
     </Compile>
+    <Compile Include="Tabs\BruteforceTab\BF_Utilities\BF_ObjectUtilities.cs" />
     <Compile Include="Tabs\BruteforceTab\ValueGetters.cs" />
     <Compile Include="Tabs\GhostTab\FileWatchers.cs">
       <SubType>UserControl</SubType>
@@ -891,6 +893,7 @@
     <Compile Include="Utilities\FlyingUtilities.cs" />
     <Compile Include="Utilities\FormsUtilities.cs" />
     <Compile Include="Utilities\GeneralUtilities.cs" />
+    <Compile Include="Utilities\IgnoreScope.cs" />
     <Compile Include="Utilities\InGameFunctionCall.cs" />
     <Compile Include="Utilities\MathOperationUtilities.cs" />
     <Compile Include="Calculators\WallDisplacementCalculator.cs" />

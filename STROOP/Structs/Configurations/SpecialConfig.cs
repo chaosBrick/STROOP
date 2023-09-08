@@ -7,7 +7,8 @@ namespace STROOP.Structs.Configurations
 {
     public static class SpecialConfig
     {
-        public static float ExtBoundariesScale => SavedSettingsConfig.UseExtendedLevelBoundaries ? 4 : 1;
+        public static int ExtBoundariesShift => SavedSettingsConfig.UseExtendedLevelBoundaries ? 2 : 0;
+        public static int ExtBoundariesScale => (1 << ExtBoundariesShift);
 
         // Cam Hack vars
 

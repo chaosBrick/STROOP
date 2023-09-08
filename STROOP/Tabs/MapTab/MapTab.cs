@@ -82,6 +82,12 @@ namespace STROOP.Tabs.MapTab
             return tracker;
         }
 
+        public void RemoveTracker(MapTracker mapTracker)
+        {
+            flowLayoutPanelMapTrackers.Controls.Remove(mapTracker);
+            externalTrackers.Remove(mapTracker);
+        }
+
         public void AddSubTracker(MapTracker obj) => flowLayoutPanelMapTrackers.Controls.Add(obj);
 
         public override Action<IEnumerable<ObjectSlot>> objectSlotsClicked => objectSlots =>
@@ -93,7 +99,7 @@ namespace STROOP.Tabs.MapTab
                 if (unselectFirst == null)
                     unselectFirst = hasKey ^ selection.Count > 1;
                 if (hasKey && unselectFirst.Value)
-                    tracker.RemoveFromMap();
+                    tracker.Kill();
                 else if (!hasKey && !unselectFirst.Value)
                 {
                     var newTracker = new MapTracker(this, $"ObjectSlot{objectSlot.Index}", new MapObjectObject(objectSlot.CurrentObject.Address));
@@ -778,7 +784,7 @@ namespace STROOP.Tabs.MapTab
                 if (semaphoreTracker == null && semaphore.checkBox.Checked)
                     semaphore.checkBox.Checked = false;
                 else if (semaphoreTracker != null && !semaphore.checkBox.Checked)
-                    semaphoreTracker.RemoveFromMap();
+                    RemoveTracker(semaphoreTracker);
             }
         }
 

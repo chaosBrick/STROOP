@@ -6,6 +6,7 @@ using STROOP.Utilities;
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
+using STROOP.Controls;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
 {
@@ -31,63 +32,119 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             return (x, y);
         }
 
+        bool _muted = false;
+        public bool muted
+        {
+            get => _muted && AccessScope<BruteforceTab.UnmuteScoringFuncs>.content == null;
+            set
+            {
+                _muted = value;
+                pbMute.Image = _muted ? Properties.Resources.checkbox_unchecked : pbMute.InitialImage;
+            }
+        }
+
         bool expanded = false;
         int collapsedHeight;
         GeneralPurpose.ScoringFuncPrecursor precursor;
+        IMethodController controller;
+        ToolTip documentationToolTip;
+        Dictionary<string, string> docs = new Dictionary<string, string>()
+        {
+            ["weight"] = "The value to multiply the result of the scoring function by.\nNegative values are allowed and usually invert the effect of the function.",
+            ["frame"] = "The 1-indexed frame number in the m64 to apply the scoring function on. 'last' will always be equal to m64_end.",
+        };
 
         public ScoringFunc()
         {
             InitializeComponent();
             BackColor = Color.AliceBlue;
+            documentationToolTip = new ToolTip();
+            documentationToolTip.ShowAlways = true;
 
             Controls.Remove(watchVariablePanelParameters);
             RecalculateSize();
             collapsedHeight = Height;
         }
 
-        public void Init(GeneralPurpose.ScoringFuncPrecursor precursor, Action UpdateStateFunc)
+        DateTime hoverBegin;
+        WatchVariableControl hoveringWatchVarControl;
+
+        void UpdateTooltip()
+        {
+            var newHoveringWatchVarControl = expanded ? watchVariablePanelParameters.hoveringWatchVariableControl : null;
+            newHoveringWatchVarControl = newHoveringWatchVarControl ?? variablePanelBaseValues.hoveringWatchVariableControl;
+            if (newHoveringWatchVarControl != hoveringWatchVarControl)
+            {
+                hoveringWatchVarControl = newHoveringWatchVarControl;
+                hoverBegin = DateTime.Now;
+                documentationToolTip.Hide(FindForm());
+                documentationToolTip.Active = false;
+            }
+            else if (newHoveringWatchVarControl != null && (DateTime.Now - hoverBegin).TotalSeconds >= 1 && docs.TryGetValue(newHoveringWatchVarControl.VarName, out var doc) && !documentationToolTip.Active)
+            {
+                documentationToolTip.Active = true;
+                documentationToolTip.Show(doc, FindForm(), FindForm().PointToClient(Cursor.Position));
+            }
+        }
+
+        public void Init(GeneralPurpose.ScoringFuncPrecursor precursor, BruteforceTab bruteforceTab)
         {
             this.precursor = precursor;
             watchVariablePanelParameters.ClearVariables();
             labelName.Text = precursor.name;
-            variablePanelBaseValues.AddVariables(
-                new WatchVariable.IVariableView[] {
-                    new WatchVariable.CustomView(typeof(Controls.WatchVariableNumberWrapper))
+            bruteforceTab.Updating += UpdateTooltip;
+            Disposed += (_, __) => bruteforceTab.Updating -= UpdateTooltip;
+
+            variablePanelBaseValues.AddVariable(new WatchVariable(
+                    new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
                     {
                         Name = "weight",
                         _getterFunction = (_) => precursor.weight,
                         _setterFunction = (value, addr) => { precursor.weight = Convert.ToDouble(value); return true; }
-                    },
-                    new WatchVariable.CustomView(typeof(Controls.WatchVariableNumberWrapper))
-                    {
-                        Name = "frame",
-                        _getterFunction = (_) => precursor.frame,
-                        _setterFunction = (value, addr) => { precursor.frame = Convert.ToUInt32(value); return true; }
-                    }
-                    }.Select(_ => (new WatchVariable(_), _))
-                );
+                    }));
+
+            var wrapper = (WatchVariableSelectionWrapper<WatchVariableNumberWrapper>)variablePanelBaseValues.AddVariable(
+                new WatchVariable(
+                new WatchVariable.CustomView(typeof(WatchVariableSelectionWrapper<WatchVariableNumberWrapper>))
+                {
+                    Name = "frame",
+                    _getterFunction = (_) => precursor.frame,
+                    _setterFunction = (value, addr) => { precursor.frame = Convert.ToUInt32(value); return true; }
+                }))
+                .WatchVarWrapper;
+            wrapper.DisplaySingleOption = false;
+
+            (Func<object> endFrameValue, Action unregister) = bruteforceTab.GetManualValue<object>("m64_end", () => wrapper.UpdateOption(0));
+            Disposed += (_, __) => unregister();
+            if (endFrameValue != null)
+            {
+                wrapper.options.Add(("last", endFrameValue));
+                wrapper.SelectOption(0);
+            }
+
             var ctrls = watchVariablePanelParameters.AddVariables(
                 precursor.parameterDefinitions.Select(kvp =>
                 {
+                    docs[kvp.Key.name] = kvp.Key.documentation;
                     string key = kvp.Key.name;
                     var backingType = BruteforceTab.backingTypes[kvp.Value];
                     if (precursor.parameterValues.TryGetValue(key, out var uncastedValue))
                         precursor.parameterValues[key] = Convert.ChangeType(uncastedValue, backingType);
                     else
                         precursor.parameterValues[key] = Activator.CreateInstance(backingType);
-                    var newWatchVar = new WatchVariable(new WatchVariable.CustomView(BruteforceTab.wrapperTypes[kvp.Value])
+                    var newWatchVar = new WatchVariable(new WatchVariable.CustomView(BruteforceTab.fallbackWrapperTypes[kvp.Value])
                     {
                         Name = kvp.Key.name,
                         _getterFunction = _ => precursor.parameterValues[key],
                         _setterFunction = (value, _) => { precursor.parameterValues[key] = value; return true; }
                     }, backingType);
-                    newWatchVar.ValueSet += UpdateStateFunc;
+                    newWatchVar.ValueSet += bruteforceTab.DeferUpdateState;
                     return (newWatchVar, newWatchVar.view);
                 }));
             if (stringToControllerType.TryGetValue(precursor.name, out var controllerType))
             {
-                var ctrl = (IMethodController)Activator.CreateInstance(controllerType);
-                ctrl.SetTargetFunc(this);
+                controller = (IMethodController)Activator.CreateInstance(controllerType);
+                controller.SetTargetFunc(this);
             }
         }
 
@@ -126,6 +183,9 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
 
         public string GetJson()
         {
+            if (muted)
+                return null;
+
             var tabs0 = new string('\t', 2);
             var tabs1 = new string('\t', 3);
             var tabs2 = new string('\t', 4);
@@ -151,8 +211,20 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
 
         public void DeleteSelf() => this.GetParent<GeneralPurpose>()?.RemoveMethod(this);
 
+        bool deleting = false;
+        public void DeleteFromMap()
+        {
+            if (deleting)
+                return;
+            deleting = true;
+            controller?.Remove();
+            DeleteSelf();
+        }
+
         private void pbExpand_Click(object sender, EventArgs e) => SetExpanded(!expanded);
 
         private void pbRemove_Click(object sender, EventArgs e) => DeleteSelf();
+
+        private void pbMute_Click(object sender, EventArgs e) => muted = !muted;
     }
 }

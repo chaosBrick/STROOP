@@ -23,10 +23,20 @@ namespace STROOP.Controls
             ("Don't display as Inverted", () => false, WrapperProperty<WatchVariableBooleanWrapper>(wr => !wr._displayAsInverted))
             );
 
-        public override bool DoubleClickToEdit => !_displayAsCheckbox;
-
         private bool _displayAsCheckbox;
         private bool _displayAsInverted;
+
+        public override void SingleClick(Control parent, Rectangle bounds)
+        {
+            if (_displayAsCheckbox)
+                Edit(parent, bounds);
+        }
+
+        public override void DoubleClick(Control parent, Rectangle bounds)
+        {
+            if (!_displayAsCheckbox)
+                Edit(parent, bounds);
+        }
 
         public WatchVariableBooleanWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl)
             : base(watchVar, watchVarControl)
@@ -61,7 +71,7 @@ namespace STROOP.Controls
                 var combinedValues = CombineValues(GetValues(false, false));
                 if (!combinedValues.meaningfulValue)
                     SetValue(0);
-                else if (System.Convert.ToDecimal(combinedValues.value) == 0)
+                else if (Convert.ToDecimal(combinedValues.value) == 0)
                     SetValue(WatchVar.Mask ?? 1);
                 else
                     SetValue(0);

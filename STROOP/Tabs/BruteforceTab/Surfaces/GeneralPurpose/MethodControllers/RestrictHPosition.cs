@@ -165,6 +165,6 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
 
     class RestrictHPosition : TrackerMethodControllerBase<RestrictHPositionMapElement, RestrictHPosition>
     {
-        protected override RestrictHPositionMapElement CreateTracker() => new RestrictHPositionMapElement();
+        protected override RestrictHPositionMapElement CreateMapObject() => new RestrictHPositionMapElement();
     }
 }
