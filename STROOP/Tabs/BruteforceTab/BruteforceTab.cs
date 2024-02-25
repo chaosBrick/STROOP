@@ -420,16 +420,17 @@ namespace STROOP.Tabs.BruteforceTab
                     && !ValueGetters.valueGetters.ContainsKey((moduleName, v.Key))
                     && fallbackWrapperTypes.TryGetValue(v.Value.name, out var wrapperType))
                 {
+                    WatchVariableControl ctrl = null;
                     object o = 0;
                     var newWatchVar = new WatchVariable(new WatchVariable.CustomView(wrapperType)
                     {
                         Name = v.Key,
                         _getterFunction = _ => o,
-                        _setterFunction = (value, _) => { o = value; return true; }
+                        _setterFunction = (value, _) => { o = value; ctrl.WatchVarWrapper.GetValueText(); return true; }
                     });
                     manualParameterVariables.Add(newWatchVar);
                     newWatchVar.ValueSet += UpdateState;
-                    var ctrl = watchVariablePanelParams.AddVariable(newWatchVar, newWatchVar.view);
+                    ctrl = watchVariablePanelParams.AddVariable(newWatchVar, newWatchVar.view);
                     Func<string> fn = () => StringUtilities.MakeJsonValue(newWatchVar.GetValues().FirstOrDefault()?.ToString() ?? "0");
                     if (v.Value.modifier == "control")
                     {
