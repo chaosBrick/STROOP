@@ -195,14 +195,14 @@
     <Compile Include="Controls\PanelEx.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\WatchVariableAddressWrapper.cs" />
+    <Compile Include="Core\WatchVariables\WatchVariableAddressWrapper.cs" />
     <Compile Include="Controls\WatchVariablePanelRenderer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\WatchVariableSelectionWrapper.cs" />
-    <Compile Include="Controls\WatchVariableSetting.cs" />
-    <Compile Include="Controls\WatchVariableTriangleWrapper.cs" />
-    <Compile Include="Controls\WatchVariableStringWrapper.cs" />
+    <Compile Include="Core\WatchVariables\WatchVariableSelectionWrapper.cs" />
+    <Compile Include="Core\WatchVariables\WatchVariableSetting.cs" />
+    <Compile Include="Core\WatchVariables\WatchVariableTriangleWrapper.cs" />
+    <Compile Include="Core\WatchVariables\WatchVariableStringWrapper.cs" />
     <Compile Include="Enums\AggregateMathOperation.cs" />
     <Compile Include="Enums\CoordinateAngle.cs" />
     <Compile Include="Enums\CopyTypeEnum.cs" />
@@ -323,15 +323,15 @@
     <Compile Include="Controls\DecompilerView.xaml.cs">
       <DependentUpon>DecompilerView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\WatchVariable.cs" />
-    <Compile Include="Controls\WatchVariableBooleanWrapper.cs" />
-    <Compile Include="Controls\WatchVariableObjectWrapper.cs" />
-    <Compile Include="Controls\WatchVariableAngleWrapper.cs" />
-    <Compile Include="Controls\WatchVariableNumberWrapper.cs" />
+    <Compile Include="Core\WatchVariables\WatchVariable.cs" />
+    <Compile Include="Core\WatchVariables\WatchVariableBooleanWrapper.cs" />
+    <Compile Include="Core\WatchVariables\WatchVariableObjectWrapper.cs" />
+    <Compile Include="Core\WatchVariables\WatchVariableAngleWrapper.cs" />
+    <Compile Include="Core\WatchVariables\WatchVariableNumberWrapper.cs" />
     <Compile Include="Controls\VarHackFlowLayoutPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\WatchVariableWrapper.cs" />
+    <Compile Include="Core\WatchVariables\WatchVariableWrapper.cs" />
     <Compile Include="Controls\InputDisplayPanel.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -1526,6 +1526,7 @@
       <Version>4.5.0</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>del "$(TargetDir)OpenTK.dll.config"
