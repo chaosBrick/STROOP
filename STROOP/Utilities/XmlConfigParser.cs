@@ -11,7 +11,7 @@ using STROOP.Extensions;
 using System.Xml;
 using STROOP.Structs.Configurations;
 using STROOP.Tabs.MapTab;
-
+using STROOP.Core.WatchVariables;
 
 namespace STROOP.Utilities
 {

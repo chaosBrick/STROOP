@@ -6,6 +6,7 @@ using OpenTK;
 using STROOP.Tabs.MapTab;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
+using STROOP.Core.WatchVariables;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
 {

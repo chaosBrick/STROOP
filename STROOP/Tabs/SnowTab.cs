@@ -4,6 +4,7 @@ using STROOP.Structs;
 using STROOP.Utilities;
 using STROOP.Controls;
 using STROOP.Structs.Configurations;
+using STROOP.Core.WatchVariables;
 
 namespace STROOP.Tabs
 {

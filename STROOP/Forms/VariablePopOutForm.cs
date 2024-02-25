@@ -1,4 +1,5 @@
 ﻿using STROOP.Controls;
+using STROOP.Core.WatchVariables;
 using STROOP.Structs;
 using System.Collections.Generic;
 using System.Windows.Forms;

@@ -5,6 +5,7 @@ using System.Drawing;
 using STROOP.Utilities;
 using STROOP.Extensions;
 using STROOP.Structs.Configurations;
+using STROOP.Core.WatchVariables;
 
 namespace STROOP.Structs
 {

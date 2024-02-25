@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Globalization;
-using STROOP.Controls;
+using STROOP.Core.WatchVariables;
 
 namespace STROOP.Utilities
 {

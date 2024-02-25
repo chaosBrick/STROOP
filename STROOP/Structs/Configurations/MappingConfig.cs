@@ -1,4 +1,5 @@
-﻿using STROOP.Utilities;
+﻿using STROOP.Core.WatchVariables;
+using STROOP.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

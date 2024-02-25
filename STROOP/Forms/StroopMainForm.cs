@@ -14,6 +14,7 @@ using STROOP.Extensions;
 using STROOP.Structs.Configurations;
 using STROOP.Forms;
 using STROOP.Models;
+using STROOP.Core.WatchVariables;
 
 namespace STROOP
 {

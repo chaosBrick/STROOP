@@ -1,4 +1,5 @@
-﻿using STROOP.Structs.Configurations;
+﻿using STROOP.Core.WatchVariables;
+using STROOP.Structs.Configurations;
 using System.Collections.Generic;
 
 namespace STROOP.Structs

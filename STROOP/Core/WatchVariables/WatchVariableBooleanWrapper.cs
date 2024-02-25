@@ -3,7 +3,10 @@ using System.Windows.Forms;
 using System.Drawing;
 using System;
 
-namespace STROOP.Controls
+// TODO: This shouldn't be necessary
+using STROOP.Controls;
+
+namespace STROOP.Core.WatchVariables
 {
     public class WatchVariableBooleanWrapper : WatchVariableNumberWrapper
     {

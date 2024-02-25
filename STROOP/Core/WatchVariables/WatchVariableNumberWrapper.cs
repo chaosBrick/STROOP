@@ -4,7 +4,10 @@ using STROOP.Utilities;
 using System;
 using System.Collections.Generic;
 
-namespace STROOP.Controls
+// TODO: This shouldn't be necessary
+using STROOP.Controls;
+
+namespace STROOP.Core.WatchVariables
 {
     public class WatchVariableNumberWrapper : WatchVariableStringWrapper
     {

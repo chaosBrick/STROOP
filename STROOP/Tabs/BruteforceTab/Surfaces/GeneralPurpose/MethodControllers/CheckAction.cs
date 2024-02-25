@@ -1,4 +1,4 @@
-﻿using STROOP.Controls;
+﻿using STROOP.Core.WatchVariables;
 using STROOP.Structs.Configurations;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers

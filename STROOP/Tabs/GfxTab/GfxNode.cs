@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Drawing;
 using STROOP.Structs.Configurations;
-using STROOP.Controls;
 using STROOP.Structs;
 using STROOP.Utilities;
+using STROOP.Core.WatchVariables;
 
 namespace STROOP.Tabs.GfxTab
 {

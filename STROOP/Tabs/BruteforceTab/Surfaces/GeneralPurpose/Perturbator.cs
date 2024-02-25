@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Linq;
 using STROOP.Utilities;
+using STROOP.Core.WatchVariables;
 using System.Collections.Generic;
 using System.Text;
 
@@ -53,7 +54,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             foreach (var param in parameterValues)
             {
                 var key_cap = param.Key;
-                variableViews[i++] = new WatchVariable.CustomView(typeof(Controls.WatchVariableNumberWrapper))
+                variableViews[i++] = new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
                 {
                     Name = param.Key,
                     _getterFunction = (_) => parameterValues[key_cap],

@@ -6,7 +6,10 @@ using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 using System.Reflection;
 
-namespace STROOP.Controls
+// TODO: This shouldn't be necessary
+using STROOP.Controls;
+
+namespace STROOP.Core.WatchVariables
 {
     class WatchVariableSelectionWrapper<TWrapperBase> : WatchVariableWrapper where TWrapperBase : WatchVariableWrapper
     {

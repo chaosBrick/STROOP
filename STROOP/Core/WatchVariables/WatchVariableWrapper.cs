@@ -5,7 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace STROOP.Controls
+// TODO: this shouldn't be required
+using STROOP.Controls;
+
+namespace STROOP.Core.WatchVariables
 {
     public abstract class WatchVariableWrapper
     {

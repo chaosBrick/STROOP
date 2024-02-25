@@ -5,9 +5,8 @@ using STROOP.Utilities;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using System.Xml.Linq;
-using STROOP.Controls;
 
-namespace STROOP
+namespace STROOP.Core.WatchVariables
 {
     public static class IVariableViewExtensions
     {

@@ -6,7 +6,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace STROOP.Controls
+// TODO: These shouldn't be required
+using STROOP.Core.WatchVariables;
+using STROOP.Controls;
+
+namespace STROOP.Core.WatchVariables
 {
     public class WatchVariableSetting
     {
@@ -74,7 +78,9 @@ namespace STROOP.Controls
             target.Add(optionsItem);
         }
     }
+}
 
+namespace STROOP.Controls { 
     partial class WatchVariableControl
     {
         class DefaultSettings
