@@ -54,6 +54,9 @@ namespace STROOP.Tabs.BruteforceTab
                 ),
 
                 [(null, "dynamic_tris")] = GetDynamicTriangles,
+                [(null, "behavior_scripts")] = GetObjectsVars,
+                [(null, "object_states")] = GetObjectsVars,
+                [(null, "dynamic_object_tris")] = GetObjectsVars,
 
                 [(null, "environment_regions")] = new GetterFuncs("Environment Boxes", new GetterFuncsDic
                 {
@@ -67,36 +70,47 @@ namespace STROOP.Tabs.BruteforceTab
 
                 [("general_purpose", "scoring_methods")] = GetSurfaceVars,
                 [("general_purpose", "perturbators")] = GetSurfaceVars,
-                [("general_purpose", "behavior_scripts")] = GetObjectsVars,
-                [("general_purpose", "object_states")] = GetObjectsVars,
-                [("general_purpose", "dynamic_object_tris")] = GetObjectsVars,
             };
         }
 
 
-        static string GetObjectState(int slot, uint[] behaviorScriptArray)
+        static string GetObjectState(uint slot, uint[] behaviorScriptPtrArray, uint[] chosenObjectSlots)
         {
-            var obj = Config.ObjectSlotsManager.ObjectSlots[slot - 1].CurrentObject;
+            var obj = Config.ObjectSlotsManager.ObjectSlots[(int)slot - 1].CurrentObject;
+            var parentSlot = (uint)Config.ObjectSlotsManager.ObjectSlots.FindIndex(x => x.CurrentObject.Address == obj.Parent) + 1;
+            var parentObjectIndex = Array.IndexOf(chosenObjectSlots, parentSlot);
             var rawData = new uint[0x50];
             for (uint i = 0; i < rawData.Length; i++)
                 rawData[i] = Config.Stream.GetUInt32(obj.Address + 0x88 + i * 4);
+            // TODO: behaviorStack (may be idiotic to do in the first place)
             return $@"
         {{
             ""raw_data"": [{string.Join(", ", rawData.Select(x => $"\"0x{x.ToString("X8")}\""))}],
-            ""hitbox_height"": {Config.Stream.GetSingle(obj.Address + 0x1FC)}
+            ""collided_obj_interact_types"": {Config.Stream.GetUInt32(obj.Address + 0x70)},
+            ""active_flags"": {Config.Stream.GetInt16(obj.Address + 0x74)},
+            ""num_collided_objs"": {Config.Stream.GetInt16(obj.Address + 0x76)},
+            ""behavior_stack_index"": { Config.Stream.GetUInt32(obj.Address + 0x1D0)},
+            ""behavior_stack"": [{string.Join(", ", Config.Stream.ReadRam(obj.Address + 0x1D4, 8, EndiannessType.Little))}],
+            ""behavior_delay_timer"": {Config.Stream.GetInt16(obj.Address + 0x1F4)},
+            ""hitbox_radius"": {Config.Stream.GetSingle(obj.Address + 0x1F8)},
+            ""hitbox_height"": {Config.Stream.GetSingle(obj.Address + 0x1FC)},
+            ""hurtbox_radius"": {Config.Stream.GetSingle(obj.Address + 0x200)},
+            ""hurtbox_height"": {Config.Stream.GetSingle(obj.Address + 0x204)},
+            ""hitbox_down_offset"": {Config.Stream.GetSingle(obj.Address + 0x208)},
+            ""behavior_script_index"": {Array.IndexOf(behaviorScriptPtrArray, obj.AbsoluteBehavior)},
+            ""parent_object_index"": {parentObjectIndex}
         }}";
         }
 
-        static Func<string, string> GetObjectData(IEnumerable<int> slots) => (string inputName) =>
+        static Func<string, string> GetObjectData(uint[] slots) => (string inputName) =>
         {
             var usedBehaviorScriptPtrSet = new HashSet<uint>();
             foreach (var slot in slots)
-                usedBehaviorScriptPtrSet.Add(Config.ObjectSlotsManager.ObjectSlots[slot - 1].CurrentObject.AbsoluteBehavior);
+                usedBehaviorScriptPtrSet.Add(Config.ObjectSlotsManager.ObjectSlots[(int)slot - 1].CurrentObject.AbsoluteBehavior);
             var behaviorScriptPtrArray = usedBehaviorScriptPtrSet.ToArray();
 
             if (inputName == "object_states")
-                return $"[{string.Join(", ", slots.Select(x => GetObjectState(x, behaviorScriptPtrArray)))}]";
-
+                return $"[{string.Join(", ", slots.Select(x => GetObjectState(x, behaviorScriptPtrArray, slots)))}]";
 
             var usedBehaviorScripts = new uint[behaviorScriptPtrArray.Length][];
             var collisionPointerSet = new HashSet<uint>();
@@ -128,7 +142,7 @@ namespace STROOP.Tabs.BruteforceTab
                     return ("Nothing", inputName => inputName == "behavior_scripts" ? "[]" : "{}");
                 return (
                         $"Slots [{string.Concat(slots.Where((int? slot) => slot != null).Select(slot => slot.Value.ToString() + ";").ToArray())}]",
-                        GetObjectData(slots.Where(x => x.HasValue).Select(x => x.Value))
+                        GetObjectData(slots.Where(x => x.HasValue).Select(x => (uint)x.Value).ToArray())
                     );
             }
         });
