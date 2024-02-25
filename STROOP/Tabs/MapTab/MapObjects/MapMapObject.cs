@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Drawing;
-using OpenTK.Graphics.OpenGL;
-using STROOP.Utilities;
-using STROOP.Structs.Configurations;
-using STROOP.Structs;
 using OpenTK;
 
 namespace STROOP.Tabs.MapTab.MapObjects

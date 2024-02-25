@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL;
 using System.Drawing;
+using STROOP.Utilities;
 
 namespace STROOP.Tabs.MapTab.Renderers
 {
-
     public class RendererCollection
     {
         const int OBJECTS_TEXTURE_SIZE = 256;

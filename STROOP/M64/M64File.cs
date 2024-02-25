@@ -1,17 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.IO;
-using System.Data;
 using System.ComponentModel;
-using System.Xml.Serialization;
 using STROOP.Structs;
-using STROOP.Structs.Configurations;
-using System.Drawing;
 using STROOP.Utilities;
 
 namespace STROOP.M64

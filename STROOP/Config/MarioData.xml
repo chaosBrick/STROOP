@@ -134,4 +134,9 @@
   
   <Data groupList="Intermediate" type="uint" offsetUS="0x80361158" offsetJP="0x8035FDE8" offsetSH="0x80343318" base="Relative" subclass="Object">Effective Mario Object</Data>
   <Data groupList="Intermediate" type="uint" offset="0x88" base="Mario" subclass="Object">Visual Mario Object</Data>
+
+  <Data groupList="Advanced" type="short" offsetUS="0x8033b4b0" offsetJP="0x8033a160" base="Relative" jsonName="mario_spawn_x">Spawn X</Data>
+  <Data groupList="Advanced" type="short" offsetUS="0x8033b4b2" offsetJP="0x8033a162" base="Relative" jsonName="mario_spawn_y">Spawn Y</Data>
+  <Data groupList="Advanced" type="short" offsetUS="0x8033b4b4" offsetJP="0x8033a164" base="Relative" jsonName="mario_spawn_z">Spawn Z</Data>
+    
 </VarData>

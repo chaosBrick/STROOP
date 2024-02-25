@@ -3,7 +3,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
-
+using STROOP.Utilities;
 
 namespace STROOP.Tabs.MapTab.Renderers
 {
@@ -152,7 +152,7 @@ namespace STROOP.Tabs.MapTab.Renderers
             GL.Uniform2(uniform_pixelsPerUnit, ref pixelsPerUnit);
             GL.Uniform1(uniform_unitShift, (uint)Structs.Configurations.SpecialConfig.ExtBoundariesShift);
 
-            GL.Uniform2(GL.GetUniformLocation(program, "gridOffset"), new Vector2(0)); // new Vector2(-3, -3));
+            GL.Uniform2(GL.GetUniformLocation(program, "gridOffset"), new Vector2(0));
 
             GL.Disable(EnableCap.CullFace);
             GL.DrawArrays(PrimitiveType.Triangles, 0, triangles.Count * 3);

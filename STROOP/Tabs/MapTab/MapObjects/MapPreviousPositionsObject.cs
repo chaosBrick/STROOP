@@ -7,7 +7,6 @@ using STROOP.Structs;
 using OpenTK;
 using System.Windows.Forms;
 
-
 namespace STROOP.Tabs.MapTab.MapObjects
 {
     [ObjectDescription("Previous Positions", "Movement")]

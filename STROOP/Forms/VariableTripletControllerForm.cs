@@ -1,18 +1,16 @@
 ﻿using STROOP.Controls;
 using STROOP.Structs;
-using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using System.Xml.Linq;
 
 namespace STROOP.Forms
 {
     public partial class VariableTripletControllerForm : Form
     {
-        public Controls.WatchVariablePanel panel => _watchVariablePanel;
+        public WatchVariablePanel panel => _watchVariablePanel;
 
         public VariableTripletControllerForm()
         {

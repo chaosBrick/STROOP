@@ -126,9 +126,9 @@ namespace STROOP.Utilities
                 if (processScanner.SelectModule(Process.MainModule))
                 {
                     var foundPatternAddress = processScanner.FindPattern(autoDetectPattern, out var t);
-                    if (foundPatternAddress != 0)
+                    if (foundPatternAddress != IntPtr.Zero)
                     {
-                        var newBaseOffset = (UIntPtr)(foundPatternAddress - x.offset);
+                        var newBaseOffset = UIntPtr.Subtract((UIntPtr)(long)foundPatternAddress, (int)x.offset);
                         _baseOffset = newBaseOffset;
                         goto verified;
                     }

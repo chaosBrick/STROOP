@@ -12,7 +12,6 @@ using STROOP.Structs.Configurations;
 using STROOP.Tabs.MapTab.MapObjects;
 using System.Xml.Linq;
 
-
 namespace STROOP.Tabs.MapTab
 {
     public partial class MapTab : STROOPTab, IDisposable

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Drawing;
-
-namespace STROOP.Tabs.MapTab.MapObjects
+﻿namespace STROOP.Tabs.MapTab.MapObjects
 {
     public class MapCurrentBackgroundObject : MapBackgroundObject
     {

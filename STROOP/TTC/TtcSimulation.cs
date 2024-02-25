@@ -1,13 +1,10 @@
 ﻿using STROOP.Forms;
-using STROOP.Models;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Windows.Forms;
 
 namespace STROOP.Ttc
 {

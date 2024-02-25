@@ -1,5 +1,4 @@
-﻿
-namespace STROOP.Structs
+﻿namespace STROOP.Structs
 {
     public static class TableConfig
     {

@@ -1,8 +1,5 @@
 ﻿using STROOP.Structs.Configurations;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace STROOP.Ttc
 {

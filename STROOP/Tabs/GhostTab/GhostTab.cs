@@ -149,19 +149,59 @@ namespace STROOP.Tabs.GhostTab
             listBoxGhosts.SelectedItem = newGhost;
         }
 
-        void SelectGhost(object sender, EventArgs e)
-        {
-            labelGhostFile.Text = $"File: {selectedGhost?.name ?? "-"}";
-            labelNumFrames.Text = $"Number of Frames: {selectedGhost?.numFrames.ToString() ?? "-"}";
-            labelGhostPlaybackStart.Text = $"Original Playback Start: {selectedGhost?.originalPlaybackBaseFrame.ToString() ?? "-"}";
-        }
+        void SelectGhost(object sender, EventArgs e) => UpdateGhostInfoControls();
 
-        void StartOfPlaybackChanged(object sender, EventArgs e) => SetStartOfPlayback((uint)((NumericUpDown)sender).Value);
+        void UpdateGhostInfoControls()
+        {
+            const string MULTIPLE_VALUES = "<Multiple values>";
+
+            string fileValue = null;
+            string numFramesValue = null;
+            string originalPlaybackStartValue = null;
+            string playbackStartValue = null;
+            string playbackOffset = null;
+            string nameValue = null;
+            CheckState? transparentValue = null;
+
+            foreach (var g in GetSelectedGhosts())
+            {
+                GeneralUtilities.GetMeaningfulValue(ref fileValue, g.fileName, "<Multiple Files>");
+                GeneralUtilities.GetMeaningfulValue(ref numFramesValue, g.numFrames.ToString(), MULTIPLE_VALUES);
+                GeneralUtilities.GetMeaningfulValue(ref originalPlaybackStartValue, g.originalPlaybackBaseFrame.ToString(), MULTIPLE_VALUES);
+                GeneralUtilities.GetMeaningfulValue(ref playbackOffset, ((long)g.playbackBaseFrame - g.originalPlaybackBaseFrame).ToString(), MULTIPLE_VALUES);
+                GeneralUtilities.GetMeaningfulValue(ref playbackStartValue, g.playbackBaseFrame.ToString(), MULTIPLE_VALUES);
+                GeneralUtilities.GetMeaningfulValue(ref nameValue, g.name, "<Multiple Names>");
+                GeneralUtilities.GetMeaningfulValue(ref transparentValue, g.transparent ? CheckState.Checked : CheckState.Unchecked, CheckState.Indeterminate);
+            }
+
+            suspendHandlers = true;
+            labelGhostFile.Text = $"File: {fileValue ?? "-"}";
+            labelNumFrames.Text = $"Number of frames: {numFramesValue ?? "-"}";
+            labelGhostPlaybackStart.Text = $"Original playback start: {originalPlaybackStartValue ?? "-"}";
+
+            if (originalPlaybackStartValue != MULTIPLE_VALUES)
+                numericUpDownStartOfPlayback.Value = uint.Parse(originalPlaybackStartValue);
+
+            if (playbackOffset != MULTIPLE_VALUES)
+                numericUpDownPlaybackOffset.Value = long.Parse(playbackOffset);
+
+            if (uint.TryParse(playbackStartValue, out uint val))
+                numericUpDownStartOfPlayback.Value = val;
+
+            if (numericUpDownStartOfPlayback.Controls[1] is TextBox txt)
+                txt.Text = playbackStartValue ?? "<No value>";
+
+            checkTransparentGhosts.CheckState = transparentValue.HasValue ? transparentValue.Value : CheckState.Indeterminate;
+
+            textBoxGhostName.Text = nameValue;
+            suspendHandlers = false;
+        }
 
         void SetStartOfPlayback(uint newValue)
         {
             foreach (var g in GetSelectedGhosts())
                 g.playbackBaseFrame = newValue;
+            UpdateGhostInfoControls();
         }
 
         float yTargetPosition;
@@ -384,41 +424,7 @@ namespace STROOP.Tabs.GhostTab
                 buttonGhostColor.BackColor = ColorUtilities.Vec4ToColor(ghost.hatColor);
                 buttonGhostColor.Enabled = true;
             }
-
-            string fileValue = null;
-            string numFramesValue = null;
-            string originalPlaybackStartValue = null;
-            string playbackStartValue = null;
-            string nameValue = null;
-            CheckState? transparentValue = null;
-
-            foreach (var g in GetSelectedGhosts())
-            {
-                GeneralUtilities.GetMeaningfulValue(ref fileValue, g.fileName, "<Multiple Files>");
-                GeneralUtilities.GetMeaningfulValue(ref numFramesValue, g.numFrames.ToString(), "<Multiple values>");
-                GeneralUtilities.GetMeaningfulValue(ref originalPlaybackStartValue, g.originalPlaybackBaseFrame.ToString(), "<Multiple values>");
-                GeneralUtilities.GetMeaningfulValue(ref playbackStartValue, g.playbackBaseFrame.ToString(), "<Multiple values>");
-                GeneralUtilities.GetMeaningfulValue(ref nameValue, g.name, "<Multiple Names>");
-                GeneralUtilities.GetMeaningfulValue(ref transparentValue, g.transparent ? CheckState.Checked : CheckState.Unchecked, CheckState.Indeterminate);
-            }
-
-            labelGhostFile.Text = $"File: {fileValue ?? "-"}";
-            labelNumFrames.Text = $"Number of frames: {numFramesValue ?? "-"}";
-            labelGhostPlaybackStart.Text = $"Original playback start: {originalPlaybackStartValue ?? "-"}";
-
-            suspendHandlers = true;
-            if (uint.TryParse(playbackStartValue, out uint val))
-                numericUpDownStartOfPlayback.Value = val;
-
-            if (numericUpDownStartOfPlayback.Controls[1] is TextBox txt)
-                txt.Text = playbackStartValue ?? "<No value>";
-
-            checkTransparentGhosts.CheckState = transparentValue.HasValue ? transparentValue.Value : CheckState.Indeterminate;
-            suspendHandlers = false;
-
-            suspendNameChanged = true;
-            textBoxGhostName.Text = nameValue;
-            suspendNameChanged = false;
+            UpdateGhostInfoControls();
         }
 
         private void listBoxGhosts_KeyDown(object sender, KeyEventArgs e)
@@ -463,13 +469,25 @@ Are you sure you want to continue?";
         private void numericUpDownStartOfPlayback_ValueChanged(object sender, EventArgs e)
         {
             if (!suspendHandlers)
+            {
                 SetStartOfPlayback((uint)numericUpDownStartOfPlayback.Value);
+                UpdateGhostInfoControls();
+            }
         }
 
-        bool suspendNameChanged;
+        private void numericUpDownPlaybakcOffset_ValueChanged(object sender, EventArgs e)
+        {
+            if (!suspendHandlers)
+            {
+                foreach (var g in GetSelectedGhosts())
+                    g.playbackBaseFrame = (uint)(g.originalPlaybackBaseFrame + (int)numericUpDownPlaybackOffset.Value);
+                UpdateGhostInfoControls();
+            }
+        }
+
         private void textBoxGhostName_TextChanged(object sender, EventArgs e)
         {
-            if (suspendNameChanged)
+            if (suspendHandlers)
                 return;
             suspendSelectedIndexChanged = true;
             var selectedIndexList = new List<int>();

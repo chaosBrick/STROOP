@@ -112,29 +112,44 @@ namespace STROOP.Tabs.GfxTab
         protected static WatchVariablePrecursor gfxProperty(string name, Type type, uint offset,
             WatchVariableSubclass subclass = WatchVariableSubclass.Number, uint? mask = null)
         {
+            mask = mask ?? 0xFFFFFFFF;
             Color color = (offset <= 0x13)
                 ? ColorUtilities.GetColorFromString("Yellow")
                 : ColorUtilities.GetColorFromString("LightBlue");
             WatchVariable.SetterFunction setter;
             WatchVariable.GetterFunction getter;
 
-            setter = (value, _) =>
+            // TODO: extract this into a utility, find where else such behaviour is desired
+            setter = (value, offsetIntoGfxNode) =>
             {
                 var b = GfxNodeBase();
                 if (b == 0)
                     return false;
-                return Config.Stream.SetValue(type, value, _);
+                var newValue = value;
+                if (subclass == WatchVariableSubclass.Boolean && Convert.ToUInt32(value) != 0)
+                    value = 0xFFFFFFFF;
+                if (type != typeof(float))
+                {
+                    var previousValue = Convert.ToUInt32(Config.Stream.GetValue(type, b + offsetIntoGfxNode));
+                    newValue = (Convert.ToUInt32(value) & mask) | (previousValue & ~mask);
+                }
+                return Config.Stream.SetValue(type, Convert.ChangeType(newValue, type), b + offsetIntoGfxNode);
             };
 
-            getter = (_) =>
+            getter = (offsetIntoGfxNode) =>
             {
                 var b = GfxNodeBase();
                 if (b == 0)
                     return false;
-                return Config.Stream.GetValue(type, _);
+                var give = Config.Stream.GetValue(type, b + offsetIntoGfxNode);
+                if (type != typeof(float))
+                    give = Convert.ChangeType(Convert.ToUInt32(give) & mask, type);
+                return give;
             };
 
-            var view = new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper)) { Name = name, _getterFunction = getter, _setterFunction = setter, wrapperType = typeof(WatchVariableNumberWrapper) };
+            var wrapperType = WatchVariableWrapper.GetWrapperType(subclass.ToString());
+
+            var view = new WatchVariable.CustomView(wrapperType) { Name = name, _getterFunction = getter, _setterFunction = setter, wrapperType = wrapperType };
             var result = new WatchVariable(view, BaseAddressType.Relative, offset);
             if (type != typeof(float))
                 view.SetValueByKey(WatchVariable.ViewProperties.useHex, true);

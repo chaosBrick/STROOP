@@ -303,7 +303,30 @@ namespace STROOP
 
         private bool SetValueInternal(uint address, object value)
         {
-            bool result = view._setterFunction(value, address);
+            bool result;
+            object oldValue = view._getterFunction(address);
+            try
+            {
+                result = view._setterFunction(value, address);
+            }
+            catch (Exception)
+            {
+                // Setter failed with the given value, attempt to revert
+                try
+                {
+                    view._setterFunction(oldValue, address);
+                }
+                catch {
+                    // Recovery failed, notify user
+                    System.Windows.Forms.MessageBox.Show(
+                        "An invalid input caused this variable to be in an inconsistent state. Recovering by loading a previous savestate is recommended.",
+                        "Inconsistent state!",
+                        System.Windows.Forms.MessageBoxButtons.OK,
+                        System.Windows.Forms.MessageBoxIcon.Warning
+                        );
+                }
+                return false;
+            }
             if (result && locks.TryGetValue(address, out var l))
                 l.value.value = value;
             if (result)

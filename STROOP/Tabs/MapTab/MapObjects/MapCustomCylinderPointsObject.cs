@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
-using STROOP.Structs;
 using System.Windows.Forms;
 
 namespace STROOP.Tabs.MapTab.MapObjects

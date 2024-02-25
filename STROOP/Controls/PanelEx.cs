@@ -1,13 +1,9 @@
-using System;
-using System.ComponentModel;
-using System.Drawing;
 using System.Windows.Forms;
-using System.Runtime.InteropServices;
 
 namespace STROOP.Controls
 {
-	public class PanelEx : Panel
-	{
+    public class PanelEx : Panel
+    {
         protected override CreateParams CreateParams
         {
             get

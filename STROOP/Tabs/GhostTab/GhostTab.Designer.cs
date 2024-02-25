@@ -41,6 +41,8 @@
             this.labelName = new System.Windows.Forms.Label();
             this.labelGhostFile = new System.Windows.Forms.Label();
             this.labelGhostPlaybackStart = new System.Windows.Forms.Label();
+            this.lblPlaybackOffset = new System.Windows.Forms.Label();
+            this.numericUpDownPlaybackOffset = new System.Windows.Forms.NumericUpDown();
             this.labelBaseGlobalTimer = new System.Windows.Forms.Label();
             this.numericUpDownStartOfPlayback = new System.Windows.Forms.NumericUpDown();
             this.buttonSaveGhost = new System.Windows.Forms.Button();
@@ -53,6 +55,7 @@
             this.groupBoxVariables = new System.Windows.Forms.GroupBox();
             this.groupBoxHelp = new System.Windows.Forms.GroupBox();
             this.buttonTutorialFileWatch = new System.Windows.Forms.Button();
+            this.buttonHelpGfxPool = new System.Windows.Forms.Button();
             this.buttonTutorialPlayback = new System.Windows.Forms.Button();
             this.buttonTutorialNotes = new System.Windows.Forms.Button();
             this.groupBoxGfxPool = new System.Windows.Forms.GroupBox();
@@ -63,9 +66,9 @@
             this.label1 = new System.Windows.Forms.Label();
             this.labelPool1Address = new System.Windows.Forms.Label();
             this.buttonMoveGfxPool = new System.Windows.Forms.Button();
-            this.buttonHelpGfxPool = new System.Windows.Forms.Button();
             this.groupBoxGhosts.SuspendLayout();
             this.groupBoxGhostInfo.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPlaybackOffset)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownStartOfPlayback)).BeginInit();
             this.groupGhostHack.SuspendLayout();
             this.groupBoxVariables.SuspendLayout();
@@ -149,6 +152,8 @@
             this.groupBoxGhostInfo.Controls.Add(this.labelName);
             this.groupBoxGhostInfo.Controls.Add(this.labelGhostFile);
             this.groupBoxGhostInfo.Controls.Add(this.labelGhostPlaybackStart);
+            this.groupBoxGhostInfo.Controls.Add(this.lblPlaybackOffset);
+            this.groupBoxGhostInfo.Controls.Add(this.numericUpDownPlaybackOffset);
             this.groupBoxGhostInfo.Controls.Add(this.labelBaseGlobalTimer);
             this.groupBoxGhostInfo.Controls.Add(this.numericUpDownStartOfPlayback);
             this.groupBoxGhostInfo.Location = new System.Drawing.Point(9, 343);
@@ -227,6 +232,33 @@
             this.labelGhostPlaybackStart.Size = new System.Drawing.Size(117, 13);
             this.labelGhostPlaybackStart.TabIndex = 3;
             this.labelGhostPlaybackStart.Text = "Original Playback Start:";
+            // 
+            // lblPlaybackOffset
+            // 
+            this.lblPlaybackOffset.AutoSize = true;
+            this.lblPlaybackOffset.Location = new System.Drawing.Point(291, 88);
+            this.lblPlaybackOffset.Name = "lblPlaybackOffset";
+            this.lblPlaybackOffset.Size = new System.Drawing.Size(83, 13);
+            this.lblPlaybackOffset.TabIndex = 3;
+            this.lblPlaybackOffset.Text = "Playback offset:";
+            // 
+            // numericUpDownPlaybackOffset
+            // 
+            this.numericUpDownPlaybackOffset.Location = new System.Drawing.Point(379, 86);
+            this.numericUpDownPlaybackOffset.Maximum = new decimal(new int[] {
+            -1,
+            0,
+            0,
+            0});
+            this.numericUpDownPlaybackOffset.Minimum = new decimal(new int[] {
+            -1,
+            0,
+            0,
+            -2147483648});
+            this.numericUpDownPlaybackOffset.Name = "numericUpDownPlaybackOffset";
+            this.numericUpDownPlaybackOffset.Size = new System.Drawing.Size(92, 20);
+            this.numericUpDownPlaybackOffset.TabIndex = 2;
+            this.numericUpDownPlaybackOffset.ValueChanged += new System.EventHandler(this.numericUpDownPlaybakcOffset_ValueChanged);
             // 
             // labelBaseGlobalTimer
             // 
@@ -319,6 +351,8 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.watchVariablePanelGhost.AutoScroll = true;
             this.watchVariablePanelGhost.DataPath = "Config/GhostData.xml";
+            this.watchVariablePanelGhost.elementNameWidth = null;
+            this.watchVariablePanelGhost.elementValueWidth = null;
             this.watchVariablePanelGhost.Location = new System.Drawing.Point(6, 19);
             this.watchVariablePanelGhost.Name = "watchVariablePanelGhost";
             this.watchVariablePanelGhost.Size = new System.Drawing.Size(209, 432);
@@ -360,6 +394,16 @@
             this.buttonTutorialFileWatch.Text = "Using File Watchers";
             this.buttonTutorialFileWatch.UseVisualStyleBackColor = true;
             this.buttonTutorialFileWatch.Click += new System.EventHandler(this.buttonTutorialFileWatch_Click);
+            // 
+            // buttonHelpGfxPool
+            // 
+            this.buttonHelpGfxPool.Location = new System.Drawing.Point(9, 110);
+            this.buttonHelpGfxPool.Name = "buttonHelpGfxPool";
+            this.buttonHelpGfxPool.Size = new System.Drawing.Size(146, 23);
+            this.buttonHelpGfxPool.TabIndex = 7;
+            this.buttonHelpGfxPool.Text = "Moving the GFX Pool";
+            this.buttonHelpGfxPool.UseVisualStyleBackColor = true;
+            this.buttonHelpGfxPool.Click += new System.EventHandler(this.buttonHelpGfxPool_Click);
             // 
             // buttonTutorialPlayback
             // 
@@ -459,16 +503,6 @@
             this.buttonMoveGfxPool.UseVisualStyleBackColor = true;
             this.buttonMoveGfxPool.Click += new System.EventHandler(this.buttonMoveGfxPool_Click);
             // 
-            // buttonHelpGfxPool
-            // 
-            this.buttonHelpGfxPool.Location = new System.Drawing.Point(9, 110);
-            this.buttonHelpGfxPool.Name = "buttonHelpGfxPool";
-            this.buttonHelpGfxPool.Size = new System.Drawing.Size(146, 23);
-            this.buttonHelpGfxPool.TabIndex = 7;
-            this.buttonHelpGfxPool.Text = "Moving the GFX Pool";
-            this.buttonHelpGfxPool.UseVisualStyleBackColor = true;
-            this.buttonHelpGfxPool.Click += new System.EventHandler(this.buttonHelpGfxPool_Click);
-            // 
             // GhostTab
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -483,6 +517,7 @@
             this.groupBoxGhosts.ResumeLayout(false);
             this.groupBoxGhostInfo.ResumeLayout(false);
             this.groupBoxGhostInfo.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPlaybackOffset)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownStartOfPlayback)).EndInit();
             this.groupGhostHack.ResumeLayout(false);
             this.groupGhostHack.PerformLayout();
@@ -532,5 +567,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label labelPool1Address;
         private System.Windows.Forms.Button buttonHelpGfxPool;
+        private System.Windows.Forms.Label lblPlaybackOffset;
+        private System.Windows.Forms.NumericUpDown numericUpDownPlaybackOffset;
     }
 }

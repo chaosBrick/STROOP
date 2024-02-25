@@ -1,8 +1,6 @@
-﻿using STROOP.Managers;
-using STROOP.Structs.Configurations;
+﻿using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 using System;
-using System.Collections.Generic;
 
 namespace STROOP.Structs
 {

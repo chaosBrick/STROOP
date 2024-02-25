@@ -1,8 +1,5 @@
-﻿using STROOP.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace STROOP.Ttc
 {
@@ -16,13 +13,13 @@ namespace STROOP.Ttc
 
         //variables to tweak how objects are printed
         public static readonly string OPENER = "(";
-	    public static readonly string SEPARATOR = ",";
-	    public static readonly string CLOSER = ")";
+        public static readonly string SEPARATOR = ",";
+        public static readonly string CLOSER = ")";
 
         public TtcRng _rng;
 
-	    //id is an identifier for this object (e.g. "Cog 2")
-	    public string _id;
+        //id is an identifier for this object (e.g. "Cog 2")
+        public string _id;
 
         //the frame that the objects are updating to
         public int _currentFrame;

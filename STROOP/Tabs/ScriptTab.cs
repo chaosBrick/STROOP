@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using STROOP.Controls;
 using STROOP.Forms;
 using STROOP.Script;
 using System.Windows.Forms;

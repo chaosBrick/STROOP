@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
 using STROOP.Utilities;
 using STROOP.Extensions;
 using STROOP.Structs.Configurations;
-using STROOP.Controls;
 
 namespace STROOP.Structs
 {

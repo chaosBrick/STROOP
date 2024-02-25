@@ -1,12 +1,4 @@
-﻿using STROOP.Controls;
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
-using System.Drawing;
-using System.Linq;
-using STROOP.Structs.Configurations;
-using STROOP.Structs;
-using STROOP.Utilities;
+﻿using System;
 
 namespace STROOP.Exceptions
 {

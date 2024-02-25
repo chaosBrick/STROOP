@@ -1,5 +1,4 @@
-﻿using STROOP.Controls;
-using STROOP.Structs;
+﻿using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 using System;

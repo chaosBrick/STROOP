@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.Serialization;
-using System.Xml.Serialization;
-using System.Drawing;
-using STROOP.Structs;
+﻿using System.Text;
 using System.Windows.Forms;
 using STROOP.Utilities;
 using STROOP.Forms;

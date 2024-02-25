@@ -1,8 +1,4 @@
-﻿using System;
-using System.Drawing;
-using STROOP.Structs.Configurations;
-
-namespace STROOP.Tabs.MapTab.MapObjects
+﻿namespace STROOP.Tabs.MapTab.MapObjects
 {
     public abstract class MapIconObject : MapObject
     {

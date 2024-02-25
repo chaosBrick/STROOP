@@ -450,7 +450,7 @@
     <Compile Include="Tabs\MapTab\MapObjects\MapNearbyObjectsObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapObjectTrianglePrediction.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapTapeMeasureObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapNearbyFloorUnits.cs" />
+    <Compile Include="Tabs\MapTab\MapObjects\MapNearbyUnits.cs" />
     <Compile Include="Tabs\MapTab\MapPopout.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -486,7 +486,7 @@
     <Compile Include="Tabs\MapTab\MapObjects\MapCustomBackgroundObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapLevelCeilingObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapLevelFloorObject.cs" />
-    <Compile Include="Tabs\MapTab\MapLevelTriangleObjectI.cs" />
+    <Compile Include="Tabs\MapTab\IMapLevelTriangleObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapLevelWallObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapCustomMapObject.cs" />
     <Compile Include="Tabs\MapTab\MapObjects\MapPathObject.cs" />
@@ -841,7 +841,6 @@
     <Compile Include="Structs\Configurations\MarioObjectConfig.cs" />
     <Compile Include="Structs\Configurations\TableConfig.cs" />
     <Compile Include="Structs\Configurations\OverlayConfig.cs" />
-    <Compile Include="Structs\Configurations\OptionsConfig.cs" />
     <Compile Include="Structs\Configurations\MiscConfig.cs" />
     <Compile Include="Structs\Configurations\VarHackConfig.cs" />
     <Compile Include="Structs\Configurations\PositionControllerRelativityConfig.cs" />
@@ -881,7 +880,7 @@
     <Compile Include="Structs\RomHack.cs" />
     <Compile Include="Structs\SpawnHack.cs" />
     <Compile Include="Enums\AngleUnitType.cs" />
-    <Compile Include="Utilities\AccessScope.cs" />
+    <Compile Include="Utilities\Scopes.cs" />
     <Compile Include="Utilities\AnimationUtilities.cs" />
     <Compile Include="Utilities\CellUtilities.cs" />
     <Compile Include="Structs\ObjectAngleTable.cs" />
@@ -893,7 +892,6 @@
     <Compile Include="Utilities\FlyingUtilities.cs" />
     <Compile Include="Utilities\FormsUtilities.cs" />
     <Compile Include="Utilities\GeneralUtilities.cs" />
-    <Compile Include="Utilities\IgnoreScope.cs" />
     <Compile Include="Utilities\InGameFunctionCall.cs" />
     <Compile Include="Utilities\MathOperationUtilities.cs" />
     <Compile Include="Calculators\WallDisplacementCalculator.cs" />

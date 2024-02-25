@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using System.IO;
-using System.Windows.Forms;
 using STROOP.Structs.Configurations;
-
 using STROOP.Structs;
 
 namespace STROOP.Tabs.MapTab

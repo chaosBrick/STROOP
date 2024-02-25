@@ -4,16 +4,11 @@ using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
 
 namespace STROOP.Ttc
 {
-
     public static class TtcUtilities
     {
-
         public static List<TtcObject> CreateRngObjects(TtcRng rng, List<int> dustFrames = null)
         {
             List<TtcObject> rngObjects = new List<TtcObject>();

@@ -1,6 +1,6 @@
 ﻿namespace STROOP.Tabs.MapTab
 {
-    public interface MapLevelTriangleObjectI
+    public interface IMapLevelTriangleObject
     {
         void NullifyTriangleListForm();
     }

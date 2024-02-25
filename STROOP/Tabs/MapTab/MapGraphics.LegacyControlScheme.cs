@@ -7,7 +7,6 @@ using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 
-
 namespace STROOP.Tabs.MapTab
 {
     partial class MapGraphics

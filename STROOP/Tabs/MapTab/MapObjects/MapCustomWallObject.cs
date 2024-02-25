@@ -4,7 +4,6 @@ using System.Drawing;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
 using STROOP.Models;
-using System.Windows.Forms;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {

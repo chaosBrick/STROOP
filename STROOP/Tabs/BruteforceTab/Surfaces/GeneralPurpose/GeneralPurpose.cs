@@ -97,7 +97,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                             var nameToken = tokenBuilder.ToString();
                             tokenBuilder.Clear();
                             if (lastTokens.Count != 1)
-                                throw new Exception("Invalid shit lol");
+                                throw new Exception("Invalid bruteforcer parameter definition file!");
                             var typeToken = lastTokens.Pop();
                             lastIdentifier = new ScoringFuncPrecursor.Identifier() { name = nameToken };
                             currentPrecursor.parameterDefinitions[lastIdentifier] = typeToken;

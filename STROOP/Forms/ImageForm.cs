@@ -1,9 +1,5 @@
-﻿using STROOP.Controls;
-using STROOP.Structs;
-using STROOP.Structs.Configurations;
+﻿using STROOP.Structs;
 using STROOP.Utilities;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
