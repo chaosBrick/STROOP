@@ -15,6 +15,8 @@ namespace STROOP.Tabs.BruteforceTab
 {
     public partial class BruteforceTab : STROOPTab
     {
+        public const int MAX_CONSOLE_LINES = 500;
+
         public class UnmuteScoringFuncs { }
 
         class WatchVariableQuarterstepWrapper : WatchVariableSelectionWrapper<WatchVariableNumberWrapper>
@@ -568,12 +570,17 @@ namespace STROOP.Tabs.BruteforceTab
             bfProcess.OutputDataReceived += (_, e) =>
             {
                 outputLines.Enqueue(e.Data);
-                if (outputLines.Count > 30)
+                if (outputLines.Count > MAX_CONSOLE_LINES)
                     outputLines.Dequeue();
                 var strBuilder = new StringBuilder();
                 foreach (var line in outputLines)
                     strBuilder.AppendLine(line);
-                Action doThis = () => txtOutput.Text = strBuilder.ToString();
+                Action doThis = () =>
+                {
+                    txtOutput.Text = strBuilder.ToString();
+                    txtOutput.Select(txtOutput.Text.Length - 1, 0);
+                    txtOutput.ScrollToCaret();
+                };
                 txtOutput.Invoke(doThis);
             };
 
