@@ -139,7 +139,7 @@ namespace STROOP.Controls
 
         public void UpdateControl()
         {
-            WatchVarWrapper.UpdateItemCheckStates();
+            WatchVarWrapper.UpdateControls();
             UpdateColor();
         }
 
@@ -261,38 +261,10 @@ namespace STROOP.Controls
         }
 
         public List<uint> GetBaseAddresses() => WatchVarWrapper.GetBaseAddresses(FixedAddressListGetter()).ToList();
-
-        public List<object> GetValues(bool useRounding = false, bool handleFormatting = true)
+        
+        public bool SetValue<T>(T value) where T : IConvertible
         {
-            return WatchVarWrapper.GetValues(useRounding, handleFormatting, FixedAddressListGetter());
-        }
-
-        public object GetValue(bool useRounding = false, bool handleFormatting = true)
-        {
-            return WatchVarWrapper.GetValue(useRounding, handleFormatting, FixedAddressListGetter());
-        }
-
-        public bool SetValueOfValues(object value, int index)
-        {
-            List<object> values = new List<object>();
-            for (int i = 0; i < index; i++)
-            {
-                values.Add(null);
-            }
-            values.Add(value);
-            return SetValues(values);
-        }
-
-        public bool SetValues(List<object> values)
-        {
-            bool success = WatchVarWrapper.SetValues(values, FixedAddressListGetter());
-            if (!success) FlashColor(FAILURE_COLOR);
-            return success;
-        }
-
-        public bool SetValue(object value)
-        {
-            bool success = WatchVarWrapper.SetValue(value, FixedAddressListGetter());
+            bool success = WatchVar.SetValue(value, FixedAddressListGetter());
             if (!success) FlashColor(FAILURE_COLOR);
             return success;
         }
@@ -306,8 +278,6 @@ namespace STROOP.Controls
         }
 
         public List<string> GetVarInfo() => WatchVarWrapper.GetVarInfo();
-
-        public List<Func<object, bool>> GetSetters() => WatchVarWrapper.GetSetters(FixedAddressListGetter());
 
         public override string ToString() => WatchVarWrapper.ToString();
     }

@@ -160,8 +160,6 @@ namespace STROOP.Tabs
             this.watchVariablePanelObject.SetGroups(ALL_VAR_GROUPS, VISIBLE_VAR_GROUPS);
             _objectSlots = Config.StroopMainForm.ObjectSlotsManager;
 
-            labelObjBhvValue.Click += _objBehaviorLabel_Click;
-
             labelObjAddValue.Click += ObjAddressLabel_Click;
             labelObjAdd.Click += ObjAddressLabel_Click;
 
@@ -426,16 +424,7 @@ namespace STROOP.Tabs
 
         // Having an empty action assigned to this adds the context menu entry to the ObjectSlot controls
         public override Action<IEnumerable<ObjectSlot>> objectSlotsClicked => objectSlots => { };
-
-        private void _objBehaviorLabel_Click(object sender, EventArgs e)
-        {
-            if (_objects.Count == 0)
-                return;
-
-            var scriptAddress = Config.Stream.GetUInt32(_objects.First().Address + ObjectConfig.BehaviorScriptOffset);
-            Config.StroopMainForm.SwitchTab(Config.StroopMainForm.GetTab<Tabs.ScriptTab>());
-        }
-
+        
         public void SetBehaviorWatchVariables(IEnumerable<WatchVariable> watchVars, Color color)
         {
             watchVariablePanelObject.RemoveVariableGroup(VariableGroup.ObjectSpecific);

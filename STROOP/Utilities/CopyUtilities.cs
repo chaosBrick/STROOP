@@ -46,7 +46,6 @@ namespace STROOP.Utilities
                 "Copy with Names",
                 "Copy as Table",
                 "Copy for Code",
-                "Copy for Bruteforcer json"
             };
         }
 
@@ -62,41 +61,20 @@ namespace STROOP.Utilities
                 () => CopyWithNames(getVars()),
                 () => CopyAsTable(getVars()),
                 () => CopyForCode(getVars()),
-                () => CopyForBruteforcer(getVars()),
             };
-        }
-
-        private static void CopyForBruteforcer(List<WatchVariableControl> controls)
-        {
-            var strBuilder = new System.Text.StringBuilder();
-            strBuilder.AppendLine();
-            foreach (var var in controls)
-            {
-                // Skip variables that have no meaning
-                var jsonName = var.view.GetJsonName();
-                if (jsonName == null)
-                    continue;
-
-                strBuilder.AppendLine($"\t\"{jsonName}\": {StringUtilities.MakeJsonValue(var.GetValue().ToString())},");
-            }
-            Clipboard.SetText(strBuilder.ToString());
         }
 
         private static void CopyWithSeparator(
             List<WatchVariableControl> controls, string separator)
         {
             if (controls.Count == 0) return;
-            Clipboard.SetText(
-                string.Join(separator, controls.ConvertAll(
-                    control => control.GetValue(
-                        useRounding: false, handleFormatting: true))));
+            Clipboard.SetText(string.Join(separator, controls.ConvertAll(control => control.WatchVarWrapper.GetValueText())));
         }
 
         private static void CopyWithNames(List<WatchVariableControl> controls)
         {
             if (controls.Count == 0) return;
-            List<string> lines = controls.ConvertAll(
-                watchVar => watchVar.VarName + "\t" + watchVar.GetValue(false));
+            List<string> lines = controls.ConvertAll(watchVar => watchVar.VarName + "\t" + watchVar.WatchVarWrapper.GetValueText());
             Clipboard.SetText(string.Join("\r\n", lines));
         }
 
@@ -109,7 +87,7 @@ namespace STROOP.Utilities
             string header = "Vars\t" + string.Join("\t", hexAddresses);
 
             List<string> names = controls.ConvertAll(control => control.VarName);
-            List<List<object>> valuesTable = controls.ConvertAll(control => control.GetValues());
+            List<List<object>> valuesTable = controls.ConvertAll(control => control.WatchVar.GetValues());
             List<string> valuesStrings = new List<string>();
             for (int i = 0; i < names.Count; i++)
             {
@@ -143,7 +121,8 @@ namespace STROOP.Utilities
                     "{0} {1} = {2}{3};",
                     type != null ? TypeUtilities.TypeToString[watchVar.GetMemoryType()] : "double",
                     varNameFunc(watchVar.VarName.Replace(" ", "")),
-                    watchVar.GetValue(false),
+                    // TODO: indicate that the watchVarWrapper should produce code conforming output (whatever that means)
+                    watchVar.WatchVarWrapper.GetValueText(),
                     type == typeof(float) ? "f" : "");
                 lines.Add(line);
             }

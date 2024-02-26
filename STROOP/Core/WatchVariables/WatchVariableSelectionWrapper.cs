@@ -11,18 +11,20 @@ using STROOP.Controls;
 
 namespace STROOP.Core.WatchVariables
 {
-    class WatchVariableSelectionWrapper<TWrapperBase> : WatchVariableWrapper where TWrapperBase : WatchVariableWrapper
+    class WatchVariableSelectionWrapper<TWrapperBase, TBackingValue> : WatchVariableWrapper<TBackingValue> 
+        where TWrapperBase : WatchVariableWrapper<TBackingValue> 
+        where TBackingValue : IConvertible
     {
         static StringFormat rightAlignFormat = new StringFormat() { Alignment = StringAlignment.Far };
 
         public bool DisplaySingleOption = false;
 
-        public List<(string name, Func<object> func)> options = new List<(string, Func<object>)>();
+        public List<(string name, Func<TBackingValue> func)> options = new List<(string, Func<TBackingValue>)>();
 
         TWrapperBase wrapperBase;
         bool isSingleOption => DisplaySingleOption && options.Count == 1;
 
-        (string name, Func<object> getter) selectedOption;
+        (string name, Func<TBackingValue> getter) selectedOption;
 
         public WatchVariableSelectionWrapper(WatchVariable var, WatchVariableControl control) : base(var, control)
         {
@@ -31,8 +33,8 @@ namespace STROOP.Core.WatchVariables
         }
 
         protected override string GetClass() => "Selection";
-
-        protected override void UpdateControls()
+        
+        public override void UpdateControls()
         {
             // There's just no keyword for what I want here :(
             typeof(TWrapperBase).GetMethod(nameof(UpdateControls), BindingFlags.NonPublic | BindingFlags.Instance).Invoke(wrapperBase, new object[0]);
@@ -64,7 +66,7 @@ namespace STROOP.Core.WatchVariables
             if (IsCursorHovering(bounds, out var _))
             {
                 if (isSingleOption)
-                    SetValue(options[0].func());
+                    WatchVar.SetValue(options[0].func());
                 else if (options.Count > 0)
                 {
                     var ctx = new ContextMenuStrip();
@@ -85,15 +87,6 @@ namespace STROOP.Core.WatchVariables
             base.DoubleClick(parentCtrl, bounds);
             if (!IsCursorHovering(bounds, out var _))
                 wrapperBase.DoubleClick(parentCtrl, bounds);
-        }
-
-        protected override void HandleVerification(object value) { /* allow null values */ }
-
-        protected override object ConvertValue(object value, bool handleRounding = true, bool handleFormatting = true)
-        {
-            if (selectedOption.getter != null)
-                return selectedOption.getter();
-            return base.ConvertValue(value, handleRounding, handleFormatting);
         }
 
         public override WatchVariablePanel.CustomDraw CustomDrawOperation => (g, rect) =>
@@ -117,9 +110,9 @@ namespace STROOP.Core.WatchVariables
                 g.DrawImage(IsCursorHovering(rect, out var drawRect) ? Properties.Resources.dropdown_box_hover : Properties.Resources.dropdown_box, drawRect);
         };
 
-        void SetOption((string name, Func<object> func) option)
+        void SetOption((string name, Func<TBackingValue> func) option)
         {
-            SetValue(option.func());
+            WatchVar.SetValue(option.func());
             selectedOption = option;
         }
 
@@ -128,9 +121,13 @@ namespace STROOP.Core.WatchVariables
         {
             if (selectedOption.Equals(options[index]))
             {
-                SetValue(selectedOption.getter());
+                WatchVar.SetValue(selectedOption.getter());
                 selectedOption = options[index];
             }
         }
+
+        public override string DisplayValue(TBackingValue value) => wrapperBase.DisplayValue(value);
+
+        public override bool TryParseValue(string value, out TBackingValue result) => wrapperBase.TryParseValue(value, out result);
     }
 }

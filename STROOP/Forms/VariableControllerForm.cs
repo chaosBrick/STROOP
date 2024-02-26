@@ -98,7 +98,7 @@ namespace STROOP.Forms
         {
             List<object> values = new List<object>();
             for (int i = 0; i < _watchVarWrappers.Count; i++)
-                values.Add(_watchVarWrappers[i].GetValue(true, true, _fixedAddressLists[i]));
+                values.Add(_watchVarWrappers[i].GetValueText(_fixedAddressLists[i]));
             return String.Join(",", values);
         }
 
@@ -110,7 +110,7 @@ namespace STROOP.Forms
             using (Config.Stream.Suspend())
             {
                 for (int i = 0; i < _watchVarWrappers.Count; i++)
-                    _watchVarWrappers[i].SetValue(values[i % values.Count], _fixedAddressLists[i]);
+                    _watchVarWrappers[i].TrySetValue(values[i % values.Count], _fixedAddressLists[i]);
             }
         }
 

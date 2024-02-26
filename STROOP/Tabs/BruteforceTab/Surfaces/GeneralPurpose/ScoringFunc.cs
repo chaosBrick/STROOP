@@ -104,9 +104,9 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                         _setterFunction = (value, addr) => { precursor.weight = Convert.ToDouble(value); return true; }
                     }));
 
-            var wrapper = (WatchVariableSelectionWrapper<WatchVariableNumberWrapper>)variablePanelBaseValues.AddVariable(
+            var wrapper = (WatchVariableSelectionWrapper<WatchVariableNumberWrapper, decimal>)variablePanelBaseValues.AddVariable(
                 new WatchVariable(
-                new WatchVariable.CustomView(typeof(WatchVariableSelectionWrapper<WatchVariableNumberWrapper>))
+                new WatchVariable.CustomView(typeof(WatchVariableSelectionWrapper<WatchVariableNumberWrapper, decimal>))
                 {
                     Name = "frame",
                     _getterFunction = (_) => precursor.frame,
@@ -115,7 +115,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                 .WatchVarWrapper;
             wrapper.DisplaySingleOption = false;
 
-            (Func<object> endFrameValue, Action unregister) = bruteforceTab.GetManualValue<object>("m64_end", () => wrapper.UpdateOption(0));
+            (Func<decimal> endFrameValue, Action unregister) = bruteforceTab.GetManualValue<decimal>("m64_end", () => wrapper.UpdateOption(0));
             Disposed += (_, __) => unregister();
             if (endFrameValue != null)
             {

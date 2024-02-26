@@ -29,11 +29,12 @@ namespace STROOP.Core.WatchVariables
             "Select Object",
             (ctrl, obj) =>
             {
-                object value = ctrl.WatchVarWrapper.UndisplayValue(ctrl.WatchVarWrapper.GetValue(true, false));
-                uint? uintValueNullable = ParsingUtilities.ParseUIntNullable(value);
-                if (!uintValueNullable.HasValue) return false;
-                uint uintValue = uintValueNullable.Value;
-                Config.ObjectSlotsManager.SelectSlotByAddress(uintValue);
+                if (ctrl.WatchVarWrapper is WatchVariableObjectWrapper objectWrapper)
+                {
+                    var value = objectWrapper.CombineValues();
+                    if (value.meaning == CombinedValuesMeaning.SameValue)
+                        Config.ObjectSlotsManager.SelectSlotByAddress((uint)value.value);
+                }
                 return false;
             });
 
@@ -57,40 +58,44 @@ namespace STROOP.Core.WatchVariables
 
         protected override string GetClass() => "Object";
 
-        protected override object ConvertValue(object value, bool handleRounding = true, bool handleFormatting = true)
+        public override string DisplayValue(decimal value)
         {
             if (_displayAsObject)
-                return HandleObjectDisplaying(value);
-            return base.ConvertValue(value, handleRounding, handleFormatting);
+            {
+                uint? uintValueNullable = ParsingUtilities.ParseUIntNullable(value);
+                if (uintValueNullable.HasValue)
+                    return Config.ObjectSlotsManager.GetDescriptiveSlotLabelFromAddress(uintValueNullable.Value, false);
+            }
+            return base.DisplayValue(value);
         }
 
-        protected object HandleObjectDisplaying(object value)
+        public override bool TryParseValue(string value, out decimal result)
         {
-            uint? uintValueNullable = ParsingUtilities.ParseUIntNullable(value);
-            if (!uintValueNullable.HasValue) return value;
-            uint uintValue = uintValueNullable.Value;
+            string slotName = value.ToLower();
 
-            return Config.ObjectSlotsManager.GetDescriptiveSlotLabelFromAddress(uintValue, false);
+            if (slotName == "(no object)" || slotName == "no object")
+            {
+                result = 0;
+                return true;
+            }
+            if (slotName == "(unused object)" || slotName == "unused object")
+            {
+                result = ObjectSlotsConfig.UnusedSlotAddress;
+                return true;
+            }
+            if (slotName.StartsWith("slot"))
+            {
+                slotName = slotName.Remove(0, "slot".Length);
+                slotName = slotName.Trim();
+                ObjectDataModel obj = Config.ObjectSlotsManager.GetObjectFromLabel(slotName);
+                if (obj != null)
+                {
+                    result = obj.Address;
+                    return true;
+                }
+            }
+
+            return base.TryParseValue(value, out result);
         }
-
-        public override object UndisplayValue(object value)
-        {
-            if (value == null)
-                return null;
-            string slotName = value.ToString().ToLower();
-
-            if (slotName == "(no object)" || slotName == "no object") return 0;
-            if (slotName == "(unused object)" || slotName == "unused object") return ObjectSlotsConfig.UnusedSlotAddress;
-
-            if (!slotName.StartsWith("slot")) return value;
-            slotName = slotName.Remove(0, "slot".Length);
-            slotName = slotName.Trim();
-            ObjectDataModel obj = Config.ObjectSlotsManager.GetObjectFromLabel(slotName);
-            if (obj != null)
-                value = obj.Address;
-            return base.UndisplayValue(value);
-        }
-
-        public override bool DisplayAsHex() => _displayAsHex && !_displayAsObject;
     }
 }

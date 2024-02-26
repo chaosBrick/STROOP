@@ -9,11 +9,12 @@ namespace STROOP.Core.WatchVariables
     {
         static WatchVariableSetting SelectTriangleSetting = new WatchVariableSetting("Select Triangle", (ctrl, _) =>
         {
-            object value = ctrl.WatchVarWrapper.GetValue(true, false, ctrl.FixedAddressListGetter());
-            uint? uintValueNullable = ParsingUtilities.ParseUIntNullable(value);
-            if (!uintValueNullable.HasValue) return false;
-            uint uintValue = uintValueNullable.Value;
-            AccessScope<StroopMainForm>.content.GetTab<Tabs.TrianglesTab>().SetCustomTriangleAddresses(uintValue);
+            if (ctrl.WatchVarWrapper is WatchVariableTriangleWrapper triangleWrapper)
+            {
+                var value = triangleWrapper.CombineValues();
+                if (value.meaning == CombinedValuesMeaning.SameValue)
+                    AccessScope<StroopMainForm>.content.GetTab<Tabs.TrianglesTab>().SetCustomTriangleAddresses((uint)value.value);
+            }
             return false;
         });
 

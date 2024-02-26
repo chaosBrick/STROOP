@@ -60,24 +60,18 @@ namespace STROOP.Core.WatchVariables
         }
 
         public override WatchVariablePanel.CustomDraw CustomDrawOperation => _displayAsCheckbox ? DrawCheckbox : (WatchVariablePanel.CustomDraw)null;
-
-        protected override void HandleVerification(object value)
-        {
-            if (!typeof(bool).IsAssignableFrom(value.GetType())&& !STROOP.Structs.TypeUtilities.IsNumber(value))
-                throw new ArgumentOutOfRangeException(value + " is not a boolean value");
-        }
-
+        
         public override void Edit(Control parent, Rectangle bounds)
         {
             if (_displayAsCheckbox)
             {
-                var combinedValues = CombineValues(GetValues(false, false));
-                if (!combinedValues.meaningfulValue)
-                    SetValue(0);
+                var combinedValues = CombineValues();
+                if (combinedValues.meaning != CombinedValuesMeaning.SameValue)
+                    WatchVar.SetValue(0);
                 else if (Convert.ToDecimal(combinedValues.value) == 0)
-                    SetValue(WatchVar.Mask ?? 1);
+                    WatchVar.SetValue(WatchVar.Mask ?? 1);
                 else
-                    SetValue(0);
+                    WatchVar.SetValue(0);
             }
             else
                 base.Edit(parent, bounds);
@@ -85,12 +79,12 @@ namespace STROOP.Core.WatchVariables
 
         void DrawCheckbox(Graphics g, Rectangle rect)
         {
-            var combinedValues = CombineValues(GetValues(false, false));
+            var combinedValues = CombineValues();
             CheckState state;
-            if (!combinedValues.meaningfulValue)
+            if (combinedValues.meaning != CombinedValuesMeaning.SameValue)
                 state = CheckState.Indeterminate;
             else
-                state = (System.Convert.ToDecimal(combinedValues.value) != 0 ^ _displayAsInverted) ? CheckState.Checked : CheckState.Unchecked;
+                state = (Convert.ToDecimal(combinedValues.value) != 0 ^ _displayAsInverted) ? CheckState.Checked : CheckState.Unchecked;
 
             Image checkboxImage;
             switch (state)

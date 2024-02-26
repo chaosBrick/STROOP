@@ -99,8 +99,8 @@ namespace STROOP.Forms
         public void SetValueInMemory()
         {
             byte[] bytes = _reversedBytes.ConvertAll(b => b.GetByteValue()).ToArray();
-            object value = TypeUtilities.ConvertBytes(_watchVar.MemoryType, bytes);
-            _watchVar.SetValue(value);
+            if (TypeUtilities.ConvertBytes(_watchVar.MemoryType, bytes) is IConvertible validValue)
+                _watchVar.SetValue(validValue);
         }
 
         private void DoColoring()

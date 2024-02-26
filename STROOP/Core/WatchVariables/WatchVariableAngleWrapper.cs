@@ -182,52 +182,48 @@ namespace STROOP.Core.WatchVariables
             return signed ? -1 * maxValue / 2 : 0;
         }
 
-        protected override object ConvertValue(object value, bool handleRounding = true, bool handleFormatting = true)
-        {
-            value = HandleAngleConverting(value);
-            return base.ConvertValue(value, handleRounding, handleFormatting);
-        }
-
-        public override object UndisplayValue(object value)
-        {
-            value = HandleAngleUnconverting(value);
-            return base.UndisplayValue(value);
-        }
-
-        protected object HandleAngleConverting(object value)
+        public override bool TryParseValue(string value, out decimal result)
         {
             double? doubleValueNullable = ParsingUtilities.ParseDoubleNullable(value);
-            if (!doubleValueNullable.HasValue) return value;
-            double doubleValue = doubleValueNullable.Value;
-
-            if (_reverse)
+            if (doubleValueNullable.HasValue)
             {
-                doubleValue += 32768;
-            }
-            if (_truncateToMultipleOf16)
-            {
-                doubleValue = MoreMath.TruncateToMultipleOf16(doubleValue);
-            }
-            doubleValue = MoreMath.NormalizeAngleUsingType(doubleValue, _effectiveType);
-            doubleValue = (doubleValue / 65536) * GetAngleUnitTypeMaxValue();
+                double doubleValue = doubleValueNullable.Value;
 
-            return doubleValue;
+                if (_reverse)
+                {
+                    doubleValue += 32768;
+                }
+                if (_truncateToMultipleOf16)
+                {
+                    doubleValue = MoreMath.TruncateToMultipleOf16(doubleValue);
+                }
+                doubleValue = MoreMath.NormalizeAngleUsingType(doubleValue, _effectiveType);
+                doubleValue = (doubleValue / 65536) * GetAngleUnitTypeMaxValue();
+
+                result = (decimal)doubleValue;
+                return true;
+            }
+            return base.TryParseValue(value, out result);
         }
 
-        protected object HandleAngleUnconverting(object value)
+        public override string DisplayValue(decimal value)
         {
             double? doubleValueNullable = ParsingUtilities.ParseDoubleNullable(value);
-            if (!doubleValueNullable.HasValue) return value;
-            double doubleValue = doubleValueNullable.Value;
-
-            doubleValue = (doubleValue / GetAngleUnitTypeMaxValue()) * 65536;
-            if (_reverse)
+            if (doubleValueNullable.HasValue)
             {
-                doubleValue += 32768;
-            }
+                double doubleValue = doubleValueNullable.Value;
 
-            return doubleValue;
+                doubleValue = (doubleValue / GetAngleUnitTypeMaxValue()) * 65536;
+                if (_reverse)
+                {
+                    doubleValue += 32768;
+                }
+
+                return doubleValue.ToString();
+            }
+            return base.DisplayValue(value);
         }
+        
 
         protected object HandleAngleRoundingOut(object value)
         {

@@ -41,45 +41,20 @@ namespace STROOP.Structs
             switch (operation)
             {
                 case AggregateMathOperation.Mean:
-                    return (uint dummy) =>
-                    {
-                        return controls
-                            .ConvertAll(control => control.GetValue(handleFormatting: false))
-                            .ConvertAll(value => ParsingUtilities.ParseDouble(value))
-                            .Average();
-                    };
+                    return (uint _) => controls.ConvertAll(control => control.WatchVar.GetValueAs<double>()).Average();
                 case AggregateMathOperation.Median:
-                    return (uint dummy) =>
+                    return (uint _) =>
                     {
-                        List<double> doubleValues = controls
-                            .ConvertAll(control => control.GetValue(handleFormatting: false))
-                            .ConvertAll(value => ParsingUtilities.ParseDouble(value));
+                        List<double> doubleValues = controls.ConvertAll(control => control.WatchVar.GetValueAs<double>());
                         doubleValues.Sort();
-                        if (doubleValues.Count % 2 == 1)
-                        {
-                            return doubleValues[doubleValues.Count / 2];
-                        }
-                        else
-                        {
-                            return (doubleValues[doubleValues.Count / 2 - 1] + doubleValues[doubleValues.Count / 2]) / 2;
-                        }
+                        return (doubleValues.Count % 2 == 1)
+                            ? doubleValues[doubleValues.Count / 2]
+                            : (doubleValues[doubleValues.Count / 2 - 1] + doubleValues[doubleValues.Count / 2]) / 2;
                     };
                 case AggregateMathOperation.Min:
-                    return (uint dummy) =>
-                    {
-                        return controls
-                            .ConvertAll(control => control.GetValue(handleFormatting: false))
-                            .ConvertAll(value => ParsingUtilities.ParseDouble(value))
-                            .Min();
-                    };
+                    return (uint _) => controls.ConvertAll(control => control.WatchVar.GetValueAs<double>()).Min();
                 case AggregateMathOperation.Max:
-                    return (uint dummy) =>
-                    {
-                        return controls
-                            .ConvertAll(control => control.GetValue(handleFormatting: false))
-                            .ConvertAll(value => ParsingUtilities.ParseDouble(value))
-                            .Max();
-                    };
+                    return (uint dummy) => controls.ConvertAll(control => control.WatchVar.GetValueAs<double>()).Max();
                 default:
                     throw new ArgumentOutOfRangeException();
             }

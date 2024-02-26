@@ -110,14 +110,16 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
             {
                 if (ignoreWatchVarUpdate)
                     return;
-                var vars = p.parameterPanel.GetVariableValuesByName("nx", "nz", "d");
-                var dir = new Vector2(Convert.ToSingle(vars[0][0]), Convert.ToSingle(vars[1][0]));
-                if (dir.Length == 0)
-                    dir.Y = -1;
-                var d = Convert.ToSingle(vars[2][0]);
-                var delta = (Vector2.Dot(arrowTip.Xz, dir) - d) * dir;
-                arrowTip -= new Vector3(delta.X, 0, delta.Y);
-                direction = Vector3.Normalize(new Vector3(dir.X, 0, dir.Y));
+                throw new NotImplementedException("Help");
+                // TODO: Reimplement this in a type safe manner
+                //var vars = p.parameterPanel.GetVariableValuesByName("nx", "nz", "d");
+                //var dir = new Vector2(Convert.ToSingle(vars[0][0]), Convert.ToSingle(vars[1][0]));
+                //if (dir.Length == 0)
+                //    dir.Y = -1;
+                //var d = Convert.ToSingle(vars[2][0]);
+                //var delta = (Vector2.Dot(arrowTip.Xz, dir) - d) * dir;
+                //arrowTip -= new Vector3(delta.X, 0, delta.Y);
+                //direction = Vector3.Normalize(new Vector3(dir.X, 0, dir.Y));
             };
             foreach (var ctrl in parent.parameterPanel.GetCurrentVariableControls())
                 ctrl.WatchVar.ValueSet += updateFromControl;

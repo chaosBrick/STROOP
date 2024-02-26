@@ -111,7 +111,7 @@ namespace STROOP.Controls
         WatchVariablePanelRenderer renderer;
 
         public WatchVariableControl hoveringWatchVariableControl => renderer.GetVariableAt(renderer.PointToClient(System.Windows.Forms.Cursor.Position)).ctrl;
-        
+
 
         public new event System.Windows.Forms.MouseEventHandler MouseDown
         {
@@ -394,7 +394,7 @@ namespace STROOP.Controls
             else if (isDKeyHeld)
             {
                 UnselectAllVariables();
-                watchVars.ForEach(watchVar => watchVar.WatchVarWrapper.ToggleDisplayAsHex());
+                watchVars.ForEach(watchVar => watchVar.WatchVarWrapper.ToggleDisplay());
             }
             else if (isCKeyHeld)
             {
@@ -817,31 +817,16 @@ namespace STROOP.Controls
         }
 
 
-        public List<object> GetCurrentVariableValues(bool useRounding = false, bool handleFormatting = true) =>
-            GetCurrentVariableControls().ConvertAll(control => control.GetValue(useRounding, handleFormatting));
+        public List<string> GetCurrentVariableValues() =>
+            GetCurrentVariableControls().ConvertAll(control => control.WatchVarWrapper.GetValueText());
 
         public List<string> GetCurrentVariableNames() => GetCurrentVariableControls().ConvertAll(control => control.VarName);
-
-        public List<(string, object)> GetCurrentVariableNamesAndValues(bool useRounding = false, bool handleFormatting = true) =>
-            GetCurrentVariableControls().ConvertAll(control => (control.VarName, control.GetValue(useRounding, handleFormatting)));
-
-        public bool SetVariableValueByName(string name, object value)
+        
+        public bool SetVariableValueByName<T>(string name, T value) where T : IConvertible
         {
             WatchVariableControl control = GetCurrentVariableControls().FirstOrDefault(c => c.VarName == name);
             if (control == null) return false;
             return control.SetValue(value);
-        }
-
-        public List<object>[] GetVariableValuesByName(params string[] names)
-        {
-            var result = new List<object>[names.Length];
-            foreach (var var in GetCurrentVariableControls())
-            {
-                var id = Array.IndexOf(names, var.VarName);
-                if (id != -1)
-                    result[id] = var.GetValues();
-            }
-            return result;
         }
 
         public WatchVariable[] GetWatchVariablesByName(params string[] names) =>

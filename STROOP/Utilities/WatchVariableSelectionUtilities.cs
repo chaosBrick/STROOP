@@ -122,8 +122,10 @@ namespace STROOP.Structs
                 if (binaryMathOperations.TryGetValue(operation, out var func))
                     for (int i = 0; i < controls.Count / 2; i++)
                     {
-                        WatchVariableControl control1 = controls[i];
-                        WatchVariableControl control2 = controls[i + controls.Count / 2];
+                        var control1 = controls[i];
+                        var control2 = controls[i + controls.Count / 2];
+                        var wrapper1 = control1.WatchVarWrapper as WatchVariableNumberWrapper;
+                        var wrapper2 = control2.WatchVarWrapper as WatchVariableNumberWrapper;
 
                         Func<double, double, double> inverseSetter1, inverseSetter2;
                         binaryMathOperationsInverse1.TryGetValue(operation, out inverseSetter1);
@@ -132,19 +134,26 @@ namespace STROOP.Structs
                         var view = new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
                         {
                             Name = $"{control1.view.Name} {MathOperationUtilities.GetSymbol(operation)} {control2.view.Name}",
-                            _getterFunction = _ =>
-                            {
-                                double value1 = ParsingUtilities.ParseDouble(control1.GetValue(handleFormatting: false));
-                                double value2 = ParsingUtilities.ParseDouble(control2.GetValue(handleFormatting: false));
-                                return func(value1, value2);
-                            },
+                            _getterFunction = _ => func((double)wrapper1.CombineValues().value, (double)wrapper2.CombineValues().value),
                             _setterFunction = (val, _) =>
                             {
                                 if (val is double valueDouble)
                                     if (!KeyboardUtilities.IsCtrlHeld())
-                                        return inverseSetter2 == null ? false : control2.SetValue(inverseSetter2(valueDouble, ParsingUtilities.ParseDouble(control1.GetValue(handleFormatting: false))));
+                                    {
+                                        var wrapper1Value = (double)wrapper1.CombineValues().value;
+                                        return inverseSetter2 == null
+                                            ? false
+                                            : control1.WatchVar.GetAddressList(control1.FixedAddressListGetter())
+                                            .All(address => control1.view._setterFunction(inverseSetter2(valueDouble, wrapper1Value), address));
+                                    }
                                     else
-                                        return inverseSetter1 == null ? false : control1.SetValue(inverseSetter1(valueDouble, ParsingUtilities.ParseDouble(control1.GetValue(handleFormatting: false))));
+                                    {
+                                        var wrapper2Value = (double)wrapper2.CombineValues().value;
+                                        return inverseSetter1 == null
+                                            ? false
+                                            : control2.WatchVar.GetAddressList(control2.FixedAddressListGetter())
+                                            .All(address => control2.view._setterFunction(inverseSetter1(valueDouble, wrapper2Value), address));
+                                    }
                                 else
                                     return false;
                             }
@@ -186,32 +195,35 @@ namespace STROOP.Structs
                         vars[2].VarName,
                         vars[3].VarName);
 
+                var varValues = vars.Select(x => x.WatchVar.GetValueAs<double>()).ToArray();
+
+                // TODO: Avoid ParsingUtilities.ParseDouble
                 WatchVariable.GetterFunction getter3D = _ =>
                 {
-                    var x1 = ParsingUtilities.ParseDouble(vars[0].GetValue(handleFormatting: false));
-                    var y1 = ParsingUtilities.ParseDouble(vars[1].GetValue(handleFormatting: false));
-                    var z1 = ParsingUtilities.ParseDouble(vars[2].GetValue(handleFormatting: false));
-                    var x2 = ParsingUtilities.ParseDouble(vars[3].GetValue(handleFormatting: false));
-                    var y2 = ParsingUtilities.ParseDouble(vars[4].GetValue(handleFormatting: false));
-                    var z2 = ParsingUtilities.ParseDouble(vars[5].GetValue(handleFormatting: false));
+                    var x1 = varValues[0];
+                    var y1 = varValues[1];
+                    var z1 = varValues[2];
+                    var x2 = varValues[3];
+                    var y2 = varValues[4];
+                    var z2 = varValues[5];
                     return new Vector3d(x2 - x1, y2 - y1, z2 - z1).Length;
                 };
                 WatchVariable.GetterFunction getter2D = _ =>
                 {
-                    var x1 = ParsingUtilities.ParseDouble(vars[0].GetValue(handleFormatting: false));
-                    var y1 = ParsingUtilities.ParseDouble(vars[1].GetValue(handleFormatting: false));
-                    var x2 = ParsingUtilities.ParseDouble(vars[3].GetValue(handleFormatting: false));
-                    var y2 = ParsingUtilities.ParseDouble(vars[4].GetValue(handleFormatting: false));
+                    var x1 = varValues[0];
+                    var y1 = varValues[1];
+                    var x2 = varValues[3];
+                    var y2 = varValues[4];
                     return new Vector2d(x2 - x1, y2 - y1).Length;
                 };
                 WatchVariable.SetterFunction setter3D = (value, _) =>
                 {
-                    var x1 = ParsingUtilities.ParseDouble(vars[0].GetValue(handleFormatting: false));
-                    var y1 = ParsingUtilities.ParseDouble(vars[1].GetValue(handleFormatting: false));
-                    var z1 = ParsingUtilities.ParseDouble(vars[2].GetValue(handleFormatting: false));
-                    var x2 = ParsingUtilities.ParseDouble(vars[3].GetValue(handleFormatting: false));
-                    var y2 = ParsingUtilities.ParseDouble(vars[4].GetValue(handleFormatting: false));
-                    var z2 = ParsingUtilities.ParseDouble(vars[5].GetValue(handleFormatting: false));
+                    var x1 = varValues[0];
+                    var y1 = varValues[1];
+                    var z1 = varValues[2];
+                    var x2 = varValues[3];
+                    var y2 = varValues[4];
+                    var z2 = varValues[5];
                     bool toggle = KeyboardUtilities.IsCtrlHeld();
                     int off = toggle ? 0 : 3;
                     Vector3d a = new Vector3d(x1, y1, z1);
@@ -222,10 +234,10 @@ namespace STROOP.Structs
                 };
                 WatchVariable.SetterFunction setter2D = (value, _) =>
                 {
-                    var x1 = ParsingUtilities.ParseDouble(vars[0].GetValue(handleFormatting: false));
-                    var y1 = ParsingUtilities.ParseDouble(vars[1].GetValue(handleFormatting: false));
-                    var x2 = ParsingUtilities.ParseDouble(vars[2].GetValue(handleFormatting: false));
-                    var y2 = ParsingUtilities.ParseDouble(vars[3].GetValue(handleFormatting: false));
+                    var x1 = varValues[0];
+                    var y1 = varValues[1];
+                    var x2 = varValues[2];
+                    var y2 = varValues[3];
                     bool toggle = KeyboardUtilities.IsCtrlHeld();
                     int off = toggle ? 0 : 2;
                     Vector2d a = new Vector2d(x1, y1);
@@ -244,27 +256,6 @@ namespace STROOP.Structs
                 panel.AddVariable(new WatchVariable(view), view);
             }
 
-            void createRealTimeVariable()
-            {
-                foreach (var control in vars)
-                {
-                    WatchVariable.GetterFunction getter =
-                        (uint dummy) =>
-                        {
-                            uint totalFrames = ParsingUtilities.ParseUIntRoundingWrapping(
-                                control.GetValue(useRounding: false, handleFormatting: false)) ?? 0;
-                            return WatchVariableSpecialUtilities.GetRealTime(totalFrames);
-                        };
-
-                    var view = new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
-                    {
-                        Name = $"{control.view.Name} (Real Time)",
-                        _getterFunction = getter,
-                        _setterFunction = WatchVariableSpecialUtilities.DEFAULT_SETTER
-                    };
-                    panel.AddVariable(new WatchVariable(view), view);
-                }
-            }
             ToolStripMenuItem itemAddVariables = new ToolStripMenuItem("Add Variable(s)...");
             ControlUtilities.AddDropDownItems(
                 itemAddVariables,
@@ -286,7 +277,6 @@ namespace STROOP.Structs
                     "2D Distance",
                     "3D Distance",
                     null,
-                    "Real Time",
                         },
                         new List<Action>()
                         {
@@ -306,27 +296,8 @@ namespace STROOP.Structs
                     () => createDistanceMathOperationVariable(use3D: false),
                     () => createDistanceMathOperationVariable(use3D: true),
                     () => { },
-                    () => createRealTimeVariable(),
             });
             itemList.Add(itemAddVariables);
-            itemList.Add(new ToolStripSeparator());
-
-            ToolStripMenuItem itemSetCascadingValues = new ToolStripMenuItem("Set Cascading Values");
-            itemSetCascadingValues.Click += (sender, e) =>
-            {
-                object value1 = DialogUtilities.GetStringFromDialog(labelText: "Base Value:");
-                object value2 = DialogUtilities.GetStringFromDialog(labelText: "Offset Value:");
-                if (value1 == null || value2 == null) return;
-                double? number1 = ParsingUtilities.ParseDoubleNullable(value1);
-                double? number2 = ParsingUtilities.ParseDoubleNullable(value2);
-                if (!number1.HasValue || !number2.HasValue) return;
-                List<Func<object, bool>> setters = vars.SelectMany(control => control.GetSetters()).ToList();
-                for (int i = 0; i < setters.Count; i++)
-                {
-                    setters[i](number1.Value + i * number2.Value);
-                }
-            };
-            itemList.Add(itemSetCascadingValues);
             itemList.Add(new ToolStripSeparator());
 
             var itemReorder = new ToolStripMenuItem("Move");
@@ -361,18 +332,6 @@ namespace STROOP.Structs
                 varController.Show();
             };
             itemList.Add(itemOpenController);
-
-            if (vars.Count == 3)
-            {
-                ToolStripMenuItem itemOpenTripletController = new ToolStripMenuItem("Open Triplet Controller");
-                itemOpenTripletController.Click += (sender, e) =>
-                {
-                    VariableTripletControllerForm form = new VariableTripletControllerForm();
-                    form.Initialize(vars.ConvertAll(control => control.CreateCopy(form.panel)));
-                    form.ShowForm();
-                };
-                itemList.Add(itemOpenTripletController);
-            }
 
             ToolStripMenuItem itemOpenPopOut = new ToolStripMenuItem("Open Pop Out");
             itemOpenPopOut.Click += (sender, e) =>

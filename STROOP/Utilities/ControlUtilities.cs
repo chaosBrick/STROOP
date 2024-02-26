@@ -199,17 +199,6 @@ namespace STROOP.Utilities
                 SetFacingDirection(lastDirection, itemInverted.Checked);
             };
 
-            ToolStripMenuItem itemPopOut = new ToolStripMenuItem("Pop Out");
-            itemPopOut.Click += (sender, e) =>
-            {
-                VariableTripletControllerForm form = new VariableTripletControllerForm();
-                TabPage parentTab = GetTab(groupbox);
-                Form parentForm = GetForm(groupbox);
-                string text = parentTab != null ? parentTab.Text + " " + groupbox.Text : parentForm.Text;
-                form.Initialize(text, coordinateSystem, allowRelativeOptions, actionMove);
-                form.ShowForm();
-            };
-
             ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
             contextMenuStrip.Items.Add(itemLeft);
             contextMenuStrip.Items.Add(itemRight);
@@ -221,8 +210,6 @@ namespace STROOP.Utilities
             contextMenuStrip.Items.Add(itemDownRight);
             contextMenuStrip.Items.Add(new ToolStripSeparator());
             contextMenuStrip.Items.Add(itemInverted);
-            contextMenuStrip.Items.Add(new ToolStripSeparator());
-            contextMenuStrip.Items.Add(itemPopOut);
             groupbox.ContextMenuStrip = contextMenuStrip;
 
             AddInversionContextMenuStrip(buttonLineUp, buttonLineDown);

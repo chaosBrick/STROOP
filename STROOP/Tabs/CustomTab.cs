@@ -11,7 +11,8 @@ namespace STROOP.Tabs
 {
     public partial class CustomTab : STROOPTab
     {
-        private Dictionary<int, List<object>> _recordedValues = new Dictionary<int, List<object>>();
+        // TODO: Record values properly, not as their projected strings
+        private Dictionary<int, List<string>> _recordedValues = new Dictionary<int, List<string>>();
         private int? _lastTimer = null;
         private int _numGaps = 0;
         private int _recordFreq = 1;
@@ -122,7 +123,7 @@ namespace STROOP.Tabs
 
                 if (!alreadyContainsKey || recordEvenIfAlreadyHave)
                 {
-                    List<object> currentValues = watchVariablePanelCustom.GetCurrentVariableValues();
+                    List<string> currentValues = watchVariablePanelCustom.GetCurrentVariableValues();
                     _recordedValues[currentTimer] = currentValues;
                 }
             }

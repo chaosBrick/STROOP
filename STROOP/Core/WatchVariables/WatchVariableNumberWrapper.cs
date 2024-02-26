@@ -9,7 +9,8 @@ using STROOP.Controls;
 
 namespace STROOP.Core.WatchVariables
 {
-    public class WatchVariableNumberWrapper : WatchVariableStringWrapper
+    // TODO: Make generic?
+    public class WatchVariableNumberWrapper : WatchVariableWrapper<decimal>
     {
         static Func<WatchVariableControl, bool> WrapperProperty(Func<WatchVariableNumberWrapper, bool> func) =>
             (ctrl) =>
@@ -56,9 +57,9 @@ namespace STROOP.Core.WatchVariables
                 {
                     if (ctrl.WatchVarWrapper is WatchVariableNumberWrapper num)
                         if (obj is bool doHexDisplay)
-                            num.ToggleDisplayAsHex(doHexDisplay);
+                            num.displayAsHex = doHexDisplay;
                         else if (obj == null)
-                            num.ToggleDisplayAsHex(num._defaultDisplayAsHex);
+                            num.displayAsHex = num._defaultDisplayAsHex;
                         else
                             return false;
                     else
@@ -77,6 +78,8 @@ namespace STROOP.Core.WatchVariables
 
         private static readonly int MAX_ROUNDING_LIMIT = 10;
 
+        public bool displayAsHex = false;
+
         private readonly int _defaultRoundingLimit;
         private int _roundingLimit;
 
@@ -85,7 +88,7 @@ namespace STROOP.Core.WatchVariables
         protected Action<bool> _setDisplayAsHex;
 
         public WatchVariableNumberWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl)
-            : base(watchVar, watchVarControl, 0)
+            : base(watchVar, watchVarControl)
         {
             if (int.TryParse(watchVarControl.view.GetValueByKey(WatchVariable.ViewProperties.roundingLimit), out var roundingLimit))
                 _defaultRoundingLimit = roundingLimit;
@@ -108,87 +111,52 @@ namespace STROOP.Core.WatchVariables
             _watchVarControl.AddSetting(DisplayAsHexSetting);
         }
 
-        protected override void HandleVerification(object value)
-        {
-            if (!TypeUtilities.IsNumber(value))
-                throw new ArgumentOutOfRangeException(value + " is not a number");
-        }
-
         protected override string GetClass() => "Number";
 
-        protected override object ConvertValue(object value, bool handleRounding = true, bool handleFormatting = true)
+        public override bool TryParseValue(string value, out decimal result)
         {
-            if (value == null) return value;
-            if (!DisplayAsHex()) value = HandleRounding(value, handleRounding);
-            if (handleFormatting) value = HandleHexDisplaying(value);
-            return value;
-        }
-
-        public override object UndisplayValue(object value)
-        {
-            if (value is string strValue)
+            if (value.IndexOf("0x") != -1 && ParsingUtilities.TryParseHex(value, out uint uintV))
+                result = uintV;
+            else if (ulong.TryParse(value, out ulong ulongV))
+                result = ulongV;
+            else if (long.TryParse(value, out long longV))
+                result = longV;
+            else if (decimal.TryParse(value, out decimal decimalV))
+                result = decimalV;
+            else
             {
-                if (strValue.IndexOf("0x") != -1 && ParsingUtilities.TryParseHex(strValue, out uint uintV))
-                    value = uintV;
-                else if (ulong.TryParse(strValue, out ulong ulongV))
-                    value = ulongV;
-                else if (long.TryParse(strValue, out long longV))
-                    value = longV;
-                else if (Double.TryParse(strValue, out double doubleV))
-                    value = doubleV;
+                result = default(decimal);
+                return false;
             }
-            return base.UndisplayValue(value);
+            return true;
         }
 
-        protected object HandleRounding(object value, bool handleRounding)
+        protected string HandleRounding(decimal value)
         {
-            if (_displayAsHex) return value;
-            int? roundingLimit = handleRounding && _roundingLimit >= 0 ? _roundingLimit : (int?)null;
-            double doubleValue = Convert.ToDouble(value);
-            double roundedValue = roundingLimit.HasValue
-                ? Math.Round(doubleValue, roundingLimit.Value)
-                : doubleValue;
+            int? roundingLimit = _roundingLimit >= 0 ? _roundingLimit : (int?)null;
+            decimal roundedValue = roundingLimit.HasValue
+                ? Math.Round(value, roundingLimit.Value)
+                : value;
             if (SavedSettingsConfig.DontRoundValuesToZero &&
-                roundedValue == 0 && doubleValue != 0)
+                roundedValue == 0 && value != 0)
             {
                 // Specially print values near zero
                 string digitsString = roundingLimit?.ToString() ?? "";
-                return doubleValue.ToString("E" + digitsString);
+                return value.ToString("E" + digitsString);
             }
-            return roundedValue;
-        }
-
-        protected object HandleHexDisplaying(object value)
-        {
-            if (!DisplayAsHex()) return value;
-            return HexUtilities.FormatValue(value, GetHexDigitCount(), true);
-        }
-
-        protected object HandleHexUndisplaying(object value)
-        {
-            string stringValue = value?.ToString() ?? "";
-            if (stringValue.Length < 2 || stringValue.Substring(0, 2) != "0x") return value;
-
-            uint? parsed = ParsingUtilities.ParseHexNullable(stringValue);
-            if (parsed != null) return parsed.Value;
-            return value;
+            return roundedValue.ToString();
         }
 
         protected virtual int? GetHexDigitCount() => WatchVar.NibbleCount;
 
-        public override bool DisplayAsHex() => _displayAsHex;
+        public override void UpdateControls() { }
 
-        public override void ToggleDisplayAsHex(bool? displayAsHexNullable = null)
+        public override string DisplayValue(decimal value)
         {
-            bool displayAsHex = displayAsHexNullable ?? !_displayAsHex;
-            _displayAsHex = displayAsHex;
-        }
-
-        protected object HandleNumberConversion(object value)
-        {
-            if (value == null) return null;
-            if (TypeUtilities.IsNumber(value)) return value;
-            return ParsingUtilities.ParseDouble(value);
+            if (displayAsHex)
+                return HexUtilities.FormatValue(value, GetHexDigitCount(), true);
+            else
+                return HandleRounding(value);
         }
     }
 }

@@ -286,7 +286,7 @@ namespace STROOP.Core.WatchVariables
             HandleMapping = handleMapping;
         }
 
-        public T GetValueAs<T>()
+        public T GetValueAs<T>() where T : IConvertible
         {
             var values = GetValues();
             if (values.Count == 0)
@@ -296,6 +296,16 @@ namespace STROOP.Core.WatchVariables
                 return default(T);
             return (T)result;
         }
+
+        public List<T> GetValuesAs<T>(List<uint> overrideAddresses) where T : IConvertible
+            => GetValues(overrideAddresses).ConvertAll(x =>
+            {
+                var result = Convert.ChangeType(x, typeof(T));
+                if (result == null)
+                    return default(T);
+                return (T)result;
+            }
+            ).ToList();
 
         public List<object> GetValues(List<uint> addresses = null) =>
             GetAddressList(addresses).ConvertAll(address => view._getterFunction(address)).ToList();
@@ -315,7 +325,8 @@ namespace STROOP.Core.WatchVariables
                 {
                     view._setterFunction(oldValue, address);
                 }
-                catch {
+                catch
+                {
                     // Recovery failed, notify user
                     System.Windows.Forms.MessageBox.Show(
                         "An invalid input caused this variable to be in an inconsistent state. Recovering by loading a previous savestate is recommended.",
@@ -333,8 +344,10 @@ namespace STROOP.Core.WatchVariables
             return result;
         }
 
-        public bool SetValue(object value, List<uint> addresses = null)
+        public bool SetValue<T>(T value, List<uint> addresses = null) where T : IConvertible
         {
+            throw new NotImplementedException("Respect MemoryType field");
+
             var addressList = GetAddressList(addresses);
             if (addressList.Count() == 0) return false;
             if (Config.Stream == null) return false;
@@ -349,7 +362,7 @@ namespace STROOP.Core.WatchVariables
             return success;
         }
 
-        public bool SetValues(List<object> values, List<uint> addresses = null)
+        public bool SetValues<T>(List<T> values, List<uint> addresses = null) where T : IConvertible
         {
             List<uint> addressList = GetAddressList(addresses);
             if (addressList.Count == 0) return false;

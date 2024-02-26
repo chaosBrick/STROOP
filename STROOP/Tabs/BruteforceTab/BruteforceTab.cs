@@ -20,7 +20,7 @@ namespace STROOP.Tabs.BruteforceTab
 
         public class UnmuteScoringFuncs { }
 
-        class WatchVariableQuarterstepWrapper : WatchVariableSelectionWrapper<WatchVariableNumberWrapper>
+        class WatchVariableQuarterstepWrapper : WatchVariableSelectionWrapper<WatchVariableNumberWrapper, decimal>
         {
             public WatchVariableQuarterstepWrapper(WatchVariable var, WatchVariableControl control) : base(var, control)
             {
@@ -32,7 +32,7 @@ namespace STROOP.Tabs.BruteforceTab
                     options.Add(($"QS {i_cap + 1} wall2", () => i_cap * 4 + 2));
                     options.Add(($"QS {i_cap + 1} final", () => i_cap * 4 + 3));
                 }
-                this.SetValue(4 * 4 - 1);
+                WatchVar.SetValue(4 * 4 - 1);
             }
         }
 
@@ -159,7 +159,7 @@ namespace STROOP.Tabs.BruteforceTab
             };
         }
 
-        public (Func<T> getValue, Action unregister) GetManualValue<T>(string key, Action onValueChange)
+        public (Func<T> getValue, Action unregister) GetManualValue<T>(string key, Action onValueChange) where T : IConvertible
         {
             foreach (var manualParameterVar_it in manualParameterVariables)
                 if (manualParameterVar_it.view.Name == key)
@@ -171,7 +171,7 @@ namespace STROOP.Tabs.BruteforceTab
             return (null, () => { });
         }
 
-        public Func<T> GetManualValue<T>(string key)
+        public Func<T> GetManualValue<T>(string key) where T : IConvertible
         {
             foreach (var manualParameterVar_it in manualParameterVariables)
                 if (manualParameterVar_it.view.Name == key)
@@ -361,14 +361,14 @@ namespace STROOP.Tabs.BruteforceTab
                 {
                     var variableName = fns.Key.displayName;
                     string o = "Keep";
-                    var newWatchVar = new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableSelectionWrapper<WatchVariableStringWrapper>))
+                    var newWatchVar = new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableSelectionWrapper<WatchVariableStringWrapper, string>))
                     {
                         Name = variableName,
                         _getterFunction = _ => o,
                         _setterFunction = (value, _) => { o = (string)value; return true; }
                     });
                     var watchVarControl = watchVariablePanelParams.AddVariable(newWatchVar, newWatchVar.view);
-                    var wrapper = (WatchVariableSelectionWrapper<WatchVariableStringWrapper>)watchVarControl.WatchVarWrapper;
+                    var wrapper = (WatchVariableSelectionWrapper<WatchVariableStringWrapper, string>)watchVarControl.WatchVarWrapper;
 
                     var options = new string[fns.Key.dic.Count + 1];
                     int i = 0;
@@ -512,7 +512,7 @@ namespace STROOP.Tabs.BruteforceTab
                     foreach (var targetVariable in manualParameterVariables) // If any of the controllable variables match, set them
                         if (targetVariable.view.GetJsonName() == kvp.Key)
                         {
-                            targetVariable.SetValue(StringUtilities.GetJsonValue(targetVariable.view.GetWrapperType(), kvp.Value.valueObject.ToString()) ?? 0);
+                            targetVariable.SetValue(StringUtilities.GetJsonValue(targetVariable.view.GetWrapperType(), kvp.Value.valueObject.ToString()) as IConvertible ?? 0);
                             goto skipNew;
                         }
                     if (!knownStateVariables.Any(_ => _.view.GetJsonName() == kvp.Key))
