@@ -77,7 +77,7 @@ namespace STROOP.Tabs
                 });
         }
 
-        private List<(WatchVariable, WatchVariable.IVariableView)> GetSnowParticleControls(int index)
+        private List<NamedVariableCollection.IVariableView> GetSnowParticleControls(int index)
         {
             uint structOffset = (uint)index * SnowConfig.ParticleStructSize;
             List<uint> offsets = new List<uint>()
@@ -93,16 +93,16 @@ namespace STROOP.Tabs
                 String.Format("Particle {0} Z", index),
             };
 
-            var controls = new List<(WatchVariable, WatchVariable.IVariableView)>();
+            var controls = new List<NamedVariableCollection.IVariableView>();
             for (int i = 0; i < 3; i++)
             {
-                var view = new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                var view = new NamedVariableCollection.CustomView<int>(typeof(WatchVariableNumberWrapper<uint>))
                 {
                     Name = names[i],
-                    _getterFunction = _ => Config.Stream.GetInt32(Config.Stream.GetUInt32(SnowConfig.SnowArrayPointerAddress) + offsets[i]),
-                    _setterFunction = (val, _) => Config.Stream.SetValue((int)val, Config.Stream.GetUInt32(SnowConfig.SnowArrayPointerAddress) + offsets[i])
+                    _getterFunction = () => Config.Stream.GetInt32(Config.Stream.GetUInt32(SnowConfig.SnowArrayPointerAddress) + offsets[i]).Yield(),
+                    _setterFunction = (val) => Config.Stream.SetValue(val, Config.Stream.GetUInt32(SnowConfig.SnowArrayPointerAddress) + offsets[i]).Yield()
                 };
-                controls.Add((new WatchVariable(view), view));
+                controls.Add(view);
             }
             return controls;
         }

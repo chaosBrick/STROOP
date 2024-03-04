@@ -511,32 +511,22 @@ namespace STROOP.Utilities
             return angleTo;
         }
 
-        public static double GetAngleTo(PositionAngle p1, PositionAngle p2, bool? inGameAngleNullable, bool truncate)
+        public static double GetAngleTo(PositionAngle p1, PositionAngle p2)
         {
-            bool inGameAngle = inGameAngleNullable ?? SavedSettingsConfig.UseInGameTrigForAngleLogic;
-            return AngleTo(p1.X, p1.Z, p2.X, p2.Z, inGameAngle, truncate);
+            return AngleTo(p1.X, p1.Z, p2.X, p2.Z, SavedSettingsConfig.UseInGameTrigForAngleLogic, false);
         }
 
-        public static double GetDAngleTo(PositionAngle p1, PositionAngle p2, bool? inGameAngleNullable, bool truncate)
+        public static double GetDAngleTo(PositionAngle p1, PositionAngle p2)
         {
-            bool inGameAngle = inGameAngleNullable ?? SavedSettingsConfig.UseInGameTrigForAngleLogic;
-            double angleTo = AngleTo(p1.X, p1.Z, p2.X, p2.Z, inGameAngle, truncate);
-            double angle = truncate ? MoreMath.NormalizeAngleTruncated(p1.Angle) : p1.Angle;
-            double angleDiff = angle - angleTo;
+            double angleTo = AngleTo(p1.X, p1.Z, p2.X, p2.Z, SavedSettingsConfig.UseInGameTrigForAngleLogic, false);
+            double angleDiff = p1.Angle - angleTo;
             return MoreMath.NormalizeAngleDoubleSigned(angleDiff);
         }
 
-        public static double GetAngleDifference(PositionAngle p1, PositionAngle p2, bool truncate)
+        public static double GetAngleDifference(PositionAngle p1, PositionAngle p2)
         {
-            double angle1 = truncate ? MoreMath.NormalizeAngleTruncated(p1.Angle) : p1.Angle;
-            double angle2 = truncate ? MoreMath.NormalizeAngleTruncated(p2.Angle) : p2.Angle;
-            double angleDiff = angle1 - angle2;
-            return MoreMath.NormalizeAngleDoubleSigned(angleDiff);
+            return MoreMath.NormalizeAngleDoubleSigned(p1.Angle - p2.Angle);
         }
-
-
-
-
 
         private static bool GetToggle()
         {

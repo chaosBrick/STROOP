@@ -82,7 +82,7 @@ namespace STROOP.Structs.Configurations
 
         // Rng vars
 
-        public static int GoalRngIndex
+        public static ushort GoalRngIndex
         {
             get => RngIndexer.GetRngIndex(GoalRngValue);
             set => GoalRngValue = RngIndexer.GetRngValue(value);
@@ -113,11 +113,7 @@ namespace STROOP.Structs.Configurations
         
 
         public static double Map2DScrollSpeed = 1.1;
-
-        // Dummy Vars
-
-        public static readonly List<object> DummyValues = new List<object>();
-
+        
         // Release Status
 
         public static uint CustomReleaseStatus = 0;

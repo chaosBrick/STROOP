@@ -1,4 +1,5 @@
-﻿using STROOP.Core.WatchVariables;
+﻿using System.Linq;
+using STROOP.Core.WatchVariables;
 using STROOP.Structs.Configurations;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
@@ -9,13 +10,10 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
 
         void IMethodController.SetTargetFunc(ScoringFunc target)
         {
-            var var = new WatchVariable(new WatchVariable.CustomView(1)
+            var view = new NamedVariableCollection.CustomView<string>(typeof(WatchVariableSelectionWrapper<WatchVariableStringWrapper, string>))
             {
-                Name = "Set to current",
-                wrapperType = typeof(WatchVariableSelectionWrapper<WatchVariableStringWrapper, string>),
-                _getterFunction = _ => null,
-                _setterFunction = (_, __) => false
-            });
+                Name = "Set to current"
+            };
 
             var panel = target.watchVariablePanelParameters;
             var currentActionVariable = panel.GetWatchVariableControlsByName("action")[0];
@@ -26,10 +24,10 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
                 //(currentActionVariable.WatchVarWrapper as WatchVariableNumberWrapper)?.ToggleDisplayAsHex(true);
 
                 // Init to current action if not loaded from file?
-                if (currentActionVariable.WatchVar.GetValueAs<uint>() == 0)
+                if (currentActionVariable.view.GetNumberValues<uint>().FirstOrDefault() == 0)
                     currentActionVariable.SetValue(Config.Stream.GetInt32(Structs.MarioConfig.StructAddress + Structs.MarioConfig.ActionOffset));
 
-                var ctrl = (WatchVariableSelectionWrapper<WatchVariableStringWrapper, string>)panel.AddVariable(var, var.view).WatchVarWrapper;
+                var ctrl = (WatchVariableSelectionWrapper<WatchVariableStringWrapper, string>)panel.AddVariable(view).WatchVarWrapper;
                 ctrl.DisplaySingleOption = true;
                 ctrl.options.Add(("Set action now", () =>
                 {

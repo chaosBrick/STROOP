@@ -21,13 +21,10 @@ namespace STROOP.Core.WatchVariables
         };
         static Dictionary<string, WatchVariableSetting> settingsForSpecials = new Dictionary<string, WatchVariableSetting>();
 
-        protected WatchVariableStringWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl, int ignore)
-            : base(watchVar, watchVarControl) { }
-
-        public WatchVariableStringWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl)
-            : this(watchVar, watchVarControl, 0)
+        public WatchVariableStringWrapper(NamedVariableCollection.IVariableView<string> watchVar, WatchVariableControl watchVarControl)
+            : base(watchVar, watchVarControl)
         {
-            AddStringContextMenuStripItems(watchVarControl.view.GetValueByKey(WatchVariable.ViewProperties.specialType));
+            AddStringContextMenuStripItems(watchVarControl.view.GetValueByKey(NamedVariableCollection.ViewProperties.specialType));
         }
 
         public override void UpdateControls() { }
@@ -60,10 +57,7 @@ namespace STROOP.Core.WatchVariables
             _watchVarControl.AddSetting(setting);
         }
 
-        protected override string GetClass()
-        {
-            return "String";
-        }
+        public override string GetClass() => "String";
 
         public override string DisplayValue(string value) => value;
 

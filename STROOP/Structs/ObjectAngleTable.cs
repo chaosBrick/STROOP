@@ -41,11 +41,13 @@ namespace STROOP.Structs
             return _indexToAngleDictionary[index];
         }
 
-        public double GetFramesToGoalAngle(ushort currentAngle)
+        public int? GetFramesToGoalAngle(ushort currentAngle)
         {
-            double currentIndex = GetIndex(currentAngle) ?? double.NaN;
-            double goalIndex = GetIndex(GoalAngle) ?? double.NaN;
-            return MoreMath.NonNegativeModulus(goalIndex - currentIndex, _angleToIndexDictionary.Count);
+            int? currentIndex = GetIndex(currentAngle);
+            int? goalIndex = GetIndex(GoalAngle);
+            if (!currentIndex.HasValue || !goalIndex.HasValue)
+                return null;
+            return MoreMath.NonNegativeModulus(goalIndex.Value - currentIndex.Value, _angleToIndexDictionary.Count);
         }
 
         public ushort? GetAngleNumFramesBeforeGoal(int numFrames)

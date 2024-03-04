@@ -30,25 +30,19 @@ namespace STROOP.Tabs.GhostTab
                 yield return (uint)(int)ind;
         }
 
-        [InitializeBaseAddress]
-        static void InitializeBaseAddress()
-        {
-            WatchVariableUtilities.baseAddressGetters["Ghost"] = GetActiveGhostIndices;
-        }
-
         [InitializeSpecial]
         static void AddSpecialVariables()
         {
             var target = WatchVariableSpecialUtilities.dictionary;
-            Func<uint, Func<GhostFrame, object>, Func<object>> displayGhostVarFloat =
-                (index, selectMember) => (() => selectMember((instance.listBoxGhosts.Items[(int)index] as Ghost)?.currentFrame ?? default(GhostFrame)));
+            Func<Func<GhostFrame, float>, Func<IEnumerable<float>>> displayGhostVarFloat =
+                (selectMember) => () => GetActiveGhostIndices().Select((uint index) => selectMember((instance.listBoxGhosts.Items[(int)index] as Ghost)?.currentFrame ?? default(GhostFrame)));
 
-            target.Add("GhostX", ((uint _) => displayGhostVarFloat(_, frame => frame.position.X)(), (object _, uint __) => false));
-            target.Add("GhostY", ((uint _) => displayGhostVarFloat(_, frame => frame.position.Y)(), (object _, uint __) => false));
-            target.Add("GhostZ", ((uint _) => displayGhostVarFloat(_, frame => frame.position.Z)(), (object _, uint __) => false));
-            target.Add("GhostYaw", ((uint _) => displayGhostVarFloat(_, frame => frame.oYaw)(), (object _, uint __) => false));
-            target.Add("GhostPitch", ((uint _) => displayGhostVarFloat(_, frame => frame.oPitch)(), (object _, uint __) => false));
-            target.Add("GhostRoll", ((uint _) => displayGhostVarFloat(_, frame => frame.oRoll)(), (object _, uint __) => false));
+            target.Add<float>("GhostX", () => displayGhostVarFloat(frame => frame.position.X)(), _ => Array.Empty<bool>());
+            target.Add<float>("GhostY", () => displayGhostVarFloat(frame => frame.position.Y)(), _ => Array.Empty<bool>());
+            target.Add<float>("GhostZ", () => displayGhostVarFloat(frame => frame.position.Z)(), _ => Array.Empty<bool>());
+            target.Add<float>("GhostYaw", () => displayGhostVarFloat(frame => frame.oYaw)(), _ => Array.Empty<bool>());
+            target.Add<float>("GhostPitch", () => displayGhostVarFloat(frame => frame.oPitch)(), _ => Array.Empty<bool>());
+            target.Add<float>("GhostRoll", () => displayGhostVarFloat(frame => frame.oRoll)(), _ => Array.Empty<bool>());
         }
         static GhostTab instance;
 

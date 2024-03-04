@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Globalization;
 using STROOP.Core.WatchVariables;
+using STROOP.Structs;
 
 namespace STROOP.Utilities
 {
@@ -78,7 +79,7 @@ namespace STROOP.Utilities
         {
             var str = valueString.Trim('"');
             double numberValue = 0;
-            if (typeof(WatchVariableNumberWrapper).IsAssignableFrom(variableWrapperType))
+            if (TypeUtilities.MatchesGenericType(typeof(WatchVariableNumberWrapper<>), variableWrapperType))
             {
                 bool set = true;
                 if (str.StartsWith("0x"))
@@ -91,6 +92,8 @@ namespace STROOP.Utilities
                 if (set)
                     return numberValue;
             }
+            else if (typeof(WatchVariableBooleanWrapper).IsAssignableFrom(variableWrapperType))
+                return valueString.ToLower() != "false" && (!int.TryParse(valueString, out var boolNumber) || boolNumber != 0);
             else
                 return valueString;
             return 0;

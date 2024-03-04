@@ -35,15 +35,22 @@ namespace STROOP.Utilities
     public static class GeneralUtilities
     {
         static Type[] stroopTypes;
+
+        static GeneralUtilities()
+        {
+            stroopTypes = typeof(GeneralUtilities).Assembly.GetTypes();
+        }
+
         public static IEnumerable<Type> EnumerateTypes(Func<Type, bool> filter)
         {
             foreach (var t in stroopTypes)
                 if (filter(t))
                     yield return t;
         }
-        static GeneralUtilities()
+
+        public static IEnumerable<T> Yield<T>(this T value)
         {
-            stroopTypes = typeof(GeneralUtilities).Assembly.GetTypes();
+            yield return value;
         }
 
         public static EqualityComparer<T> GetEqualityComparer<T>(Func<T, T, bool> equalsFunc, Func<T, int> getHashCodeFunc = null)

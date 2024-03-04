@@ -8,10 +8,11 @@ using System.Text;
 using System.Reflection;
 using STROOP.Controls;
 using STROOP.Core.WatchVariables;
+using STROOP.Tabs.BruteforceTab.BF_Utilities;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
 {
-    public partial class ScoringFunc : UserControl
+    partial class ScoringFunc : UserControl
     {
         static Dictionary<string, Type> stringToControllerType = new Dictionary<string, Type>();
         static ScoringFunc()
@@ -96,26 +97,30 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             bruteforceTab.Updating += UpdateTooltip;
             Disposed += (_, __) => bruteforceTab.Updating -= UpdateTooltip;
 
-            variablePanelBaseValues.AddVariable(new WatchVariable(
-                    new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
-                    {
-                        Name = "weight",
-                        _getterFunction = (_) => precursor.weight,
-                        _setterFunction = (value, addr) => { precursor.weight = Convert.ToDouble(value); return true; }
-                    }));
+            variablePanelBaseValues.AddVariable(new NamedVariableCollection.CustomView<double>(typeof(WatchVariableNumberWrapper<double>))
+            {
+                Name = "weight",
+                _getterFunction = () => precursor.weight.Yield(),
+                _setterFunction = value =>
+                {
+                    precursor.weight = value;
+                    return true.Yield();
+                }
+            });
 
-            var wrapper = (WatchVariableSelectionWrapper<WatchVariableNumberWrapper, decimal>)variablePanelBaseValues.AddVariable(
-                new WatchVariable(
-                new WatchVariable.CustomView(typeof(WatchVariableSelectionWrapper<WatchVariableNumberWrapper, decimal>))
+            var wrapper = (WatchVariableSelectionWrapper<WatchVariableNumberWrapper<uint>, uint>)variablePanelBaseValues.AddVariable(
+                new NamedVariableCollection.CustomView<uint>(typeof(WatchVariableSelectionWrapper<WatchVariableNumberWrapper<uint>, uint>))
                 {
                     Name = "frame",
-                    _getterFunction = (_) => precursor.frame,
-                    _setterFunction = (value, addr) => { precursor.frame = Convert.ToUInt32(value); return true; }
-                }))
-                .WatchVarWrapper;
+                    _getterFunction = () => precursor.frame.Yield(),
+                    _setterFunction = value =>
+                    {
+                        precursor.frame = value;
+                        return true.Yield();
+                    }
+                }).WatchVarWrapper;
             wrapper.DisplaySingleOption = false;
-
-            (Func<decimal> endFrameValue, Action unregister) = bruteforceTab.GetManualValue<decimal>("m64_end", () => wrapper.UpdateOption(0));
+            (Func<uint> endFrameValue, Action unregister) = bruteforceTab.GetManualValue<uint>("m64_end", () => wrapper.UpdateOption(0));
             Disposed += (_, __) => unregister();
             if (endFrameValue != null)
             {
@@ -128,19 +133,19 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                 {
                     docs[kvp.Key.name] = kvp.Key.documentation;
                     string key = kvp.Key.name;
-                    var backingType = BruteforceTab.backingTypes[kvp.Value];
+                    var backingType = BF_VariableUtilties.backingTypes[kvp.Value];
                     if (precursor.parameterValues.TryGetValue(key, out var uncastedValue))
+                    {
+                        uncastedValue = uncastedValue is string stringValue 
+                            ? StringUtilities.GetJsonValue(BF_VariableUtilties.fallbackWrapperTypes[kvp.Value], stringValue) 
+                            : uncastedValue;
                         precursor.parameterValues[key] = Convert.ChangeType(uncastedValue, backingType);
+                    }
                     else
                         precursor.parameterValues[key] = Activator.CreateInstance(backingType);
-                    var newWatchVar = new WatchVariable(new WatchVariable.CustomView(BruteforceTab.fallbackWrapperTypes[kvp.Value])
-                    {
-                        Name = kvp.Key.name,
-                        _getterFunction = _ => precursor.parameterValues[key],
-                        _setterFunction = (value, _) => { precursor.parameterValues[key] = value; return true; }
-                    }, backingType);
+                    var newWatchVar = BF_VariableUtilties.CreateNamedVariable(kvp.Value, kvp.Key.name);
                     newWatchVar.ValueSet += bruteforceTab.DeferUpdateState;
-                    return (newWatchVar, newWatchVar.view);
+                    return newWatchVar;
                 }));
             if (stringToControllerType.TryGetValue(precursor.name, out var controllerType))
             {

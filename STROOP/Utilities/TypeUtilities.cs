@@ -240,6 +240,18 @@ namespace STROOP.Structs
             return type1 == type2 || type1.IsSubclassOf(type2);
         }
 
+        public static bool MatchesGenericType(Type genericType, Type typeToCheck)
+        {
+            var t = typeToCheck;
+            while (t != null)
+            {
+                if (t.IsGenericType && t.GetGenericTypeDefinition() == genericType)
+                    return true;
+                t = t.BaseType;
+            }
+            return false;
+        }
+
         public static uint GetRelativeAddressFromAbsoluteAddress(uint addr, int byteCount)
         {
             UIntPtr addressPtr = new UIntPtr(addr);

@@ -79,8 +79,8 @@ namespace STROOP.Tabs
                 uint address = addressNullable.Value;
 
                 string typeString = TypeUtilities.TypeToString[_memoryType];
-                WatchVariable watchVar = new WatchVariable(WatchVariable.DefaultView(typeString, false, _memoryType), BaseAddressType.Relative, address);
-                watchVariablePanelSearch.AddVariable(watchVar, watchVar.view);
+                MemoryDescriptor watchVar = new MemoryDescriptor(typeString, BaseAddressType.Relative, address);
+                watchVariablePanelSearch.AddVariable(watchVar.CreateView());
             }
         }
 

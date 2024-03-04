@@ -124,55 +124,55 @@ namespace STROOP.Structs
                     {
                         var control1 = controls[i];
                         var control2 = controls[i + controls.Count / 2];
-                        var wrapper1 = control1.WatchVarWrapper as WatchVariableNumberWrapper;
-                        var wrapper2 = control2.WatchVarWrapper as WatchVariableNumberWrapper;
+                        var wrapper1 = control1.WatchVarWrapper;
+                        var wrapper2 = control2.WatchVarWrapper;
 
                         Func<double, double, double> inverseSetter1, inverseSetter2;
                         binaryMathOperationsInverse1.TryGetValue(operation, out inverseSetter1);
                         binaryMathOperationsInverse2.TryGetValue(operation, out inverseSetter2);
 
-                        var view = new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                        var view = new NamedVariableCollection.CustomView<double>(typeof(WatchVariableNumberWrapper<double>))
                         {
                             Name = $"{control1.view.Name} {MathOperationUtilities.GetSymbol(operation)} {control2.view.Name}",
-                            _getterFunction = _ => func((double)wrapper1.CombineValues().value, (double)wrapper2.CombineValues().value),
-                            _setterFunction = (val, _) =>
+                            _getterFunction = () => func(wrapper1._view.CombineValues<double>().value, wrapper2._view.CombineValues<double>().value).Yield(),
+                            _setterFunction = val =>
                             {
                                 if (val is double valueDouble)
                                     if (!KeyboardUtilities.IsCtrlHeld())
                                     {
-                                        var wrapper1Value = (double)wrapper1.CombineValues().value;
+                                        var wrapper1Value = wrapper1._view.CombineValues<double>().value;
                                         return inverseSetter2 == null
-                                            ? false
-                                            : control1.WatchVar.GetAddressList(control1.FixedAddressListGetter())
-                                            .All(address => control1.view._setterFunction(inverseSetter2(valueDouble, wrapper1Value), address));
+                                            ? Array.Empty<bool>()
+                                            : control1.view.TrySetValue(inverseSetter2(valueDouble, wrapper1Value));
                                     }
                                     else
                                     {
-                                        var wrapper2Value = (double)wrapper2.CombineValues().value;
+                                        var wrapper2Value = wrapper2._view.CombineValues<double>().value;
                                         return inverseSetter1 == null
-                                            ? false
-                                            : control2.WatchVar.GetAddressList(control2.FixedAddressListGetter())
-                                            .All(address => control2.view._setterFunction(inverseSetter1(valueDouble, wrapper2Value), address));
+                                            ? Array.Empty<bool>()
+                                            : control2.view.TrySetValue(inverseSetter1(valueDouble, wrapper2Value));
                                     }
                                 else
-                                    return false;
+                                    return Array.Empty<bool>();
                             }
                         };
-                        panel.AddVariable(new WatchVariable(view), view);
+                        panel.AddVariable(view);
                     }
             }
+
             void createAggregateMathOperationVariable(AggregateMathOperation operation)
             {
                 if (vars.Count == 0) return;
                 var getter = WatchVariableSpecialUtilities.AddAggregateMathOperationEntry(vars, operation);
-                var view = new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                var view = new NamedVariableCollection.CustomView<double>(typeof(WatchVariableNumberWrapper<double>))
                 {
                     Name = $"{operation}({vars.First().view.Name}-{vars.Last().view.Name})",
                     _getterFunction = getter,
-                    _setterFunction = WatchVariableSpecialUtilities.DEFAULT_SETTER
+                    _setterFunction = WatchVariableSpecialUtilities.Defaults<double>.DEFAULT_SETTER
                 };
-                panel.AddVariable(new WatchVariable(view), view);
+                panel.AddVariable(view);
             }
+
             void createDistanceMathOperationVariable(bool use3D)
             {
                 bool satisfies2D = !use3D && vars.Count >= 4;
@@ -195,10 +195,9 @@ namespace STROOP.Structs
                         vars[2].VarName,
                         vars[3].VarName);
 
-                var varValues = vars.Select(x => x.WatchVar.GetValueAs<double>()).ToArray();
+                var varValues = vars.Select(x => x.view.GetNumberValues<double>().ToArray()).ToArray();
 
-                // TODO: Avoid ParsingUtilities.ParseDouble
-                WatchVariable.GetterFunction getter3D = _ =>
+                NamedVariableCollection.GetterFunction<double> getter3D = () =>
                 {
                     var x1 = varValues[0];
                     var y1 = varValues[1];
@@ -206,17 +205,25 @@ namespace STROOP.Structs
                     var x2 = varValues[3];
                     var y2 = varValues[4];
                     var z2 = varValues[5];
-                    return new Vector3d(x2 - x1, y2 - y1, z2 - z1).Length;
+                    var min = varValues.Min(x => x.Length);
+                    var result = new List<double>(min);
+                    for (int i = 0; i < min; i++)
+                        result.Add(new Vector3d(x2[i] - x1[i], y2[i] - y1[i], z2[i] - z1[i]).Length);
+                    return result;
                 };
-                WatchVariable.GetterFunction getter2D = _ =>
+                NamedVariableCollection.GetterFunction<double> getter2D = () =>
                 {
                     var x1 = varValues[0];
                     var y1 = varValues[1];
                     var x2 = varValues[3];
                     var y2 = varValues[4];
-                    return new Vector2d(x2 - x1, y2 - y1).Length;
+                    var min = varValues.Min(x => x.Length);
+                    var result = new List<double>(min);
+                    for (int i = 0; i < min; i++)
+                        result.Add(new Vector2d(x2[i] - x1[i], y2[i] - y1[i]).Length);
+                    return result;
                 };
-                WatchVariable.SetterFunction setter3D = (value, _) =>
+                NamedVariableCollection.SetterFunction<double> setter3D = value =>
                 {
                     var x1 = varValues[0];
                     var y1 = varValues[1];
@@ -226,13 +233,19 @@ namespace STROOP.Structs
                     var z2 = varValues[5];
                     bool toggle = KeyboardUtilities.IsCtrlHeld();
                     int off = toggle ? 0 : 3;
-                    Vector3d a = new Vector3d(x1, y1, z1);
-                    Vector3d b = new Vector3d(x2, y2, z2);
-                    if (toggle) { var tmp = a; a = b; b = tmp; }
-                    b = a + Vector3d.Normalize(b - a) * (double)value;
-                    return vars[off].SetValue(b.X) && vars[off].SetValue(b.Y) && vars[off].SetValue(b.Z);
+                    var min = varValues.Min(x => x.Length);
+                    var result = new List<bool>(min);
+                    for (int i = 0; i < min; i++)
+                    {
+                        Vector3d a = new Vector3d(x1[i], y1[i], z1[i]);
+                        Vector3d b = new Vector3d(x2[i], y2[i], z2[i]);
+                        if (toggle) { var tmp = a; a = b; b = tmp; }
+                        b = a + Vector3d.Normalize(b - a) * value;
+                        result.Add(vars[off].SetValue(b.X) && vars[off].SetValue(b.Y) && vars[off].SetValue(b.Z));
+                    }
+                    return result;
                 };
-                WatchVariable.SetterFunction setter2D = (value, _) =>
+                NamedVariableCollection.SetterFunction<double> setter2D = value =>
                 {
                     var x1 = varValues[0];
                     var y1 = varValues[1];
@@ -240,20 +253,26 @@ namespace STROOP.Structs
                     var y2 = varValues[3];
                     bool toggle = KeyboardUtilities.IsCtrlHeld();
                     int off = toggle ? 0 : 2;
-                    Vector2d a = new Vector2d(x1, y1);
-                    Vector2d b = new Vector2d(x2, y2);
-                    if (toggle) { var tmp = a; a = b; b = tmp; }
-                    b = a + Vector2d.Normalize(b - a) * (double)value;
-                    return vars[off].SetValue(b.X) && vars[off].SetValue(b.Y);
+                    var min = varValues.Min(x => x.Length);
+                    var result = new List<bool>(min);
+                    for (int i = 0; i < min; i++)
+                    {
+                        Vector2d a = new Vector2d(x1[i], y1[i]);
+                        Vector2d b = new Vector2d(x2[i], y2[i]);
+                        if (toggle) { var tmp = a; a = b; b = tmp; }
+                        b = a + Vector2d.Normalize(b - a) * (double)value;
+                        result.Add(vars[off].SetValue(b.X) && vars[off].SetValue(b.Y));
+                    }
+                    return result;
                 };
 
-                var view = new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                var view = new NamedVariableCollection.CustomView<double>(typeof(WatchVariableNumberWrapper<double>))
                 {
                     Name = name,
                     _getterFunction = use3D ? getter3D : getter2D,
                     _setterFunction = use3D ? setter3D : setter2D
                 };
-                panel.AddVariable(new WatchVariable(view), view);
+                panel.AddVariable(view);
             }
 
             ToolStripMenuItem itemAddVariables = new ToolStripMenuItem("Add Variable(s)...");
@@ -323,21 +342,17 @@ namespace STROOP.Structs
 
             ToolStripMenuItem itemOpenController = new ToolStripMenuItem("Open Controller");
             itemOpenController.Click += (sender, e) =>
-            {
-                VariableControllerForm varController =
                 new VariableControllerForm(
-                vars.ConvertAll(control => control.VarName),
-                vars.ConvertAll(control => control.WatchVarWrapper),
-                vars.ConvertAll(control => control.FixedAddressListGetter()));
-                varController.Show();
-            };
+                    vars.ConvertAll(control => control.VarName),
+                    vars.ConvertAll(control => control.WatchVarWrapper)
+                ).Show();
             itemList.Add(itemOpenController);
 
             ToolStripMenuItem itemOpenPopOut = new ToolStripMenuItem("Open Pop Out");
             itemOpenPopOut.Click += (sender, e) =>
             {
                 VariablePopOutForm form = new VariablePopOutForm();
-                form.Initialize(vars.ConvertAll(control => control.WatchVar));
+                form.Initialize(vars.ConvertAll(control => control.view));
                 form.ShowForm();
             };
             itemList.Add(itemOpenPopOut);

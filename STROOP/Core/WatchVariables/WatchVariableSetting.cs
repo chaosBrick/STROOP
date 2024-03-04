@@ -122,50 +122,51 @@ namespace STROOP.Controls {
                     ("White", () => Color.White, ctrl => ctrl.HighlightColor == Color.White)
                     );
 
-            public static readonly WatchVariableSetting LockSetting = new WatchVariableSetting(
-                    "Lock",
-                    (ctrl, obj) =>
-                    {
-                        if (obj is bool newLock)
-                            return ctrl.WatchVar.SetLocked(newLock, null);
-                        else
-                            return false;
-                    },
-                    ("Lock", () => true, ctrl => ctrl.WatchVar.locked),
-                    ("Don't Lock", () => false, ctrl => !ctrl.WatchVar.locked)
-                    );
+            // TODO: work out fixing feature
+            //public static readonly WatchVariableSetting LockSetting = new WatchVariableSetting(
+            //        "Lock",
+            //        (ctrl, obj) =>
+            //        {
+            //            if (obj is bool newLock)
+            //                return ctrl.WatchVar.SetLocked(newLock, null);
+            //            else
+            //                return false;
+            //        },
+            //        ("Lock", () => true, ctrl => ctrl.WatchVar.locked),
+            //        ("Don't Lock", () => false, ctrl => !ctrl.WatchVar.locked)
+            //        );
 
-            private static readonly object FixSpecial = new object();
-            public static readonly WatchVariableSetting FixAddressSetting = new WatchVariableSetting(
-                    "Fix Address",
-                    (ctrl, obj) =>
-                    {
-                        if (obj is bool newFixAddress)
-                            ctrl.SetFixedAddress(newFixAddress);
-                        else if (obj == FixSpecial)
-                        {
-                            List<uint> addresses = ctrl.FixedAddressListGetter() ?? ctrl.WatchVarWrapper.GetCurrentAddressesToFix();
-                            if (addresses.Count > 0)
-                            {
-                                uint objAddress = addresses[0];
-                                uint parent = Config.Stream.GetUInt32(objAddress + ObjectConfig.ParentOffset);
-                                int subtype = Config.Stream.GetInt32(objAddress + ObjectConfig.BehaviorSubtypeOffset);
-                                ctrl.FixedAddressListGetter = () =>
-                                    Config.ObjectSlotsManager.GetLoadedObjectsWithPredicate(
-                                     _obj => _obj.Parent == parent && _obj.SubType == subtype && _obj.Address != _obj.Parent)
-                                    .ConvertAll(_obj => _obj.Address);
-                            }
-                        }
-                        else if (obj == null)
-                            ctrl.FixedAddressListGetter = ctrl._defaultFixedAddressListGetter;
-                        else return false;
-                        return true;
-                    },
-                    ("Default", () => null, null),
-                    ("Fix Address", () => false, null),
-                    ("Fix Address Special", () => FixSpecial, null),
-                    ("Don't Fix Address", () => false, null)
-                    );
+            //private static readonly object FixSpecial = new object();
+            //public static readonly WatchVariableSetting FixAddressSetting = new WatchVariableSetting(
+            //        "Fix Address",
+            //        (ctrl, obj) =>
+            //        {
+            //            if (obj is bool newFixAddress)
+            //                ctrl.SetFixedAddress(newFixAddress);
+            //            else if (obj == FixSpecial)
+            //            {
+            //                List<uint> addresses = ctrl.FixedAddressListGetter() ?? ctrl.WatchVarWrapper.GetCurrentAddressesToFix();
+            //                if (addresses.Count > 0)
+            //                {
+            //                    uint objAddress = addresses[0];
+            //                    uint parent = Config.Stream.GetUInt32(objAddress + ObjectConfig.ParentOffset);
+            //                    int subtype = Config.Stream.GetInt32(objAddress + ObjectConfig.BehaviorSubtypeOffset);
+            //                    ctrl.FixedAddressListGetter = () =>
+            //                        Config.ObjectSlotsManager.GetLoadedObjectsWithPredicate(
+            //                         _obj => _obj.Parent == parent && _obj.SubType == subtype && _obj.Address != _obj.Parent)
+            //                        .ConvertAll(_obj => _obj.Address);
+            //                }
+            //            }
+            //            else if (obj == null)
+            //                ctrl.FixedAddressListGetter = ctrl._defaultFixedAddressListGetter;
+            //            else return false;
+            //            return true;
+            //        },
+            //        ("Default", () => null, null),
+            //        ("Fix Address", () => false, null),
+            //        ("Fix Address Special", () => FixSpecial, null),
+            //        ("Don't Fix Address", () => false, null)
+            //        );
 
             private static readonly object RevertToDefaultColor = new object();
             public static readonly WatchVariableSetting BackgroundColorSetting = new WatchVariableSetting(

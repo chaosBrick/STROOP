@@ -15,7 +15,7 @@ namespace STROOP.Controls
         public delegate int SortVariables(WatchVariableControl a, WatchVariableControl b);
 
         public static SortVariables SortNone = (a, b) => 0;
-        public static SortVariables SortByPriority = (a, b) => b.WatchVar.view.DislpayPriority.CompareTo(a.WatchVar.view.DislpayPriority);
+        public static SortVariables SortByPriority = (a, b) => a.view.DislpayPriority.CompareTo(a.view.DislpayPriority);
         public static SortVariables SortByName = (a, b) => a.VarName.CompareTo(b.VarName);
 
         public static readonly Color DEFAULT_COLOR = SystemColors.Control;
@@ -26,11 +26,10 @@ namespace STROOP.Controls
         public static readonly Color SELECTED_COLOR = Color.FromArgb(51, 153, 255);
         private static readonly int FLASH_DURATION_MS = 1000;
 
+        public readonly NamedVariableCollection.IVariableView view;
         public readonly WatchVariableWrapper WatchVarWrapper;
-        public readonly List<string> GroupList;
 
-        public WatchVariable WatchVar => WatchVarWrapper.WatchVar;
-        public WatchVariable.IVariableView view;
+        public readonly List<string> GroupList;
 
         // Parent control
         public readonly WatchVariablePanel containingPanel;
@@ -61,17 +60,11 @@ namespace STROOP.Controls
         bool _isSelected;
         public bool IsSelected { get { return _isSelected && containingPanel.IsSelected; } set { _isSelected = value; } }
 
-        private Func<List<uint>> _defaultFixedAddressListGetter;
-        public Func<List<uint>> FixedAddressListGetter;
-
-        public WatchVariableControl(WatchVariablePanel panel, WatchVariable watchVar)
-            : this(panel, watchVar, watchVar.view) { }
-
-        public WatchVariableControl(WatchVariablePanel panel, WatchVariable watchVar, WatchVariable.IVariableView view)
+        public WatchVariableControl(WatchVariablePanel panel, NamedVariableCollection.IVariableView view)
         {
             this.view = view;
             this.containingPanel = panel;
-            WatchVarWrapper = (WatchVariableWrapper)Activator.CreateInstance(view.GetWrapperType(), watchVar, this);
+
             view.OnDelete += () => containingPanel.RemoveVariable(this);
 
             // Initialize main fields
@@ -79,13 +72,6 @@ namespace STROOP.Controls
             GroupList = WatchVariableUtilities.ParseVariableGroupList(view.GetValueByKey("groupList") ?? "Custom");
             RenameMode = false;
             IsSelected = false;
-
-            List<uint> fixedAddresses = null;
-
-            List<uint> copy1 = fixedAddresses == null ? null : new List<uint>(fixedAddresses);
-            _defaultFixedAddressListGetter = () => copy1;
-            List<uint> copy2 = fixedAddresses == null ? null : new List<uint>(fixedAddresses);
-            FixedAddressListGetter = () => copy2;
 
             // Initialize color fields
             var colorString = view.GetValueByKey("color");
@@ -102,14 +88,19 @@ namespace STROOP.Controls
             _isFlashing = false;
             _flashStartTime = DateTime.Now;
 
+            if (!WatchVariableUtilities.TryCreateWrapper(view, this, out WatchVarWrapper))
+                BaseColor = Color.DarkRed;
+
             AddSetting(DefaultSettings.BackgroundColorSetting);
             AddSetting(DefaultSettings.HighlightColorSetting);
-            AddSetting(DefaultSettings.FixAddressSetting);
+            // TODO: work out fixing setting
+            //AddSetting(DefaultSettings.FixAddressSetting);
             AddSetting(DefaultSettings.HighlightSetting);
-            AddSetting(DefaultSettings.LockSetting);
+            // TODO: work out locking setting
+            //AddSetting(DefaultSettings.LockSetting);
         }
 
-        void ShowMainContextMenu(object sender, System.Windows.Forms.MouseEventArgs e)
+        void ShowMainContextMenu(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
                 ShowContextMenu();
@@ -214,7 +205,7 @@ namespace STROOP.Controls
 
         public WatchVariableControl CreateCopy(WatchVariablePanel panel)
         {
-            var copy = new WatchVariableControl(panel, WatchVar);
+            var copy = new WatchVariableControl(panel, view);
             copy.BaseColor = _baseColor;
             copy.VarName = VarName;
             copy.GroupList.Clear();
@@ -222,31 +213,8 @@ namespace STROOP.Controls
             return copy;
         }
 
-        public void ToggleFixedAddress()
-        {
-            if (FixedAddressListGetter() == null)
-            {
-                List<uint> copy = new List<uint>(WatchVarWrapper.GetCurrentAddressesToFix());
-                FixedAddressListGetter = () => copy;
-            }
-            else
-            {
-                FixedAddressListGetter = () => null;
-            }
-        }
-
-        public void SetFixedAddress(bool fix)
-        {
-            if (fix)
-            {
-                List<uint> copy = new List<uint>(WatchVarWrapper.GetCurrentAddressesToFix());
-                FixedAddressListGetter = () => copy;
-            }
-            else
-            {
-                FixedAddressListGetter = () => null;
-            }
-        }
+        public void ToggleFixedAddress(bool? fix)
+            => (view as NamedVariableCollection.IMemoryDescriptorVariableView).describedMemoryState.ToggleFixedAddress(fix);
 
         public void ToggleHighlighted(Color? color = null)
         {
@@ -257,22 +225,35 @@ namespace STROOP.Controls
 
         public Type GetMemoryType()
         {
-            return WatchVarWrapper.GetMemoryType();
+            var viewType = view.GetType();
+            while (viewType != null)
+            {
+                if (viewType.IsGenericType)
+                {
+                    if (viewType.GetGenericTypeDefinition() == typeof(NamedVariableCollection.MemoryDescriptorView<>)
+                        || viewType.GetGenericTypeDefinition() == typeof(NamedVariableCollection.XmlMemoryView<>))
+                        return viewType.GetGenericArguments()[0];
+                }
+                viewType = viewType.BaseType;
+            }
+            return null;
         }
 
-        public List<uint> GetBaseAddresses() => WatchVarWrapper.GetBaseAddresses(FixedAddressListGetter()).ToList();
-        
-        public bool SetValue<T>(T value) where T : IConvertible
+        public bool SetValue<T>(T value)
         {
-            bool success = WatchVar.SetValue(value, FixedAddressListGetter());
-            if (!success) FlashColor(FAILURE_COLOR);
-            return success;
+            if (view is NamedVariableCollection.IVariableView<T> compatibleView
+                && compatibleView._setterFunction(value).Aggregate(true, (a, b) => a && b))
+                return true;
+            else if (value is IConvertible convertibleValue && view.TrySetValue(convertibleValue).Aggregate(true, (a, b) => a && b))
+                return true;
+            FlashColor(FAILURE_COLOR);
+            return false;
         }
 
         public XElement ToXml(bool useCurrentState = true)
         {
             Color? color = _baseColor == DEFAULT_COLOR ? (Color?)null : _baseColor;
-            if (WatchVar.view is WatchVariable.XmlView xmlView)
+            if (view is NamedVariableCollection.XmlMemoryView xmlView)
                 return xmlView.GetXml();
             return null;
         }

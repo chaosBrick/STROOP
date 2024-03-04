@@ -16,13 +16,11 @@ namespace STROOP.Forms
         public VariableCreationForm()
         {
             InitializeComponent();
+            var baseTypeValues = WatchVariableUtilities.baseAddressGetters.Keys.ToArray();
             comboBoxTypeValue.DataSource = TypeUtilities.InGameTypeList;
-            comboBoxBaseValue.DataSource = WatchVariableUtilities.baseAddressGetters.Keys.ToArray();
+            comboBoxBaseValue.DataSource = baseTypeValues;
             comboBoxTypeValue.SelectedIndex = TypeUtilities.InGameTypeList.IndexOf("int");
-            comboBoxBaseValue.SelectedIndex = Array.IndexOf(
-                WatchVariableUtilities.baseAddressGetters.Values.ToArray(),
-                BaseAddressType.Object
-                );
+            comboBoxBaseValue.SelectedIndex = Array.IndexOf(baseTypeValues, BaseAddressType.Object);
 
             ControlUtilities.AddCheckableContextMenuStripFunctions(
                 buttonAddVariable,
@@ -42,16 +40,11 @@ namespace STROOP.Forms
 
         public void Initialize(WatchVariablePanel varPanel)
         {
-            buttonAddVariable.Click += (sender, e) =>
-            {
-                var watchVar = CreateWatchVariableControl();
-                varPanel.AddVariable(watchVar, watchVar.view);
-            };
+            buttonAddVariable.Click += (sender, e) => varPanel.AddVariable(CreateWatchVariableControl());
         }
 
-        private WatchVariable CreateWatchVariableControl()
+        private NamedVariableCollection.IVariableView CreateWatchVariableControl()
         {
-            string name = textBoxNameValue.Text;
             string memoryTypeString = comboBoxTypeValue.SelectedItem.ToString();
             string baseAddressType = (string)comboBoxBaseValue.SelectedItem;
             uint offset = ParsingUtilities.ParseHexNullable(textBoxOffsetValue.Text) ?? 0;
@@ -60,16 +53,9 @@ namespace STROOP.Forms
 
             var isAbsolute = baseAddressType == BaseAddressType.Absolute;
 
-            return new WatchVariable(
-                new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
-                {
-                    Name = name,
-                    _getterFunction = b => Structs.Configurations.Config.Stream.GetValue(memoryType, b, isAbsolute),
-                    _setterFunction = (value, b) => Structs.Configurations.Config.Stream.SetValue(memoryType, value, b, isAbsolute),
-                },
-                baseAddressType,
-                offset
-                );
+            var result = new MemoryDescriptor(memoryTypeString, baseAddressType, offset).CreateView();
+            result.Name = textBoxNameValue.Text;
+            return result;
         }
     }
 }

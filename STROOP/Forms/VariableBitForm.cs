@@ -1,4 +1,5 @@
 ﻿using STROOP.Structs;
+using STROOP.Structs.Configurations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,22 +12,31 @@ using STROOP.Core.WatchVariables;
 
 namespace STROOP.Forms
 {
+    // TODO: fix UI inconsistencies
     public partial class VariableBitForm : Form, IUpdatableForm
     {
         private readonly string _varName;
-        private readonly WatchVariable _watchVar;
-        private readonly List<uint> _fixedAddressList;
         private readonly BindingList<ByteModel> _bytes;
         private readonly List<ByteModel> _reversedBytes;
+        private readonly MemoryDescriptor _memoryDescriptor;
 
         private bool _hasDoneColoring = false;
         private bool _showFloatComponents = false;
 
-        public VariableBitForm(string varName, WatchVariable watchVar, List<uint> fixedAddressList)
+        private Func<IEnumerable<uint>> _addressGetter;
+
+        public VariableBitForm(string varName, MemoryDescriptor memoryDescriptor, bool fixAddresses)
         {
             _varName = varName;
-            _watchVar = watchVar;
-            _fixedAddressList = fixedAddressList;
+            _memoryDescriptor = memoryDescriptor;
+
+            if (fixAddresses)
+            {
+                var fixedAddresses = memoryDescriptor.GetAddressList();
+                _addressGetter = () => fixedAddresses;
+            }
+            else
+                _addressGetter = () => memoryDescriptor.GetAddressList();
 
             InitializeComponent();
             FormManager.AddForm(this);
@@ -34,9 +44,9 @@ namespace STROOP.Forms
 
             _textBoxVarName.Text = _varName;
             _bytes = new BindingList<ByteModel>();
-            for (int i = 0; i < watchVar.ByteCount.Value; i++)
+            for (int i = 0; i < _memoryDescriptor.ByteCount.Value; i++)
             {
-                _bytes.Add(new ByteModel(watchVar.ByteCount.Value - 1 - i, 0, _dataGridViewBits, this));
+                _bytes.Add(new ByteModel(_memoryDescriptor.ByteCount.Value - 1 - i, 0, _dataGridViewBits, this));
             }
             _dataGridViewBits.DataSource = _bytes;
             _dataGridViewBits.CellContentClick += (sender, e) =>
@@ -67,7 +77,14 @@ namespace STROOP.Forms
                 _hasDoneColoring = true;
             }
 
-            List<object> values = _watchVar.GetValues(_fixedAddressList);
+            List<object> values = _addressGetter().Select(address => Config.Stream.GetValue(
+                    _memoryDescriptor.MemoryType,
+                    address,
+                    _memoryDescriptor.UseAbsoluteAddressing,
+                    _memoryDescriptor.Mask,
+                    _memoryDescriptor.Shift
+                    )
+                ).ToList();
             if (values.Count == 0) return;
             object value = values[0];
             if (!TypeUtilities.IsNumber(value))
@@ -91,7 +108,7 @@ namespace STROOP.Forms
             else
             {
                 _textBoxDecValue.Text = value.ToString();
-                _textBoxHexValue.Text = HexUtilities.FormatMemory(value, _watchVar.NibbleCount.Value);
+                _textBoxHexValue.Text = HexUtilities.FormatMemory(value, _memoryDescriptor.NibbleCount.Value);
                 _textBoxBinaryValue.Text = String.Join(" ", _bytes.ToList().ConvertAll(b => b.GetBinary()));
             }
         }
@@ -99,14 +116,15 @@ namespace STROOP.Forms
         public void SetValueInMemory()
         {
             byte[] bytes = _reversedBytes.ConvertAll(b => b.GetByteValue()).ToArray();
-            if (TypeUtilities.ConvertBytes(_watchVar.MemoryType, bytes) is IConvertible validValue)
-                _watchVar.SetValue(validValue);
+            if (TypeUtilities.ConvertBytes(_memoryDescriptor.MemoryType, bytes) is IConvertible validValue)
+                foreach (var address in _addressGetter())
+                    Config.Stream.SetValue(_memoryDescriptor.MemoryType, validValue, address, _memoryDescriptor.UseAbsoluteAddressing, _memoryDescriptor.Mask, _memoryDescriptor.Shift);
         }
 
         private void DoColoring()
         {
             // Color specially the differents parts of a float
-            if (_watchVar.MemoryType == typeof(float))
+            if (_memoryDescriptor.MemoryType == typeof(float))
             {
                 Color signColor = Color.LightBlue;
                 Color exponentColor = Color.Pink;

@@ -18,7 +18,7 @@ namespace STROOP.Core.WatchVariables
             return false;
         });
 
-        public WatchVariableTriangleWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl)
+        public WatchVariableTriangleWrapper(NamedVariableCollection.IVariableView<uint> watchVar, WatchVariableControl watchVarControl)
             : base(watchVar, watchVarControl)
         {
             AddTriangleContextMenuStripItems();
@@ -29,9 +29,6 @@ namespace STROOP.Core.WatchVariables
             _watchVarControl.AddSetting(SelectTriangleSetting);
         }
 
-        protected override string GetClass()
-        {
-            return "Triangle";
-        }
+        public override string GetClass() => "Triangle";
     }
 }

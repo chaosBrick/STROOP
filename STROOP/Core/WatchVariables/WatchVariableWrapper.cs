@@ -1,12 +1,10 @@
 ﻿using STROOP.Forms;
-using STROOP.Structs.Configurations;
-using STROOP.Utilities;
+using STROOP.Structs;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-
 using System.Drawing;
-using System.Windows.Forms;
+using System.Linq;
 
 // TODO: this shouldn't be required
 using STROOP.Controls;
@@ -22,73 +20,56 @@ namespace STROOP.Core.WatchVariables
 
     public abstract class WatchVariableWrapper
     {
-        static Dictionary<string, Type> wrapperTypes = new Dictionary<string, Type>();
-        static WatchVariableWrapper()
-        {
-            foreach (var t in typeof(WatchVariableWrapper<>).Assembly.GetTypes())
-                if (t.IsSubclassOf(typeof(WatchVariableWrapper<>)) && !t.IsGenericType && !t.IsAbstract)
-                    if (t.Name.StartsWith("WatchVariable") && t.Name.EndsWith("Wrapper"))
-                        wrapperTypes[t.Name.Substring("WatchVariable".Length, t.Name.Length - ("WatchVariable".Length + "Wrapper".Length))] = t;
-        }
+        public readonly NamedVariableCollection.IVariableView _view;
 
-        public static Type GetWrapperType(string name)
-        {
-            if (wrapperTypes.TryGetValue(name, out var result))
-                return result;
-            return typeof(WatchVariableNumberWrapper);
-        }
+        public event Action ValueSet = () => { };
 
-        public readonly WatchVariable WatchVar;
         protected readonly WatchVariableControl _watchVarControl;
-
         protected CarretlessTextBox textBox = null;
         protected Action editValueHandler;
 
         public virtual WatchVariablePanel.CustomDraw CustomDrawOperation => null;
 
-        protected WatchVariableWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl)
+        protected WatchVariableWrapper(NamedVariableCollection.IVariableView watchVar, WatchVariableControl watchVarControl)
         {
-            WatchVar = watchVar;
+            _view = watchVar;
             _watchVarControl = watchVarControl;
         }
 
         public void ShowControllerForm()
         {
-            VariableControllerForm varController =
-                new VariableControllerForm(
-                    _watchVarControl.VarName,
-                    this,
-                    _watchVarControl.FixedAddressListGetter());
-            varController.Show();
+            new VariableControllerForm(_watchVarControl.VarName, this).Show();
         }
 
         public void ShowVarInfo()
         {
+            var memoryDescriptor = (_view as NamedVariableCollection.IMemoryDescriptorVariableView)?.memoryDescriptor;
             VariableViewerForm varInfo =
                 new VariableViewerForm(
                     name: _watchVarControl.VarName,
                     clazz: GetClass(),
-                    type: WatchVar.GetTypeDescription(),
-                    baseTypeOffset: WatchVar.GetBaseTypeOffsetDescription(),
-                    n64BaseAddress: WatchVar.GetBaseAddressListString(_watchVarControl.FixedAddressListGetter()),
-                    emulatorBaseAddress: WatchVar.GetProcessAddressListString(_watchVarControl.FixedAddressListGetter()),
-                    n64Address: WatchVar.GetRamAddressListString(true, _watchVarControl.FixedAddressListGetter()),
-                    emulatorAddress: WatchVar.GetProcessAddressListString(_watchVarControl.FixedAddressListGetter()));
+                    type: memoryDescriptor?.GetTypeDescription() ?? "special",
+                    baseTypeOffset: memoryDescriptor?.GetBaseTypeOffsetDescription() ?? "<none>",
+                    n64BaseAddress: memoryDescriptor?.GetBaseAddressListString() ?? "<none>",
+                    emulatorBaseAddress: memoryDescriptor?.GetProcessAddressListString() ?? "<none>",
+                    n64Address: memoryDescriptor?.GetRamAddressListString(true) ?? "<none>",
+                    emulatorAddress: memoryDescriptor?.GetProcessAddressListString() ?? "<none>");
             varInfo.Show();
         }
 
         public List<string> GetVarInfo()
         {
+            var memoryDescriptor = (_view as NamedVariableCollection.MemoryDescriptorView)?.memoryDescriptor;
             return new List<string>()
             {
                 _watchVarControl.VarName,
                 GetClass(),
-                WatchVar.GetTypeDescription(),
-                WatchVar.GetBaseTypeOffsetDescription(),
-                WatchVar.GetBaseAddressListString(_watchVarControl.FixedAddressListGetter()),
-                WatchVar.GetProcessAddressListString(_watchVarControl.FixedAddressListGetter()),
-                WatchVar.GetRamAddressListString(true, _watchVarControl.FixedAddressListGetter()),
-                WatchVar.GetProcessAddressListString(_watchVarControl.FixedAddressListGetter()),
+                memoryDescriptor?.GetTypeDescription() ?? "special",
+                memoryDescriptor?.GetBaseTypeOffsetDescription(),
+                memoryDescriptor?.GetBaseAddressListString(),
+                memoryDescriptor?.GetProcessAddressListString(),
+                memoryDescriptor?.GetRamAddressListString(true),
+                memoryDescriptor?.GetProcessAddressListString(),
             };
         }
 
@@ -109,102 +90,28 @@ namespace STROOP.Core.WatchVariables
 
         public void ShowBitForm()
         {
-            if (WatchVar.IsSpecial) return;
-            VariableBitForm varController =
-                new VariableBitForm(
-                    _watchVarControl.VarName,
-                    WatchVar,
-                    _watchVarControl.FixedAddressListGetter());
-            varController.Show();
+            if (_view is NamedVariableCollection.IMemoryDescriptorVariableView compatible)
+                new VariableBitForm(compatible.Name, compatible.memoryDescriptor, true).Show();
         }
 
-        public abstract bool TrySetValue(string value, List<uint> addresses = null);
+        public abstract bool TrySetValue(string value);
 
         public virtual void SingleClick(Control parentCtrl, Rectangle bounds) { }
-        public virtual void DoubleClick(Control parentCtrl, Rectangle bounds)
-            => Edit(parentCtrl, bounds);
+        public virtual void DoubleClick(Control parentCtrl, Rectangle bounds) => Edit(parentCtrl, bounds);
 
-        public virtual void Edit(Control parent, Rectangle bounds)
-        {
-            if (editValueHandler != null)
-                editValueHandler();
-            else
-            {
-                textBox = new CarretlessTextBox();
-                textBox.Bounds = bounds;
-                textBox.Text = GetValueText();
-
-                bool updateValue = true;
-                textBox.Multiline = false;
-                textBox.KeyDown += (_, e) =>
-                {
-                    updateValue = true;
-                    if (e.KeyCode == Keys.Enter)
-                        textBox.Parent.Focus();
-                    else if (e.KeyCode == Keys.Escape)
-                    {
-                        updateValue = false;
-                        textBox.Parent.Focus();
-                    }
-                };
-                EventHandler HandleLostFocus = null;
-                HandleLostFocus = (_, e) =>
-                {
-                    if (updateValue)
-                        WatchVar.SetValue(textBox.Text);
-                    textBox.LostFocus -= HandleLostFocus;
-                    textBox.Parent.Controls.Remove(textBox);
-                    textBox.Dispose();
-                };
-
-                textBox.LostFocus += HandleLostFocus;
-                parent.Controls.Add(textBox);
-                textBox.Focus();
-            }
-        }
-
-        public Type GetMemoryType()
-        {
-            return WatchVar.MemoryType;
-        }
-
-        public IEnumerable<uint> GetBaseAddresses(List<uint> addresses = null)
-        {
-            return addresses ?? WatchVar.GetBaseAddressList();
-        }
-
-        public List<uint> GetCurrentAddressesToFix()
-        {
-            return new List<uint>(WatchVar.GetBaseAddressList());
-        }
-
-        protected abstract string GetClass();
-        public abstract string GetValueText(List<uint> overrideAddresses = null);
+        public abstract void Edit(Control parent, Rectangle bounds);
+        public abstract string GetClass();
+        public abstract string GetValueText();
         public abstract void UpdateControls();
         public virtual void ToggleDisplay() { }
 
-        // TODO: This does NOT belong here
-        public void ViewInMemoryTab()
-        {
-            if (WatchVar.IsSpecial) return;
-            List<uint> addressList = WatchVar.GetAddressList(_watchVarControl.FixedAddressListGetter());
-            if (addressList.Count == 0) return;
-            uint address = addressList[0];
-            Config.TabControlMain.SelectedTab = Config.TabControlMain.TabPages["tabPageMemory"];
-            var tab = AccessScope<StroopMainForm>.content.GetTab<Tabs.MemoryTab>();
-            tab.SetCustomAddress(address);
-            tab.UpdateHexDisplay();
-        }
-
-        // TODO: This does NOT belong here
-        public void ToggleLocked(bool? newLockedValueNullable, List<uint> addresses = null)
-        {
-            WatchVar.SetLocked(newLockedValueNullable ?? !WatchVar.locked, addresses);
-        }
+        protected void OnValueSet() => ValueSet();
     }
 
-    public abstract class WatchVariableWrapper<TBackingValue> : WatchVariableWrapper where TBackingValue : IConvertible
+    public abstract class WatchVariableWrapper<TBackingValue> : WatchVariableWrapper
     {
+        public NamedVariableCollection.IVariableView<TBackingValue> view => (NamedVariableCollection.IVariableView<TBackingValue>)_view;
+
         protected static Func<WatchVariableControl, object, bool> CreateBoolWithDefault<TWrapper>(
             Action<TWrapper, bool> setValue,
             Func<TWrapper, bool> getDefault
@@ -231,24 +138,66 @@ namespace STROOP.Core.WatchVariables
                 return false;
             };
 
-        protected WatchVariableWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl)
+        protected WatchVariableWrapper(NamedVariableCollection.IVariableView watchVar, WatchVariableControl watchVarControl)
             : base(watchVar, watchVarControl)
         { }
 
-        public (CombinedValuesMeaning meaning, TBackingValue value) CombineValues(List<uint> overrideAddresses = null)
+        public (CombinedValuesMeaning meaning, TBackingValue value) CombineValues()
         {
-            var values = WatchVar.GetValuesAs<TBackingValue>(overrideAddresses);
-            if (values.Count == 0) return (CombinedValuesMeaning.NoValue, default(TBackingValue));
+            var values = view._getterFunction().ToArray();
+            if (values.Length == 0) return (CombinedValuesMeaning.NoValue, default(TBackingValue));
             TBackingValue firstValue = values[0];
-            for (int i = 1; i < values.Count; i++)
+            for (int i = 1; i < values.Length; i++)
                 if (!Equals(values[i], firstValue))
                     return (CombinedValuesMeaning.MultipleValues, default(TBackingValue));
             return (CombinedValuesMeaning.SameValue, firstValue);
         }
 
-        public override sealed string GetValueText(List<uint> overrideAddresses = null)
+        public override void Edit(Control parent, Rectangle bounds)
         {
-            var combinedValues = CombineValues(overrideAddresses);
+            if (editValueHandler != null)
+                editValueHandler();
+            else
+            {
+                textBox = new CarretlessTextBox();
+                textBox.Bounds = bounds;
+                textBox.Text = GetValueText();
+
+                bool updateValue = true;
+                textBox.Multiline = false;
+                textBox.KeyDown += (_, e) =>
+                {
+                    updateValue = true;
+                    if (e.KeyCode == Keys.Enter)
+                        textBox.Parent.Focus();
+                    else if (e.KeyCode == Keys.Escape)
+                    {
+                        updateValue = false;
+                        textBox.Parent.Focus();
+                    }
+                };
+                EventHandler HandleLostFocus = null;
+                HandleLostFocus = (_, e) =>
+                {
+                    if (updateValue && TryParseValue(textBox.Text, out var validValue))
+                    {
+                        if (view._setterFunction(validValue).Aggregate(true, (a, b) => a && b))
+                            OnValueSet();
+                    }
+                    textBox.LostFocus -= HandleLostFocus;
+                    textBox.Parent.Controls.Remove(textBox);
+                    textBox.Dispose();
+                };
+
+                textBox.LostFocus += HandleLostFocus;
+                parent.Controls.Add(textBox);
+                textBox.Focus();
+            }
+        }
+
+        public override sealed string GetValueText()
+        {
+            var combinedValues = CombineValues();
             switch (combinedValues.meaning)
             {
                 case CombinedValuesMeaning.NoValue:
@@ -262,11 +211,11 @@ namespace STROOP.Core.WatchVariables
             }
         }
 
-        public override sealed bool TrySetValue(string value, List<uint> addresses)
+        public override sealed bool TrySetValue(string value)
         {
             var success = TryParseValue(value, out var result);
             if (success)
-                WatchVar.SetValue(result, addresses);
+                view._setterFunction(result);
             return success;
         }
 

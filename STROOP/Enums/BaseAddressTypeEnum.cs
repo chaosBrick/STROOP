@@ -22,6 +22,8 @@
         File,
         MainSave,
         Object,
+        ProcessGroup,
+        Coin,
         Triangle,
         Area;
     };

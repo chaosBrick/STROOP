@@ -1,14 +1,169 @@
 ﻿using STROOP.Structs.Configurations;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using STROOP.Utilities;
+using STROOP.Core.WatchVariables;
+
+// TODO: This shouldn't be necessary
+using STROOP.Controls;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace STROOP.Structs
 {
     public static class WatchVariableUtilities
     {
+        private class WatchVariableWrapperFallback : WatchVariableWrapper
+        {
+            public WatchVariableWrapperFallback(NamedVariableCollection.IVariableView watchVar, WatchVariableControl watchVarControl)
+                : base(watchVar, watchVarControl)
+            { }
+
+            public override void Edit(Control parent, Rectangle bounds) { }
+
+            public override string GetClass() => "INVALID VARIABLE";
+
+            public override string GetValueText() => "INVALID VARIABLE";
+
+            public override bool TrySetValue(string value) => false;
+
+            public override void UpdateControls() { }
+        }
+
+        static readonly Dictionary<string, List<(Type wrapperType, Type typeRestriction)>> wrapperTypes = new Dictionary<string, List<(Type, Type)>>();
+
+        static readonly Regex WatchVariableTypeNameRegex = new Regex("(?<=(^WatchVariable))[a-zA-Z0-9]+(?=(Wrapper))", RegexOptions.Compiled);
+
+        static WatchVariableUtilities()
+        {
+            GeneralUtilities.ExecuteInitializers<InitializeBaseAddressAttribute>();
+            foreach (var t in typeof(WatchVariableWrapper<>).Assembly.GetTypes())
+            {
+                var match = WatchVariableTypeNameRegex.Match(t.Name);
+                if (match.Success)
+                    if (!t.IsAbstract && t.IsPublic && TypeUtilities.MatchesGenericType(typeof(WatchVariableWrapper<>), t))
+                    {
+                        foreach (var ctor in t.GetConstructors())
+                        {
+                            var parameters = ctor.GetParameters();
+                            if (parameters[0].ParameterType.IsGenericType
+                                && parameters[0].ParameterType.GetGenericTypeDefinition() == typeof(NamedVariableCollection.IVariableView<>)
+                                && parameters[1].ParameterType == typeof(WatchVariableControl))
+                            {
+                                if (!wrapperTypes.TryGetValue(match.Value, out var wrapperTypeList))
+                                    wrapperTypes[match.Value] = wrapperTypeList = new List<(Type wrapperType, Type typeRestriction)>();
+                                wrapperTypeList.Add((t, parameters[0].ParameterType.GetGenericArguments()[0]));
+                                break;
+                            }
+                        };
+                    }
+            }
+        }
+
+        public static Type GetWrapperType(Type potentiallyNullableVariableType, string wrapperTypeName = "Number")
+        {
+            Type GetNonNullableWrapper(Type variableType)
+            {
+                int GenericTypeArgumentsLength((Type a, Type b) w) => w.a.GetGenericArguments().Length;
+
+                bool Passt(Type restrictionType) =>
+                    (variableType == restrictionType
+                    || variableType.IsSubclassOf(restrictionType)
+                    || variableType.GetInterfaces().Any(i => i == restrictionType));
+                bool CanWrap((Type wrapperType, Type typeRestriction) wrapper, out Type result)
+                {
+                    result = null;
+                    if (wrapper.typeRestriction.IsGenericParameter
+                        ? wrapper.typeRestriction.GetGenericParameterConstraints().All(r => Passt(r))
+                        : Passt(wrapper.typeRestriction)
+                        )
+                    {
+                        var innermostType = wrapper.wrapperType;
+                        Stack<Type> genericTypeArguments = new Stack<Type>();
+                        genericTypeArguments.Push(wrapper.wrapperType);
+
+                        while (innermostType != null && innermostType.GetGenericArguments().Length == 2)
+                        {
+                            innermostType = innermostType.GetGenericArguments()[0];
+                            if (innermostType == null)
+                                return false;
+                            var newArgs = innermostType.GetGenericArguments();
+                            if (newArgs.Length > 2)
+                                return false;
+                            genericTypeArguments.Push(innermostType
+                                .GetGenericParameterConstraints()
+                                .FirstOrDefault(c => c.IsClass)
+                                ?.GetGenericTypeDefinition()
+                                );
+                        }
+
+                        if (wrapper.wrapperType.IsGenericType)
+                        {
+                            genericTypeArguments.Push(variableType);
+                            while (genericTypeArguments.Count > 1)
+                            {
+                                var qualifiedType = genericTypeArguments.Pop();
+                                var genericType = genericTypeArguments.Pop();
+                                if (genericType == null)
+                                    return false;
+                                genericTypeArguments.Push(genericType.MakeGenericType(genericType.GetGenericArguments().Length == 2 ? new[] { qualifiedType, variableType } : new[] { qualifiedType }));
+                            }
+                        }
+
+                        result = genericTypeArguments.Pop();
+                    }
+                    else if (Passt(wrapper.typeRestriction))
+                        result = wrapper.wrapperType;
+                    return result != null;
+                }
+                if (wrapperTypes.TryGetValue(wrapperTypeName, out var specificCandidateList))
+                    foreach (var specificCandidate in specificCandidateList.OrderBy(GenericTypeArgumentsLength))
+                        if (CanWrap(specificCandidate, out var specificWrapper))
+                            return specificWrapper;
+
+                foreach (var fallbackCandidate in wrapperTypes.Values.SelectMany(list => list).OrderBy(GenericTypeArgumentsLength))
+                    if (CanWrap(fallbackCandidate, out var fallbackWrapper))
+                        return fallbackWrapper;
+
+                return null;
+            }
+
+            bool isNullable = potentiallyNullableVariableType.IsGenericType && potentiallyNullableVariableType.GetGenericTypeDefinition() == typeof(Nullable<>);
+            var nonNullableWrapper = GetNonNullableWrapper(isNullable ? potentiallyNullableVariableType.GetGenericArguments()[0] : potentiallyNullableVariableType);
+            if (nonNullableWrapper != null)
+                return isNullable
+                        ? typeof(WatchVariableNullableWrapper<,>).MakeGenericType(nonNullableWrapper, nonNullableWrapper.GetGenericArguments()[0])
+                        : nonNullableWrapper;
+
+            System.Diagnostics.Debugger.Break();
+            throw new InvalidOperationException($"{potentiallyNullableVariableType.FullName} could not be wrapped!");
+        }
+
+        public static bool TryCreateWrapper(NamedVariableCollection.IVariableView view, WatchVariableControl control, out WatchVariableWrapper result)
+        {
+            result = null;
+            var interfaceType = view.GetType().GetInterfaces().FirstOrDefault(x => x.Name == $"{nameof(NamedVariableCollection.IVariableView)}`1");
+            if (interfaceType == null)
+            {
+                result = new WatchVariableWrapperFallback(view, control);
+                return false;
+            }
+
+            var wrapperType = view.GetWrapperType();
+            var constructor = wrapperType.GetConstructor(new Type[] { interfaceType, typeof(WatchVariableControl) });
+            if (constructor == null)
+            {
+                result = new WatchVariableWrapperFallback(view, control);
+                return false;
+            }
+
+            result = (WatchVariableWrapper)constructor.Invoke(new object[] { view, control });
+            return true;
+        }
+
         public static SortedDictionary<string, Func<IEnumerable<uint>>> baseAddressGetters = new SortedDictionary<string, Func<IEnumerable<uint>>>();
-        static WatchVariableUtilities() => GeneralUtilities.ExecuteInitializers<InitializeBaseAddressAttribute>();
 
         //TODO: Move some of these where they belong
         [InitializeBaseAddress]
@@ -74,7 +229,7 @@ namespace STROOP.Structs
         private static List<uint> GetBaseAddressListZero() => BaseAddressListZero;
         private static List<uint> GetBaseAddressListEmpty() => BaseAddressListEmpty;
 
-        public static IEnumerable<uint> GetBaseAddressListFromBaseAddressType(string baseAddressType)
+        public static IEnumerable<uint> GetBaseAddresses(string baseAddressType)
         {
             if (baseAddressGetters.TryGetValue(baseAddressType, out var result))
                 return result();

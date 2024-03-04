@@ -3,6 +3,7 @@ using STROOP.Core.WatchVariables;
 using STROOP.Structs;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using OpenTK;
 
@@ -80,23 +81,22 @@ namespace STROOP.Utilities
 
         private static void CopyAsTable(List<WatchVariableControl> controls)
         {
-            if (controls.Count == 0) return;
-            List<uint> addresses = controls[0].GetBaseAddresses();
-            if (addresses.Count == 0) return;
-            List<string> hexAddresses = addresses.ConvertAll(address => HexUtilities.FormatValue(address));
-            string header = "Vars\t" + string.Join("\t", hexAddresses);
+            // TODO: reconsider CopyAsTable
+            //if (controls.Count == 0) return;
+            //List<string> hexAddresses = controls.Select(x => x.view as NamedVariableCollection.MemoryDescriptorView).Where(x => x != null).ConvertAll(address => HexUtilities.FormatValue(address));
+            //string header = "Vars\t" + string.Join("\t", hexAddresses);
 
-            List<string> names = controls.ConvertAll(control => control.VarName);
-            List<List<object>> valuesTable = controls.ConvertAll(control => control.WatchVar.GetValues());
-            List<string> valuesStrings = new List<string>();
-            for (int i = 0; i < names.Count; i++)
-            {
-                string line = names[i] + "\t" + string.Join("\t", valuesTable[i]);
-                valuesStrings.Add(line);
-            }
+            //List<string> names = controls.ConvertAll(control => control.VarName);
+            //List<List<object>> valuesTable = controls.ConvertAll(control => control.view.GetValues());
+            //List<string> valuesStrings = new List<string>();
+            //for (int i = 0; i < names.Count; i++)
+            //{
+            //    string line = names[i] + "\t" + string.Join("\t", valuesTable[i]);
+            //    valuesStrings.Add(line);
+            //}
 
-            string output = header + "\r\n" + string.Join("\r\n", valuesStrings);
-            Clipboard.SetText(output);
+            //string output = header + "\r\n" + string.Join("\r\n", valuesStrings);
+            //Clipboard.SetText(output);
         }
 
         private static void CopyForCode(List<WatchVariableControl> controls)
@@ -119,7 +119,7 @@ namespace STROOP.Utilities
                 Type type = watchVar.GetMemoryType();
                 string line = string.Format(
                     "{0} {1} = {2}{3};",
-                    type != null ? TypeUtilities.TypeToString[watchVar.GetMemoryType()] : "double",
+                    type != null ? TypeUtilities.TypeToString[type] : "double",
                     varNameFunc(watchVar.VarName.Replace(" ", "")),
                     // TODO: indicate that the watchVarWrapper should produce code conforming output (whatever that means)
                     watchVar.WatchVarWrapper.GetValueText(),

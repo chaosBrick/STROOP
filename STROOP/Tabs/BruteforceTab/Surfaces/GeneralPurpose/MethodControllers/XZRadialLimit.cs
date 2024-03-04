@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using System.Linq;
 using OpenTK;
 using STROOP.Tabs.MapTab;
 using STROOP.Structs.Configurations;
@@ -36,7 +37,12 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
         readonly HoverData hover;
         XZRadialLimit parent;
         float x, z;
-        WatchVariable[] vars;
+        IBruteforceVariableView[] vars;
+        BruteforceVariableView<float> varX => vars[0] as BruteforceVariableView<float>;
+        BruteforceVariableView<float> varZ => vars[1] as BruteforceVariableView<float>;
+        BruteforceVariableView<float> varSize => vars[2] as BruteforceVariableView<float>;
+        BruteforceVariableView<bool> varApproach => vars[3] as BruteforceVariableView<bool>;
+
         IgnoreScope ignoreUpdates = new IgnoreScope();
 
         public XZRadialLimitMapObject() : base(null) { hover = new HoverData(this); }
@@ -50,21 +56,21 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
         {
             this.parent = parent;
             enableDragging = true;
-            vars = parent.parameterPanel.GetWatchVariablesByName("x", "z", "dist", "approach");
+            vars = parent.parameterPanel.GetWatchVariablesByName("x", "z", "dist", "approach").Select(x => x as IBruteforceVariableView).ToArray();
             Action updateFromControl = () =>
             {
                 if (ignoreUpdates)
                     return;
-                x = vars[0].GetValueAs<float>();
-                z = vars[1].GetValueAs<float>();
-                Size = vars[2].GetValueAs<float>();
+                x = varX?._getterFunction().FirstOrDefault() ?? 0;
+                z = varZ?._getterFunction().FirstOrDefault() ?? 0;
+                Size = varSize?._getterFunction().FirstOrDefault() ?? 0;
             };
             foreach (var var in vars)
                 var.ValueSet += updateFromControl;
             SizeChanged += () =>
             {
                 using (ignoreUpdates.New())
-                    vars[2].SetValue(Size);
+                    (vars[2] as NamedVariableCollection.IVariableView<float>)?._setterFunction(Size);
             };
             updateFromControl();
         }
@@ -73,9 +79,9 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
         {
             using (ignoreUpdates.New())
             {
-                vars[0].SetValue(x);
-                vars[1].SetValue(z);
-                vars[2].SetValue(Size);
+                varX?._setterFunction(x);
+                varZ?._setterFunction(z);
+                varSize?._setterFunction(Size);
             }
         }
 
@@ -91,7 +97,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
             base.DrawTopDown(graphics);
             graphics.drawLayers[(int)MapGraphics.DrawLayers.FillBuffers].Add(() =>
             {
-                if (vars[3].GetValueAs<bool>() /* approach */)
+                if (varApproach?._getterFunction().FirstOrDefault() ?? false /* approach */)
                 {
                     var szThing = 40.0f / graphics.MapViewScaleValue;
                     var szThing2 = 10.0f / graphics.MapViewScaleValue;

@@ -21,65 +21,67 @@ namespace STROOP.Utilities
                 ("Base Info",
                 pa =>
                 {
-                    WatchVariable MakePATypeView(WatchVariable.CustomView view)
+                    T MakePATypeView<T>(T view) where T : NamedVariableCollection.IVariableView
                     {
-                        view.SetValueByKey(WatchVariable.ViewProperties.specialType, "PositionAngle");
-                        return new WatchVariable(view);
+                        view.SetValueByKey(NamedVariableCollection.ViewProperties.specialType, "PositionAngle");
+                        return view;
                     }
-                    var vars = new[]
+                    var vars = new NamedVariableCollection.CustomView[]
                         {
-                        MakePATypeView(new WatchVariable.CustomView(typeof(WatchVariableStringWrapper)) {
+                        MakePATypeView(new NamedVariableCollection.CustomView<string>(typeof(WatchVariableStringWrapper)) {
                             Name = $"{pa.name} Pos Type",
                             Color = "Blue",
-                            _getterFunction = _ => pa.first().ToString(),
-                            _setterFunction = (newPAString, _) => {
+                            _getterFunction = () => pa.first().ToString().Yield(),
+                            _setterFunction = newPAString => {
                                 var newPA = PositionAngle.FromString((string)newPAString);
-                                if(newPA == null) return false;
+                                if(newPA == null)
+                                    return false.Yield();
                                 pa.first = () => newPA;
-                                return true;
+                                return true.Yield();
                             }
                         }),
-                        MakePATypeView(new WatchVariable.CustomView(typeof(WatchVariableStringWrapper)) {
+                        MakePATypeView(new NamedVariableCollection.CustomView<string>(typeof(WatchVariableStringWrapper)) {
                             Name = $"{pa.name} Angle Type",
                             Color = "Blue",
-                            _getterFunction = _ => pa.second().ToString(),
-                            _setterFunction = (newPAString, _) => {
+                            _getterFunction = () => pa.second().ToString().Yield(),
+                            _setterFunction = newPAString => {
                                 var newPA = PositionAngle.FromString((string)newPAString);
-                                if(newPA == null) return false;
+                                if(newPA == null)
+                                    return false.Yield();
                                 pa.second = () => newPA;
-                                return true;
+                                return true.Yield();
                             }
                         }),
-                        new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper)) {
+                        new NamedVariableCollection.CustomView<double>(typeof(WatchVariableNumberWrapper<double>)) {
                             Name = $"{pa.name} X",
                             Color = "Blue",
-                            _getterFunction = _ => pa.first().X,
-                            _setterFunction = (val, _) => pa.first().SetX(Convert.ToDouble(val))
-                        }),
-                        new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper)) {
+                            _getterFunction = () => pa.first().X.Yield(),
+                            _setterFunction = val => pa.first().SetX(val).Yield()
+                        },
+                        new NamedVariableCollection.CustomView<double>(typeof(WatchVariableNumberWrapper<double>)) {
                             Name = $"{pa.name} Y",
                             Color = "Blue",
-                            _getterFunction = _ => pa.first().Y,
-                            _setterFunction = (val, _) => pa.first().SetY(Convert.ToDouble(val))
-                        }),
-                        new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper)) {
+                            _getterFunction = () => pa.first().Y.Yield(),
+                            _setterFunction = val => pa.first().SetY(val).Yield()
+                        },
+                        new NamedVariableCollection.CustomView<double>(typeof(WatchVariableNumberWrapper<double>)) {
                             Name = $"{pa.name} Z",
                             Color = "Blue",
-                            _getterFunction = _ => pa.first().Z,
-                            _setterFunction = (val, _) => pa.first().SetZ(Convert.ToDouble(val))
-                        }),
-                        new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableAngleWrapper)) {
+                            _getterFunction = () => pa.first().Z.Yield(),
+                            _setterFunction = val => pa.first().SetZ(val).Yield()
+                        },
+                        new NamedVariableCollection.CustomView<double>(typeof(WatchVariableAngleWrapper<double>)) {
                             Name = $"{pa.name} Angle",
                             Color = "Blue",
                             Display = "short",
-                            _getterFunction = _ => pa.second().Angle,
-                            _setterFunction = (val, _) => pa.second().SetAngle(Convert.ToDouble(val))
-                        }),
+                            _getterFunction = () => pa.second().Angle.Yield(),
+                            _setterFunction = val => pa.second().SetAngle(val).Yield()
+                        },
                     };
                     pa.OnDelete += () =>
                     {
                         foreach (var v in vars)
-                            v.view.OnDelete();
+                            v.OnDelete();
                     };
                     return vars;
                 }
@@ -89,7 +91,7 @@ namespace STROOP.Utilities
                 ($"Relations to {relation.name}",
                (HybridPositionAngle pa) =>
                 {
-                    List<WatchVariable> vars = new List<WatchVariable>();
+                    List<NamedVariableCollection.IVariableView> vars = new List<NamedVariableCollection.IVariableView>();
                     var distTypes = new[] { "X", "Y", "Z", "H", "", "F", "S" };
                     var distGetters = new Func<PositionAngle, PositionAngle, double>[]
                         {
@@ -118,50 +120,46 @@ namespace STROOP.Utilities
                         Func<PositionAngle, PositionAngle, double> getter = distGetters[k];
                         Func<PositionAngle, PositionAngle, double, bool> setter = distSetters[k];
 
-                        vars.Add(new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                        vars.Add(new NamedVariableCollection.CustomView<double>(typeof(WatchVariableNumberWrapper<double>))
                         {
                             Color = "LightBlue",
                             Name = $"{distType}Dist {relation.name} To {pa.name}",
-                            _getterFunction = (uint address) => getter(relation, pa),
-                            _setterFunction = (object dist, uint address) => setter(relation, pa, Convert.ToDouble(dist))
-                        }
-                        ));
+                            _getterFunction = () => getter(relation, pa).Yield(),
+                            _setterFunction = (double dist) => setter(relation, pa, dist).Yield()
+                        });
                     }
 
-                    vars.Add(new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableAngleWrapper))
+                    vars.Add(new NamedVariableCollection.CustomView<double>(typeof(WatchVariableAngleWrapper<double>))
                     {
                         Color = "LightBlue",
                         Name = $"Angle {relation.name} To {pa.name}",
                         Display = "short",
-                        _getterFunction = (uint address) => GetAngleTo(relation, pa, null, false),
-                        _setterFunction = (object angle, uint address) => SetAngleTo(relation, pa, Convert.ToDouble(angle))
-                    }
-                    ));
+                        _getterFunction = () => GetAngleTo(relation, pa).Yield(),
+                        _setterFunction = (double angle) => SetAngleTo(relation, pa, angle).Yield()
+                    });
 
-                    vars.Add(new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableAngleWrapper))
+                    vars.Add(new NamedVariableCollection.CustomView<double>(typeof(WatchVariableAngleWrapper<double>))
                     {
                         Color = "LightBlue",
                         Name = $"DAngle {relation.name} To {pa.name}",
                         Display = "short",
-                        _getterFunction = (uint address) => GetDAngleTo(relation, pa, null, false),
-                        _setterFunction = (object angleDiff, uint address) => SetDAngleTo(relation, pa, Convert.ToDouble(angleDiff))
-                    }
-                    ));
+                        _getterFunction = () => GetDAngleTo(relation, pa).Yield(),
+                        _setterFunction = (double angleDiff) => SetDAngleTo(relation, pa, Convert.ToDouble(angleDiff)).Yield()
+                    });
 
-                    vars.Add(new WatchVariable(new WatchVariable.CustomView(typeof(WatchVariableAngleWrapper))
+                    vars.Add(new NamedVariableCollection.CustomView<double>(typeof(WatchVariableAngleWrapper<double>))
                     {
                         Color = "LightBlue",
                         Name = $"AngleDiff {relation.name} To {pa.name}",
                         Display = "short",
-                        _getterFunction = (uint address) => GetAngleDifference(relation, pa, false),
-                        _setterFunction = (object angleDiff, uint address) => SetAngleDifference(relation, pa, Convert.ToDouble(angleDiff))
-                    }
-                    ));
+                        _getterFunction = () => GetAngleDifference(relation, pa).Yield(),
+                        _setterFunction = (double angleDiff) => SetAngleDifference(relation, pa, Convert.ToDouble(angleDiff)).Yield()
+                    });
 
                     Action remove = () =>
                     {
                         foreach (var v in vars)
-                            v.view.OnDelete();
+                            v.OnDelete();
                     };
                     pa.OnDelete += remove;
                     relation.OnDelete += remove;

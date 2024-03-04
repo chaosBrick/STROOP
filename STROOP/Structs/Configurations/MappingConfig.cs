@@ -103,21 +103,21 @@ namespace STROOP.Structs.Configurations
          *  Gets user added variables from the mapping,
          *  assuming they're suffixed with "_f32", "_s16", etc.
          */
-        public static IEnumerable<(WatchVariable, WatchVariable.IVariableView)> GetVariables()
+        public static IEnumerable<NamedVariableCollection.IVariableView> GetVariables()
         {
-            if (mappingCurrent == null) return new(WatchVariable, WatchVariable.IVariableView)[0];
+            if (mappingCurrent == null) return new NamedVariableCollection.IVariableView[0];
 
-            var controls = new List<(WatchVariable, WatchVariable.IVariableView)>();
-            foreach (uint address in mappingCurrent.Keys)
-            {
-                string stringValue = mappingCurrent[address];
-                (Type type, string name) = GetInfoIfUserAddedWord(stringValue);
-                if (type == null) continue;
-                string typeString = TypeUtilities.TypeToString[type];
+            var controls = new List<NamedVariableCollection.IVariableView>();
+            // TODO: get back the mapping feature, but cooler
+            //foreach (uint address in mappingCurrent.Keys)
+            //{
+            //    string stringValue = mappingCurrent[address];
+            //    (Type type, string name) = GetInfoIfUserAddedWord(stringValue);
+            //    if (type == null) continue;
+            //    string typeString = TypeUtilities.TypeToString[type];
 
-                WatchVariable watchVar = new WatchVariable(WatchVariable.DefaultView(name, false, type), BaseAddressType.Relative, address);
-                controls.Add((watchVar, watchVar.view));
-            }
+            //    controls.Add(new MemoryDescriptor(name, type));
+            //}
             return controls;
         }
 

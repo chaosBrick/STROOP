@@ -8,26 +8,29 @@ using STROOP.Controls;
 
 namespace STROOP.Core.WatchVariables
 {
-    public class WatchVariableBooleanWrapper : WatchVariableNumberWrapper
+    public abstract class WatchVariableBooleanWrapperBase<T> : WatchVariableWrapper<T>
     {
         public static readonly WatchVariableSetting DisplayAsCheckboxSetting = new WatchVariableSetting(
             "Boolean: Display as Checkbox",
-            CreateBoolWithDefault<WatchVariableBooleanWrapper>((wrapper, val) => wrapper._displayAsCheckbox = val, wrapper => wrapper._displayAsCheckbox),
-            ("Default", () => true, WrapperProperty<WatchVariableBooleanWrapper>(wr => wr._displayAsCheckbox == true)),
-            ("Display as Checkbox", () => true, WrapperProperty<WatchVariableBooleanWrapper>(wr => wr._displayAsCheckbox)),
-            ("Don't display as Checkbox", () => false, WrapperProperty<WatchVariableBooleanWrapper>(wr => !wr._displayAsCheckbox))
+            CreateBoolWithDefault<WatchVariableBooleanWrapperBase<T>>((wrapper, val) => wrapper._displayAsCheckbox = val, wrapper => wrapper._displayAsCheckbox),
+            ("Default", () => true, WrapperProperty<WatchVariableBooleanWrapperBase<T>>(wr => wr._displayAsCheckbox == true)),
+            ("Display as Checkbox", () => true, WrapperProperty<WatchVariableBooleanWrapperBase<T>>(wr => wr._displayAsCheckbox)),
+            ("Don't display as Checkbox", () => false, WrapperProperty<WatchVariableBooleanWrapperBase<T>>(wr => !wr._displayAsCheckbox))
             );
 
         public static readonly WatchVariableSetting DisplayAsInverted = new WatchVariableSetting(
             "Boolean: Display as Inverted",
-            CreateBoolWithDefault<WatchVariableBooleanWrapper>((wrapper, val) => wrapper._displayAsInverted = val, wrapper => wrapper._displayAsInverted),
-            ("Default", () => false, WrapperProperty<WatchVariableBooleanWrapper>(wr => wr._displayAsInverted == false)),
-            ("Display as Inverted", () => true, WrapperProperty<WatchVariableBooleanWrapper>(wr => wr._displayAsInverted)),
-            ("Don't display as Inverted", () => false, WrapperProperty<WatchVariableBooleanWrapper>(wr => !wr._displayAsInverted))
+            CreateBoolWithDefault<WatchVariableBooleanWrapperBase<T>>((wrapper, val) => wrapper._displayAsInverted = val, wrapper => wrapper._displayAsInverted),
+            ("Default", () => false, WrapperProperty<WatchVariableBooleanWrapperBase<T>>(wr => wr._displayAsInverted == false)),
+            ("Display as Inverted", () => true, WrapperProperty<WatchVariableBooleanWrapperBase<T>>(wr => wr._displayAsInverted)),
+            ("Don't display as Inverted", () => false, WrapperProperty<WatchVariableBooleanWrapperBase<T>>(wr => !wr._displayAsInverted))
             );
 
         private bool _displayAsCheckbox;
         private bool _displayAsInverted;
+
+        protected abstract T falseValue { get; }
+        protected abstract T trueValue { get; }
 
         public override void SingleClick(Control parent, Rectangle bounds)
         {
@@ -41,11 +44,11 @@ namespace STROOP.Core.WatchVariables
                 Edit(parent, bounds);
         }
 
-        public WatchVariableBooleanWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl)
+        public WatchVariableBooleanWrapperBase(NamedVariableCollection.IVariableView<T> watchVar, WatchVariableControl watchVarControl)
             : base(watchVar, watchVarControl)
         {
             _displayAsCheckbox = true;
-            if (bool.TryParse(watchVarControl.view.GetValueByKey(WatchVariable.ViewProperties.invertBool), out var invertBool))
+            if (bool.TryParse(watchVarControl.view.GetValueByKey(NamedVariableCollection.ViewProperties.invertBool), out var invertBool))
                 _displayAsInverted = invertBool;
             else
                 _displayAsInverted = false;
@@ -60,18 +63,16 @@ namespace STROOP.Core.WatchVariables
         }
 
         public override WatchVariablePanel.CustomDraw CustomDrawOperation => _displayAsCheckbox ? DrawCheckbox : (WatchVariablePanel.CustomDraw)null;
-        
-        public override void Edit(Control parent, Rectangle bounds)
+
+        public override sealed void Edit(Control parent, Rectangle bounds)
         {
             if (_displayAsCheckbox)
             {
                 var combinedValues = CombineValues();
                 if (combinedValues.meaning != CombinedValuesMeaning.SameValue)
-                    WatchVar.SetValue(0);
-                else if (Convert.ToDecimal(combinedValues.value) == 0)
-                    WatchVar.SetValue(WatchVar.Mask ?? 1);
+                    view._setterFunction(falseValue);
                 else
-                    WatchVar.SetValue(0);
+                    view._setterFunction(combinedValues.value.Equals(falseValue) ? trueValue : falseValue);
             }
             else
                 base.Edit(parent, bounds);
@@ -113,18 +114,43 @@ namespace STROOP.Core.WatchVariables
             return HandleInverting(doubleValue == 0) ? CheckState.Unchecked : CheckState.Checked;
         }
 
-        protected object ConvertCheckStateToValue(CheckState checkState)
-        {
-            if (checkState == CheckState.Indeterminate) return "";
-
-            object offValue = 0;
-            object onValue = WatchVar.Mask ?? 1;
-
-            return HandleInverting(checkState == CheckState.Unchecked) ? offValue : onValue;
-        }
-
         private bool HandleInverting(bool boolValue) => boolValue != _displayAsInverted;
 
-        protected override string GetClass() => "Boolean";
+        public override string GetClass() => "Boolean";
+
+        public override void UpdateControls() { }
+    }
+
+    public class WatchVariableBooleanWrapper : WatchVariableBooleanWrapperBase<bool>
+    {
+        protected override bool falseValue => false;
+
+        protected override bool trueValue => true;
+
+        public WatchVariableBooleanWrapper(NamedVariableCollection.IVariableView<bool> watchVar, WatchVariableControl watchVarControl)
+            : base(watchVar, watchVarControl)
+        { }
+
+        public override bool TryParseValue(string value, out bool result)
+            => bool.TryParse(value, out result);
+
+        public override string DisplayValue(bool value) => value.ToString();
+    }
+
+    public class WatchVariableBooleanWrapper<TNumber> : WatchVariableBooleanWrapperBase<TNumber> where TNumber : struct, IConvertible
+    {
+        public WatchVariableBooleanWrapper(NamedVariableCollection.IVariableView<TNumber> watchVar, WatchVariableControl watchVarControl)
+            : base(watchVar, watchVarControl)
+        { }
+
+        private static TNumber MaxValue = (TNumber)typeof(TNumber).GetField(nameof(MaxValue)).GetValue(null);
+
+        protected override TNumber falseValue => (TNumber)Convert.ChangeType(0, typeof(TNumber));
+        protected override TNumber trueValue => MaxValue;
+
+        public override bool TryParseValue(string value, out TNumber result)
+            => ParsingUtilities.TryParseNumber(value, out result);
+
+        public override string DisplayValue(TNumber value) => value.ToString();
     }
 }

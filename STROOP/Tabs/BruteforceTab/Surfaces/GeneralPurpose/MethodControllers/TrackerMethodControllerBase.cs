@@ -4,7 +4,7 @@ using STROOP.Utilities;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
 {
-    public abstract class TrackerMethodControllerBase<MapObjectType, ControllerType> : IMethodController
+    abstract class TrackerMethodControllerBase<MapObjectType, ControllerType> : IMethodController
         where MapObjectType :
         MapTab.MapObjects.MapObject,
         ITrackerMethodMapObject<ControllerType> where
@@ -16,13 +16,10 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
         public void SetTargetFunc(ScoringFunc target)
         {
             this.target = target;
-            var var = new WatchVariable(new WatchVariable.CustomView(1)
+            var var = new NamedVariableCollection.CustomView<string>(typeof(WatchVariableSelectionWrapper<WatchVariableStringWrapper, string>))
             {
                 Name = "Adjust on Map",
-                wrapperType = typeof(WatchVariableSelectionWrapper<WatchVariableStringWrapper, string>),
-                _getterFunction = _ => null,
-                _setterFunction = (_, __) => false
-            });
+            };
 
             var mapTab = AccessScope<StroopMainForm>.content.GetTab<MapTab.MapTab>();
             mapTab.UpdateOrInitialize(true);
@@ -32,7 +29,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
             target.Disposed += (_, __) => mapObject.tracker.Kill();
             tracker.Disposed += (_, __) => target.DeleteSelf();
 
-            var ctrl = (WatchVariableSelectionWrapper<WatchVariableStringWrapper, string>)parameterPanel.AddVariable(var, var.view).WatchVarWrapper;
+            var ctrl = (WatchVariableSelectionWrapper<WatchVariableStringWrapper, string>)parameterPanel.AddVariable(var).WatchVarWrapper;
             ctrl.DisplaySingleOption = true;
             ctrl.options.Add(("Go to Map Tab", () =>
             {

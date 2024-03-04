@@ -195,10 +195,13 @@
     <Compile Include="Controls\PanelEx.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Core\WatchVariables\DescribedMemoryState.cs" />
+    <Compile Include="Core\WatchVariables\VariableGroup.cs" />
     <Compile Include="Core\WatchVariables\WatchVariableAddressWrapper.cs" />
     <Compile Include="Controls\WatchVariablePanelRenderer.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Core\WatchVariables\WatchVariableNullableWrapper.cs" />
     <Compile Include="Core\WatchVariables\WatchVariableSelectionWrapper.cs" />
     <Compile Include="Core\WatchVariables\WatchVariableSetting.cs" />
     <Compile Include="Core\WatchVariables\WatchVariableTriangleWrapper.cs" />
@@ -317,7 +320,7 @@
     <Compile Include="Controls\DecompilerView.xaml.cs">
       <DependentUpon>DecompilerView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Core\WatchVariables\WatchVariable.cs" />
+    <Compile Include="Core\WatchVariables\MemoryDescriptor.cs" />
     <Compile Include="Core\WatchVariables\WatchVariableBooleanWrapper.cs" />
     <Compile Include="Core\WatchVariables\WatchVariableObjectWrapper.cs" />
     <Compile Include="Core\WatchVariables\WatchVariableAngleWrapper.cs" />
@@ -386,12 +389,14 @@
       <DependentUpon>MainLoadingForm.cs</DependentUpon>
     </Compile>
     <Compile Include="LoadingHandler.cs" />
+    <Compile Include="Tabs\BruteforceTab\BF_Utilities\BF_VariableUtilties.cs" />
     <Compile Include="Tabs\BruteforceTab\BruteforceTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Tabs\BruteforceTab\BruteforceTab.Designer.cs">
       <DependentUpon>BruteforceTab.cs</DependentUpon>
     </Compile>
+    <Compile Include="Tabs\BruteforceTab\BruteforceVariableView.cs" />
     <Compile Include="Tabs\BruteforceTab\Json.cs" />
     <Compile Include="Tabs\BruteforceTab\Surface.cs" />
     <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\GeneralPurpose.cs">

@@ -95,7 +95,7 @@ namespace STROOP.Tabs
 
             List<int> rngIndexes = Enumerable.Range(0, 65114).ToList();
 
-            foreach (int rngIndex in rngIndexes)
+            foreach (ushort rngIndex in rngIndexes)
             {
                 // rng based values
                 ushort rngValue = RngIndexer.GetRngValue(rngIndex);

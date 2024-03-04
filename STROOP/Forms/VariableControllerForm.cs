@@ -18,23 +18,15 @@ namespace STROOP.Forms
 
         private readonly List<string> _varNames;
         private readonly List<WatchVariableWrapper> _watchVarWrappers;
-        private List<List<uint>> _fixedAddressLists;
 
-        public VariableControllerForm(
-            string varName, WatchVariableWrapper watchVarWrapper, List<uint> fixedAddressList) :
-                this(new List<string>() { varName },
-                      new List<WatchVariableWrapper>() { watchVarWrapper },
-                      new List<List<uint>>() { fixedAddressList })
-        {
+        public VariableControllerForm(string varName, WatchVariableWrapper watchVarWrapper) :
+                this(new List<string>() { varName }, new List<WatchVariableWrapper>() { watchVarWrapper })
+        { }
 
-        }
-
-        public VariableControllerForm(
-            List<string> varNames, List<WatchVariableWrapper> watchVarWrappers, List<List<uint>> fixedAddressLists)
+        public VariableControllerForm(List<string> varNames, List<WatchVariableWrapper> watchVarWrappers)
         {
             _varNames = varNames;
             _watchVarWrappers = watchVarWrappers;
-            _fixedAddressLists = fixedAddressLists;
 
             InitializeComponent();
             FormManager.AddForm(this);
@@ -77,28 +69,30 @@ namespace STROOP.Forms
 
             _checkBoxFixAddress.Click += (s, e) => ToggleFixedAddress();
 
-            _checkBoxLock.Click += (s, e) =>
-            {
-                List<bool> lockedBools = new List<bool>();
-                for (int i = 0; i < _watchVarWrappers.Count; i++)
-                    lockedBools.Add(_watchVarWrappers[i].WatchVar.locked);
-                bool anyLocked = lockedBools.Any(b => b);
-                for (int i = 0; i < _watchVarWrappers.Count; i++)
-                    _watchVarWrappers[i].ToggleLocked(!anyLocked, _fixedAddressLists[i]);
-            };
+            // TODO: work out locking feature
+            //_checkBoxLock.Click += (s, e) =>
+            //{
+            //    List<bool> lockedBools = new List<bool>();
+            //    for (int i = 0; i < _watchVarWrappers.Count; i++)
+            //        lockedBools.Add(_watchVarWrappers[i]._view.locked);
+            //    bool anyLocked = lockedBools.Any(b => b);
+            //    for (int i = 0; i < _watchVarWrappers.Count; i++)
+            //        _watchVarWrappers[i].ToggleLocked(!anyLocked, _fixedAddressLists[i]);
+            //};
 
-            _checkBoxFixAddress.CheckState = BoolUtilities.GetCheckState(
-                fixedAddressLists.ConvertAll(fixedAddressList => fixedAddressList != null));
+            // TODO: work out fixing feature
+            //_checkBoxFixAddress.CheckState = BoolUtilities.GetCheckState(
+            //    fixedAddressLists.ConvertAll(fixedAddressList => fixedAddressList != null));
 
-            _textBoxCurrentValue.BackColor = GetColorForCheckState(BoolUtilities.GetCheckState(
-                fixedAddressLists.ConvertAll(fixedAddressList => fixedAddressList != null)));
+            //_textBoxCurrentValue.BackColor = GetColorForCheckState(BoolUtilities.GetCheckState(
+            //    fixedAddressLists.ConvertAll(fixedAddressList => fixedAddressList != null)));
         }
 
         private string GetValues()
         {
             List<object> values = new List<object>();
             for (int i = 0; i < _watchVarWrappers.Count; i++)
-                values.Add(_watchVarWrappers[i].GetValueText(_fixedAddressLists[i]));
+                values.Add(_watchVarWrappers[i].GetValueText());
             return String.Join(",", values);
         }
 
@@ -110,7 +104,7 @@ namespace STROOP.Forms
             using (Config.Stream.Suspend())
             {
                 for (int i = 0; i < _watchVarWrappers.Count; i++)
-                    _watchVarWrappers[i].TrySetValue(values[i % values.Count], _fixedAddressLists[i]);
+                    _watchVarWrappers[i].TrySetValue(values[i % values.Count]);
             }
         }
 
@@ -133,26 +127,28 @@ namespace STROOP.Forms
         {
             _textBoxCurrentValue.Text = GetValues();
             List<bool> lockedBools = new List<bool>();
-            for (int i = 0; i < _watchVarWrappers.Count; i++)
-                lockedBools.Add(_watchVarWrappers[i].WatchVar.locked);
+            // TODO: work out locking feature
+            //for (int i = 0; i < _watchVarWrappers.Count; i++)
+            //    lockedBools.Add(_watchVarWrappers[i]._view.locked);
             _checkBoxLock.CheckState = BoolUtilities.GetCheckState(lockedBools);
         }
 
         public void ToggleFixedAddress()
         {
-            bool fixedAddress = _checkBoxFixAddress.Checked;
-            if (fixedAddress)
-            {
-                _textBoxCurrentValue.BackColor = COLOR_RED;
-                _fixedAddressLists = _watchVarWrappers.ConvertAll(
-                    watchVarWrapper => watchVarWrapper.GetCurrentAddressesToFix());
-            }
-            else
-            {
-                _textBoxCurrentValue.BackColor = COLOR_BLUE;
-                _fixedAddressLists = _watchVarWrappers.ConvertAll(
-                    watchVarWrapper => (List<uint>)null);
-            }
+            // TODO: work out fixing feature
+            //bool fixedAddress = _checkBoxFixAddress.Checked;
+            //if (fixedAddress)
+            //{
+            //    _textBoxCurrentValue.BackColor = COLOR_RED;
+            //    _fixedAddressLists = _watchVarWrappers.ConvertAll(
+            //        watchVarWrapper => watchVarWrapper.GetCurrentAddressesToFix());
+            //}
+            //else
+            //{
+            //    _textBoxCurrentValue.BackColor = COLOR_BLUE;
+            //    _fixedAddressLists = _watchVarWrappers.ConvertAll(
+            //        watchVarWrapper => (List<uint>)null);
+            //}
         }
     }
 }

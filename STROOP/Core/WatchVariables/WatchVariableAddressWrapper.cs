@@ -1,6 +1,5 @@
 ﻿using STROOP.Structs.Configurations;
 using STROOP.Utilities;
-using System;
 using System.Linq;
 
 // TODO: This shouldn't be necessary
@@ -8,7 +7,7 @@ using STROOP.Controls;
 
 namespace STROOP.Core.WatchVariables
 {
-    public class WatchVariableAddressWrapper : WatchVariableNumberWrapper
+    public class WatchVariableAddressWrapper : WatchVariableNumberWrapper<uint>
     {
         static WatchVariableSetting ViewAddressSetting = new WatchVariableSetting(
             "View Address",
@@ -16,7 +15,7 @@ namespace STROOP.Core.WatchVariables
             {
                 if (ctrl.WatchVarWrapper is WatchVariableAddressWrapper addressWrapper)
                 {
-                    uint uintValue = ctrl.FixedAddressListGetter().FirstOrDefault();
+                    uint uintValue = (uint)addressWrapper.view._getterFunction().FirstOrDefault();
                     if (uintValue == 0) return false;
                     if (ObjectUtilities.IsObjectAddress(uintValue))
                         AccessScope<StroopMainForm>.content.GetTab<Tabs.MemoryTab>().SetObjectAddress(uintValue);
@@ -27,8 +26,8 @@ namespace STROOP.Core.WatchVariables
                 return false;
             });
 
-        public WatchVariableAddressWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl)
-            : base(watchVar, watchVarControl)
+        public WatchVariableAddressWrapper(NamedVariableCollection.IVariableView<uint> watchVar, WatchVariableControl watchVarControl)
+            : base(watchVar.WithKeyedValue(NamedVariableCollection.ViewProperties.useHex, true), watchVarControl)
         {
             AddAddressContextMenuStripItems();
         }
@@ -38,6 +37,6 @@ namespace STROOP.Core.WatchVariables
             _watchVarControl.AddSetting(ViewAddressSetting);
         }
 
-        protected override string GetClass() => "Address";
+        public override string GetClass() => "Address";
     }
 }

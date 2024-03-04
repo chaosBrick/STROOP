@@ -64,7 +64,7 @@ namespace STROOP.Forms
             List<DataGridViewRow> rows = ControlUtilities.GetTableSelectedRows(dataGridView);
             rows.ForEach(row =>
             {
-                if (ParsingUtilities.TryParseHex(row.Cells[0].Value, out uint address))
+                if (ParsingUtilities.TryParseHex((string)row.Cells[0].Value, out uint address))
                     ButtonUtilities.AnnihilateTriangle(new List<uint>() { address });
             });
         }
@@ -87,7 +87,7 @@ namespace STROOP.Forms
             List<DataGridViewRow> rows = ControlUtilities.GetTableSelectedRows(dataGridView);
             rows.ForEach(row =>
             {
-                if (ParsingUtilities.TryParseHex(row.Cells[0].Value, out uint address))
+                if (ParsingUtilities.TryParseHex((string)row.Cells[0].Value, out uint address))
                     _triAddressList.Remove(address);
             });
             RefreshDataGridViewAfterRemoval();
@@ -98,7 +98,7 @@ namespace STROOP.Forms
             List<DataGridViewRow> rows = ControlUtilities.GetTableAllRows(dataGridView);
             rows.ForEach(row =>
             {
-                if (ParsingUtilities.TryParseHex(row.Cells[0].Value, out uint address))
+                if (ParsingUtilities.TryParseHex((string)row.Cells[0].Value, out uint address))
                     if (!_triAddressList.Contains(address))
                         dataGridView.Rows.Remove(row);
             });

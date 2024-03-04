@@ -9,6 +9,26 @@ namespace STROOP.Utilities
     public static class ParsingUtilities
     {
 
+        public static bool TryParseNumber<T>(string value, out T result) where T: struct, IConvertible
+        {
+            {
+                if (value.IndexOf("0x") != -1 && ParsingUtilities.TryParseHex(value, out uint uintV))
+                    result = (T)Convert.ChangeType(uintV, typeof(T));
+                else if (ulong.TryParse(value, out ulong ulongV))
+                    result = (T)Convert.ChangeType(ulongV, typeof(T));
+                else if (long.TryParse(value, out long longV))
+                    result = (T)Convert.ChangeType(longV, typeof(T));
+                else if (double.TryParse(value, out double doubleV))
+                    result = (T)Convert.ChangeType(doubleV, typeof(T));
+                else
+                {
+                    result = default(T);
+                    return false;
+                }
+                return true;
+            }
+        }
+
         public static List<T> ParseTupleList<T>(string input, Func<string[], T> elementConverter)
         {
             List<T> ts = new List<T>();
@@ -36,7 +56,7 @@ namespace STROOP.Utilities
                     return (0, 0, 0);
                 });
 
-        public static bool TryParseHex(object obj, out uint result)
+        public static bool TryParseHex(string obj, out uint result)
         {
             string str = obj?.ToString() ?? "";
             int prefixPos = str.IndexOf("0x");
@@ -45,7 +65,7 @@ namespace STROOP.Utilities
             return uint.TryParse(str, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out result);
         }
 
-        public static uint ParseHex(object obj)
+        public static uint ParseHex(string obj)
         {
             if (TryParseHex(obj, out uint result))
                 return result;

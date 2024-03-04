@@ -1,4 +1,5 @@
 Features:
+- Add Dropdown for "held button" WatchVariablePanel features
 - Add interacted walls display (modify previous positions tracker?)
 - Add wall seams finder
 
@@ -16,3 +17,5 @@ Internal:
 Issues / Bugs:
 - float + float variable yields double
 - Save vars fails to consider composite / state dependent variables (should probably not be done like this)
+- Moving "WatchVariables" places them at end always
+- VariableBitForm can screw up when clicking checkboxes fast

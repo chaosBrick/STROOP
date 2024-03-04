@@ -6,19 +6,19 @@ namespace STROOP.Utilities
 {
     public static class RngIndexer
     {
-        public static readonly int RNG_COUNT = 65114;
-        public static readonly int NON_RESET_RNG_COUNT = 65534;
+        public static readonly ushort RNG_COUNT = 65114;
+        public static readonly ushort NON_RESET_RNG_COUNT = 65534;
 
-        private static readonly Dictionary<int, ushort> IndexToRNGDictionary;
-        private static readonly Dictionary<ushort, int> RNGToIndexDictionary;
+        private static readonly Dictionary<ushort, ushort> IndexToRNGDictionary;
+        private static readonly Dictionary<ushort, ushort> RNGToIndexDictionary;
 
         static RngIndexer()
         {
-            IndexToRNGDictionary = new Dictionary<int, ushort>();
-            RNGToIndexDictionary = new Dictionary<ushort, int>();
+            IndexToRNGDictionary = new Dictionary<ushort, ushort>();
+            RNGToIndexDictionary = new Dictionary<ushort, ushort>();
 
             ushort rngValue = 0;
-            for (int index = 0; index < RNG_COUNT; index++)
+            for (ushort index = 0; index < RNG_COUNT; index++)
             {
                 IndexToRNGDictionary.Add(index, rngValue);
                 RNGToIndexDictionary.Add(rngValue, index);
@@ -27,12 +27,12 @@ namespace STROOP.Utilities
 
             for (int index = RNG_COUNT; rngValue != 0; index++)
             {
-                RNGToIndexDictionary.Add(rngValue, index - NON_RESET_RNG_COUNT);
+                RNGToIndexDictionary.Add(rngValue, (ushort)(index - NON_RESET_RNG_COUNT));
                 rngValue = GetNextRNG(rngValue, false);
             }
 
-            RNGToIndexDictionary.Add(58704, RNG_COUNT - NON_RESET_RNG_COUNT - 2);
-            RNGToIndexDictionary.Add(22026, RNG_COUNT - NON_RESET_RNG_COUNT - 1);
+            RNGToIndexDictionary.Add(58704, (ushort)(RNG_COUNT - NON_RESET_RNG_COUNT - 2));
+            RNGToIndexDictionary.Add(22026, (ushort)(RNG_COUNT - NON_RESET_RNG_COUNT - 1));
         }
 
         public static ushort GetNextRNG(ushort rng, bool earlyReset = true)
@@ -63,7 +63,7 @@ namespace STROOP.Utilities
             return GetRngIndex(Config.Stream.GetUInt16(MiscConfig.RngAddress));
         }
 
-        public static int GetRngIndex(ushort rngValue)
+        public static ushort GetRngIndex(ushort rngValue)
         {
             return RNGToIndexDictionary[rngValue];
         }
@@ -71,7 +71,7 @@ namespace STROOP.Utilities
         public static ushort GetRngValue(int index)
         {
             index = MoreMath.NonNegativeModulus(index, RNG_COUNT);
-            return IndexToRNGDictionary[index];
+            return IndexToRNGDictionary[(ushort)index];
         }
 
         public static int GetRngIndexDiff(ushort rngValue1, ushort rngValue2)

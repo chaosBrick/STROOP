@@ -1,19 +1,19 @@
-﻿using System.Drawing;
-using System.Windows.Forms;
+﻿using System;
 using System.Collections.Generic;
-using System;
+using System.Drawing;
+using System.Linq;
+using System.Windows.Forms;
+
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
-using System.Reflection;
 
 // TODO: This shouldn't be necessary
 using STROOP.Controls;
 
 namespace STROOP.Core.WatchVariables
 {
-    class WatchVariableSelectionWrapper<TWrapperBase, TBackingValue> : WatchVariableWrapper<TBackingValue> 
-        where TWrapperBase : WatchVariableWrapper<TBackingValue> 
-        where TBackingValue : IConvertible
+    public class WatchVariableSelectionWrapper<TBaseWrapper, TBackingValue> : WatchVariableWrapper<TBackingValue>
+        where TBaseWrapper : WatchVariableWrapper<TBackingValue>
     {
         static StringFormat rightAlignFormat = new StringFormat() { Alignment = StringAlignment.Far };
 
@@ -21,23 +21,26 @@ namespace STROOP.Core.WatchVariables
 
         public List<(string name, Func<TBackingValue> func)> options = new List<(string, Func<TBackingValue>)>();
 
-        TWrapperBase wrapperBase;
+        TBaseWrapper baseWrapper;
         bool isSingleOption => DisplaySingleOption && options.Count == 1;
 
         (string name, Func<TBackingValue> getter) selectedOption;
 
-        public WatchVariableSelectionWrapper(WatchVariable var, WatchVariableControl control) : base(var, control)
+        public WatchVariableSelectionWrapper(NamedVariableCollection.IVariableView<TBackingValue> var, WatchVariableControl control) : base(var, control)
         {
-            wrapperBase = (TWrapperBase)Activator.CreateInstance(typeof(TWrapperBase), new object[] { var, control });
-            WatchVar.ValueSet += () => selectedOption = (null, null);
+            var interfaceType = view.GetType().GetInterfaces().First(x => x.Name == $"{nameof(NamedVariableCollection.IVariableView)}`1");
+            baseWrapper = (TBaseWrapper)
+                typeof(TBaseWrapper)
+                .GetConstructor(new Type[] { interfaceType, typeof(WatchVariableControl) })
+                .Invoke(new object[] { view, control });
+            _view.ValueSet += () => selectedOption = (null, null);
         }
 
-        protected override string GetClass() => "Selection";
-        
+        public override string GetClass() => $"Selection for {baseWrapper.GetClass()}";
+
         public override void UpdateControls()
         {
-            // There's just no keyword for what I want here :(
-            typeof(TWrapperBase).GetMethod(nameof(UpdateControls), BindingFlags.NonPublic | BindingFlags.Instance).Invoke(wrapperBase, new object[0]);
+            baseWrapper.UpdateControls();
         }
 
         bool IsCursorHovering(Rectangle rect, out Rectangle drawRectangle)
@@ -66,7 +69,7 @@ namespace STROOP.Core.WatchVariables
             if (IsCursorHovering(bounds, out var _))
             {
                 if (isSingleOption)
-                    WatchVar.SetValue(options[0].func());
+                    view._setterFunction(options[0].func());
                 else if (options.Count > 0)
                 {
                     var ctx = new ContextMenuStrip();
@@ -79,19 +82,19 @@ namespace STROOP.Core.WatchVariables
                 }
             }
             else
-                wrapperBase.SingleClick(parentCtrl, bounds);
+                baseWrapper.SingleClick(parentCtrl, bounds);
         }
 
         public override void DoubleClick(Control parentCtrl, Rectangle bounds)
         {
             base.DoubleClick(parentCtrl, bounds);
             if (!IsCursorHovering(bounds, out var _))
-                wrapperBase.DoubleClick(parentCtrl, bounds);
+                baseWrapper.DoubleClick(parentCtrl, bounds);
         }
 
         public override WatchVariablePanel.CustomDraw CustomDrawOperation => (g, rect) =>
         {
-            wrapperBase.CustomDrawOperation?.Invoke(g, rect);
+            baseWrapper.CustomDrawOperation?.Invoke(g, rect);
 
             int marginX = (int)SavedSettingsConfig.WatchVarPanelHorizontalMargin.value;
             int marginY = (int)SavedSettingsConfig.WatchVarPanelVerticalMargin.value;
@@ -112,7 +115,7 @@ namespace STROOP.Core.WatchVariables
 
         void SetOption((string name, Func<TBackingValue> func) option)
         {
-            WatchVar.SetValue(option.func());
+            view._setterFunction(option.func());
             selectedOption = option;
         }
 
@@ -121,13 +124,13 @@ namespace STROOP.Core.WatchVariables
         {
             if (selectedOption.Equals(options[index]))
             {
-                WatchVar.SetValue(selectedOption.getter());
+                view._setterFunction(selectedOption.getter());
                 selectedOption = options[index];
             }
         }
 
-        public override string DisplayValue(TBackingValue value) => wrapperBase.DisplayValue(value);
+        public override string DisplayValue(TBackingValue value) => baseWrapper.DisplayValue(value);
 
-        public override bool TryParseValue(string value, out TBackingValue result) => wrapperBase.TryParseValue(value, out result);
+        public override bool TryParseValue(string value, out TBackingValue result) => baseWrapper.TryParseValue(value, out result);
     }
 }

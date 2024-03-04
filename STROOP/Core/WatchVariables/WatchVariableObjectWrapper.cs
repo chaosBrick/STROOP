@@ -40,9 +40,7 @@ namespace STROOP.Core.WatchVariables
 
         private bool _displayAsObject;
 
-        public WatchVariableObjectWrapper(
-            WatchVariable watchVar,
-            WatchVariableControl watchVarControl)
+        public WatchVariableObjectWrapper(NamedVariableCollection.IVariableView<uint> watchVar, WatchVariableControl watchVarControl)
             : base(watchVar, watchVarControl)
         {
             _displayAsObject = true;
@@ -56,9 +54,9 @@ namespace STROOP.Core.WatchVariables
             _watchVarControl.AddSetting(SelectObjectSetting);
         }
 
-        protected override string GetClass() => "Object";
+        public override string GetClass() => "Object";
 
-        public override string DisplayValue(decimal value)
+        public override string DisplayValue(uint value)
         {
             if (_displayAsObject)
             {
@@ -69,7 +67,7 @@ namespace STROOP.Core.WatchVariables
             return base.DisplayValue(value);
         }
 
-        public override bool TryParseValue(string value, out decimal result)
+        public override bool TryParseValue(string value, out uint result)
         {
             string slotName = value.ToLower();
 

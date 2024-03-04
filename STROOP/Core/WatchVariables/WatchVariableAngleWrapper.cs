@@ -8,21 +8,21 @@ using STROOP.Controls;
 
 namespace STROOP.Core.WatchVariables
 {
-    public class WatchVariableAngleWrapper : WatchVariableNumberWrapper
+    public class WatchVariableAngleWrapper<TNumber> : WatchVariableNumberWrapper<TNumber> where TNumber : struct, IConvertible
     {
         public static readonly WatchVariableSetting DisplaySignedSetting = new WatchVariableSetting(
                 "Angle: Signed",
-                CreateBoolWithDefault<WatchVariableAngleWrapper>((wrapper, val) => wrapper._signed = val, wrapper => wrapper._defaultSigned),
-                ("Default", () => null, WrapperProperty<WatchVariableAngleWrapper>(wr => wr._signed == wr._defaultSigned)),
-                ("Unsigned", () => false, WrapperProperty<WatchVariableAngleWrapper>(wr => !wr._signed)),
-                ("Signed", () => true, WrapperProperty<WatchVariableAngleWrapper>(wr => wr._signed))
+                CreateBoolWithDefault<WatchVariableAngleWrapper<TNumber>>((wrapper, val) => wrapper._signed = val, wrapper => wrapper._defaultSigned),
+                ("Default", () => null, WrapperProperty<WatchVariableAngleWrapper<TNumber>>(wr => wr._signed == wr._defaultSigned)),
+                ("Unsigned", () => false, WrapperProperty<WatchVariableAngleWrapper<TNumber>>(wr => !wr._signed)),
+                ("Signed", () => true, WrapperProperty<WatchVariableAngleWrapper<TNumber>>(wr => wr._signed))
             );
 
         public static readonly WatchVariableSetting AngleUnitTypeSetting = new WatchVariableSetting(
                 "Angle: Units",
                 (ctrl, obj) =>
                 {
-                    if (ctrl.WatchVarWrapper is WatchVariableAngleWrapper num)
+                    if (ctrl.WatchVarWrapper is WatchVariableAngleWrapper<TNumber> num)
                         if (obj is AngleUnitType type)
                             num._angleUnitType = type;
                         else if (obj == null)
@@ -41,7 +41,7 @@ namespace STROOP.Core.WatchVariables
                         string stringValue = angleUnitType.ToString();
                         if (stringValue == AngleUnitType.InGameUnits.ToString()) stringValue = "In-Game Units";
                         var value = angleUnitType;
-                        lst.Add((stringValue, () => angleUnitType, WrapperProperty<WatchVariableAngleWrapper>(wr => wr._angleUnitType == angleUnitType)));
+                        lst.Add((stringValue, () => angleUnitType, WrapperProperty<WatchVariableAngleWrapper<TNumber>>(wr => wr._angleUnitType == angleUnitType)));
                     }
                     return lst.ToArray();
                 }))()
@@ -49,26 +49,26 @@ namespace STROOP.Core.WatchVariables
 
         public static readonly WatchVariableSetting TruncateToMultipleOf16Setting = new WatchVariableSetting(
             "Angle: Truncate to Multiple of 16",
-            CreateBoolWithDefault<WatchVariableAngleWrapper>((wrapper, val) => wrapper._truncateToMultipleOf16 = val, wrapper => wrapper._defaultTruncateToMultipleOf16),
-            ("Default", () => null, WrapperProperty<WatchVariableAngleWrapper>(wr => wr._truncateToMultipleOf16 == wr._defaultTruncateToMultipleOf16)),
-            ("Truncate to Multiple of 16", () => true, WrapperProperty<WatchVariableAngleWrapper>(wr => wr._truncateToMultipleOf16)),
-            ("Don't Truncate to Multiple of 16", () => false, WrapperProperty<WatchVariableAngleWrapper>(wr => !wr._truncateToMultipleOf16))
+            CreateBoolWithDefault<WatchVariableAngleWrapper<TNumber>>((wrapper, val) => wrapper._truncateToMultipleOf16 = val, wrapper => wrapper._defaultTruncateToMultipleOf16),
+            ("Default", () => null, WrapperProperty<WatchVariableAngleWrapper<TNumber>>(wr => wr._truncateToMultipleOf16 == wr._defaultTruncateToMultipleOf16)),
+            ("Truncate to Multiple of 16", () => true, WrapperProperty<WatchVariableAngleWrapper<TNumber>>(wr => wr._truncateToMultipleOf16)),
+            ("Don't Truncate to Multiple of 16", () => false, WrapperProperty<WatchVariableAngleWrapper<TNumber>>(wr => !wr._truncateToMultipleOf16))
             );
 
         public static readonly WatchVariableSetting ConstrainToOneRevolutionSetting = new WatchVariableSetting(
             "Angle: Constrain to One Revolution",
-            CreateBoolWithDefault<WatchVariableAngleWrapper>((wrapper, val) => wrapper._constrainToOneRevolution = val, wrapper => wrapper._defaultConstrainToOneRevolution),
-            ("Default", () => null, WrapperProperty<WatchVariableAngleWrapper>(wr => wr._constrainToOneRevolution == wr._defaultConstrainToOneRevolution)),
-            ("Constrain to One Revolution", () => true, WrapperProperty<WatchVariableAngleWrapper>(wr => wr._constrainToOneRevolution)),
-            ("Don't Constrain to One Revolution", () => false, WrapperProperty<WatchVariableAngleWrapper>(wr => !wr._constrainToOneRevolution))
+            CreateBoolWithDefault<WatchVariableAngleWrapper<TNumber>>((wrapper, val) => wrapper._constrainToOneRevolution = val, wrapper => wrapper._defaultConstrainToOneRevolution),
+            ("Default", () => null, WrapperProperty<WatchVariableAngleWrapper<TNumber>>(wr => wr._constrainToOneRevolution == wr._defaultConstrainToOneRevolution)),
+            ("Constrain to One Revolution", () => true, WrapperProperty<WatchVariableAngleWrapper<TNumber>>(wr => wr._constrainToOneRevolution)),
+            ("Don't Constrain to One Revolution", () => false, WrapperProperty<WatchVariableAngleWrapper<TNumber>>(wr => !wr._constrainToOneRevolution))
             );
 
         public static readonly WatchVariableSetting ReverseSetting = new WatchVariableSetting(
             "Angle: Reverse",
-            CreateBoolWithDefault<WatchVariableAngleWrapper>((wrapper, val) => wrapper._reverse = val, wrapper => wrapper._defaultReverse),
-            ("Default", () => null, WrapperProperty<WatchVariableAngleWrapper>(wr => wr._reverse == wr._defaultReverse)),
-            ("Reverse", () => true, WrapperProperty<WatchVariableAngleWrapper>(wr => wr._reverse)),
-            ("Don't Reverse", () => false, WrapperProperty<WatchVariableAngleWrapper>(wr => !wr._reverse))
+            CreateBoolWithDefault<WatchVariableAngleWrapper<TNumber>>((wrapper, val) => wrapper._reverse = val, wrapper => wrapper._defaultReverse),
+            ("Default", () => null, WrapperProperty<WatchVariableAngleWrapper<TNumber>>(wr => wr._reverse == wr._defaultReverse)),
+            ("Reverse", () => true, WrapperProperty<WatchVariableAngleWrapper<TNumber>>(wr => wr._reverse)),
+            ("Don't Reverse", () => false, WrapperProperty<WatchVariableAngleWrapper<TNumber>>(wr => !wr._reverse))
             );
 
         private readonly bool _defaultSigned;
@@ -102,11 +102,11 @@ namespace STROOP.Core.WatchVariables
         private readonly bool _isYaw;
         private bool effectiveSigned => _signed && (!_isYaw || Structs.Configurations.SavedSettingsConfig.DisplayYawAnglesAsUnsigned);
 
-        public WatchVariableAngleWrapper(WatchVariable watchVar, WatchVariableControl watchVarControl)
+        public WatchVariableAngleWrapper(NamedVariableCollection.IVariableView<TNumber> watchVar, WatchVariableControl watchVarControl)
             : base(watchVar, watchVarControl)
         {
-            var displayType = watchVar.MemoryType;
-            if (TypeUtilities.StringToType.TryGetValue(watchVarControl.view.GetValueByKey(WatchVariable.ViewProperties.display) ?? "", out var dType))
+            var displayType = (view as NamedVariableCollection.MemoryDescriptorView)?.memoryDescriptor.MemoryType ?? typeof(double);
+            if (TypeUtilities.StringToType.TryGetValue(watchVarControl.view.GetValueByKey(NamedVariableCollection.ViewProperties.display) ?? "", out var dType))
                 displayType = dType;
 
             _baseType = displayType;
@@ -122,8 +122,7 @@ namespace STROOP.Core.WatchVariables
             _defaultTruncateToMultipleOf16 = false;
             _truncateToMultipleOf16 = _defaultTruncateToMultipleOf16;
 
-            _defaultConstrainToOneRevolution =
-                watchVar.MemoryType != null && TypeUtilities.TypeSize[watchVar.MemoryType] == 4;
+            _defaultConstrainToOneRevolution = displayType != null && TypeUtilities.TypeSize[displayType] == 4;
             _constrainToOneRevolution = _defaultConstrainToOneRevolution;
 
             _defaultReverse = false;
@@ -182,7 +181,7 @@ namespace STROOP.Core.WatchVariables
             return signed ? -1 * maxValue / 2 : 0;
         }
 
-        public override bool TryParseValue(string value, out decimal result)
+        public override bool TryParseValue(string value, out TNumber result)
         {
             double? doubleValueNullable = ParsingUtilities.ParseDoubleNullable(value);
             if (doubleValueNullable.HasValue)
@@ -200,30 +199,25 @@ namespace STROOP.Core.WatchVariables
                 doubleValue = MoreMath.NormalizeAngleUsingType(doubleValue, _effectiveType);
                 doubleValue = (doubleValue / 65536) * GetAngleUnitTypeMaxValue();
 
-                result = (decimal)doubleValue;
+                result = (TNumber)Convert.ChangeType(doubleValue, typeof(TNumber));
                 return true;
             }
             return base.TryParseValue(value, out result);
         }
 
-        public override string DisplayValue(decimal value)
+        public override string DisplayValue(TNumber value)
         {
-            double? doubleValueNullable = ParsingUtilities.ParseDoubleNullable(value);
-            if (doubleValueNullable.HasValue)
+            double doubleValue = (double)Convert.ChangeType(value, typeof(double));
+
+            doubleValue = (doubleValue / GetAngleUnitTypeMaxValue()) * 65536;
+            if (_reverse)
             {
-                double doubleValue = doubleValueNullable.Value;
-
-                doubleValue = (doubleValue / GetAngleUnitTypeMaxValue()) * 65536;
-                if (_reverse)
-                {
-                    doubleValue += 32768;
-                }
-
-                return doubleValue.ToString();
+                doubleValue += 32768;
             }
-            return base.DisplayValue(value);
+
+            return doubleValue.ToString();
         }
-        
+
 
         protected object HandleAngleRoundingOut(object value)
         {
@@ -237,14 +231,8 @@ namespace STROOP.Core.WatchVariables
             return doubleValue;
         }
 
-        protected override int? GetHexDigitCount()
-        {
-            return TypeUtilities.TypeSize[_effectiveType] * 2;
-        }
+        protected override int? GetHexDigitCount() => TypeUtilities.TypeSize[_effectiveType] * 2;
 
-        protected override string GetClass()
-        {
-            return "Angle";
-        }
+        public override string GetClass() => "Angle";
     }
 }

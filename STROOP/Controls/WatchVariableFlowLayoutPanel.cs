@@ -1,16 +1,18 @@
-﻿using STROOP.Core.WatchVariables;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Linq;
+using System.Reflection;
+using System.Windows.Forms;
+using System.Windows.Input;
+using System.Xml.Linq;
+
+using STROOP.Core.WatchVariables;
 using STROOP.Forms;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
-using System.Xml.Linq;
-using System.ComponentModel;
-using System.Windows.Input;
 
 namespace STROOP.Controls
 {
@@ -22,37 +24,32 @@ namespace STROOP.Controls
         static void InitializeSpecial()
         {
             var target = WatchVariableSpecialUtilities.dictionary;
-            target.Add("WatchVarPanelNameWidth", ((uint _) => SavedSettingsConfig.WatchVarPanelNameWidth.value, (object value, uint __) =>
+            target.Add("WatchVarPanelNameWidth", () => SavedSettingsConfig.WatchVarPanelNameWidth.value, (uint value) =>
             {
-                SavedSettingsConfig.WatchVarPanelNameWidth.value = Math.Max(1, (uint)Convert.ToSingle(value));
+                SavedSettingsConfig.WatchVarPanelNameWidth.value = Math.Max(1, value);
                 return true;
-            }
-            ));
-            target.Add("WatchVarPanelValueWidth", ((uint _) => SavedSettingsConfig.WatchVarPanelValueWidth.value, (object value, uint __) =>
+            });
+            target.Add("WatchVarPanelValueWidth", () => SavedSettingsConfig.WatchVarPanelValueWidth.value, (uint value) =>
             {
-                SavedSettingsConfig.WatchVarPanelValueWidth.value = Math.Max(1, (uint)Convert.ToSingle(value));
+                SavedSettingsConfig.WatchVarPanelValueWidth.value = Math.Max(1, value);
                 return true;
-            }
-            ));
-            target.Add("WatchVarPanelXMargin", ((uint _) => SavedSettingsConfig.WatchVarPanelHorizontalMargin.value, (object value, uint __) =>
+            });
+            target.Add("WatchVarPanelXMargin", () => SavedSettingsConfig.WatchVarPanelHorizontalMargin.value, (uint value) =>
             {
-                SavedSettingsConfig.WatchVarPanelHorizontalMargin.value = (uint)Math.Max(1, (int)Convert.ToSingle(value));
+                SavedSettingsConfig.WatchVarPanelHorizontalMargin.value = (uint)Math.Max(1, value);
                 return true;
-            }
-            ));
-            target.Add("WatchVarPanelYMargin", ((uint _) => SavedSettingsConfig.WatchVarPanelVerticalMargin.value, (object value, uint __) =>
+            });
+            target.Add("WatchVarPanelYMargin", () => SavedSettingsConfig.WatchVarPanelVerticalMargin.value, (uint value) =>
             {
-                SavedSettingsConfig.WatchVarPanelVerticalMargin.value = (uint)Math.Max(1, (int)Convert.ToSingle(value));
+                SavedSettingsConfig.WatchVarPanelVerticalMargin.value = (uint)Math.Max(1, value);
                 return true;
-            }
-            ));
-            target.Add("WatchVarPanelBoldNames", ((uint _) => SavedSettingsConfig.WatchVarPanelBoldNames ? 1 : 0, (object value, uint __) =>
+            });
+            target.Add("WatchVarPanelBoldNames", () => SavedSettingsConfig.WatchVarPanelBoldNames.value, (bool value) =>
             {
-                SavedSettingsConfig.WatchVarPanelBoldNames.value = Convert.ToDouble(value) != 0;
+                SavedSettingsConfig.WatchVarPanelBoldNames.value = value;
                 return true;
-            }
-            ));
-            target.Add("WatchVarPanelFont", ((uint _) => SavedSettingsConfig.WatchVarPanelFontOverride.value?.Name ?? "(default)", (object value, uint __) => false));
+            });
+            target.Add("WatchVarPanelFont", () => SavedSettingsConfig.WatchVarPanelFontOverride.value?.Name ?? "(default)", (string value) => false);
             WatchVariableStringWrapper.specialTypeContextMenuHandlers.Add("WatchVarPanelFont", () =>
             {
                 var dlg = new FontDialog();
@@ -76,7 +73,7 @@ namespace STROOP.Controls
         public readonly Func<List<WatchVariableControl>> GetSelectedVars;
         public List<ToolStripItem> customContextMenuItems = new List<ToolStripItem>();
 
-        public delegate IEnumerable<WatchVariable> SpecialFuncWatchVariables(PositionAngle.HybridPositionAngle input);
+        public delegate IEnumerable<NamedVariableCollection.IVariableView> SpecialFuncWatchVariables(PositionAngle.HybridPositionAngle input);
         public Func<IEnumerable<(string name, SpecialFuncWatchVariables generateVariables)>> getSpecialFuncWatchVariables = null;
 
         public bool initialized = false;
@@ -196,8 +193,8 @@ namespace STROOP.Controls
             {
                 SuspendLayout();
 
-                List<WatchVariable> precursors = _varFilePath == null
-                    ? new List<WatchVariable>()
+                List<NamedVariableCollection.IVariableView> precursors = _varFilePath == null
+                    ? new List<NamedVariableCollection.IVariableView>()
                     : XmlConfigParser.OpenWatchVariableControlPrecursors(_varFilePath);
 
                 foreach (var watchVarControl in precursors.ConvertAll(precursor => new WatchVariableControl(this, precursor)))
@@ -367,13 +364,17 @@ namespace STROOP.Controls
             //}
             else if (isNKeyHeld)
             {
-                UnselectAllVariables();
-                watchVars.ForEach(watchVar => watchVar.WatchVarWrapper.ViewInMemoryTab());
+                var memoryDescriptorView = watchVars.FirstOrDefault()?.view as NamedVariableCollection.IMemoryDescriptorVariableView;
+                if (memoryDescriptorView != null)
+                {
+                    UnselectAllVariables();
+                    memoryDescriptorView.describedMemoryState.ViewInMemoryTab();
+                }
             }
             else if (isFKeyHeld)
             {
                 UnselectAllVariables();
-                watchVars.ForEach(watchVar => watchVar.ToggleFixedAddress());
+                watchVars.ForEach(watchVar => watchVar.ToggleFixedAddress(null));
             }
             else if (isHKeyHeld)
             {
@@ -388,8 +389,12 @@ namespace STROOP.Controls
             }
             else if (isLKeyHeld)
             {
-                UnselectAllVariables();
-                watchVars.ForEach(watchVar => watchVar.WatchVarWrapper.ToggleLocked(null, watchVar.FixedAddressListGetter()));
+                var memoryDescriptorView = watchVars.FirstOrDefault()?.view as NamedVariableCollection.IMemoryDescriptorVariableView;
+                if (memoryDescriptorView != null)
+                {
+                    UnselectAllVariables();
+                    memoryDescriptorView.describedMemoryState.ToggleLocked(null);
+                }
             }
             else if (isDKeyHeld)
             {
@@ -461,6 +466,23 @@ namespace STROOP.Controls
             deferredActions.Add(action);
         }
 
+        private static int numDummies = 0;
+        private static NamedVariableCollection.CustomView<T> CreateDummyVariable<T>() where T : struct, IConvertible
+        {
+            T capturedValue = default(T);
+
+            return new NamedVariableCollection.CustomView<T>(WatchVariableUtilities.GetWrapperType(typeof(T)))
+            {
+                Name = $"Dummy {++numDummies} {StringUtilities.Capitalize(typeof(T).Name)}",
+                _getterFunction = () => capturedValue.Yield(),
+                _setterFunction = (T value) =>
+                {
+                    capturedValue = value;
+                    return true.Yield();
+                }
+            };
+        }
+
         private void ShowContextMenu()
         {
             ToolStripMenuItem resetVariablesItem = new ToolStripMenuItem("Reset Variables");
@@ -499,22 +521,12 @@ namespace STROOP.Controls
 
                     for (int i = 0; i < numEntries; i++)
                     {
-                        int index = SpecialConfig.DummyValues.Count;
                         Type type = TypeUtilities.StringToType[typeString];
-                        SpecialConfig.DummyValues.Add(ParsingUtilities.ParseValueRoundingWrapping(0, type));
-                        var view = new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
-                        {
-                            Name = $"Dummy {index} {StringUtilities.Capitalize(typeString)}",
-                            _getterFunction = (uint dummy) => SpecialConfig.DummyValues[index],
-                            _setterFunction = (object value, uint dummy) =>
-                            {
-                                object o = ParsingUtilities.ParseValueRoundingWrapping(value, type);
-                                if (o == null) return false;
-                                SpecialConfig.DummyValues[index] = o;
-                                return true;
-                            }
-                        };
-                        AddVariable(new WatchVariable(view), view);
+                        var view = (NamedVariableCollection.CustomView)typeof(WatchVariablePanel)
+                            .GetMethod(nameof(CreateDummyVariable), BindingFlags.NonPublic | BindingFlags.Static)
+                            .MakeGenericMethod(type)
+                            .Invoke(null, Array.Empty<object>());
+                        AddVariable(view);
                     }
                 };
             }
@@ -527,7 +539,7 @@ namespace STROOP.Controls
                 if (getSpecialFuncVars != null && specificsCount > 0)
                 {
                     void BindHandler(ToolStripMenuItem menuItem, PositionAngle.HybridPositionAngle targetPA, SpecialFuncWatchVariables generator) =>
-                    menuItem.Click += (_, __) => AddVariables(generator(targetPA).ConvertAll(v => (v, v.view)));
+                    menuItem.Click += (_, __) => AddVariables(generator(targetPA));
 
                     addRelativeVariablesItem = new ToolStripMenuItem("Add relative variables for...");
                     if (specificsCount == 1)
@@ -676,21 +688,18 @@ namespace STROOP.Controls
             _filteringDropDownItems.ForEach(item => filterVariablesItem.DropDownItems.Add(item));
         }
 
-        public WatchVariableControl AddVariable(WatchVariable var) =>
-            AddVariables(new[] { (var, var.view) }).First();
+        public WatchVariableControl AddVariable(NamedVariableCollection.IVariableView view) =>
+            AddVariables(new[] { view }).First();
 
-        public WatchVariableControl AddVariable(WatchVariable var, WatchVariable.IVariableView view) =>
-            AddVariables(new[] { (var, view) }).First();
-
-        public IEnumerable<WatchVariableControl> AddVariables(IEnumerable<(WatchVariable var, WatchVariable.IVariableView view)> watchVarControls)
+        public IEnumerable<WatchVariableControl> AddVariables(IEnumerable<NamedVariableCollection.IVariableView> watchVars)
         {
             if (!initialized)
                 DeferredInitialize();
 
             var lst = new List<WatchVariableControl>();
-            foreach (var data in watchVarControls)
+            foreach (var view in watchVars)
             {
-                var newControl = new WatchVariableControl(this, data.var, data.view);
+                var newControl = new WatchVariableControl(this, view);
                 lst.Add(newControl);
                 _allWatchVarControls.Add(newControl);
                 if (ShouldShow(newControl)) _shownWatchVarControls.Add(newControl);
@@ -752,10 +761,10 @@ namespace STROOP.Controls
             _visibleGroups.AddRange(_initialVisibleGroups);
             UpdateFilterItemCheckedStatuses();
 
-            List<WatchVariable> precursors = _varFilePath == null
-                ? new List<WatchVariable>()
+            List<NamedVariableCollection.IVariableView> views = _varFilePath == null
+                ? new List<NamedVariableCollection.IVariableView>()
                 : XmlConfigParser.OpenWatchVariableControlPrecursors(_varFilePath);
-            AddVariables(precursors.ConvertAll(precursor => (precursor, precursor.view)));
+            AddVariables(views);
         }
 
         public void UnselectAllVariables()
@@ -779,17 +788,13 @@ namespace STROOP.Controls
             List<XElement> elements = DialogUtilities.OpenXmlElements(FileType.StroopVariables);
             if (elements.Count == 0) return;
             VariablePopOutForm form = new VariablePopOutForm();
-            form.Initialize(elements.ConvertAndRemoveNull(element => WatchVariable.ParseXml(element)));
+            form.Initialize(elements.ConvertAndRemoveNull(element => NamedVariableCollection.ParseXml(element)));
             form.ShowForm();
         }
 
         public void OpenVariables(List<XElement> elements)
         {
-            AddVariables(elements.ConvertAll(element =>
-            {
-                var newVar = WatchVariable.ParseXml(element);
-                return (newVar, (WatchVariable.IVariableView)new WatchVariable.XmlView(newVar, element));
-            }));
+            AddVariables(elements.ConvertAll(element => NamedVariableCollection.ParseXml(element)));
         }
 
         public void SaveVariablesInPlace()
@@ -811,17 +816,14 @@ namespace STROOP.Controls
             return lst;
         }
 
-        public List<WatchVariable> GetCurrentVariablePrecursors()
-        {
-            return GetCurrentVariableControls().ConvertAll(control => control.WatchVar);
-        }
-
+        public IEnumerable<MemoryDescriptor> GetCurrentVariablePrecursors()
+            => GetCurrentVariableControls().ConvertAndRemoveNull(control => (control.view as NamedVariableCollection.IMemoryDescriptorVariableView)?.memoryDescriptor);
 
         public List<string> GetCurrentVariableValues() =>
             GetCurrentVariableControls().ConvertAll(control => control.WatchVarWrapper.GetValueText());
 
         public List<string> GetCurrentVariableNames() => GetCurrentVariableControls().ConvertAll(control => control.VarName);
-        
+
         public bool SetVariableValueByName<T>(string name, T value) where T : IConvertible
         {
             WatchVariableControl control = GetCurrentVariableControls().FirstOrDefault(c => c.VarName == name);
@@ -829,15 +831,15 @@ namespace STROOP.Controls
             return control.SetValue(value);
         }
 
-        public WatchVariable[] GetWatchVariablesByName(params string[] names) =>
-            GetWatchVariableControlsByName(names).Select(x => x?.WatchVar ?? null).ToArray();
+        public NamedVariableCollection.IVariableView[] GetWatchVariablesByName(params string[] names) =>
+            GetWatchVariableControlsByName(names).Select(x => x?.view ?? null).ToArray();
 
         public WatchVariableControl[] GetWatchVariableControlsByName(params string[] names)
         {
             var result = new WatchVariableControl[names.Length];
             foreach (var var in _allWatchVarControls)
             {
-                var index = Array.IndexOf(names, var.WatchVar.view.Name);
+                var index = Array.IndexOf(names, var.view.Name);
                 if (index != -1)
                     result[index] = var;
             }

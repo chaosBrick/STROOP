@@ -16,9 +16,9 @@ namespace STROOP.Tabs
     public partial class MemoryTab : STROOPTab
     {
         private readonly List<ValueText> _currentValueTexts;
-        private readonly List<WatchVariable> _objectPrecursors;
-        private readonly List<WatchVariable> _objectSpecificPrecursors;
-        private List<WatchVariable> _memTabPrecursors => watchVariablePanelMemory.GetCurrentVariablePrecursors();
+        private readonly List<MemoryDescriptor> _objectPrecursors;
+        private readonly List<MemoryDescriptor> _objectSpecificPrecursors;
+        private List<MemoryDescriptor> _memTabPrecursors => watchVariablePanelMemory.GetCurrentVariablePrecursors().ToList();
 
         private uint? _address;
         public uint? Address
@@ -52,7 +52,10 @@ namespace STROOP.Tabs
                 _behavior = value;
                 _objectSpecificPrecursors.Clear();
                 if (_behavior.HasValue)
-                    _objectSpecificPrecursors.AddRange(Config.ObjectAssociations.GetWatchVarControls(_behavior.Value));
+                    _objectSpecificPrecursors.AddRange(
+                        Config.ObjectAssociations.GetWatchVarControls(_behavior.Value)
+                        .ConvertAndRemoveNull(x => (x as NamedVariableCollection.IMemoryDescriptorVariableView)?.memoryDescriptor)
+                        );
             }
         }
 
@@ -71,8 +74,9 @@ namespace STROOP.Tabs
             _objectSnapshot = null;
 
             _currentValueTexts = new List<ValueText>();
-            _objectPrecursors = XmlConfigParser.OpenWatchVariableControlPrecursors(watchVariablePanelMemory.DataPath);
-            _objectSpecificPrecursors = new List<WatchVariable>();
+            _objectPrecursors = XmlConfigParser.OpenWatchVariableControlPrecursors(watchVariablePanelMemory.DataPath)
+                .ConvertAndRemoveNull(x => (x as NamedVariableCollection.MemoryDescriptorView)?.memoryDescriptor);
+            _objectSpecificPrecursors = new List<MemoryDescriptor>();
         }
 
         public override string GetDisplayName() => "Memory";
@@ -229,16 +233,14 @@ namespace STROOP.Tabs
             bool useRelativeName = checkBoxMemoryRelativeAddresses.Checked;
             if (isAltKeyHeld)
             {
-                List<List<WatchVariable>> precursorLists = new List<List<WatchVariable>>() { _objectPrecursors, _objectSpecificPrecursors };
+                List<List<MemoryDescriptor>> precursorLists = new List<List<MemoryDescriptor>>() { _objectPrecursors, _objectSpecificPrecursors };
                 _currentValueTexts.ForEach(valueText =>
                 {
                     if (index >= valueText.StringIndex && index <= valueText.StringIndex + valueText.StringSize)
                     {
                         precursorLists.ForEach(precursors =>
                         {
-                            foreach (var ctrl in watchVariablePanelMemory.AddVariables(
-                                valueText.GetOverlapped(precursors).ConvertAll(
-                                    precursor => (precursor, precursor.view))))
+                            foreach (var ctrl in watchVariablePanelMemory.AddVariables(valueText.GetOverlapped(precursors).Select(x => x.CreateView())))
                                 ctrl.GroupList.Add("Custom");
                         });
                     }
@@ -249,10 +251,7 @@ namespace STROOP.Tabs
                 _currentValueTexts.ForEach(valueText =>
                 {
                     if (index >= valueText.StringIndex && index <= valueText.StringIndex + valueText.StringSize)
-                    {
-                        WatchVariablePrecursor precursor = valueText.CreatePrecursor(useObjAddress, useHex, useObj, useRelativeName);
-                        watchVariablePanelMemory.AddVariable(precursor.value.var, precursor.value.view);
-                    }
+                        watchVariablePanelMemory.AddVariable(valueText.CreatePrecursor(useObjAddress, useHex, useObj, useRelativeName));
                 });
             }
             richTextBoxMemoryValues.Parent.Focus();
@@ -283,40 +282,39 @@ namespace STROOP.Tabs
                 MemoryType = memoryType;
             }
 
-            public bool OverlapsData(List<WatchVariable> precursors)
+            public bool OverlapsData(List<MemoryDescriptor> precursors)
             {
                 return GetOverlapped(precursors).Count > 0;
             }
 
-            public List<WatchVariable> GetOverlapped(List<WatchVariable> precursors)
+            public List<MemoryDescriptor> GetOverlapped(List<MemoryDescriptor> precursors)
             {
                 uint minOffset = MemoryAddress;
                 uint maxOffset = MemoryAddress + (uint)ByteSize - 1;
                 uint? minObjOffset = ObjectUtilities.GetObjectRelativeAddress(minOffset);
                 uint? maxObjOffset = ObjectUtilities.GetObjectRelativeAddress(maxOffset);
 
-                return precursors.FindAll(watchVar =>
+                return precursors.FindAll((memoryDescriptor =>
                 {
-                    if (watchVar.IsSpecial) return false;
-                    if (watchVar.Mask != null) return false;
+                    if (memoryDescriptor.Mask != null) return false;
 
-                    uint minPrecursorOffset = watchVar.Offset;
-                    uint maxPrecursorOffset = watchVar.Offset + (uint)watchVar.ByteCount.Value - 1;
+                    uint minPrecursorOffset = memoryDescriptor.Offset;
+                    uint maxPrecursorOffset = memoryDescriptor.Offset + (uint)memoryDescriptor.ByteCount.Value - 1;
 
-                    if (watchVar.BaseAddressType == BaseAddressType.Object)
+                    if (memoryDescriptor.BaseAddressType == BaseAddressType.Object)
                     {
                         if (!minObjOffset.HasValue || !maxObjOffset.HasValue) return false;
                         return minObjOffset <= maxPrecursorOffset && maxObjOffset >= minPrecursorOffset;
                     }
-                    if (watchVar.BaseAddressType == BaseAddressType.Relative)
+                    if (memoryDescriptor.BaseAddressType == BaseAddressType.Relative)
                     {
                         return minOffset <= maxPrecursorOffset && maxOffset >= minPrecursorOffset;
                     }
                     return false;
-                });
+                }));
             }
 
-            public WatchVariablePrecursor CreatePrecursor(bool useObjAddress, bool useHex, bool useObj, bool useRelativeName)
+            public NamedVariableCollection.IVariableView CreatePrecursor(bool useObjAddress, bool useHex, bool useObj, bool useRelativeName)
             {
                 WatchVariableSubclass subclass = useObj
                     ? WatchVariableSubclass.Object
@@ -340,11 +338,9 @@ namespace STROOP.Tabs
                 uint nameOffset = useRelativeName ? (uint)ByteIndex : MemoryAddress;
                 bool isAbsolute = baseAddressType == BaseAddressType.Absolute;
 
-                WatchVariable result = null;
-                var view = WatchVariable.DefaultView($"{baseAddressType}: 0x{offset.ToString("X8")}", isAbsolute, effectiveType);
-                result = new WatchVariable(view, baseAddressType, offset);
-                view.SetValueByKey(WatchVariable.ViewProperties.useHex, true);
-                return (result, view);
+                var view = new MemoryDescriptor(typeString, baseAddressType, offset).CreateView();
+                view.SetValueByKey(NamedVariableCollection.ViewProperties.useHex, true);
+                return view;
             }
         }
 

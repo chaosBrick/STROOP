@@ -41,12 +41,12 @@ namespace STROOP.Forms
             };
         }
 
-        public void Initialize(List<WatchVariable> vars)
+        public void Initialize(List<NamedVariableCollection.IVariableView> vars)
         {
             // initialize panel
             _watchVariablePanel.Initialize();
             _watchVariablePanel.DeferredInitialize();
-            _watchVariablePanel.AddVariables(vars.ConvertAll(_ => (_, _.view)));
+            _watchVariablePanel.AddVariables(vars);
 
             // add borderless item to panel
             ToolStripMenuItem itemBorderless = new ToolStripMenuItem("Borderless");

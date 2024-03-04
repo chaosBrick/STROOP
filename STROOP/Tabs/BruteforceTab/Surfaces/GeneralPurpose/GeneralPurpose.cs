@@ -3,11 +3,12 @@ using System.IO;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using STROOP.Utilities;
+using STROOP.Tabs.BruteforceTab.BF_Utilities;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
 {
     [Surface("general_purpose")]
-    public partial class GeneralPurpose : Surface
+    partial class GeneralPurpose : Surface
     {
         public class ScoringFuncPrecursor
         {
@@ -27,7 +28,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
 
             public Type GetParameterWrapperType(string name)
             {
-                if (parameterDefinitions.TryGetValue(new Identifier { name = name }, out var typeString) && BruteforceTab.fallbackWrapperTypes.TryGetValue(typeString, out var type))
+                if (parameterDefinitions.TryGetValue(new Identifier { name = name }, out var typeString) && BF_VariableUtilties.fallbackWrapperTypes.TryGetValue(typeString, out var type))
                     return type;
                 return null;
             }
@@ -242,13 +243,13 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                     numPerturbators++;
                     var perturbator = new Perturbator();
                     if (obj.TryGetValue<JsonNodeNumber>("perturbation_chance", out var perturbationChance))
-                        perturbator.SetValue("perturbation_chance", perturbationChance.valueDouble);
+                        perturbator.perturbationChanceVariable._setterFunction((float)perturbationChance.valueDouble);
                     if (obj.TryGetValue<JsonNodeNumber>("max_perturbation", out var maxPerturbation))
-                        perturbator.SetValue("max_perturbation", maxPerturbation.valueLong);
+                        perturbator.maxPerturbationVariable._setterFunction((byte)maxPerturbation.valueLong);
                     if (obj.TryGetValue<JsonNodeNumber>("min_frame", out var minFrame))
-                        perturbator.SetValue("min_frame", minFrame.valueLong);
+                        perturbator.minFrameVariable._setterFunction((uint)minFrame.valueLong);
                     if (obj.TryGetValue<JsonNodeNumber>("max_frame", out var maxFrame))
-                        perturbator.SetValue("max_frame", maxFrame.valueLong);
+                        perturbator.maxFrameVariable._setterFunction((uint)maxFrame.valueLong);
                     AddPerturbator(perturbator);
                 }
 

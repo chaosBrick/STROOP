@@ -67,7 +67,7 @@ namespace STROOP.Tabs
                 int? rngIncrementullable = ParsingUtilities.ParseIntNullable(txtRNGIncrement.Text);
                 int? rngIndexNullable = ParsingUtilities.ParseIntNullable(textBoxRNGIndexTester.Text);
                 if (!rngIndexNullable.HasValue || !rngIncrementullable.HasValue) return;
-                int rngIndex = rngIndexNullable.Value;
+                ushort rngIndex = (ushort)rngIndexNullable.Value;
                 ushort rngValue = RngIndexer.GetRngValue(rngIndex);
                 Config.Stream.SetValue(rngValue, MiscConfig.RngAddress);
                 int nextRngIndex = rngIndex + rngIncrementullable.Value;

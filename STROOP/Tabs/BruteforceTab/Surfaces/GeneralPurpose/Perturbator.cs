@@ -1,15 +1,16 @@
 ﻿using System;
-using System.Drawing;
-using System.Windows.Forms;
-using System.Linq;
-using STROOP.Utilities;
-using STROOP.Core.WatchVariables;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 using System.Text;
+using System.Windows.Forms;
+
+using STROOP.Controls;
+using STROOP.Utilities;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
 {
-    public partial class Perturbator : UserControl
+    partial class Perturbator : UserControl
     {
         static (int x, int y) GetChildBounds(Control parent)
         {
@@ -25,13 +26,18 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
         bool expanded = false;
         int collapsedHeight;
 
-        Dictionary<string, object> parameterValues = new Dictionary<string, object>()
+        public readonly BruteforceVariableView<uint> minFrameVariable, maxFrameVariable;
+        public readonly BruteforceVariableView<float> perturbationChanceVariable;
+        public readonly BruteforceVariableView<byte> maxPerturbationVariable;
+        List<IBruteforceVariableView> variableViews = new List<IBruteforceVariableView>();
+        List<WatchVariableControl> controls = new List<WatchVariableControl>();
+
+        private BruteforceVariableView<T> CreateVar<T>(string name, string bruteforcerType, T defaultValue)
         {
-            ["min_frame"] = 0,
-            ["max_frame"] = 9999,
-            ["perturbation_chance"] = 0.25f,
-            ["max_perturbation"] = 8
-        };
+            var result = (BruteforceVariableView<T>)BF_Utilities.BF_VariableUtilties.CreateNamedVariable(name, bruteforcerType, defaultValue);
+            variableViews.Add(result);
+            return result;
+        }
 
         public Perturbator()
         {
@@ -41,31 +47,21 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             Controls.Remove(watchVariablePanelParameters);
             RecalculateSize();
             collapsedHeight = Height;
-        }
 
-        public void SetValue(string key, object value) => parameterValues[key] = value;
+            minFrameVariable = CreateVar<uint>("u32", "min_frame", 0);
+            maxFrameVariable = CreateVar<uint>("u32", "max_frame", 999999);
+            perturbationChanceVariable = CreateVar<float>("f32", "perturbation_chance", 0.25f);
+            maxPerturbationVariable = CreateVar<byte>("u8", "max_perturbation", 8);
+        }
 
         public void Init(BruteforceTab bruteforceTab)
         {
             watchVariablePanelParameters.ClearVariables();
             labelName.Text = "Perturbator";
-            var variableViews = new WatchVariable.IVariableView[parameterValues.Count];
-            int i = 0;
-            foreach (var param in parameterValues)
-            {
-                var key_cap = param.Key;
-                variableViews[i++] = new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
-                {
-                    Name = param.Key,
-                    _getterFunction = (_) => parameterValues[key_cap],
-                    _setterFunction = (value, addr) => { parameterValues[key_cap] = value; return true; }
-                };
-            }
-            watchVariablePanelParameters.AddVariables(variableViews.Select(_ => {
-                var result = new WatchVariable(_);
-                result.ValueSet += bruteforceTab.DeferUpdateControlState;
-                return (result, _);
-            }));
+
+            controls = watchVariablePanelParameters.AddVariables(variableViews).ToList();
+            foreach (var control in controls)
+                control.WatchVarWrapper.ValueSet += bruteforceTab.DeferUpdateControlState;
         }
 
         void RecalculateSize()
@@ -116,8 +112,8 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
             var strBuilder = new StringBuilder();
 
             strBuilder.Append($"{tabs0}{{");
-            foreach (var param in parameterValues)
-                strBuilder.Append($"{Environment.NewLine}{tabs1}\"{param.Key}\": {param.Value},");
+            foreach (var param in controls)
+                strBuilder.Append($"{Environment.NewLine}{tabs1}\"{param.view.Name}\": {param.WatchVarWrapper.GetValueText()},");
             strBuilder.Remove(strBuilder.Length - 1, 1);
             strBuilder.AppendLine($"{Environment.NewLine}{tabs0}}}");
             return strBuilder.ToString();

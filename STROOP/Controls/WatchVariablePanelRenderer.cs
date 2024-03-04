@@ -195,29 +195,31 @@ namespace STROOP.Controls
 
                 void DrawLockAndFixImages(WatchVariableControl ctrl, int baseX, int baseY)
                 {
-                    var lockImg = GetLockImageForCheckState(ctrl.WatchVar.HasLocks());
-                    var xCoord = baseX + 2;
-                    var iconHeight = elementHeight - elementMarginTopBottom * 2;
-                    if (lockImg != null)
-                    {
-                        var iconWidth = (int)(iconHeight * (lockImg.Width / (float)lockImg.Height));
-                        g.DrawImage(lockImg,
-                            new Rectangle(
-                                xCoord,
-                                baseY + elementMarginTopBottom,
-                                iconWidth,
-                                iconHeight)
-                                );
-                        xCoord += iconWidth + 2;
-                    }
-                    if (ctrl.FixedAddressListGetter() != null)
-                        g.DrawImage(_pinnedImage,
-                            new Rectangle(
-                                xCoord,
-                                baseY + elementMarginTopBottom,
-                                (int)(iconHeight * (_pinnedImage.Width / (float)_pinnedImage.Height)),
-                                iconHeight)
-                                );
+                    // TODO: work out locking feature
+                    // TODO: work out fixing feature
+                    //var lockImg = GetLockImageForCheckState(ctrl.view.HasLocks());
+                    //var xCoord = baseX + 2;
+                    //var iconHeight = elementHeight - elementMarginTopBottom * 2;
+                    //if (lockImg != null)
+                    //{
+                    //    var iconWidth = (int)(iconHeight * (lockImg.Width / (float)lockImg.Height));
+                    //    g.DrawImage(lockImg,
+                    //        new Rectangle(
+                    //            xCoord,
+                    //            baseY + elementMarginTopBottom,
+                    //            iconWidth,
+                    //            iconHeight)
+                    //            );
+                    //    xCoord += iconWidth + 2;
+                    //}
+                    //if (ctrl.FixedAddressListGetter() != null)
+                    //    g.DrawImage(_pinnedImage,
+                    //        new Rectangle(
+                    //            xCoord,
+                    //            baseY + elementMarginTopBottom,
+                    //            (int)(iconHeight * (_pinnedImage.Width / (float)_pinnedImage.Height)),
+                    //            iconHeight)
+                    //            );
                 }
 
                 void DrawGrid()

@@ -2,6 +2,7 @@
 using STROOP.Forms;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
+using STROOP.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -58,63 +59,61 @@ namespace STROOP.Tabs
             if (!Enumerable.SequenceEqual(warpNodeAddresses, _warpNodeAddresses))
             {
                 watchVariablePanelWarp.RemoveVariableGroup(VariableGroup.WarpNode);
-                watchVariablePanelWarp.AddVariables(
-                    GetWarpNodeVariables(warpNodeAddresses).ConvertAll(_ => (new WatchVariable(_), (WatchVariable.IVariableView)_))
-                    );
+                watchVariablePanelWarp.AddVariables(GetWarpNodeVariables(warpNodeAddresses));
                 _warpNodeAddresses = warpNodeAddresses;
             }
 
             base.Update(updateView);
         }
 
-        private List<WatchVariable.CustomView> GetWarpNodeVariables(List<uint> addresses)
+        private List<NamedVariableCollection.CustomView> GetWarpNodeVariables(List<uint> addresses)
         {
-            var controls = new List<WatchVariable.CustomView>();
+            var controls = new List<NamedVariableCollection.CustomView>();
             int i = 0;
             foreach (var address in addresses)
                 controls.AddRange(GetWarpNodeVariables(address, i++));
             return controls;
         }
 
-        private IEnumerable<WatchVariable.CustomView> GetWarpNodeVariables(uint address, int index)
+        private IEnumerable<NamedVariableCollection.CustomView> GetWarpNodeVariables(uint address, int index)
         {
-            return new WatchVariable.CustomView[]
+            return new NamedVariableCollection.CustomView[]
             {
-                new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                new NamedVariableCollection.CustomView<byte>(typeof(WatchVariableNumberWrapper<byte>))
                 {
                     Name = $"Warp {index} ID",
-                    _getterFunction = _ => Config.Stream.GetByte(address),
-                    _setterFunction = (val, _) => Config.Stream.SetValue(System.Convert.ToByte(val), address)
+                    _getterFunction = () => Config.Stream.GetByte(address).Yield(),
+                    _setterFunction = (val) => Config.Stream.SetValue(val, address).Yield()
                 },
-                new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                new NamedVariableCollection.CustomView<byte>(typeof(WatchVariableNumberWrapper<byte>))
                 {
                     Name = $"Warp {index} Dest Level",
-                    _getterFunction = _ => Config.Stream.GetByte(address + 0x1),
-                    _setterFunction = (val, _) => Config.Stream.SetValue(System.Convert.ToByte(val), address + 0x1)
+                    _getterFunction = () => Config.Stream.GetByte(address + 0x1).Yield(),
+                    _setterFunction = val => Config.Stream.SetValue(val, address + 0x1).Yield()
                 },
-                new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                new NamedVariableCollection.CustomView<byte>(typeof(WatchVariableNumberWrapper<byte>))
                 {
                     Name = $"Warp {index} Dest Area",
-                    _getterFunction = _ => Config.Stream.GetByte(address + 0x2),
-                    _setterFunction = (val, _) => Config.Stream.SetValue(System.Convert.ToByte(val), address + 0x2)
+                    _getterFunction = () => Config.Stream.GetByte(address + 0x2).Yield(),
+                    _setterFunction = val => Config.Stream.SetValue(val, address + 0x2).Yield()
                 },
-                new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                new NamedVariableCollection.CustomView<byte>(typeof(WatchVariableNumberWrapper<byte>))
                 {
                     Name = $"Warp {index} Dest Node",
-                    _getterFunction = _ => Config.Stream.GetByte(address + 0x3),
-                    _setterFunction = (val, _) => Config.Stream.SetValue(System.Convert.ToByte(val), address + 0x3)
+                    _getterFunction = () => Config.Stream.GetByte(address + 0x3).Yield(),
+                    _setterFunction = val => Config.Stream.SetValue(val, address + 0x3).Yield()
                 },
-                new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                new NamedVariableCollection.CustomView<uint>(typeof(WatchVariableNumberWrapper<uint>))
                 {
                     Name = $"Warp {index} Object",
-                    _getterFunction = _ => Config.Stream.GetUInt32(address + 0x4),
-                    _setterFunction = (val, _) => Config.Stream.SetValue((uint)val, address + 0x4)
+                    _getterFunction = () => Config.Stream.GetUInt32(address + 0x4).Yield(),
+                    _setterFunction = val => Config.Stream.SetValue(val, address + 0x4).Yield()
                 },
-                new WatchVariable.CustomView(typeof(WatchVariableNumberWrapper))
+                new NamedVariableCollection.CustomView<uint>(typeof(WatchVariableNumberWrapper<uint>))
                 {
                     Name = $"Warp {index} Next",
-                    _getterFunction = _ => Config.Stream.GetUInt32(address + 0x8),
-                    _setterFunction = (val, _) => Config.Stream.SetValue((uint)val, address + 0x8)
+                    _getterFunction = () => Config.Stream.GetUInt32(address + 0x8).Yield(),
+                    _setterFunction = val => Config.Stream.SetValue(val, address + 0x8).Yield()
                 },
             };
         }
