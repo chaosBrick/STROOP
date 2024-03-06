@@ -10,11 +10,24 @@ namespace STROOP.Core.Variables
 {
     public class NamedVariableCollection
     {
-        private static IEnumerable<T> GetValues<T>(MemoryDescriptor m) where T : struct, IConvertible
-            => m.GetAddressList().ConvertAll(address => (T)Config.Stream.GetValue(typeof(T), address, m.UseAbsoluteAddressing, m.Mask, m.Shift));
+        private static IEnumerable<T> GetValues<T>(DescribedMemoryState memoryState) where T : struct, IConvertible
+            => memoryState.GetAddressList().ConvertAll(address => (T)Config.Stream.GetValue(
+                typeof(T),
+                address,
+                memoryState.descriptor.UseAbsoluteAddressing,
+                memoryState.descriptor.Mask,
+                memoryState.descriptor.Shift
+                ));
 
-        private static IEnumerable<bool> SetAll<T>(MemoryDescriptor m, T value) where T : struct, IConvertible
-            => m.GetAddressList().Select(address => Config.Stream.SetValueRoundingWrapping(typeof(T), value, address, m.UseAbsoluteAddressing, m.Mask, m.Shift)).ToArray();
+        private static IEnumerable<bool> SetAll<T>(DescribedMemoryState memoryState, T value) where T : struct, IConvertible
+            => memoryState.GetAddressList().Select(address => Config.Stream.SetValueRoundingWrapping(
+                typeof(T),
+                value,
+                address,
+                memoryState.descriptor.UseAbsoluteAddressing,
+                memoryState.descriptor.Mask,
+                memoryState.descriptor.Shift
+                )).ToArray();
 
         public delegate IEnumerable<T> GetterFunction<out T>();
         public delegate IEnumerable<bool> SetterFunction<T>(T value);
@@ -116,8 +129,8 @@ namespace STROOP.Core.Variables
             public MemoryDescriptorView(MemoryDescriptor memoryDescriptor, string wrapper = "Number")
                 : base(memoryDescriptor, wrapper)
             {
-                _getterFunction = () => GetValues<T>(memoryDescriptor);
-                _setterFunction = (T value) => SetAll(memoryDescriptor, value);
+                _getterFunction = () => GetValues<T>(describedMemoryState);
+                _setterFunction = (T value) => SetAll(describedMemoryState, value);
             }
 
             public GetterFunction<T> _getterFunction { get; private set; }
@@ -160,8 +173,8 @@ namespace STROOP.Core.Variables
             public XmlMemoryView(MemoryDescriptor memoryDescriptor, XElement xElement)
                 : base(memoryDescriptor, xElement)
             {
-                _getterFunction = () => GetValues<T>(memoryDescriptor);
-                _setterFunction = (T value) => SetAll(memoryDescriptor, value);
+                _getterFunction = () => GetValues<T>(describedMemoryState);
+                _setterFunction = (T value) => SetAll(describedMemoryState, value);
             }
 
             public GetterFunction<T> _getterFunction { get; private set; }

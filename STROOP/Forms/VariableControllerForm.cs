@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
+using STROOP.Core.Variables;
 using STROOP.Controls.VariablePanel;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
@@ -18,6 +19,7 @@ namespace STROOP.Forms
 
         private readonly List<string> _varNames;
         private readonly List<WatchVariableWrapper> _watchVarWrappers;
+        private readonly List<DescribedMemoryState> _variableMemoryStates;
 
         public VariableControllerForm(string varName, WatchVariableWrapper watchVarWrapper) :
                 this(new List<string>() { varName }, new List<WatchVariableWrapper>() { watchVarWrapper })
@@ -27,6 +29,9 @@ namespace STROOP.Forms
         {
             _varNames = varNames;
             _watchVarWrappers = watchVarWrappers;
+
+            // TODO: Create and correctly use own DescribedMemoryState?
+            _variableMemoryStates = _watchVarWrappers.ConvertAndRemoveNull(x => (x._view as NamedVariableCollection.IMemoryDescriptorView)?.describedMemoryState);
 
             InitializeComponent();
             FormManager.AddForm(this);
@@ -80,12 +85,7 @@ namespace STROOP.Forms
             //        _watchVarWrappers[i].ToggleLocked(!anyLocked, _fixedAddressLists[i]);
             //};
 
-            // TODO: work out fixing feature
-            //_checkBoxFixAddress.CheckState = BoolUtilities.GetCheckState(
-            //    fixedAddressLists.ConvertAll(fixedAddressList => fixedAddressList != null));
-
-            //_textBoxCurrentValue.BackColor = GetColorForCheckState(BoolUtilities.GetCheckState(
-            //    fixedAddressLists.ConvertAll(fixedAddressList => fixedAddressList != null)));
+            UpdateFixedCheckState();
         }
 
         private string GetValues()
@@ -106,6 +106,12 @@ namespace STROOP.Forms
                 for (int i = 0; i < _watchVarWrappers.Count; i++)
                     _watchVarWrappers[i].TrySetValue(values[i % values.Count]);
             }
+        }
+
+        private void UpdateFixedCheckState()
+        {
+            _checkBoxFixAddress.CheckState = BoolUtilities.GetCheckState(_variableMemoryStates.ConvertAll(x => x.fixedAddresses));
+            _textBoxCurrentValue.BackColor = GetColorForCheckState(_checkBoxFixAddress.CheckState);
         }
 
         private Color GetColorForCheckState(CheckState checkState)
@@ -135,20 +141,10 @@ namespace STROOP.Forms
 
         public void ToggleFixedAddress()
         {
-            // TODO: work out fixing feature
-            //bool fixedAddress = _checkBoxFixAddress.Checked;
-            //if (fixedAddress)
-            //{
-            //    _textBoxCurrentValue.BackColor = COLOR_RED;
-            //    _fixedAddressLists = _watchVarWrappers.ConvertAll(
-            //        watchVarWrapper => watchVarWrapper.GetCurrentAddressesToFix());
-            //}
-            //else
-            //{
-            //    _textBoxCurrentValue.BackColor = COLOR_BLUE;
-            //    _fixedAddressLists = _watchVarWrappers.ConvertAll(
-            //        watchVarWrapper => (List<uint>)null);
-            //}
+            bool fixedAddress = _checkBoxFixAddress.Checked;
+            foreach (var memoryState in _variableMemoryStates)
+                memoryState.ToggleFixedAddress(fixedAddress);
+            UpdateFixedCheckState();
         }
     }
 }

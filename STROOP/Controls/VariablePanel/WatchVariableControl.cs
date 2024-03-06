@@ -94,11 +94,14 @@ namespace STROOP.Controls.VariablePanel
 
             AddSetting(DefaultSettings.BackgroundColorSetting);
             AddSetting(DefaultSettings.HighlightColorSetting);
-            // TODO: work out fixing setting
-            //AddSetting(DefaultSettings.FixAddressSetting);
             AddSetting(DefaultSettings.HighlightSetting);
-            // TODO: work out locking setting
-            //AddSetting(DefaultSettings.LockSetting);
+
+            if (view is NamedVariableCollection.IMemoryDescriptorView)
+            {
+                AddSetting(DefaultSettings.FixAddressSetting);
+                // TODO: work out locking setting
+                //AddSetting(DefaultSettings.LockSetting);
+            }
         }
 
         void ShowMainContextMenu(object sender, MouseEventArgs e)

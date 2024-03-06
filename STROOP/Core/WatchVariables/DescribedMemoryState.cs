@@ -10,15 +10,21 @@ namespace STROOP.Core.Variables
 
     public class DescribedMemoryState
     {
+        public readonly MemoryDescriptor descriptor;
+
+        public bool locked => HasLocks() != System.Windows.Forms.CheckState.Unchecked;
+        Dictionary<uint, object> locks = new Dictionary<uint, object>();
+
         private Func<IEnumerable<uint>> _fixedAddressGetter = null;
-        public readonly MemoryDescriptor memoryDescriptor;
+        public bool fixedAddresses => _fixedAddressGetter != null;
+
         public DescribedMemoryState(MemoryDescriptor memoryDescriptor)
         {
-            this.memoryDescriptor = memoryDescriptor;
+            this.descriptor = memoryDescriptor;
         }
 
         public IEnumerable<uint> GetAddressList()
-            => _fixedAddressGetter?.Invoke() ?? memoryDescriptor.GetBaseAddressList().Select(x => x + memoryDescriptor.Offset);
+            => _fixedAddressGetter?.Invoke() ?? descriptor.GetBaseAddressList().Select(x => x + descriptor.Offset);
 
         public void ToggleFixedAddress(bool? fix)
         {
@@ -47,11 +53,6 @@ namespace STROOP.Core.Variables
             tab.SetCustomAddress(address);
             tab.UpdateHexDisplay();
         }
-
-
-        public bool locked => HasLocks() != System.Windows.Forms.CheckState.Unchecked;
-
-        Dictionary<uint, object> locks = new Dictionary<uint, object>();
 
         public bool SetLocked(bool locked, List<uint> addresses)
         {
