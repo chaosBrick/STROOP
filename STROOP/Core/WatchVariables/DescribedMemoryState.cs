@@ -5,7 +5,7 @@ using System.Linq;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 
-namespace STROOP.Core.WatchVariables
+namespace STROOP.Core.Variables
 {
 
     public class DescribedMemoryState

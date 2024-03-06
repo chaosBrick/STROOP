@@ -5,7 +5,7 @@ using STROOP.Tabs.MapTab;
 using STROOP.Structs.Configurations;
 using System.Windows.Forms;
 using STROOP.Utilities;
-using STROOP.Core.WatchVariables;
+using STROOP.Core.Variables;
 using System.Linq;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers

@@ -1,5 +1,5 @@
 ﻿using System;
-using STROOP.Core.WatchVariables;
+using STROOP.Core.Variables;
 using STROOP.Utilities;
 
 namespace STROOP.Tabs.BruteforceTab

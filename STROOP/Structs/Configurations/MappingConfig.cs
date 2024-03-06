@@ -1,4 +1,4 @@
-﻿using STROOP.Core.WatchVariables;
+﻿using STROOP.Core.Variables;
 using STROOP.Utilities;
 using System;
 using System.Collections.Generic;

@@ -6,7 +6,7 @@ using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using System.Xml.Linq;
 
-namespace STROOP.Core.WatchVariables
+namespace STROOP.Core.Variables
 {
     public class MemoryDescriptor
     {

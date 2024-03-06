@@ -9,7 +9,7 @@ using System.Linq;
 // TODO: this shouldn't be required
 using STROOP.Controls;
 
-namespace STROOP.Core.WatchVariables
+namespace STROOP.Core.Variables
 {
     public enum CombinedValuesMeaning
     {

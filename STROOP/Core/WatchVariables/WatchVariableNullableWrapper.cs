@@ -2,7 +2,7 @@
 using System.Linq;
 using STROOP.Controls;
 
-namespace STROOP.Core.WatchVariables
+namespace STROOP.Core.Variables
 {
     class WatchVariableNullableWrapper<TBaseWrapper, TBackingType> : WatchVariableWrapper<TBackingType?>
         where TBaseWrapper : WatchVariableWrapper<TBackingType>

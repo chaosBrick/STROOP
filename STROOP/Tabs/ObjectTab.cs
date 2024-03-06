@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using STROOP.Structs.Configurations;
 using STROOP.Forms;
 using STROOP.Models;
-using STROOP.Core.WatchVariables;
+using STROOP.Core.Variables;
 
 namespace STROOP.Tabs
 {

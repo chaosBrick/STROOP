@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using STROOP.Core.WatchVariables;
+using STROOP.Core.Variables;
 using STROOP.Structs.Configurations;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers

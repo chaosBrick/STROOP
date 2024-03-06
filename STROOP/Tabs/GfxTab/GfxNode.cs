@@ -4,7 +4,7 @@ using System.Drawing;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
 using STROOP.Utilities;
-using STROOP.Core.WatchVariables;
+using STROOP.Core.Variables;
 
 namespace STROOP.Tabs.GfxTab
 {

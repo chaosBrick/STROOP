@@ -5,7 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using STROOP.Utilities;
 using STROOP.Controls;
-using STROOP.Core.WatchVariables;
+using STROOP.Core.Variables;
 
 namespace STROOP.Forms
 {

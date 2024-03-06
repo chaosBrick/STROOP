@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using STROOP.Utilities;
-using STROOP.Core.WatchVariables;
+using STROOP.Core.Variables;
 
 // TODO: This shouldn't be necessary
 using STROOP.Controls;
@@ -29,7 +29,7 @@ namespace STROOP.Structs
 
             public override bool TrySetValue(string value) => false;
 
-            public override void UpdateControls() { }
+            public override void Update() { }
         }
 
         static readonly Dictionary<string, List<(Type wrapperType, Type typeRestriction)>> wrapperTypes = new Dictionary<string, List<(Type, Type)>>();
@@ -195,7 +195,6 @@ namespace STROOP.Structs
             baseAddressGetters[BaseAddressType.MainSave] = () => new List<uint> { MainSaveConfig.CurrentMainSaveAddress };
 
             baseAddressGetters[BaseAddressType.Object] = () => Config.ObjectSlotsManager.SelectedSlotsAddresses;
-            baseAddressGetters["ProcessGroup"] = () =>
                 Config.ObjectSlotsManager.SelectedObjects.ConvertAll(obj => obj.CurrentProcessGroup ?? uint.MaxValue);
 
             baseAddressGetters["Graphics"] = () =>

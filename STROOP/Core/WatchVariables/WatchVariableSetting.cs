@@ -7,10 +7,10 @@ using System.Drawing;
 using System.Windows.Forms;
 
 // TODO: These shouldn't be required
-using STROOP.Core.WatchVariables;
+using STROOP.Core.Variables;
 using STROOP.Controls;
 
-namespace STROOP.Core.WatchVariables
+namespace STROOP.Core.Variables
 {
     public class WatchVariableSetting
     {

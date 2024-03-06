@@ -8,7 +8,7 @@ using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Forms;
 using STROOP.Controls;
-using STROOP.Core.WatchVariables;
+using STROOP.Core.Variables;
 
 namespace STROOP.Tabs
 {

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 // TODO: This shouldn't be necessary
 using STROOP.Controls;
 
-namespace STROOP.Core.WatchVariables
+namespace STROOP.Core.Variables
 {
     public class WatchVariableAngleWrapper<TNumber> : WatchVariableNumberWrapper<TNumber> where TNumber : struct, IConvertible
     {

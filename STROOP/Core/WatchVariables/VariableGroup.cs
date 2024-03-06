@@ -7,7 +7,7 @@ using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 
-namespace STROOP.Core.WatchVariables
+namespace STROOP.Core.Variables
 {
     public static class IVariableViewExtensions
     {

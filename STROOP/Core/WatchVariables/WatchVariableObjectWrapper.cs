@@ -6,7 +6,7 @@ using STROOP.Utilities;
 // TODO: This shouldn't be necessary
 using STROOP.Controls;
 
-namespace STROOP.Core.WatchVariables
+namespace STROOP.Core.Variables
 {
     public class WatchVariableObjectWrapper : WatchVariableAddressWrapper
     {

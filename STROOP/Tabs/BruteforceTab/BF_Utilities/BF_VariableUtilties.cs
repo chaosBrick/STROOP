@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using STROOP.Core.WatchVariables;
+using STROOP.Core.Variables;
 using STROOP.Controls;
 
 namespace STROOP.Tabs.BruteforceTab.BF_Utilities

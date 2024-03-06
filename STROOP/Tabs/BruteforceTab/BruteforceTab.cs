@@ -1,7 +1,7 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using STROOP.Controls;
 using STROOP.Utilities;
-using STROOP.Core.WatchVariables;
+using STROOP.Core.Variables;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
