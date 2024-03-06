@@ -68,11 +68,10 @@ namespace STROOP.Core.WatchVariables
         {
             if (_displayAsCheckbox)
             {
-                var combinedValues = CombineValues();
-                if (combinedValues.meaning != CombinedValuesMeaning.SameValue)
-                    view._setterFunction(falseValue);
+                if (lastValueMeaning != CombinedValuesMeaning.SameValue)
+                    nextValue = falseValue;
                 else
-                    view._setterFunction(combinedValues.value.Equals(falseValue) ? trueValue : falseValue);
+                    nextValue = lastValue.Equals(falseValue) ? trueValue : falseValue;
             }
             else
                 base.Edit(parent, bounds);
@@ -117,8 +116,6 @@ namespace STROOP.Core.WatchVariables
         private bool HandleInverting(bool boolValue) => boolValue != _displayAsInverted;
 
         public override string GetClass() => "Boolean";
-
-        public override void UpdateControls() { }
     }
 
     public class WatchVariableBooleanWrapper : WatchVariableBooleanWrapperBase<bool>

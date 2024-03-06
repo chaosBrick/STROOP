@@ -130,7 +130,7 @@ namespace STROOP.Controls
 
         public void UpdateControl()
         {
-            WatchVarWrapper.UpdateControls();
+            WatchVarWrapper.Update();
             UpdateColor();
         }
 

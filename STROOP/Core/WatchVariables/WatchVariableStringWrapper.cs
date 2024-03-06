@@ -27,8 +27,6 @@ namespace STROOP.Core.WatchVariables
             AddStringContextMenuStripItems(watchVarControl.view.GetValueByKey(NamedVariableCollection.ViewProperties.specialType));
         }
 
-        public override void UpdateControls() { }
-
         private void AddStringContextMenuStripItems(string specialType)
         {
             if (specialType != null && specialTypeContextMenuHandlers.TryGetValue(specialType, out editValueHandler))

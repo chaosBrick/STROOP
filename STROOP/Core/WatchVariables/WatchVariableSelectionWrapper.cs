@@ -38,10 +38,7 @@ namespace STROOP.Core.WatchVariables
 
         public override string GetClass() => $"Selection for {baseWrapper.GetClass()}";
 
-        public override void UpdateControls()
-        {
-            baseWrapper.UpdateControls();
-        }
+        public override void UpdateControls() => baseWrapper.UpdateControls();
 
         bool IsCursorHovering(Rectangle rect, out Rectangle drawRectangle)
         {

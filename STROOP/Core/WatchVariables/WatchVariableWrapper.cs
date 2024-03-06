@@ -102,7 +102,7 @@ namespace STROOP.Core.WatchVariables
         public abstract void Edit(Control parent, Rectangle bounds);
         public abstract string GetClass();
         public abstract string GetValueText();
-        public abstract void UpdateControls();
+        public abstract void Update();
         public virtual void ToggleDisplay() { }
 
         protected void OnValueSet() => ValueSet();
@@ -110,8 +110,6 @@ namespace STROOP.Core.WatchVariables
 
     public abstract class WatchVariableWrapper<TBackingValue> : WatchVariableWrapper
     {
-        public NamedVariableCollection.IVariableView<TBackingValue> view => (NamedVariableCollection.IVariableView<TBackingValue>)_view;
-
         protected static Func<WatchVariableControl, object, bool> CreateBoolWithDefault<TWrapper>(
             Action<TWrapper, bool> setValue,
             Func<TWrapper, bool> getDefault
@@ -138,6 +136,22 @@ namespace STROOP.Core.WatchVariables
                 return false;
             };
 
+        public NamedVariableCollection.IVariableView<TBackingValue> view => (NamedVariableCollection.IVariableView<TBackingValue>)_view;
+
+        protected TBackingValue lastValue { get; private set; }
+        protected CombinedValuesMeaning lastValueMeaning { get; private set; }
+
+        private bool hasNextValue = false;
+        private TBackingValue _nextValue;
+        protected TBackingValue nextValue
+        {
+            get => _nextValue; set
+            {
+                hasNextValue = true;
+                _nextValue = value;
+            }
+        }
+
         protected WatchVariableWrapper(NamedVariableCollection.IVariableView watchVar, WatchVariableControl watchVarControl)
             : base(watchVar, watchVarControl)
         { }
@@ -153,6 +167,20 @@ namespace STROOP.Core.WatchVariables
             return (CombinedValuesMeaning.SameValue, firstValue);
         }
 
+        public override sealed void Update()
+        {
+            (lastValueMeaning, lastValue) = CombineValues();
+            if (hasNextValue)
+            {
+                if (view._setterFunction(nextValue).Aggregate(true, (a, b) => a && b))
+                    OnValueSet();
+                hasNextValue = false;
+            }
+            UpdateControls();
+        }
+
+        public virtual void UpdateControls() { }
+
         public override void Edit(Control parent, Rectangle bounds)
         {
             if (editValueHandler != null)
@@ -161,7 +189,7 @@ namespace STROOP.Core.WatchVariables
             {
                 textBox = new CarretlessTextBox();
                 textBox.Bounds = bounds;
-                textBox.Text = GetValueText();
+                textBox.Text = DisplayValue(lastValue);
 
                 bool updateValue = true;
                 textBox.Multiline = false;
@@ -179,11 +207,8 @@ namespace STROOP.Core.WatchVariables
                 EventHandler HandleLostFocus = null;
                 HandleLostFocus = (_, e) =>
                 {
-                    if (updateValue && TryParseValue(textBox.Text, out var validValue))
-                    {
-                        if (view._setterFunction(validValue).Aggregate(true, (a, b) => a && b))
-                            OnValueSet();
-                    }
+                    if (updateValue && TryParseValue(textBox.Text, out var nextValue))
+                        this.nextValue = nextValue;
                     textBox.LostFocus -= HandleLostFocus;
                     textBox.Parent.Controls.Remove(textBox);
                     textBox.Dispose();
