@@ -53,7 +53,7 @@ namespace STROOP.Forms
 
             var isAbsolute = baseAddressType == BaseAddressType.Absolute;
 
-            var result = new MemoryDescriptor(memoryTypeString, baseAddressType, offset).CreateView();
+            var result = new MemoryDescriptor(TypeUtilities.StringToType[memoryTypeString], baseAddressType, offset).CreateView();
             result.Name = textBoxNameValue.Text;
             return result;
         }

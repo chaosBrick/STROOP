@@ -25,6 +25,7 @@
         ProcessGroup,
         Coin,
         Triangle,
-        Area;
+        Area,
+        GfxNode;
     };
 }

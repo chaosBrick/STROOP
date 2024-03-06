@@ -26,7 +26,7 @@ namespace STROOP.Core.WatchVariables
             bool handleMapping = (element.Attribute(XName.Get("handleMapping")) != null) ?
                 bool.Parse(element.Attribute(XName.Get("handleMapping")).Value) : true;
 
-            var memoryDescriptor = new MemoryDescriptor(typeName, baseAddressType, offsetUS, offsetJP, offsetSH, offsetEU, offsetDefault, mask, shift, handleMapping);
+            var memoryDescriptor = new MemoryDescriptor(TypeUtilities.StringToType[typeName], baseAddressType, offsetUS, offsetJP, offsetSH, offsetEU, offsetDefault, mask, shift, handleMapping);
             var view = (NamedVariableCollection.XmlMemoryView)
                 typeof(NamedVariableCollection.XmlMemoryView<>)
                 .MakeGenericType(memoryDescriptor.MemoryType)
@@ -35,7 +35,6 @@ namespace STROOP.Core.WatchVariables
             return (memoryDescriptor, view);
         }
 
-        public readonly string MemoryTypeName;
         public readonly Type MemoryType;
         public readonly int? ByteCount;
         public readonly bool? SignedType;
@@ -88,18 +87,18 @@ namespace STROOP.Core.WatchVariables
             return baseAddresses.ConvertAll(baseAddress => baseAddress + offset).ToList();
         }
 
-        public MemoryDescriptor(string memoryTypeName, string baseAddress = nameof(Structs.BaseAddressType.None), uint offset = 0)
-            : this(memoryTypeName, baseAddress, null, null, null, null, offset, null, null, false)
+        public MemoryDescriptor(Type memoryTypeName, string baseAddress, uint offset, uint? mask = null, int? shift = null)
+            : this(memoryTypeName, baseAddress, null, null, null, null, offset, mask, shift, false)
         { }
 
-        public NamedVariableCollection.MemoryDescriptorView CreateView()
+        public NamedVariableCollection.MemoryDescriptorView CreateView(string wrapper = "Number")
             => (NamedVariableCollection.MemoryDescriptorView)
                 typeof(NamedVariableCollection.MemoryDescriptorView<>)
                 .MakeGenericType(MemoryType)
-                .GetConstructor(new Type[] { typeof(MemoryDescriptor) })
-                .Invoke(new object[] { this });
+                .GetConstructor(new Type[] { typeof(MemoryDescriptor), typeof(string) })
+                .Invoke(new object[] { this, wrapper });
 
-        private MemoryDescriptor(string memoryTypeName, string baseAddressType,
+        private MemoryDescriptor(Type memoryType, string baseAddressType,
             uint? offsetUS, uint? offsetJP, uint? offsetSH, uint? offsetEU, uint? offsetDefault, uint? mask, int? shift, bool handleMapping)
         {
             if (offsetDefault.HasValue && (offsetUS.HasValue || offsetJP.HasValue || offsetSH.HasValue || offsetEU.HasValue))
@@ -115,10 +114,9 @@ namespace STROOP.Core.WatchVariables
             OffsetEU = offsetEU;
             OffsetDefault = offsetDefault;
 
-            MemoryTypeName = memoryTypeName;
-            MemoryType = memoryTypeName == null ? null : TypeUtilities.StringToType[MemoryTypeName];
-            ByteCount = memoryTypeName == null ? (int?)null : TypeUtilities.TypeSize[MemoryType];
-            SignedType = memoryTypeName == null ? (bool?)null : TypeUtilities.TypeSign[MemoryType];
+            MemoryType = memoryType;
+            ByteCount = TypeUtilities.TypeSize[MemoryType];
+            SignedType = TypeUtilities.TypeSign[MemoryType];
 
             Mask = mask;
             Shift = shift;
@@ -143,7 +141,7 @@ namespace STROOP.Core.WatchVariables
                 string pluralSuffix = ByteCount.Value == 1 ? "" : "s";
                 byteCountString = string.Format(" ({0} byte{1})", ByteCount.Value, pluralSuffix);
             }
-            return MemoryTypeName + maskString + shiftString + byteCountString;
+            return TypeUtilities.TypeToString[MemoryType] + maskString + shiftString + byteCountString;
         }
 
         public string GetBaseTypeOffsetDescription() => $"{BaseAddressType} + {HexUtilities.FormatValue(Offset)}";

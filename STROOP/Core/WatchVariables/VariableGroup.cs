@@ -189,8 +189,8 @@ namespace STROOP.Core.WatchVariables
             public MemoryDescriptor memoryDescriptor { get; }
             public DescribedMemoryState describedMemoryState { get; }
 
-            public MemoryDescriptorView(MemoryDescriptor memoryDescriptor)
-                : base(WatchVariableUtilities.GetWrapperType(memoryDescriptor.MemoryType))
+            public MemoryDescriptorView(MemoryDescriptor memoryDescriptor, string wrapper)
+                : base(WatchVariableUtilities.GetWrapperType(memoryDescriptor.MemoryType, wrapper))
             {
                 this.memoryDescriptor = memoryDescriptor;
                 this.describedMemoryState = new DescribedMemoryState(memoryDescriptor);
@@ -199,8 +199,8 @@ namespace STROOP.Core.WatchVariables
 
         public class MemoryDescriptorView<T> : MemoryDescriptorView, IVariableView<T> where T : struct, IConvertible
         {
-            public MemoryDescriptorView(MemoryDescriptor memoryDescriptor)
-                : base(memoryDescriptor)
+            public MemoryDescriptorView(MemoryDescriptor memoryDescriptor, string wrapper = "Number")
+                : base(memoryDescriptor, wrapper)
             {
                 _getterFunction = () => GetValues<T>(memoryDescriptor);
                 _setterFunction = (T value) => SetAll(memoryDescriptor, value);

@@ -99,13 +99,6 @@ namespace STROOP.Tabs.GfxTab
             precursors.Add(gfxProperty<uint>("Parent", 0x0C, WatchVariableSubclass.Address));
             precursors.Add(gfxProperty<uint>("Child", 0x10, WatchVariableSubclass.Address));
             return precursors;
-
-        }
-
-        static uint GfxNodeBase()
-        {
-            GfxNode node = AccessScope<StroopMainForm>.content.GetTab<GfxTab>().SelectedNode;
-            return node?.Address ?? 0;
         }
 
         // Wrapper to make defining variables easier
@@ -120,42 +113,11 @@ namespace STROOP.Tabs.GfxTab
             Color color = (offset <= 0x13)
                 ? ColorUtilities.GetColorFromString("Yellow")
                 : ColorUtilities.GetColorFromString("LightBlue");
-            NamedVariableCollection.SetterFunction<T> setter;
-            NamedVariableCollection.GetterFunction<T> getter;
 
-            // TODO: This looks like a job for a MemoryDescriptor
-            setter = (v) =>
-            {
-                var b = GfxNodeBase();
-                if (b == 0)
-                    return false.Yield();
-                var value = (uint)Convert.ChangeType(v, typeof(uint));
-                var newValue = value;
-                if (subclass == WatchVariableSubclass.Boolean && Convert.ToUInt32(value) != 0)
-                    value = 0xFFFFFFFF;
-                if (typeof(T) != typeof(float))
-                {
-                    var previousValue = Convert.ToUInt32(Config.Stream.GetValue(typeof(T), b + offset));
-                    newValue = (Convert.ToUInt32(value) & mask.Value) | (previousValue & ~mask.Value);
-                }
-                return Config.Stream.SetValue(typeof(T), Convert.ChangeType(newValue, typeof(T)), b + offset).Yield();
-            };
-
-            getter = () =>
-            {
-                var b = GfxNodeBase();
-                if (b == 0)
-                    return Array.Empty<T>();
-                var finalResult = Config.Stream.GetValue(typeof(T), b + offset);
-                if (typeof(T) != typeof(float))
-                    finalResult = Convert.ChangeType(Convert.ToUInt32(finalResult) & mask, typeof(T));
-                return new T[] { (T)finalResult };
-            };
-
-            // TODO: verify that subclass.ToString() is a good idea here
-            var wrapperType = WatchVariableUtilities.GetWrapperType(typeof(T), subclass.ToString());
-
-            return new NamedVariableCollection.CustomView<T>(wrapperType) { Name = name, _getterFunction = getter, _setterFunction = setter };
+            var descriptor = new MemoryDescriptor(typeof(T), BaseAddressType.GfxNode, offset, mask);
+            var view = descriptor.CreateView(subclass.ToString());
+            view.Name = name;
+            return (NamedVariableCollection.MemoryDescriptorView<T>)view;
         }
 
         // If there are type specific variables, this should be overridden 

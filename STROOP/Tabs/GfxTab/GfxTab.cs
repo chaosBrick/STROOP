@@ -21,6 +21,15 @@ namespace STROOP.Tabs.GfxTab
         * This manager makes it easy to browse all the nodes and edit them
         */
 
+        static GfxTab theOneAndOnly;
+
+        [InitializeBaseAddress]
+        static void InitBaseAddresses()
+        {
+            WatchVariableUtilities.baseAddressGetters[BaseAddressType.GfxNode] =
+                () => theOneAndOnly.SelectedNode?.Address.Yield() ?? Array.Empty<uint>();
+        }
+
         public GfxNode SelectedNode;
         IEnumerable<WatchVariableControl> SpecificVariables;
 
@@ -79,6 +88,16 @@ namespace STROOP.Tabs.GfxTab
                 MessageBox.Show("Hack files are missing in Resources\\Hacks folder");
             }
             hck?.LoadPayload();
+        }
+
+        public override void Update(bool active)
+        {
+            // TODO: base WatchVariableWrapper value readouts on their value on update, 
+            //       instead of evaluating them every time the value is queried (e.g. Application.DoEvents())
+            theOneAndOnly = this;
+            // allow calls made in the update scope to retrieve this tab's selected node address
+            using (new AccessScope<GfxTab>(this))
+                base.Update(active);
         }
 
         // Dump the display list of the currently selected gfx node (if applicable)
