@@ -8,9 +8,9 @@ using STROOP.Core.Variables;
 using STROOP.Models;
 using STROOP.Structs.Configurations;
 using STROOP.Ttc;
-using STROOP.Utilities;
+using STROOP.Structs;
 
-namespace STROOP.Structs
+namespace STROOP.Utilities
 {
     public static class WatchVariableSpecialUtilities
     {

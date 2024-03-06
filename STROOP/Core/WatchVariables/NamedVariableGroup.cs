@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
-using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 

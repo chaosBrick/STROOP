@@ -7,10 +7,10 @@ using System.Windows.Forms;
 
 using STROOP.Controls.VariablePanel;
 using STROOP.Core.Variables;
+using STROOP.Structs;
 using STROOP.Structs.Configurations;
-using STROOP.Utilities;
 
-namespace STROOP.Structs
+namespace STROOP.Utilities
 {
     public static class IVariableViewExtensions
     {

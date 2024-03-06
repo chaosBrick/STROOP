@@ -1,10 +1,10 @@
-﻿using STROOP.Core.Variables;
-using STROOP.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace STROOP.Structs
+using STROOP.Utilities;
+
+namespace STROOP.Core.Variables
 {
     public class WatchVariableSpecialDictionary
     {

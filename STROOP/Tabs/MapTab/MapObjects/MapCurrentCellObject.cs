@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using STROOP.Structs.Configurations;
+
 using STROOP.Structs;
+using STROOP.Structs.Configurations;
+using STROOP.Utilities;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {

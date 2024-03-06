@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 using OpenTK;
 
-using STROOP.Controls.VariablePanel;
+using STROOP.Core.Variables;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 
