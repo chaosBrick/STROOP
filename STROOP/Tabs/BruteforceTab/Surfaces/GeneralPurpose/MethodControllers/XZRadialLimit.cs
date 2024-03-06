@@ -70,7 +70,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
             SizeChanged += () =>
             {
                 using (ignoreUpdates.New())
-                    (vars[2] as NamedVariableCollection.IVariableView<float>)?._setterFunction(Size);
+                    (vars[2] as NamedVariableCollection.IView<float>)?._setterFunction(Size);
             };
             updateFromControl();
         }

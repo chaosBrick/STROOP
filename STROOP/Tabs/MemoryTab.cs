@@ -54,7 +54,7 @@ namespace STROOP.Tabs
                 if (_behavior.HasValue)
                     _objectSpecificPrecursors.AddRange(
                         Config.ObjectAssociations.GetWatchVarControls(_behavior.Value)
-                        .ConvertAndRemoveNull(x => (x as NamedVariableCollection.IMemoryDescriptorVariableView)?.memoryDescriptor)
+                        .ConvertAndRemoveNull(x => (x as NamedVariableCollection.IMemoryDescriptorView)?.memoryDescriptor)
                         );
             }
         }
@@ -314,7 +314,7 @@ namespace STROOP.Tabs
                 }));
             }
 
-            public NamedVariableCollection.IVariableView CreatePrecursor(bool useObjAddress, bool useHex, bool useObj, bool useRelativeName)
+            public NamedVariableCollection.IView CreatePrecursor(bool useObjAddress, bool useHex, bool useObj, bool useRelativeName)
             {
                 WatchVariableSubclass subclass = useObj
                     ? WatchVariableSubclass.Object

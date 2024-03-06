@@ -77,7 +77,7 @@ namespace STROOP.Tabs
                 });
         }
 
-        private List<NamedVariableCollection.IVariableView> GetSnowParticleControls(int index)
+        private List<NamedVariableCollection.IView> GetSnowParticleControls(int index)
         {
             uint structOffset = (uint)index * SnowConfig.ParticleStructSize;
             List<uint> offsets = new List<uint>()
@@ -93,7 +93,7 @@ namespace STROOP.Tabs
                 String.Format("Particle {0} Z", index),
             };
 
-            var controls = new List<NamedVariableCollection.IVariableView>();
+            var controls = new List<NamedVariableCollection.IView>();
             for (int i = 0; i < 3; i++)
             {
                 var view = new NamedVariableCollection.CustomView<int>(typeof(WatchVariableNumberWrapper<uint>))

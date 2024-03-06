@@ -8,14 +8,14 @@ namespace STROOP.Structs
 {
     public class WatchVariableSpecialDictionary
     {
-        private readonly Dictionary<string, NamedVariableCollection.IVariableView> _dictionary;
+        private readonly Dictionary<string, NamedVariableCollection.IView> _dictionary;
 
         public WatchVariableSpecialDictionary()
         {
-            _dictionary = new Dictionary<string, NamedVariableCollection.IVariableView>();
+            _dictionary = new Dictionary<string, NamedVariableCollection.IView>();
         }
 
-        public bool TryGetValue(string key, out NamedVariableCollection.IVariableView getterSetter)
+        public bool TryGetValue(string key, out NamedVariableCollection.IView getterSetter)
             => _dictionary.TryGetValue(key, out getterSetter);
 
         public void Add<T>(string key, NamedVariableCollection.GetterFunction<T> getter, NamedVariableCollection.SetterFunction<T> setter, Type wrapperType = null)

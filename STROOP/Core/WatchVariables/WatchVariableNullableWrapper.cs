@@ -10,10 +10,10 @@ namespace STROOP.Core.Variables
     {
 
         private TBaseWrapper baseWrapper;
-        public WatchVariableNullableWrapper(NamedVariableCollection.IVariableView<TBackingType?> var, WatchVariableControl control)
+        public WatchVariableNullableWrapper(NamedVariableCollection.IView<TBackingType?> var, WatchVariableControl control)
             : base(var, control)
         {
-            var interfaceType = view.GetType().GetInterfaces().First(x => x.Name == $"{nameof(NamedVariableCollection.IVariableView)}`1");
+            var interfaceType = view.GetType().GetInterfaces().First(x => x.Name == $"{nameof(NamedVariableCollection.IView)}`1");
             interfaceType = interfaceType.GetGenericTypeDefinition().MakeGenericType(interfaceType.GenericTypeArguments[0].GenericTypeArguments[0]);
             baseWrapper = (TBaseWrapper)
                 typeof(TBaseWrapper)

@@ -26,9 +26,9 @@ namespace STROOP.Core.Variables
 
         (string name, Func<TBackingValue> getter) selectedOption;
 
-        public WatchVariableSelectionWrapper(NamedVariableCollection.IVariableView<TBackingValue> var, WatchVariableControl control) : base(var, control)
+        public WatchVariableSelectionWrapper(NamedVariableCollection.IView<TBackingValue> var, WatchVariableControl control) : base(var, control)
         {
-            var interfaceType = view.GetType().GetInterfaces().First(x => x.Name == $"{nameof(NamedVariableCollection.IVariableView)}`1");
+            var interfaceType = view.GetType().GetInterfaces().First(x => x.Name == $"{nameof(NamedVariableCollection.IView)}`1");
             baseWrapper = (TBaseWrapper)
                 typeof(TBaseWrapper)
                 .GetConstructor(new Type[] { interfaceType, typeof(WatchVariableControl) })

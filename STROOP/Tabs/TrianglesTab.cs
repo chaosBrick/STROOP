@@ -40,7 +40,7 @@ namespace STROOP.Tabs
             ("Triangle projections",
            (PositionAngle.HybridPositionAngle pa) =>
            {
-               var vars = new List<NamedVariableCollection.IVariableView>();
+               var vars = new List<NamedVariableCollection.IView>();
                vars.Add(new NamedVariableCollection.CustomView<double>(typeof(WatchVariableNumberWrapper<double>))
                {
                    Color = "LightBlue",

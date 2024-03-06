@@ -21,7 +21,7 @@ namespace STROOP.Utilities
                 ("Base Info",
                 pa =>
                 {
-                    T MakePATypeView<T>(T view) where T : NamedVariableCollection.IVariableView
+                    T MakePATypeView<T>(T view) where T : NamedVariableCollection.IView
                     {
                         view.SetValueByKey(NamedVariableCollection.ViewProperties.specialType, "PositionAngle");
                         return view;
@@ -91,7 +91,7 @@ namespace STROOP.Utilities
                 ($"Relations to {relation.name}",
                (HybridPositionAngle pa) =>
                 {
-                    List<NamedVariableCollection.IVariableView> vars = new List<NamedVariableCollection.IVariableView>();
+                    List<NamedVariableCollection.IView> vars = new List<NamedVariableCollection.IView>();
                     var distTypes = new[] { "X", "Y", "Z", "H", "", "F", "S" };
                     var distGetters = new Func<PositionAngle, PositionAngle, double>[]
                         {

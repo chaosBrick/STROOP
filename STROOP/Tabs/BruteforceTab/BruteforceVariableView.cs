@@ -4,7 +4,7 @@ using STROOP.Utilities;
 
 namespace STROOP.Tabs.BruteforceTab
 {
-    interface IBruteforceVariableView : NamedVariableCollection.IVariableView
+    interface IBruteforceVariableView : NamedVariableCollection.IView
     {
         object value { get; set; }
     }

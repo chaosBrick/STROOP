@@ -103,11 +103,11 @@ namespace STROOP.Structs.Configurations
          *  Gets user added variables from the mapping,
          *  assuming they're suffixed with "_f32", "_s16", etc.
          */
-        public static IEnumerable<NamedVariableCollection.IVariableView> GetVariables()
+        public static IEnumerable<NamedVariableCollection.IView> GetVariables()
         {
-            if (mappingCurrent == null) return new NamedVariableCollection.IVariableView[0];
+            if (mappingCurrent == null) return new NamedVariableCollection.IView[0];
 
-            var controls = new List<NamedVariableCollection.IVariableView>();
+            var controls = new List<NamedVariableCollection.IView>();
             // TODO: get back the mapping feature, but cooler
             //foreach (uint address in mappingCurrent.Keys)
             //{

@@ -35,17 +35,17 @@ namespace STROOP.Structs
         {
             foreach (var ctrl in controls)
             {
-                if (ctrl.view is NamedVariableCollection.IVariableView<byte> byteView) yield return byteView._getterFunction().Select(x => (double)x);
-                else if (ctrl.view is NamedVariableCollection.IVariableView<sbyte> sbyteView) yield return sbyteView._getterFunction().Select(x => (double)x);
-                else if (ctrl.view is NamedVariableCollection.IVariableView<ushort> ushortView) yield return ushortView._getterFunction().Select(x => (double)x);
-                else if (ctrl.view is NamedVariableCollection.IVariableView<short> shortView) yield return shortView._getterFunction().Select(x => (double)x);
-                else if (ctrl.view is NamedVariableCollection.IVariableView<uint> uintView) yield return uintView._getterFunction().Select(x => (double)x);
-                else if (ctrl.view is NamedVariableCollection.IVariableView<int> intView) yield return intView._getterFunction().Select(x => (double)x);
-                else if (ctrl.view is NamedVariableCollection.IVariableView<ulong> ulongView) yield return ulongView._getterFunction().Select(x => (double)x);
-                else if (ctrl.view is NamedVariableCollection.IVariableView<long> longView) yield return longView._getterFunction().Select(x => (double)x);
-                else if (ctrl.view is NamedVariableCollection.IVariableView<float> floatView) yield return floatView._getterFunction().Select(x => (double)x);
-                else if (ctrl.view is NamedVariableCollection.IVariableView<double> doubleView) yield return doubleView._getterFunction().Select(x => (double)x);
-                else if (ctrl.view is NamedVariableCollection.IVariableView<decimal> decmialView) yield return decmialView._getterFunction().Select(x => (double)x);
+                if (ctrl.view is NamedVariableCollection.IView<byte> byteView) yield return byteView._getterFunction().Select(x => (double)x);
+                else if (ctrl.view is NamedVariableCollection.IView<sbyte> sbyteView) yield return sbyteView._getterFunction().Select(x => (double)x);
+                else if (ctrl.view is NamedVariableCollection.IView<ushort> ushortView) yield return ushortView._getterFunction().Select(x => (double)x);
+                else if (ctrl.view is NamedVariableCollection.IView<short> shortView) yield return shortView._getterFunction().Select(x => (double)x);
+                else if (ctrl.view is NamedVariableCollection.IView<uint> uintView) yield return uintView._getterFunction().Select(x => (double)x);
+                else if (ctrl.view is NamedVariableCollection.IView<int> intView) yield return intView._getterFunction().Select(x => (double)x);
+                else if (ctrl.view is NamedVariableCollection.IView<ulong> ulongView) yield return ulongView._getterFunction().Select(x => (double)x);
+                else if (ctrl.view is NamedVariableCollection.IView<long> longView) yield return longView._getterFunction().Select(x => (double)x);
+                else if (ctrl.view is NamedVariableCollection.IView<float> floatView) yield return floatView._getterFunction().Select(x => (double)x);
+                else if (ctrl.view is NamedVariableCollection.IView<double> doubleView) yield return doubleView._getterFunction().Select(x => (double)x);
+                else if (ctrl.view is NamedVariableCollection.IView<decimal> decmialView) yield return decmialView._getterFunction().Select(x => (double)x);
             }
         }
 

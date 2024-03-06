@@ -40,7 +40,7 @@ namespace STROOP.Core.Variables
 
         private bool _displayAsObject;
 
-        public WatchVariableObjectWrapper(NamedVariableCollection.IVariableView<uint> watchVar, WatchVariableControl watchVarControl)
+        public WatchVariableObjectWrapper(NamedVariableCollection.IView<uint> watchVar, WatchVariableControl watchVarControl)
             : base(watchVar, watchVarControl)
         {
             _displayAsObject = true;

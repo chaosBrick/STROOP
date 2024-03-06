@@ -41,7 +41,7 @@ namespace STROOP.Forms
             };
         }
 
-        public void Initialize(List<NamedVariableCollection.IVariableView> vars)
+        public void Initialize(List<NamedVariableCollection.IView> vars)
         {
             // initialize panel
             _watchVariablePanel.Initialize();

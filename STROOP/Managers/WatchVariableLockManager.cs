@@ -6,9 +6,9 @@ namespace STROOP.Structs
 {
     public static class WatchVariableLockManager
     {
-        private static HashSet<NamedVariableCollection.IVariableView> _lockList = new HashSet<NamedVariableCollection.IVariableView>();
+        private static HashSet<NamedVariableCollection.IView> _lockList = new HashSet<NamedVariableCollection.IView>();
 
-        public static void AddLocks(NamedVariableCollection.IVariableView variable)
+        public static void AddLocks(NamedVariableCollection.IView variable)
         {
             _lockList.Add(variable);
         }

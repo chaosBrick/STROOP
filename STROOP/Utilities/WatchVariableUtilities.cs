@@ -17,7 +17,7 @@ namespace STROOP.Structs
     {
         private class WatchVariableWrapperFallback : WatchVariableWrapper
         {
-            public WatchVariableWrapperFallback(NamedVariableCollection.IVariableView watchVar, WatchVariableControl watchVarControl)
+            public WatchVariableWrapperFallback(NamedVariableCollection.IView watchVar, WatchVariableControl watchVarControl)
                 : base(watchVar, watchVarControl)
             { }
 
@@ -49,7 +49,7 @@ namespace STROOP.Structs
                         {
                             var parameters = ctor.GetParameters();
                             if (parameters[0].ParameterType.IsGenericType
-                                && parameters[0].ParameterType.GetGenericTypeDefinition() == typeof(NamedVariableCollection.IVariableView<>)
+                                && parameters[0].ParameterType.GetGenericTypeDefinition() == typeof(NamedVariableCollection.IView<>)
                                 && parameters[1].ParameterType == typeof(WatchVariableControl))
                             {
                                 if (!wrapperTypes.TryGetValue(match.Value, out var wrapperTypeList))
@@ -141,10 +141,10 @@ namespace STROOP.Structs
             throw new InvalidOperationException($"{potentiallyNullableVariableType.FullName} could not be wrapped!");
         }
 
-        public static bool TryCreateWrapper(NamedVariableCollection.IVariableView view, WatchVariableControl control, out WatchVariableWrapper result)
+        public static bool TryCreateWrapper(NamedVariableCollection.IView view, WatchVariableControl control, out WatchVariableWrapper result)
         {
             result = null;
-            var interfaceType = view.GetType().GetInterfaces().FirstOrDefault(x => x.Name == $"{nameof(NamedVariableCollection.IVariableView)}`1");
+            var interfaceType = view.GetType().GetInterfaces().FirstOrDefault(x => x.Name == $"{nameof(NamedVariableCollection.IView)}`1");
             if (interfaceType == null)
             {
                 result = new WatchVariableWrapperFallback(view, control);
@@ -195,6 +195,7 @@ namespace STROOP.Structs
             baseAddressGetters[BaseAddressType.MainSave] = () => new List<uint> { MainSaveConfig.CurrentMainSaveAddress };
 
             baseAddressGetters[BaseAddressType.Object] = () => Config.ObjectSlotsManager.SelectedSlotsAddresses;
+            baseAddressGetters[BaseAddressType.ProcessGroup] = () =>
                 Config.ObjectSlotsManager.SelectedObjects.ConvertAll(obj => obj.CurrentProcessGroup ?? uint.MaxValue);
 
             baseAddressGetters["Graphics"] = () =>

@@ -43,7 +43,7 @@ namespace STROOP.Forms
             buttonAddVariable.Click += (sender, e) => varPanel.AddVariable(CreateWatchVariableControl());
         }
 
-        private NamedVariableCollection.IVariableView CreateWatchVariableControl()
+        private NamedVariableCollection.IView CreateWatchVariableControl()
         {
             string memoryTypeString = comboBoxTypeValue.SelectedItem.ToString();
             string baseAddressType = (string)comboBoxBaseValue.SelectedItem;

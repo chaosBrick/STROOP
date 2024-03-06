@@ -425,7 +425,7 @@ namespace STROOP.Tabs
         // Having an empty action assigned to this adds the context menu entry to the ObjectSlot controls
         public override Action<IEnumerable<ObjectSlot>> objectSlotsClicked => objectSlots => { };
         
-        public void SetBehaviorWatchVariables(IEnumerable<NamedVariableCollection.IVariableView> watchVars, Color color)
+        public void SetBehaviorWatchVariables(IEnumerable<NamedVariableCollection.IView> watchVars, Color color)
         {
             watchVariablePanelObject.RemoveVariableGroup(VariableGroup.ObjectSpecific);
             foreach (var ctrl in watchVariablePanelObject.AddVariables(watchVars))
@@ -479,7 +479,7 @@ namespace STROOP.Tabs
                 SlotPos = "";
                 labelObjAddValue.Text = "";
                 _lastGeneralizedBehavior = null;
-                SetBehaviorWatchVariables(Array.Empty<NamedVariableCollection.IVariableView>(), Color.White);
+                SetBehaviorWatchVariables(Array.Empty<NamedVariableCollection.IView>(), Color.White);
             }
             else if (_objects.Count() == 1)
             {
@@ -529,7 +529,7 @@ namespace STROOP.Tabs
                     else
                     {
                         Behavior = "";
-                        SetBehaviorWatchVariables(Array.Empty<NamedVariableCollection.IVariableView>(), Color.White);
+                        SetBehaviorWatchVariables(Array.Empty<NamedVariableCollection.IView>(), Color.White);
                     }
                     _lastGeneralizedBehavior = multiBehavior;
                 }

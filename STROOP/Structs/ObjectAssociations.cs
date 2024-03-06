@@ -203,12 +203,12 @@ namespace STROOP.Structs
             return assoc.Name;
         }
 
-        public IEnumerable<NamedVariableCollection.IVariableView> GetWatchVarControls(BehaviorCriteria behaviorCriteria)
+        public IEnumerable<NamedVariableCollection.IView> GetWatchVarControls(BehaviorCriteria behaviorCriteria)
         {
             var assoc = FindObjectAssociation(behaviorCriteria);
 
             if (assoc == null)
-                return Array.Empty<NamedVariableCollection.IVariableView>();
+                return Array.Empty<NamedVariableCollection.IView>();
 
             else return assoc.Precursors;
         }

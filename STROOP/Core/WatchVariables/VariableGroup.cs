@@ -11,13 +11,13 @@ namespace STROOP.Core.Variables
 {
     public static class IVariableViewExtensions
     {
-        public static NamedVariableCollection.IVariableView<T> WithKeyedValue<T, TValue>(this NamedVariableCollection.IVariableView<T> view, string key, TValue value)
+        public static NamedVariableCollection.IView<T> WithKeyedValue<T, TValue>(this NamedVariableCollection.IView<T> view, string key, TValue value)
         {
             view.SetValueByKey(key, value);
             return view;
         }
 
-        public static string GetJsonName(this NamedVariableCollection.IVariableView view)
+        public static string GetJsonName(this NamedVariableCollection.IView view)
         {
             var explicitJsonName = view.GetValueByKey("jsonName");
             if (explicitJsonName == "")
@@ -27,20 +27,20 @@ namespace STROOP.Core.Variables
             return $"{view.Name}".Replace(' ', '_').ToLower();
         }
 
-        public static IEnumerable<T> GetNumberValues<T>(this NamedVariableCollection.IVariableView view) where T : struct, IConvertible
+        public static IEnumerable<T> GetNumberValues<T>(this NamedVariableCollection.IView view) where T : struct, IConvertible
         {
             if (view.TryGetNumberValues<T>(out var result))
                 return result;
             throw new InvalidOperationException($"'{view.GetType().FullName}' is not a vaild number type.");
         }
 
-        public static bool TryGetNumberValues<T>(this NamedVariableCollection.IVariableView view, out IEnumerable<T> result)
+        public static bool TryGetNumberValues<T>(this NamedVariableCollection.IView view, out IEnumerable<T> result)
             where T : struct, IConvertible
         {
             bool Get<Q>(out IEnumerable<T> innerResult)
             {
                 innerResult = null;
-                if (view is NamedVariableCollection.IVariableView<Q> qView)
+                if (view is NamedVariableCollection.IView<Q> qView)
                 {
                     innerResult = qView._getterFunction().Select(x => (T)Convert.ChangeType(x, typeof(T)));
                     return true;
@@ -60,11 +60,11 @@ namespace STROOP.Core.Variables
                 ;
         }
 
-        public static IEnumerable<bool> TrySetValue<T>(this NamedVariableCollection.IVariableView view, T value) where T : IConvertible
+        public static IEnumerable<bool> TrySetValue<T>(this NamedVariableCollection.IView view, T value) where T : IConvertible
         {
             IEnumerable<bool> Set<Q>()
             {
-                if (view is NamedVariableCollection.IVariableView<Q> qView)
+                if (view is NamedVariableCollection.IView<Q> qView)
                     return qView._setterFunction((Q)Convert.ChangeType(value, typeof(Q)));
                 return null;
             }
@@ -82,7 +82,7 @@ namespace STROOP.Core.Variables
                 ;
         }
 
-        public static (CombinedValuesMeaning meaning, T value) CombineValues<T>(this NamedVariableCollection.IVariableView view) where T : struct, IConvertible
+        public static (CombinedValuesMeaning meaning, T value) CombineValues<T>(this NamedVariableCollection.IView view) where T : struct, IConvertible
         {
             var values = view.GetNumberValues<T>().ToArray();
             if (values.Length == 0) return (CombinedValuesMeaning.NoValue, default(T));
@@ -120,7 +120,7 @@ namespace STROOP.Core.Variables
                 ;
         }
 
-        public interface IVariableView
+        public interface IView
         {
             Action ValueSet { get; set; }
             Action OnDelete { get; set; }
@@ -131,19 +131,19 @@ namespace STROOP.Core.Variables
             int DislpayPriority { get; }
         }
 
-        public interface IVariableView<T> : IVariableView
+        public interface IView<T> : IView
         {
             GetterFunction<T> _getterFunction { get; }
             SetterFunction<T> _setterFunction { get; }
         }
 
-        public interface IMemoryDescriptorVariableView : IVariableView
+        public interface IMemoryDescriptorView : IView
         {
             MemoryDescriptor memoryDescriptor { get; }
             DescribedMemoryState describedMemoryState { get; }
         }
 
-        public class CustomView : IVariableView
+        public class CustomView : IView
         {
             public Action ValueSet { get; set; }
             public Action OnDelete { get; set; }
@@ -176,7 +176,7 @@ namespace STROOP.Core.Variables
             }
         }
 
-        public class CustomView<T> : CustomView, IVariableView<T>
+        public class CustomView<T> : CustomView, IView<T>
         {
             public GetterFunction<T> _getterFunction { get; set; }
             public SetterFunction<T> _setterFunction { get; set; }
@@ -184,7 +184,7 @@ namespace STROOP.Core.Variables
             public CustomView(Type wrapperType) : base(wrapperType) { }
         }
 
-        public class MemoryDescriptorView : CustomView, IMemoryDescriptorVariableView
+        public class MemoryDescriptorView : CustomView, IMemoryDescriptorView
         {
             public MemoryDescriptor memoryDescriptor { get; }
             public DescribedMemoryState describedMemoryState { get; }
@@ -197,7 +197,7 @@ namespace STROOP.Core.Variables
             }
         }
 
-        public class MemoryDescriptorView<T> : MemoryDescriptorView, IVariableView<T> where T : struct, IConvertible
+        public class MemoryDescriptorView<T> : MemoryDescriptorView, IView<T> where T : struct, IConvertible
         {
             public MemoryDescriptorView(MemoryDescriptor memoryDescriptor, string wrapper = "Number")
                 : base(memoryDescriptor, wrapper)
@@ -210,12 +210,12 @@ namespace STROOP.Core.Variables
             public SetterFunction<T> _setterFunction { get; private set; }
         }
 
-        public class XmlMemoryView : IMemoryDescriptorVariableView
+        public class XmlMemoryView : IMemoryDescriptorView
         {
             public Action ValueSet { get; set; }
             public Action OnDelete { get; set; }
             public string Name { get; private set; }
-            int IVariableView.DislpayPriority => 0;
+            int IView.DislpayPriority => 0;
 
             readonly string wrapper;
             readonly XElement xElement;
@@ -241,7 +241,7 @@ namespace STROOP.Core.Variables
             public XElement GetXml() => xElement;
         }
 
-        public class XmlMemoryView<T> : XmlMemoryView, IVariableView<T> where T : struct, IConvertible
+        public class XmlMemoryView<T> : XmlMemoryView, IView<T> where T : struct, IConvertible
         {
             public XmlMemoryView(MemoryDescriptor memoryDescriptor, XElement xElement)
                 : base(memoryDescriptor, xElement)
@@ -254,7 +254,7 @@ namespace STROOP.Core.Variables
             public SetterFunction<T> _setterFunction { get; private set; }
         }
 
-        public static IVariableView ParseXml(XElement element)
+        public static IView ParseXml(XElement element)
         {
             switch (element.Name.LocalName)
             {

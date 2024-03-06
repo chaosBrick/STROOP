@@ -44,7 +44,7 @@ namespace STROOP.Core.Variables
                 Edit(parent, bounds);
         }
 
-        public WatchVariableBooleanWrapperBase(NamedVariableCollection.IVariableView<T> watchVar, WatchVariableControl watchVarControl)
+        public WatchVariableBooleanWrapperBase(NamedVariableCollection.IView<T> watchVar, WatchVariableControl watchVarControl)
             : base(watchVar, watchVarControl)
         {
             _displayAsCheckbox = true;
@@ -124,7 +124,7 @@ namespace STROOP.Core.Variables
 
         protected override bool trueValue => true;
 
-        public WatchVariableBooleanWrapper(NamedVariableCollection.IVariableView<bool> watchVar, WatchVariableControl watchVarControl)
+        public WatchVariableBooleanWrapper(NamedVariableCollection.IView<bool> watchVar, WatchVariableControl watchVarControl)
             : base(watchVar, watchVarControl)
         { }
 
@@ -136,7 +136,7 @@ namespace STROOP.Core.Variables
 
     public class WatchVariableBooleanWrapper<TNumber> : WatchVariableBooleanWrapperBase<TNumber> where TNumber : struct, IConvertible
     {
-        public WatchVariableBooleanWrapper(NamedVariableCollection.IVariableView<TNumber> watchVar, WatchVariableControl watchVarControl)
+        public WatchVariableBooleanWrapper(NamedVariableCollection.IView<TNumber> watchVar, WatchVariableControl watchVarControl)
             : base(watchVar, watchVarControl)
         { }
 

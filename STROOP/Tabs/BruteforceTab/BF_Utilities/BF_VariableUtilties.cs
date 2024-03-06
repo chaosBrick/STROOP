@@ -10,7 +10,7 @@ namespace STROOP.Tabs.BruteforceTab.BF_Utilities
     {
         class WatchVariableQuarterstepWrapper : WatchVariableSelectionWrapper<WatchVariableNumberWrapper<byte>, byte>
         {
-            public WatchVariableQuarterstepWrapper(NamedVariableCollection.IVariableView<byte> var, WatchVariableControl control) : base(var, control)
+            public WatchVariableQuarterstepWrapper(NamedVariableCollection.IView<byte> var, WatchVariableControl control) : base(var, control)
             {
                 for (int i = 0; i < 4; i++)
                 {

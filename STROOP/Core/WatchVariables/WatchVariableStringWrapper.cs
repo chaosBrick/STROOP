@@ -21,7 +21,7 @@ namespace STROOP.Core.Variables
         };
         static Dictionary<string, WatchVariableSetting> settingsForSpecials = new Dictionary<string, WatchVariableSetting>();
 
-        public WatchVariableStringWrapper(NamedVariableCollection.IVariableView<string> watchVar, WatchVariableControl watchVarControl)
+        public WatchVariableStringWrapper(NamedVariableCollection.IView<string> watchVar, WatchVariableControl watchVarControl)
             : base(watchVar, watchVarControl)
         {
             AddStringContextMenuStripItems(watchVarControl.view.GetValueByKey(NamedVariableCollection.ViewProperties.specialType));

@@ -67,7 +67,7 @@ namespace STROOP.Tabs.BruteforceTab
         Dictionary<string, Func<string>> parameterGetters = new Dictionary<string, Func<string>>();
         Dictionary<string, Func<string>> controlStateGetters = new Dictionary<string, Func<string>>();
         Dictionary<string, string> docs = new Dictionary<string, string>();
-        List<NamedVariableCollection.IVariableView> knownStateVariables = new List<NamedVariableCollection.IVariableView>();
+        List<NamedVariableCollection.IView> knownStateVariables = new List<NamedVariableCollection.IView>();
         List<IBruteforceVariableView> manualParameterVariables = new List<IBruteforceVariableView>();
         Queue<string> outputLines = new Queue<string>();
         WatchVariableControl hoveringWatchVarControl;

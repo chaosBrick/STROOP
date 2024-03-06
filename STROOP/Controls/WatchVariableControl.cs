@@ -26,7 +26,7 @@ namespace STROOP.Controls
         public static readonly Color SELECTED_COLOR = Color.FromArgb(51, 153, 255);
         private static readonly int FLASH_DURATION_MS = 1000;
 
-        public readonly NamedVariableCollection.IVariableView view;
+        public readonly NamedVariableCollection.IView view;
         public readonly WatchVariableWrapper WatchVarWrapper;
 
         public readonly List<string> GroupList;
@@ -60,7 +60,7 @@ namespace STROOP.Controls
         bool _isSelected;
         public bool IsSelected { get { return _isSelected && containingPanel.IsSelected; } set { _isSelected = value; } }
 
-        public WatchVariableControl(WatchVariablePanel panel, NamedVariableCollection.IVariableView view)
+        public WatchVariableControl(WatchVariablePanel panel, NamedVariableCollection.IView view)
         {
             this.view = view;
             this.containingPanel = panel;
@@ -214,7 +214,7 @@ namespace STROOP.Controls
         }
 
         public void ToggleFixedAddress(bool? fix)
-            => (view as NamedVariableCollection.IMemoryDescriptorVariableView).describedMemoryState.ToggleFixedAddress(fix);
+            => (view as NamedVariableCollection.IMemoryDescriptorView).describedMemoryState.ToggleFixedAddress(fix);
 
         public void ToggleHighlighted(Color? color = null)
         {
@@ -241,7 +241,7 @@ namespace STROOP.Controls
 
         public bool SetValue<T>(T value)
         {
-            if (view is NamedVariableCollection.IVariableView<T> compatibleView
+            if (view is NamedVariableCollection.IView<T> compatibleView
                 && compatibleView._setterFunction(value).Aggregate(true, (a, b) => a && b))
                 return true;
             else if (value is IConvertible convertibleValue && view.TrySetValue(convertibleValue).Aggregate(true, (a, b) => a && b))

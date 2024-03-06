@@ -244,7 +244,7 @@ namespace STROOP.Tabs
             _numPans = numPans;
         }
 
-        private NamedVariableCollection.IVariableView CreatePanVar(
+        private NamedVariableCollection.IView CreatePanVar(
             string name,
             string specialType,
             string color,
@@ -264,10 +264,10 @@ namespace STROOP.Tabs
             return NamedVariableCollection.ParseXml(xElement);
         }
 
-        private List<NamedVariableCollection.IVariableView> CreatePanVars(int index)
+        private List<NamedVariableCollection.IView> CreatePanVars(int index)
         {
             WatchVariableSpecialUtilities.AddPanEntriesToDictionary(index);
-            return new List<NamedVariableCollection.IVariableView>
+            return new List<NamedVariableCollection.IView>
             {
                 CreatePanVar("Global Timer", String.Format("Pan{0}GlobalTimer", index), "Orange"),
                 CreatePanVar(String.Format("Pan{0} Start Time", index), String.Format("Pan{0}StartTime", index), "Orange"),

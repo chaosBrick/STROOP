@@ -20,7 +20,7 @@ namespace STROOP.Core.Variables
 
     public abstract class WatchVariableWrapper
     {
-        public readonly NamedVariableCollection.IVariableView _view;
+        public readonly NamedVariableCollection.IView _view;
 
         public event Action ValueSet = () => { };
 
@@ -30,7 +30,7 @@ namespace STROOP.Core.Variables
 
         public virtual WatchVariablePanel.CustomDraw CustomDrawOperation => null;
 
-        protected WatchVariableWrapper(NamedVariableCollection.IVariableView watchVar, WatchVariableControl watchVarControl)
+        protected WatchVariableWrapper(NamedVariableCollection.IView watchVar, WatchVariableControl watchVarControl)
         {
             _view = watchVar;
             _watchVarControl = watchVarControl;
@@ -43,7 +43,7 @@ namespace STROOP.Core.Variables
 
         public void ShowVarInfo()
         {
-            var memoryDescriptor = (_view as NamedVariableCollection.IMemoryDescriptorVariableView)?.memoryDescriptor;
+            var memoryDescriptor = (_view as NamedVariableCollection.IMemoryDescriptorView)?.memoryDescriptor;
             VariableViewerForm varInfo =
                 new VariableViewerForm(
                     name: _watchVarControl.VarName,
@@ -90,7 +90,7 @@ namespace STROOP.Core.Variables
 
         public void ShowBitForm()
         {
-            if (_view is NamedVariableCollection.IMemoryDescriptorVariableView compatible)
+            if (_view is NamedVariableCollection.IMemoryDescriptorView compatible)
                 new VariableBitForm(compatible.Name, compatible.memoryDescriptor, true).Show();
         }
 
@@ -136,7 +136,7 @@ namespace STROOP.Core.Variables
                 return false;
             };
 
-        public NamedVariableCollection.IVariableView<TBackingValue> view => (NamedVariableCollection.IVariableView<TBackingValue>)_view;
+        public NamedVariableCollection.IView<TBackingValue> view => (NamedVariableCollection.IView<TBackingValue>)_view;
 
         protected TBackingValue lastValue { get; private set; }
         protected CombinedValuesMeaning lastValueMeaning { get; private set; }
@@ -152,7 +152,7 @@ namespace STROOP.Core.Variables
             }
         }
 
-        protected WatchVariableWrapper(NamedVariableCollection.IVariableView watchVar, WatchVariableControl watchVarControl)
+        protected WatchVariableWrapper(NamedVariableCollection.IView watchVar, WatchVariableControl watchVarControl)
             : base(watchVar, watchVarControl)
         { }
 
