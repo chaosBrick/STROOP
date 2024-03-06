@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using STROOP.Controls;
+
+using STROOP.Controls.VariablePanel;
 using STROOP.Core.Variables;
 
 namespace STROOP.Utilities

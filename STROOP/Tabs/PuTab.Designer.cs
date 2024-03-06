@@ -62,7 +62,7 @@
             this.buttonPuConZpPu = new System.Windows.Forms.Button();
             this.buttonPuConZpQpu = new System.Windows.Forms.Button();
             this.buttonPuConHome = new System.Windows.Forms.Button();
-            this.watchVariablePanelPu = new STROOP.Controls.WatchVariablePanel();
+            this.watchVariablePanelPu = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerPu)).BeginInit();
             this.splitContainerPu.Panel1.SuspendLayout();
             this.splitContainerPu.Panel2.SuspendLayout();
@@ -534,6 +534,6 @@
         private System.Windows.Forms.Button buttonPuConZpPu;
         private System.Windows.Forms.Button buttonPuConZpQpu;
         private System.Windows.Forms.Button buttonPuConHome;
-        private Controls.WatchVariablePanel watchVariablePanelPu;
+        private STROOP.Controls.VariablePanel.WatchVariablePanel watchVariablePanelPu;
     }
 }

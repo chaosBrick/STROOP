@@ -35,7 +35,7 @@
             this.checkBoxUseRomHack = new System.Windows.Forms.CheckBox();
             this.buttonOptionsResetSavedSettings = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
-            this.watchVariablePanelOptions = new STROOP.Controls.WatchVariablePanel();
+            this.watchVariablePanelOptions = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerOptions)).BeginInit();
             this.splitContainerOptions.Panel1.SuspendLayout();
             this.splitContainerOptions.Panel2.SuspendLayout();
@@ -158,6 +158,6 @@
         internal System.Windows.Forms.CheckBox checkBoxUseRomHack;
         private System.Windows.Forms.Button buttonOptionsResetSavedSettings;
         private System.Windows.Forms.Label label3;
-        private Controls.WatchVariablePanel watchVariablePanelOptions;
+        private STROOP.Controls.VariablePanel.WatchVariablePanel watchVariablePanelOptions;
     }
 }

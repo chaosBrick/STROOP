@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Drawing;
-using OpenTK;
-using STROOP.Tabs.MapTab;
-using STROOP.Structs.Configurations;
-using System.Windows.Forms;
-using STROOP.Utilities;
-using STROOP.Core.Variables;
 using System.Linq;
+using System.Windows.Forms;
+
+using OpenTK;
+
+using STROOP.Structs.Configurations;
+using STROOP.Tabs.MapTab;
+using STROOP.Utilities;
+using STROOP.Structs;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
 {

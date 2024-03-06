@@ -31,7 +31,7 @@
             this.pbExpand = new System.Windows.Forms.PictureBox();
             this.pbRemove = new System.Windows.Forms.PictureBox();
             this.labelName = new System.Windows.Forms.Label();
-            this.watchVariablePanelParameters = new STROOP.Controls.WatchVariablePanel();
+            this.watchVariablePanelParameters = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.pbExpand)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbRemove)).BeginInit();
             this.SuspendLayout();
@@ -104,6 +104,6 @@
         private System.Windows.Forms.PictureBox pbExpand;
         private System.Windows.Forms.PictureBox pbRemove;
         private System.Windows.Forms.Label labelName;
-        public Controls.WatchVariablePanel watchVariablePanelParameters;
+        public STROOP.Controls.VariablePanel.WatchVariablePanel watchVariablePanelParameters;
     }
 }

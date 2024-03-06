@@ -14,7 +14,7 @@ using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 
-namespace STROOP.Controls
+namespace STROOP.Controls.VariablePanel
 {
     public partial class WatchVariablePanel : UserControl
     {

@@ -1,12 +1,10 @@
-﻿using STROOP.Models;
+﻿using STROOP.Core.Variables;
+using STROOP.Models;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 
-// TODO: This shouldn't be necessary
-using STROOP.Controls;
-
-namespace STROOP.Core.Variables
+namespace STROOP.Controls.VariablePanel
 {
     public class WatchVariableObjectWrapper : WatchVariableAddressWrapper
     {

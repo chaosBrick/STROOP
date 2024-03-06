@@ -41,7 +41,7 @@
             this.button100Lives = new STROOP.BinaryButton();
             this.buttonTurnOnOffHud = new STROOP.BinaryButton();
             this.buttonFullHp = new System.Windows.Forms.Button();
-            this.watchVariablePanelHud = new STROOP.Controls.WatchVariablePanel();
+            this.watchVariablePanelHud = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerHud)).BeginInit();
             this.splitContainerHud.Panel1.SuspendLayout();
             this.splitContainerHud.Panel2.SuspendLayout();
@@ -234,6 +234,6 @@
         private BinaryButton button100Lives;
         private BinaryButton buttonTurnOnOffHud;
         private System.Windows.Forms.Button buttonFullHp;
-        private Controls.WatchVariablePanel watchVariablePanelHud;
+        private STROOP.Controls.VariablePanel.WatchVariablePanel watchVariablePanelHud;
     }
 }

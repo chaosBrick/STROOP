@@ -37,7 +37,7 @@
             this.checkBoxTurnOffMusic = new System.Windows.Forms.CheckBox();
             this.panelMiscBorder = new System.Windows.Forms.Panel();
             this.pictureBoxMisc = new STROOP.Controls.IntPictureBox();
-            this.watchVariablePanelMisc = new STROOP.Controls.WatchVariablePanel();
+            this.watchVariablePanelMisc = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             this.txtRNGIncrement = new STROOP.BetterTextbox();
             this.labelRNGIncrement = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMisc)).BeginInit();
@@ -213,7 +213,7 @@
         private System.Windows.Forms.CheckBox checkBoxTurnOffMusic;
         private System.Windows.Forms.Panel panelMiscBorder;
         private Controls.IntPictureBox pictureBoxMisc;
-        private Controls.WatchVariablePanel watchVariablePanelMisc;
+        private STROOP.Controls.VariablePanel.WatchVariablePanel watchVariablePanelMisc;
         private System.Windows.Forms.Label labelRNGIncrement;
         private BetterTextbox txtRNGIncrement;
     }

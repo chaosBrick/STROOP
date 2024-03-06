@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Globalization;
-using STROOP.Core.Variables;
+using System.Reflection;
+
+using STROOP.Controls.VariablePanel;
 using STROOP.Structs;
 
 namespace STROOP.Utilities

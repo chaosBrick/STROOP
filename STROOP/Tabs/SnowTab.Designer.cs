@@ -46,7 +46,7 @@
             this.buttonSnowPositionXnZp = new System.Windows.Forms.Button();
             this.buttonSnowPositionXn = new System.Windows.Forms.Button();
             this.buttonSnowPositionXnZn = new System.Windows.Forms.Button();
-            this.watchVariablePanelSnow = new STROOP.Controls.WatchVariablePanel();
+            this.watchVariablePanelSnow = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerSnow)).BeginInit();
             this.splitContainerSnow.Panel1.SuspendLayout();
             this.splitContainerSnow.Panel2.SuspendLayout();
@@ -303,6 +303,6 @@
         private System.Windows.Forms.Button buttonSnowPositionXnZp;
         private System.Windows.Forms.Button buttonSnowPositionXn;
         private System.Windows.Forms.Button buttonSnowPositionXnZn;
-        private Controls.WatchVariablePanel watchVariablePanelSnow;
+        private STROOP.Controls.VariablePanel.WatchVariablePanel watchVariablePanelSnow;
     }
 }

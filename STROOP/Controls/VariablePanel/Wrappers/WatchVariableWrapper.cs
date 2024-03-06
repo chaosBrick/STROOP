@@ -1,15 +1,13 @@
-﻿using STROOP.Forms;
-using STROOP.Structs;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
 using System.Drawing;
 using System.Linq;
+using System.Windows.Forms;
 
-// TODO: this shouldn't be required
-using STROOP.Controls;
+using STROOP.Core.Variables;
+using STROOP.Forms;
 
-namespace STROOP.Core.Variables
+namespace STROOP.Controls.VariablePanel
 {
     public enum CombinedValuesMeaning
     {

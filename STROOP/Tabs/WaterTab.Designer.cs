@@ -29,13 +29,13 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.watchVariablePanelWater = new STROOP.Controls.WatchVariablePanel();
+            this.watchVariablePanelWater = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             this.SuspendLayout();
             // 
             // watchVariablePanelWater
             // 
-            this.watchVariablePanelWater.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.watchVariablePanelWater.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.watchVariablePanelWater.DataPath = "Config/WaterData.xml";
             this.watchVariablePanelWater.Location = new System.Drawing.Point(0, 0);
@@ -56,6 +56,6 @@
 
         #endregion
 
-        private Controls.WatchVariablePanel watchVariablePanelWater;
+        private STROOP.Controls.VariablePanel.WatchVariablePanel watchVariablePanelWater;
     }
 }

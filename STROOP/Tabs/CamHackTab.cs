@@ -1,14 +1,15 @@
-﻿using STROOP.Controls;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+using System.Xml.Linq;
+
+using STROOP.Controls.VariablePanel;
 using STROOP.Core.Variables;
 using STROOP.Models;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using System.Xml.Linq;
 
 namespace STROOP.Tabs
 {

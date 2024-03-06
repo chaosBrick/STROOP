@@ -49,7 +49,7 @@
             this.radioButtonAdvancedModeCheckInfo = new System.Windows.Forms.RadioButton();
             this.radioButtonAdvancedModeStageInfo = new System.Windows.Forms.RadioButton();
             this.radioButtonAdvancedModeMapInfo = new System.Windows.Forms.RadioButton();
-            this.watchVariablePanelDebug = new STROOP.Controls.WatchVariablePanel();
+            this.watchVariablePanelDebug = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerDebug)).BeginInit();
             this.splitContainerDebug.Panel1.SuspendLayout();
             this.splitContainerDebug.Panel2.SuspendLayout();
@@ -355,6 +355,6 @@
         private System.Windows.Forms.RadioButton radioButtonAdvancedModeCheckInfo;
         private System.Windows.Forms.RadioButton radioButtonAdvancedModeStageInfo;
         private System.Windows.Forms.RadioButton radioButtonAdvancedModeMapInfo;
-        private Controls.WatchVariablePanel watchVariablePanelDebug;
+        private STROOP.Controls.VariablePanel.WatchVariablePanel watchVariablePanelDebug;
     }
 }

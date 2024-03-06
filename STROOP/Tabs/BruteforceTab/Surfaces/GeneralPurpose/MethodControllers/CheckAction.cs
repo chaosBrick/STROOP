@@ -1,6 +1,9 @@
 ﻿using System.Linq;
+
+using STROOP.Controls.VariablePanel;
 using STROOP.Core.Variables;
 using STROOP.Structs.Configurations;
+using STROOP.Structs;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
 {

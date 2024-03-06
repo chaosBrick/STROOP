@@ -37,7 +37,7 @@
             this.buttonGfxDumpDisplayList = new System.Windows.Forms.Button();
             this.buttonGfxRefreshObject = new System.Windows.Forms.Button();
             this.buttonGfxRefresh = new System.Windows.Forms.Button();
-            this.watchVariablePanelGfx = new STROOP.Controls.WatchVariablePanel();
+            this.watchVariablePanelGfx = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             this.richTextBoxGfx = new System.Windows.Forms.RichTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerGfxLeft)).BeginInit();
             this.splitContainerGfxLeft.Panel1.SuspendLayout();
@@ -209,7 +209,7 @@
         private System.Windows.Forms.Button buttonGfxDumpDisplayList;
         private System.Windows.Forms.Button buttonGfxRefreshObject;
         private System.Windows.Forms.Button buttonGfxRefresh;
-        private Controls.WatchVariablePanel watchVariablePanelGfx;
+        private STROOP.Controls.VariablePanel.WatchVariablePanel watchVariablePanelGfx;
         private System.Windows.Forms.RichTextBox richTextBoxGfx;
     }
 }

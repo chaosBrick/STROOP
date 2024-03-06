@@ -105,7 +105,7 @@
             this.labelObjSlotPos = new System.Windows.Forms.Label();
             this.labelObjAdd = new System.Windows.Forms.Label();
             this.labelObjSlotInd = new System.Windows.Forms.Label();
-            this.watchVariablePanelObject = new STROOP.Controls.WatchVariablePanel();
+            this.watchVariablePanelObject = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerObject)).BeginInit();
             this.splitContainerObject.Panel1.SuspendLayout();
             this.splitContainerObject.Panel2.SuspendLayout();
@@ -1103,6 +1103,6 @@
         private System.Windows.Forms.Label labelObjSlotPos;
         private System.Windows.Forms.Label labelObjAdd;
         private System.Windows.Forms.Label labelObjSlotInd;
-        private Controls.WatchVariablePanel watchVariablePanelObject;
+        private STROOP.Controls.VariablePanel.WatchVariablePanel watchVariablePanelObject;
     }
 }

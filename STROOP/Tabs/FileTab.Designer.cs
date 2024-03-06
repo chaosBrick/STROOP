@@ -262,7 +262,7 @@
             this.radioButtonFileC = new System.Windows.Forms.RadioButton();
             this.radioButtonFileBSaved = new System.Windows.Forms.RadioButton();
             this.buttonFileSave = new System.Windows.Forms.Button();
-            this.watchVariablePanelFile = new STROOP.Controls.WatchVariablePanel();
+            this.watchVariablePanelFile = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerFile)).BeginInit();
             this.splitContainerFile.Panel1.SuspendLayout();
             this.splitContainerFile.Panel2.SuspendLayout();
@@ -4163,6 +4163,6 @@
         private System.Windows.Forms.RadioButton radioButtonFileC;
         private System.Windows.Forms.RadioButton radioButtonFileBSaved;
         private System.Windows.Forms.Button buttonFileSave;
-        private Controls.WatchVariablePanel watchVariablePanelFile;
+        private STROOP.Controls.VariablePanel.WatchVariablePanel watchVariablePanelFile;
     }
 }

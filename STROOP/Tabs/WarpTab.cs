@@ -1,10 +1,12 @@
-﻿using STROOP.Core.Variables;
+﻿using System.Collections.Generic;
+using System.Linq;
+
+using STROOP.Controls.VariablePanel;
+using STROOP.Core.Variables;
 using STROOP.Forms;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace STROOP.Tabs
 {

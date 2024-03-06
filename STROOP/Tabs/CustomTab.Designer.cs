@@ -42,7 +42,7 @@
             this.buttonCopyVars = new System.Windows.Forms.Button();
             this.buttonSaveVars = new System.Windows.Forms.Button();
             this.buttonOpenVars = new System.Windows.Forms.Button();
-            this.watchVariablePanelCustom = new STROOP.Controls.WatchVariablePanel();
+            this.watchVariablePanelCustom = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerCustom)).BeginInit();
             this.splitContainerCustom.Panel1.SuspendLayout();
             this.splitContainerCustom.Panel2.SuspendLayout();
@@ -260,6 +260,6 @@
         private System.Windows.Forms.Button buttonCopyVars;
         private System.Windows.Forms.Button buttonSaveVars;
         private System.Windows.Forms.Button buttonOpenVars;
-        internal Controls.WatchVariablePanel watchVariablePanelCustom;
+        internal STROOP.Controls.VariablePanel.WatchVariablePanel watchVariablePanelCustom;
     }
 }

@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Collections.Generic;
-using OpenTK;
-using STROOP.Utilities;
-using STROOP.Structs.Configurations;
 
-namespace STROOP.Controls
+using OpenTK;
+
+using STROOP.Controls.VariablePanel;
+using STROOP.Structs.Configurations;
+using STROOP.Utilities;
+
+namespace STROOP.Controls.VariablePanel
 {
     partial class WatchVariablePanel
     {

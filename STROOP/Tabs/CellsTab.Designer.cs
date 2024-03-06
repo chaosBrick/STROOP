@@ -33,7 +33,7 @@
             this.splitContainerCellsControls = new STROOP.BetterSplitContainer();
             this.buttonCellsBuildTree = new System.Windows.Forms.Button();
             this.treeViewCells = new System.Windows.Forms.TreeView();
-            this.watchVariablePanelCells = new STROOP.Controls.WatchVariablePanel();
+            this.watchVariablePanelCells = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerCells)).BeginInit();
             this.splitContainerCells.Panel1.SuspendLayout();
             this.splitContainerCells.Panel2.SuspendLayout();
@@ -152,6 +152,6 @@
         private BetterSplitContainer splitContainerCellsControls;
         private System.Windows.Forms.Button buttonCellsBuildTree;
         private System.Windows.Forms.TreeView treeViewCells;
-        private Controls.WatchVariablePanel watchVariablePanelCells;
+        private STROOP.Controls.VariablePanel.WatchVariablePanel watchVariablePanelCells;
     }
 }

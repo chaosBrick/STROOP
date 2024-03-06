@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+
+using STROOP.Controls.VariablePanel;
 using STROOP.Core.Variables;
-using STROOP.Controls;
 
 namespace STROOP.Tabs.BruteforceTab.BF_Utilities
 {

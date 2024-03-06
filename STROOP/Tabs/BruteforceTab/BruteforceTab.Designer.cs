@@ -30,7 +30,7 @@
         {
             this.btnLoadModule = new System.Windows.Forms.Button();
             this.txtJsonOutput = new System.Windows.Forms.RichTextBox();
-            this.watchVariablePanelParams = new STROOP.Controls.WatchVariablePanel();
+            this.watchVariablePanelParams = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             this.btnApplyKnownStates = new System.Windows.Forms.Button();
             this.btnRun = new System.Windows.Forms.Button();
             this.labelM64 = new System.Windows.Forms.Label();
@@ -278,7 +278,7 @@
 
         private System.Windows.Forms.Button btnLoadModule;
         private System.Windows.Forms.RichTextBox txtJsonOutput;
-        private Controls.WatchVariablePanel watchVariablePanelParams;
+        private STROOP.Controls.VariablePanel.WatchVariablePanel watchVariablePanelParams;
         private System.Windows.Forms.Button btnApplyKnownStates;
         private System.Windows.Forms.Button btnRun;
         private System.Windows.Forms.Label labelM64;

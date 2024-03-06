@@ -1,14 +1,15 @@
-﻿using STROOP.Structs;
-using STROOP.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Linq;
-using STROOP.Core.Variables;
 
-namespace STROOP.Controls
+using STROOP.Core.Variables;
+using STROOP.Structs;
+using STROOP.Utilities;
+
+namespace STROOP.Controls.VariablePanel
 {
     public partial class WatchVariableControl
     {

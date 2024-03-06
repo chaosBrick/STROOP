@@ -1,8 +1,4 @@
-﻿using Microsoft.WindowsAPICodePack.Dialogs;
-using STROOP.Controls;
-using STROOP.Utilities;
-using STROOP.Core.Variables;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -10,7 +6,15 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml.Linq;
+
+using Microsoft.WindowsAPICodePack.Dialogs;
+
+using STROOP.Controls.VariablePanel;
+using STROOP.Core.Variables;
+using STROOP.Structs;
 using STROOP.Tabs.BruteforceTab.BF_Utilities;
+using STROOP.Utilities;
+
 using AutomaticParameterGetters = System.Collections.Generic.Dictionary<STROOP.Tabs.BruteforceTab.ValueGetters.GetterFuncs, System.Collections.Generic.HashSet<string>>;
 
 namespace STROOP.Tabs.BruteforceTab

@@ -1,4 +1,6 @@
 ﻿using System.Windows.Forms;
+
+using STROOP.Controls.VariablePanel;
 using STROOP.Core.Variables;
 using STROOP.Utilities;
 
@@ -12,7 +14,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
     {
         MapObjectType mapObject;
         public ScoringFunc target { get; private set; }
-        public Controls.WatchVariablePanel parameterPanel => target.watchVariablePanelParameters;
+        public WatchVariablePanel parameterPanel => target.watchVariablePanelParameters;
         public void SetTargetFunc(ScoringFunc target)
         {
             this.target = target;

@@ -31,7 +31,7 @@
             this.components = new System.ComponentModel.Container();
             this.splitContainerPainting = new STROOP.BetterSplitContainer();
             this.listBoxPainting = new System.Windows.Forms.ListBox();
-            this.watchVariablePanelPainting = new STROOP.Controls.WatchVariablePanel();
+            this.watchVariablePanelPainting = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerPainting)).BeginInit();
             this.splitContainerPainting.Panel1.SuspendLayout();
             this.splitContainerPainting.Panel2.SuspendLayout();
@@ -104,6 +104,6 @@
 
         private BetterSplitContainer splitContainerPainting;
         private System.Windows.Forms.ListBox listBoxPainting;
-        private Controls.WatchVariablePanel watchVariablePanelPainting;
+        private STROOP.Controls.VariablePanel.WatchVariablePanel watchVariablePanelPainting;
     }
 }

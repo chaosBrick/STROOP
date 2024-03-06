@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
-using STROOP.Controls;
 
-namespace STROOP.Core.Variables
+using STROOP.Core.Variables;
+
+namespace STROOP.Controls.VariablePanel
 {
     class WatchVariableNullableWrapper<TBaseWrapper, TBackingType> : WatchVariableWrapper<TBackingType?>
         where TBaseWrapper : WatchVariableWrapper<TBackingType>

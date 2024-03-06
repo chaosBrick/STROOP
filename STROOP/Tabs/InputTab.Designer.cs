@@ -31,7 +31,7 @@
             this.components = new System.ComponentModel.Container();
             this.splitContainerInput = new STROOP.BetterSplitContainer();
             this.inputDisplayPanel = new STROOP.InputDisplayPanel();
-            this.watchVariablePanelInput = new STROOP.Controls.WatchVariablePanel();
+            this.watchVariablePanelInput = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerInput)).BeginInit();
             this.splitContainerInput.Panel1.SuspendLayout();
             this.splitContainerInput.Panel2.SuspendLayout();
@@ -105,6 +105,6 @@
 
         private BetterSplitContainer splitContainerInput;
         private InputDisplayPanel inputDisplayPanel;
-        private Controls.WatchVariablePanel watchVariablePanelInput;
+        private STROOP.Controls.VariablePanel.WatchVariablePanel watchVariablePanelInput;
     }
 }

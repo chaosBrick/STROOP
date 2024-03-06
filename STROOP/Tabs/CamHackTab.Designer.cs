@@ -104,7 +104,7 @@
             this.radioButtonCamHackMode2 = new System.Windows.Forms.RadioButton();
             this.radioButtonCamHackMode1AbsoluteAngle = new System.Windows.Forms.RadioButton();
             this.radioButtonCamHackMode1RelativeAngle = new System.Windows.Forms.RadioButton();
-            this.watchVariablePanelCamHack = new STROOP.Controls.WatchVariablePanel();
+            this.watchVariablePanelCamHack = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerCamHack)).BeginInit();
             this.splitContainerCamHack.Panel1.SuspendLayout();
             this.splitContainerCamHack.Panel2.SuspendLayout();
@@ -1070,6 +1070,6 @@
         private System.Windows.Forms.RadioButton radioButtonCamHackMode2;
         private System.Windows.Forms.RadioButton radioButtonCamHackMode1AbsoluteAngle;
         private System.Windows.Forms.RadioButton radioButtonCamHackMode1RelativeAngle;
-        private Controls.WatchVariablePanel watchVariablePanelCamHack;
+        private STROOP.Controls.VariablePanel.WatchVariablePanel watchVariablePanelCamHack;
     }
 }

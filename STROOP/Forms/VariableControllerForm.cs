@@ -1,12 +1,12 @@
-﻿using STROOP.Structs;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
-using STROOP.Utilities;
-using STROOP.Core.Variables;
+
+using STROOP.Controls.VariablePanel;
+using STROOP.Structs;
 using STROOP.Structs.Configurations;
+using STROOP.Utilities;
 
 namespace STROOP.Forms
 {

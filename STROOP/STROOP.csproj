@@ -196,16 +196,16 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Core\WatchVariables\DescribedMemoryState.cs" />
-    <Compile Include="Core\WatchVariables\VariableGroup.cs" />
-    <Compile Include="Core\WatchVariables\WatchVariableAddressWrapper.cs" />
-    <Compile Include="Controls\WatchVariablePanelRenderer.cs">
+    <Compile Include="Core\WatchVariables\NamedVariableGroup.cs" />
+    <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableAddressWrapper.cs" />
+    <Compile Include="Controls\VariablePanel\WatchVariablePanelRenderer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Core\WatchVariables\WatchVariableNullableWrapper.cs" />
-    <Compile Include="Core\WatchVariables\WatchVariableSelectionWrapper.cs" />
-    <Compile Include="Core\WatchVariables\WatchVariableSetting.cs" />
-    <Compile Include="Core\WatchVariables\WatchVariableTriangleWrapper.cs" />
-    <Compile Include="Core\WatchVariables\WatchVariableStringWrapper.cs" />
+    <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableNullableWrapper.cs" />
+    <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableSelectionWrapper.cs" />
+    <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableSetting.cs" />
+    <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableTriangleWrapper.cs" />
+    <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableStringWrapper.cs" />
     <Compile Include="Enums\AggregateMathOperation.cs" />
     <Compile Include="Enums\CoordinateAngle.cs" />
     <Compile Include="Enums\CopyTypeEnum.cs" />
@@ -296,7 +296,7 @@
       <DependentUpon>VariableCreationForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Interfaces\IUpdatable.cs" />
-    <Compile Include="Controls\WatchVariableControl.cs" />
+    <Compile Include="Controls\VariablePanel\WatchVariableControl.cs" />
     <Compile Include="Controls\VarHackContainer.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -321,14 +321,14 @@
       <DependentUpon>DecompilerView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Core\WatchVariables\MemoryDescriptor.cs" />
-    <Compile Include="Core\WatchVariables\WatchVariableBooleanWrapper.cs" />
-    <Compile Include="Core\WatchVariables\WatchVariableObjectWrapper.cs" />
-    <Compile Include="Core\WatchVariables\WatchVariableAngleWrapper.cs" />
-    <Compile Include="Core\WatchVariables\WatchVariableNumberWrapper.cs" />
+    <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableBooleanWrapper.cs" />
+    <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableObjectWrapper.cs" />
+    <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableAngleWrapper.cs" />
+    <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableNumberWrapper.cs" />
     <Compile Include="Controls\VarHackFlowLayoutPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Core\WatchVariables\WatchVariableWrapper.cs" />
+    <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableWrapper.cs" />
     <Compile Include="Controls\InputDisplayPanel.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -363,7 +363,7 @@
     <Compile Include="Controls\IntPictureBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\WatchVariableFlowLayoutPanel.cs">
+    <Compile Include="Controls\VariablePanel\WatchVariableFlowLayoutPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\RichTextBoxEx.cs">

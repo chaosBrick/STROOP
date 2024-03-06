@@ -1,11 +1,11 @@
-﻿using STROOP.Structs.Configurations;
+﻿using System.Linq;
+
+using STROOP.Core.Variables;
+using STROOP.Structs.Configurations;
 using STROOP.Utilities;
-using System.Linq;
+using STROOP.Structs;
 
-// TODO: This shouldn't be necessary
-using STROOP.Controls;
-
-namespace STROOP.Core.Variables
+namespace STROOP.Controls.VariablePanel
 {
     public class WatchVariableAddressWrapper : WatchVariableNumberWrapper<uint>
     {

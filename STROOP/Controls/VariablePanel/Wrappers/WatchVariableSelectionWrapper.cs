@@ -4,13 +4,11 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
+using STROOP.Core.Variables;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 
-// TODO: This shouldn't be necessary
-using STROOP.Controls;
-
-namespace STROOP.Core.Variables
+namespace STROOP.Controls.VariablePanel
 {
     public class WatchVariableSelectionWrapper<TBaseWrapper, TBackingValue> : WatchVariableWrapper<TBackingValue>
         where TBaseWrapper : WatchVariableWrapper<TBackingValue>

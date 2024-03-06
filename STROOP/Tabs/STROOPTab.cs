@@ -1,8 +1,9 @@
 ﻿using System;
-using STROOP.Controls;
-using System.Windows.Forms;
-using System.Drawing;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Windows.Forms;
+
+using STROOP.Controls.VariablePanel;
 
 namespace STROOP.Tabs
 {

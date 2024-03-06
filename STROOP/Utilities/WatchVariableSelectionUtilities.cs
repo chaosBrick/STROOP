@@ -1,13 +1,16 @@
-﻿using STROOP.Controls;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+
+using OpenTK;
+
+using STROOP.Controls;
+using STROOP.Controls.VariablePanel;
 using STROOP.Core.Variables;
 using STROOP.Forms;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using OpenTK;
 
 namespace STROOP.Structs
 {

@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(VariablePopOutForm));
-            this._watchVariablePanel = new STROOP.Controls.WatchVariablePanel();
+            this._watchVariablePanel = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             this.SuspendLayout();
             // 
             // _watchVariablePanel
@@ -62,6 +62,6 @@
 
         #endregion
 
-        private Controls.WatchVariablePanel _watchVariablePanel;
+        private STROOP.Controls.VariablePanel.WatchVariablePanel _watchVariablePanel;
     }
 }

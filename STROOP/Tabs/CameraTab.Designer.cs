@@ -88,7 +88,7 @@
             this.buttonCameraPosXnZp = new System.Windows.Forms.Button();
             this.buttonCameraPosXn = new System.Windows.Forms.Button();
             this.buttonCameraPosXnZn = new System.Windows.Forms.Button();
-            this.watchVariablePanelCamera = new STROOP.Controls.WatchVariablePanel();
+            this.watchVariablePanelCamera = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerCamera)).BeginInit();
             this.splitContainerCamera.Panel1.SuspendLayout();
             this.splitContainerCamera.Panel2.SuspendLayout();
@@ -863,6 +863,6 @@
         private System.Windows.Forms.Button buttonCameraPosXnZp;
         private System.Windows.Forms.Button buttonCameraPosXn;
         private System.Windows.Forms.Button buttonCameraPosXnZn;
-        private Controls.WatchVariablePanel watchVariablePanelCamera;
+        private STROOP.Controls.VariablePanel.WatchVariablePanel watchVariablePanelCamera;
     }
 }

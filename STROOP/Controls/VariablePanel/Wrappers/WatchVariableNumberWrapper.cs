@@ -1,12 +1,11 @@
-﻿using STROOP.Structs.Configurations;
-using STROOP.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-// TODO: This shouldn't be necessary
-using STROOP.Controls;
+using STROOP.Core.Variables;
+using STROOP.Structs.Configurations;
+using STROOP.Utilities;
 
-namespace STROOP.Core.Variables
+namespace STROOP.Controls.VariablePanel
 {
     public class WatchVariableNumberWrapper<TNumber> : WatchVariableWrapper<TNumber> where TNumber : struct, IConvertible
     {

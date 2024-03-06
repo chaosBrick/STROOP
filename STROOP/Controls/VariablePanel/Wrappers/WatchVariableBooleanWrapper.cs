@@ -1,12 +1,11 @@
-﻿using STROOP.Utilities;
-using System.Windows.Forms;
+﻿using System;
 using System.Drawing;
-using System;
+using System.Windows.Forms;
 
-// TODO: This shouldn't be necessary
-using STROOP.Controls;
+using STROOP.Core.Variables;
+using STROOP.Utilities;
 
-namespace STROOP.Core.Variables
+namespace STROOP.Controls.VariablePanel
 {
     public abstract class WatchVariableBooleanWrapperBase<T> : WatchVariableWrapper<T>
     {

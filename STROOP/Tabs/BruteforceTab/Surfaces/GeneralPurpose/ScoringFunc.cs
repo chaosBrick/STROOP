@@ -1,14 +1,15 @@
 ﻿using System;
-using System.Drawing;
-using System.Windows.Forms;
-using System.Linq;
-using STROOP.Utilities;
 using System.Collections.Generic;
-using System.Text;
+using System.Drawing;
+using System.Linq;
 using System.Reflection;
-using STROOP.Controls;
+using System.Text;
+using System.Windows.Forms;
+
+using STROOP.Controls.VariablePanel;
 using STROOP.Core.Variables;
 using STROOP.Tabs.BruteforceTab.BF_Utilities;
+using STROOP.Utilities;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
 {

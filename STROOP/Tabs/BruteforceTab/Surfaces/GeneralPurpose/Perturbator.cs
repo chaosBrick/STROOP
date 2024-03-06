@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-using STROOP.Controls;
+using STROOP.Controls.VariablePanel;
 using STROOP.Utilities;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose

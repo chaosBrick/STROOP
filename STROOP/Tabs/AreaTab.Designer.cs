@@ -40,7 +40,7 @@
             this.radioButtonArea1 = new System.Windows.Forms.RadioButton();
             this.radioButtonArea2 = new System.Windows.Forms.RadioButton();
             this.checkBoxSelectCurrentArea = new System.Windows.Forms.CheckBox();
-            this.watchVariablePanelArea = new STROOP.Controls.WatchVariablePanel();
+            this.watchVariablePanelArea = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerArea)).BeginInit();
             this.splitContainerArea.Panel1.SuspendLayout();
             this.splitContainerArea.Panel2.SuspendLayout();
@@ -225,6 +225,6 @@
         private System.Windows.Forms.RadioButton radioButtonArea1;
         private System.Windows.Forms.RadioButton radioButtonArea2;
         private System.Windows.Forms.CheckBox checkBoxSelectCurrentArea;
-        private Controls.WatchVariablePanel watchVariablePanelArea;
+        private STROOP.Controls.VariablePanel.WatchVariablePanel watchVariablePanelArea;
     }
 }

@@ -1,9 +1,7 @@
-﻿using STROOP.Utilities;
+﻿using STROOP.Core.Variables;
+using STROOP.Utilities;
 
-// TODO: This shouldn't be necessary
-using STROOP.Controls;
-
-namespace STROOP.Core.Variables
+namespace STROOP.Controls.VariablePanel
 {
     public class WatchVariableTriangleWrapper : WatchVariableAddressWrapper
     {

@@ -1,11 +1,12 @@
-﻿using STROOP.Controls;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
 using System.Drawing;
 using System.Linq;
-using STROOP.Structs.Configurations;
+using System.Windows.Forms;
+
+using STROOP.Controls.VariablePanel;
 using STROOP.Structs;
+using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 
 namespace STROOP.Tabs.GfxTab

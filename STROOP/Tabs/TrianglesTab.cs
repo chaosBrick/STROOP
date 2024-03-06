@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+
+using STROOP.Controls.VariablePanel;
+using STROOP.Core.Variables;
+using STROOP.Forms;
 using STROOP.Models;
 using STROOP.Structs;
-using STROOP.Utilities;
 using STROOP.Structs.Configurations;
-using STROOP.Forms;
-using STROOP.Controls;
-using STROOP.Core.Variables;
+using STROOP.Utilities;
 
 namespace STROOP.Tabs
 {
