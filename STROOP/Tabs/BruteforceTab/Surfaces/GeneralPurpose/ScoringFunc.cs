@@ -134,18 +134,9 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                 {
                     docs[kvp.Key.name] = kvp.Key.documentation;
                     string key = kvp.Key.name;
-                    var backingType = BF_VariableUtilties.backingTypes[kvp.Value];
-                    if (precursor.parameterValues.TryGetValue(key, out var uncastedValue))
-                    {
-                        uncastedValue = uncastedValue is string stringValue 
-                            ? StringUtilities.GetJsonValue(BF_VariableUtilties.fallbackWrapperTypes[kvp.Value], stringValue) 
-                            : uncastedValue;
-                        precursor.parameterValues[key] = Convert.ChangeType(uncastedValue, backingType);
-                    }
-                    else
-                        precursor.parameterValues[key] = Activator.CreateInstance(backingType);
                     var newWatchVar = BF_VariableUtilties.CreateNamedVariable(kvp.Value, kvp.Key.name);
                     newWatchVar.ValueSet += bruteforceTab.DeferUpdateState;
+                    precursor.parameterValues[key] = newWatchVar;
                     return newWatchVar;
                 }));
             if (stringToControllerType.TryGetValue(precursor.name, out var controllerType))
@@ -209,7 +200,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose
                 if (!first)
                     strBuilder.AppendLine(",");
                 first = false;
-                strBuilder.Append($"{tabs2}\"{parameterValue.Key}\": {StringUtilities.MakeJsonValue(parameterValue.Value.ToString())}");
+                strBuilder.Append($"{tabs2}\"{parameterValue.Key}\": {StringUtilities.MakeJsonValue(parameterValue.Value.value.ToString())}");
             }
             strBuilder.AppendLine($"\n{tabs1}}}");
             strBuilder.Append($"{tabs0}}}");

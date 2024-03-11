@@ -108,7 +108,10 @@ namespace STROOP.Core.Variables
             public GetterFunction<T> _getterFunction { get; set; }
             public SetterFunction<T> _setterFunction { get; set; }
 
-            public CustomView(Type wrapperType) : base(wrapperType) { }
+            public CustomView(Type wrapperType) : base(wrapperType) {
+                _getterFunction = WatchVariableSpecialUtilities.Defaults<T>.DEFAULT_GETTER;
+                _setterFunction = WatchVariableSpecialUtilities.Defaults<T>.DEFAULT_SETTER;
+            }
         }
 
         public class MemoryDescriptorView : CustomView, IMemoryDescriptorView

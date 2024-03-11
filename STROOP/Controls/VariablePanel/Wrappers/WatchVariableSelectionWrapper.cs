@@ -80,13 +80,6 @@ namespace STROOP.Controls.VariablePanel
                 baseWrapper.SingleClick(parentCtrl, bounds);
         }
 
-        public override void DoubleClick(Control parentCtrl, Rectangle bounds)
-        {
-            base.DoubleClick(parentCtrl, bounds);
-            if (!IsCursorHovering(bounds, out var _))
-                baseWrapper.DoubleClick(parentCtrl, bounds);
-        }
-
         public override WatchVariablePanel.CustomDraw CustomDrawOperation => (g, rect) =>
         {
             baseWrapper.CustomDrawOperation?.Invoke(g, rect);
@@ -98,7 +91,7 @@ namespace STROOP.Controls.VariablePanel
                 g.FillRectangle(IsCursorHovering(rect, out var drawRect) ? Brushes.LightSlateGray : Brushes.Gray, drawRect);
 
             var txtPoint = new Point(rect.Right - marginX, rect.Top + marginY);
-            g.DrawString(isSingleOption ? options[0].name : (selectedOption.name ?? GetValueText()),
+            g.DrawString(isSingleOption ? options[0].name : GetValueText(),
                 _watchVarControl.containingPanel.Font,
                 _watchVarControl.IsSelected ? Brushes.White : Brushes.Black,
                 txtPoint,

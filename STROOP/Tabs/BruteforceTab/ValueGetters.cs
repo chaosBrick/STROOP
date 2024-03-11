@@ -141,7 +141,7 @@ namespace STROOP.Tabs.BruteforceTab
                 if (!slots.Any())
                     return ("Nothing", inputName => inputName == "behavior_scripts" ? "[]" : "{}");
                 return (
-                        $"Slots [{string.Concat(slots.Where((int? slot) => slot != null).Select(slot => slot.Value.ToString() + ";").ToArray())}]",
+                        $"Slots [{string.Join("; ", slots.Where((int? slot) => slot != null).Select(slot => slot.Value.ToString()))}]",
                         GetObjectData(slots.Where(x => x.HasValue).Select(x => (uint)x.Value).ToArray())
                     );
             }
@@ -185,7 +185,7 @@ namespace STROOP.Tabs.BruteforceTab
             {
                 var slots = ParsingUtilities.ParseIntList(DialogUtilities.GetStringFromDialog(labelText: "Enter the object slot numbers:"));
                 return (
-                    $"Slots [{string.Concat(slots.Where((int? slot) => slot != null).Select(slot => slot.Value.ToString() + ";").ToArray())}]",
+                    $"Slots [{string.Join("; ", slots.Where((int? slot) => slot != null).Select(slot => slot.Value.ToString()))}]",
                     var =>
                     {
                         var triangles = new List<Models.TriangleDataModel>();

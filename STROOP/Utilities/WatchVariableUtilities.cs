@@ -67,8 +67,17 @@ namespace STROOP.Utilities
         {
             IEnumerable<bool> Set<Q>()
             {
+                Q convertedValue = default(Q);
+                try
+                {
+                    convertedValue = (Q)Convert.ChangeType(value, typeof(Q));
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
                 if (view is NamedVariableCollection.IView<Q> qView)
-                    return qView._setterFunction((Q)Convert.ChangeType(value, typeof(Q)));
+                    return qView._setterFunction(convertedValue);
                 return null;
             }
             return Set<byte>()

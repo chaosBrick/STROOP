@@ -60,6 +60,15 @@ namespace STROOP.Tabs.BruteforceTab.BF_Utilities
         public static IBruteforceVariableView CreateNamedVariable(string bruteforcerType, string name, object defaultValue = null)
         {
             var backingType = backingTypes[bruteforcerType];
+            try
+            {
+                if (defaultValue != null)
+                    defaultValue = Convert.ChangeType(defaultValue, backingType);
+            }
+            catch (Exception)
+            {
+
+            }
             return (IBruteforceVariableView)typeof(BruteforceVariableView<>)
                         .MakeGenericType(backingType)
                         .GetConstructor(new[] { typeof(string), typeof(string), backingType })

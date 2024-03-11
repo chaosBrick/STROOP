@@ -309,12 +309,9 @@ namespace STROOP.Tabs.BruteforceTab
                 if (fns.Key.displayName != null)
                 {
                     var variableName = fns.Key.displayName;
-                    string o = "Keep";
-                    var newWatchVar = new NamedVariableCollection.CustomView<string>(typeof(WatchVariableSelectionWrapper<WatchVariableStringWrapper, string>))
+                    var newWatchVar = new BruteforceVariableView<string>(typeof(WatchVariableSelectionWrapper<WatchVariableStringWrapper, string>), variableName)
                     {
                         Name = variableName,
-                        _getterFunction = () => o.Yield(),
-                        _setterFunction = value => { o = value; return true.Yield(); }
                     };
                     var watchVarControl = watchVariablePanelParams.AddVariable(newWatchVar);
                     var wrapper = (WatchVariableSelectionWrapper<WatchVariableStringWrapper, string>)watchVarControl.WatchVarWrapper;
@@ -337,7 +334,7 @@ namespace STROOP.Tabs.BruteforceTab
                         };
                     }
 
-                    void SetSelected(string selectedStr)
+                    string SetSelected(string selectedStr)
                     {
                         Func<string, string> fn = var =>
                         {
@@ -352,11 +349,18 @@ namespace STROOP.Tabs.BruteforceTab
                             selectedStr = option.optionName;
                         }
                         SetConcreteOption((selectedStr, fn));
+                        return selectedStr;
                     }
                     foreach (var option_it in options)
                     {
                         var option_cap = option_it;
-                        wrapper.options.Add((option_cap, () => { SetSelected(option_cap); UpdateState(); return option_cap; }));
+                        Func<string> geledate = () =>
+                        {
+                            var displayText = SetSelected(option_cap);
+                            UpdateState();
+                            return displayText;
+                        };
+                        wrapper.options.Add((option_cap, geledate));
                     }
                     SetSelected("[Keep]");
                     if (fns.Key.defaultOption != null)

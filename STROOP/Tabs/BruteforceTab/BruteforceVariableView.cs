@@ -31,7 +31,11 @@ namespace STROOP.Tabs.BruteforceTab
         }
 
         public BruteforceVariableView(string bruteforcerType, string name, T defaultValue = default(T))
-            : base(BF_Utilities.BF_VariableUtilties.fallbackWrapperTypes[bruteforcerType])
+            : this(BF_Utilities.BF_VariableUtilties.fallbackWrapperTypes[bruteforcerType], name, defaultValue)
+        { }
+
+        public BruteforceVariableView(Type wrapperType, string name, T defaultValue = default(T))
+            : base(wrapperType)
         {
             Name = name;
             _value = defaultValue;

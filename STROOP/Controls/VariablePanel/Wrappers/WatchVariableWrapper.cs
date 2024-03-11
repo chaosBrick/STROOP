@@ -103,7 +103,7 @@ namespace STROOP.Controls.VariablePanel
         public abstract void Update();
         public virtual void ToggleDisplay() { }
 
-        protected void OnValueSet() => ValueSet();
+        protected void OnValueSet() { ValueSet(); _view.ValueSet?.Invoke(); }
     }
 
     public abstract class WatchVariableWrapper<TBackingValue> : WatchVariableWrapper
@@ -238,7 +238,10 @@ namespace STROOP.Controls.VariablePanel
         {
             var success = TryParseValue(value, out var result);
             if (success)
+            {
                 view._setterFunction(result);
+                OnValueSet();
+            }
             return success;
         }
 
