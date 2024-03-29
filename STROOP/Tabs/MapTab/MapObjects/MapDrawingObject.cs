@@ -28,7 +28,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 menu.Items.Add(myItem);
             }
 
-            public bool CanDrag() => true;
+            public DragMask CanDrag() => DragMask.All & ~DragMask.Angle;
 
             public void DragTo(Vector3 newPosition, bool setY)
             {
@@ -40,6 +40,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 }
                 parent._lastVertex = currentVertex;
             }
+
+            public void SetLookAt(Vector3 lookAt) { }
 
             public void LeftClick(Vector3 position)
             {

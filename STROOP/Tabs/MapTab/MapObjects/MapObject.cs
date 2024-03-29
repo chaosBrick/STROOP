@@ -94,11 +94,25 @@ namespace STROOP.Tabs.MapTab.MapObjects
         public readonly ObjectCreateParams creationParameters;
 
         ToolStripMenuItem itemEnableDragging = new ToolStripMenuItem("Enable dragging");
+        ToolStripMenuItem itemEnableDraggingX = new ToolStripMenuItem("Enable X");
+        ToolStripMenuItem itemEnableDraggingY = new ToolStripMenuItem("Enable Y");
+        ToolStripMenuItem itemEnableDraggingZ = new ToolStripMenuItem("Enable Z");
+        ToolStripMenuItem itemEnableDraggingAngle = new ToolStripMenuItem("Enable Angle (hold ctrl)");
         public bool enableDragging
         {
             get => itemEnableDragging.Checked;
-            set => itemEnableDragging.Checked = value;
+            set => itemEnableDragging.Checked
+                = itemEnableDraggingX.Checked
+                = itemEnableDraggingY.Checked
+                = itemEnableDraggingZ.Checked
+                = itemEnableDraggingAngle.Checked = value;
         }
+
+        public DragMask dragMask =>
+            (itemEnableDraggingX.Checked ? DragMask.X : 0)
+            | (itemEnableDraggingY.Checked ? DragMask.Y : 0)
+            | (itemEnableDraggingZ.Checked ? DragMask.Z : 0)
+            | (itemEnableDraggingAngle.Checked ? DragMask.Angle : 0);
 
         public virtual IHoverData GetHoverData(MapGraphics graphics, ref Vector3 position) => null;
 
@@ -251,7 +265,13 @@ namespace STROOP.Tabs.MapTab.MapObjects
         protected virtual ContextMenuStrip GetContextMenuStrip(MapTracker targetTracker)
         {
             var _contextMenuStrip = new ContextMenuStrip();
-            itemEnableDragging.Click += (_, __) => itemEnableDragging.Checked = !itemEnableDragging.Checked;
+            itemEnableDragging.Click += (_, __) => enableDragging = dragMask == DragMask.None;
+            foreach (var item_it in new[] { itemEnableDraggingX, itemEnableDraggingY, itemEnableDraggingZ, itemEnableDraggingAngle })
+            {
+                var item = item_it;
+                itemEnableDragging.DropDownItems.Add(item_it);
+                item_it.Click += (_, __) => item_it.Checked = !item_it.Checked;
+            }
             _contextMenuStrip.Items.Add(itemEnableDragging);
 
             return _contextMenuStrip;

@@ -20,7 +20,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
 
             public void AddContextMenuItems(MapTab.MapTab tab, ContextMenuStrip menu) { }
 
-            public bool CanDrag() => parent.enableDragging;
+            public DragMask CanDrag() => parent.dragMask;
 
             public void DragTo(Vector3 position, bool setY)
             {
@@ -32,6 +32,8 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
             public void LeftClick(Vector3 position) { }
 
             public void RightClick(Vector3 position) { }
+
+            public void SetLookAt(Vector3 lookAt) { }
         }
 
         readonly HoverData hover;

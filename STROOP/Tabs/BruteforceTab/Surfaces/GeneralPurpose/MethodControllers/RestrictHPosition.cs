@@ -23,7 +23,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
 
             public void AddContextMenuItems(MapTab.MapTab tab, ContextMenuStrip menu) { }
 
-            public bool CanDrag() => parent.enableDragging;
+            public DragMask CanDrag() => parent.dragMask;
 
             public void DragTo(Vector3 position, bool setY)
             {
@@ -65,6 +65,8 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
             public void LeftClick(Vector3 position) { }
 
             public void RightClick(Vector3 position) { }
+
+            public void SetLookAt(Vector3 lookAt) { }
         }
 
         RestrictHPosition parent;
@@ -150,7 +152,7 @@ namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
                 screenSpacePos.Z = 0;
                 graphics.textRenderer.AddText(
                     new[] { ($"RestrictHPosition ({parent.GetFuncIndex()?.ToString() ?? "-"})", Vector3.Zero) },
-                    OutlineColor, 
+                    OutlineColor,
                     Matrix4.CreateScale(1.0f / graphics.glControl.Height) * Matrix4.CreateTranslation(screenSpacePos),
                     true);
             });

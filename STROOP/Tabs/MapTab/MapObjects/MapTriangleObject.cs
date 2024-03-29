@@ -24,6 +24,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
             public void DragTo(Vector3 position, bool setY) { }
 
+            public void SetLookAt(Vector3 lookAt) { }
+
             public void LeftClick(Vector3 position) { }
 
             public void RightClick(Vector3 position)
@@ -31,7 +33,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 mapCursorOnRightClick = position;
             }
 
-            public bool CanDrag() => false;
+            public DragMask CanDrag() => DragMask.None;
 
             public void AddContextMenuItems(MapTab tab, ContextMenuStrip menu)
             {

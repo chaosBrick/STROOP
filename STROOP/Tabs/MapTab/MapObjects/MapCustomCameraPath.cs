@@ -94,6 +94,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 targetItem.DropDownItems.Add(keyFrameDeleteItem);
             }
 
+            public override void SetLookAt(Vector3 lookAt) { }
+
             protected override void SetPosition(Vector3 newPosition)
             {
                 currentPositionAngle.position = newPosition;

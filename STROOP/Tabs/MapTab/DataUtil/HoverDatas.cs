@@ -13,6 +13,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
             protected readonly MapObject parent;
             protected abstract void SetPosition(Vector3 position);
             protected abstract Vector3 GetPosition();
+            public abstract void SetLookAt(Vector3 lookAt);
 
             public PointHoverData(MapObject parent)
             {
@@ -23,16 +24,19 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
             public virtual void RightClick(Vector3 position) { }
 
-            public virtual bool CanDrag() => parent.itemEnableDragging.Checked;
+            public virtual DragMask CanDrag() => parent.dragMask;
 
             public void DragTo(Vector3 newPosition, bool setY)
             {
-                if (CanDrag())
-                {
-                    if (!setY)
-                        newPosition.Y = GetPosition().Y;
-                    SetPosition(newPosition);
-                }
+                var dragMask = CanDrag();
+                var oldPosition = GetPosition();
+                if (!dragMask.HasFlag(DragMask.X))
+                    newPosition.X = oldPosition.X;
+                if (!dragMask.HasFlag(DragMask.Y) || !setY)
+                    newPosition.Y = oldPosition.Y;
+                if (!dragMask.HasFlag(DragMask.Z))
+                    newPosition.Z = oldPosition.Z;
+                SetPosition(newPosition);
             }
 
             public virtual void Pivot(MapTab tab)
@@ -144,6 +148,12 @@ namespace STROOP.Tabs.MapTab.MapObjects
             {
                 var capture = currentPositionAngle;
                 yield return (capture.GetMapName(), () => capture.position);
+            }
+
+            public override void SetLookAt(Vector3 lookAt)
+            {
+                var radians = -Math.Atan2(lookAt.Z - currentPositionAngle.position.Z, lookAt.X - currentPositionAngle.position.X) + Math.PI / 2;
+                currentPositionAngle.SetAngle(MoreMath.RadiansToAngleUnits(radians));
             }
         }
     }

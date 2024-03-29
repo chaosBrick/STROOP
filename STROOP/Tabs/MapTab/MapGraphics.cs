@@ -567,10 +567,21 @@ namespace STROOP.Tabs.MapTab
             using (new AccessScope<MapTab>(mapTab))
             {
                 foreach (var hover in mapTab.hoverData)
-                    if (mouseDown[0] && hover.CanDrag())
+                    if (mouseDown[0])
                     {
-                        hover.DragTo(mapCursorPosition, view.mode != MapView.ViewMode.TopDown);
-                        return;
+                        if (KeyboardUtilities.IsCtrlHeld())
+                        {
+                            if (hover.CanDrag().HasFlag(DragMask.Angle))
+                            {
+                                hover.SetLookAt(mapCursorPosition);
+                                return;
+                            }
+                        }
+                        else if (hover.CanDrag() != DragMask.None)
+                        {
+                            hover.DragTo(mapCursorPosition, view.mode != MapView.ViewMode.TopDown);
+                            return;
+                        }
                     }
             }
 

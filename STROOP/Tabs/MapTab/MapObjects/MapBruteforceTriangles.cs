@@ -27,7 +27,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 menu.Items.GetSubItem("Triangle Collection").DropDownItems.AddHandlerToItem("Copy Bruteforcer json", parent.CopyJson);
             }
 
-            bool IHoverData.CanDrag() => true;
+            DragMask IHoverData.CanDrag() => DragMask.All;
 
             void IHoverData.DragTo(Vector3 position, bool setY)
             {
@@ -38,6 +38,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 else
                     parent.triangleAddresses.Remove(parent.currentMapTab.graphics.hoverTriangle.Address);
             }
+
+            void IHoverData.SetLookAt(Vector3 lookAt) { }
 
             void IHoverData.LeftClick(Vector3 position)
             {

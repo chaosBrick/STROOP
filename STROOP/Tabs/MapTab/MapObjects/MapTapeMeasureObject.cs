@@ -26,7 +26,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 this.parent = parent;
             }
 
-            public bool CanDrag() => parent.itemEnableDragging.Checked;
+            public DragMask CanDrag() => parent.dragMask;
 
             public void DragTo(Vector3 newPosition, bool setY)
             {
@@ -36,6 +36,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
                     parent.b = newPosition;
                 parent.targetTracker.textBoxSize.Text = (parent.Size = (parent.a - parent.b).Length).ToString();
             }
+
+            public void SetLookAt(Vector3 lookAt) { }
 
             public void LeftClick(Vector3 position) { }
 
