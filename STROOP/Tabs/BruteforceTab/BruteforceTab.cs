@@ -11,7 +11,6 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 
 using STROOP.Controls.VariablePanel;
 using STROOP.Core.Variables;
-using STROOP.Structs;
 using STROOP.Tabs.BruteforceTab.BF_Utilities;
 using STROOP.Utilities;
 
@@ -434,8 +433,116 @@ namespace STROOP.Tabs.BruteforceTab
             using (new AccessScope<BruteforceTab>(this))
                 InitSurface(moduleName);
 
+            CreateRecordReferenceLua(modulePath);
+
             UpdateState();
             btnRun.Enabled = true;
+        }
+
+        private void CreateRecordReferenceLua(string modulePath)
+        {
+            void WriteFrame(StringBuilder builder)
+            {
+                builder.AppendLine("function RecordFrame()");
+
+                builder.AppendLine("local v;");
+                builder.AppendLine("local result = \"\";");
+
+                var knownStateVariablesLookup = new Dictionary<string, NamedVariableCollection.IView>();
+                foreach (var helpMeGodIsNotReal in knownStateVariables)
+                {
+                    var jsonName = helpMeGodIsNotReal.GetJsonName();
+                    if (jsonName != null)
+                        knownStateVariablesLookup[jsonName] = helpMeGodIsNotReal;
+                }
+                foreach (var variable in variables)
+                {
+                    if (variable.Value.modifier == "dynamic"
+                        && knownStateVariablesLookup.TryGetValue(variable.Key, out var view)
+                        && view is NamedVariableCollection.IMemoryDescriptorView memoryView)
+                    {
+                        var address = memoryView.describedMemoryState.GetAddressList().FirstOrDefault();
+                        if (address == 0)
+                            continue;
+
+                        string readMethod = null;
+                        string format = null;
+                        switch (memoryView.memoryDescriptor.MemoryType)
+                        {
+                            case Type t when t == typeof(sbyte):
+                                readMethod = "bytesigned";
+                                format = "%d";
+                                break;
+                            case Type t when t == typeof(byte):
+                                readMethod = "byte";
+                                format = "%d";
+                                break;
+                            case Type t when t == typeof(short):
+                                readMethod = "wordsigned";
+                                format = "%d";
+                                break;
+                            case Type t when t == typeof(ushort):
+                                readMethod = "word";
+                                format = "%d";
+                                break;
+                            case Type t when t == typeof(int):
+                                readMethod = "dwordsigned";
+                                format = "%d";
+                                break;
+                            case Type t when t == typeof(uint):
+                                readMethod = "dword";
+                                format = "%d";
+                                break;
+                            case Type t when t == typeof(float):
+                                readMethod = "float";
+                                format = "%f";
+                                break;
+                            case Type t when t == typeof(double):
+                                readMethod = "double";
+                                format = "%f";
+                                break;
+                        }
+                        if (readMethod == null)
+                            continue;
+
+                        builder.Append("-- ");
+                        builder.AppendLine(memoryView.Name);
+                        builder.Append("v = memory.read");
+                        builder.Append(readMethod);
+                        builder.Append("(0x");
+                        builder.Append(address.ToString("X8"));
+                        builder.AppendLine(");");
+                        builder.AppendLine($"result = result .. string.format(\"\t\\\"{variable.Key}\\\": {format},\\n\", v);");
+                    }
+                }
+
+                builder.AppendLine(@"result = string.format(""{\n%s\n},\n"", result:sub(1, result: len() - 2));");
+                builder.AppendLine("everything = everything .. result;");
+                builder.AppendLine("end");
+            }
+
+            var scriptOutputBuilder = new StringBuilder();
+            scriptOutputBuilder.Append(@"
+local everything = """"
+
+function WriteOutput()
+    PATH_ROOT = debug.getinfo(1).source:sub(2):match(""(.*\\)"");
+    local targetFileName = PATH_ROOT..""ground_truth.json"";
+    local file = io.open(targetFileName, ""w"");
+    file:write(string.format(""[\n%s\n]\n"", everything:sub(1, everything: len() - 2)));
+    file:close();
+    print(""Results were written to "" .. targetFileName);
+end
+");
+
+            WriteFrame(scriptOutputBuilder);
+
+            scriptOutputBuilder.Append(@"
+emu.atinput(RecordFrame);
+emu.atstop(WriteOutput);
+");
+
+            File.WriteAllText($"{ modulePath}/record_reference.lua", scriptOutputBuilder.ToString());
         }
 
         private void ApplyKnownState()
