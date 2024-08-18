@@ -123,19 +123,56 @@ namespace STROOP.Utilities
                 var comparisonBuffer = new byte[autoDetectPattern.Length];
 
                 var processScanner = new SigScanSharp(Process.Handle);
-                if (processScanner.SelectModule(Process.MainModule))
+                var minOffset = 0;
+                while (processScanner.SelectModule(Process.MainModule))
                 {
-                    var foundPatternAddress = processScanner.FindPattern(autoDetectPattern, out var t);
+                    var foundPatternAddress = processScanner.FindPattern(autoDetectPattern, ref minOffset, out var t);
+                    minOffset += autoDetectPattern.Length;
                     if (foundPatternAddress != IntPtr.Zero)
                     {
                         var newBaseOffset = UIntPtr.Subtract((UIntPtr)(long)foundPatternAddress, (int)x.offset);
                         _baseOffset = newBaseOffset;
-                        goto verified;
+                        if (VerifyCandidate(newBaseOffset))
+                            goto verified;
                     }
+                    else
+                        break;
                 }
             }
             messageLogBuilder.AppendLine("Unable to verify or correct RAM start.");
-            verified:;
+        verified:;
+
+            bool VerifyCandidate(UIntPtr candidate)
+            {
+                try
+                {
+                    var mem = new byte[0x200];
+                    var expectedSignature = new byte?[] {
+                         null,0x80,0x1a, 0x3c,
+                         null,null,0x5a, 0x27,
+                         0x08,0x00,0x40, 0x03,
+                         0x00,0x00,0x00, 0x00,
+                    };
+                    if (!ReadFunc(candidate, mem))
+                        return false;
+
+                    for (int i = 0; i < expectedSignature.Length; i++)
+                    {
+                        if (expectedSignature[i].HasValue && mem[i] != expectedSignature[i].Value)
+                            return false;
+                        else if (!expectedSignature[i].HasValue)
+                            expectedSignature[i] = mem[i];
+                    }
+
+                    foreach (var location in new[] { 0x80, 0x100, 0x180 })
+                        for (var i = 0; i < expectedSignature.Length; i++)
+                            if (expectedSignature[i].Value != mem[i + location])
+                                return false;
+                }
+                catch (Exception e)
+                { return false; }
+                return true;
+            }
         }
 
         public override bool Suspend()

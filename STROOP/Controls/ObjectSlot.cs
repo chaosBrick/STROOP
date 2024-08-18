@@ -27,6 +27,9 @@ namespace STROOP
             {
                 OverlayExpression GetAddressExpression(Func<ObjectSlot, uint, bool> addressExpression) => obj =>
                 {
+                    if (Config.Stream == null)
+                        return false;
+
                     uint? address = obj.CurrentObject?.Address ?? null;
                     if (address.HasValue) return addressExpression(obj, address.Value);
                     return false;
@@ -208,7 +211,7 @@ namespace STROOP
         public BehaviorCriteria Behavior => _behavior;
 
         bool _isActive = false;
-        
+
         public override string Text => _text;
         Color _textColor
         {

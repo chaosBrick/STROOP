@@ -96,7 +96,6 @@ namespace STROOP
 
         private void StroopMainForm_Load(object sender, EventArgs e)
         {
-            Config.Stream.OnUpdate += OnUpdate;
             Config.Stream.OnDisconnect += _sm64Stream_OnDisconnect;
             Config.Stream.WarnReadonlyOff += _sm64Stream_WarnReadonlyOff;
 
@@ -309,13 +308,16 @@ namespace STROOP
             return resortList;
         }
 
-        private void OnUpdate(object sender, EventArgs e)
+        public void OnUpdate()
         {
             using (new AccessScope<StroopMainForm>(this))
             {
-                labelFpsCounter.Text = "FPS: " + (int)Config.Stream?.FpsInPractice ?? "<none>";
-                UpdateComboBoxes();
-                DataModels.Update();
+                labelFpsCounter.Text = "FPS: " + (int?)Config.Stream?.FpsInPractice ?? "<none>";
+                if (Config.Stream != null)
+                {
+                    UpdateGlobalConfig();
+                    DataModels.Update();
+                }
                 FormManager.Update();
                 ObjectSlotsManager.Update();
                 //Config.InjectionManager.Update();
@@ -329,7 +331,7 @@ namespace STROOP
             }
         }
 
-        private void UpdateComboBoxes()
+        private void UpdateGlobalConfig()
         {
             // Rom Version
             RomVersionConfig.UpdateRomVersion(comboBoxRomVersion);
@@ -582,7 +584,6 @@ namespace STROOP
             base.OnFormClosing(e);
             if (Config.Stream != null)
             {
-                Config.Stream.OnUpdate -= OnUpdate;
                 Config.Stream.OnDisconnect -= _sm64Stream_OnDisconnect;
                 Config.Stream.WarnReadonlyOff -= _sm64Stream_WarnReadonlyOff;
             }

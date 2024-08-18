@@ -79,14 +79,14 @@ public class SigScanSharp
         return true;
     }
 
-    public IntPtr FindPattern(byte[] arrPattern, out long lTime)
+    public IntPtr FindPattern(byte[] arrPattern, ref int minOffset, out long lTime)
     {
         if (g_arrModuleBuffer == null || g_lpModuleBase == IntPtr.Zero)
             throw new Exception("Selected module is null");
 
         Stopwatch stopwatch = Stopwatch.StartNew();
 
-        for (int nModuleIndex = 0; nModuleIndex < g_arrModuleBuffer.Length; nModuleIndex++)
+        for (int nModuleIndex = minOffset; nModuleIndex < g_arrModuleBuffer.Length; nModuleIndex++)
         {
             if (this.g_arrModuleBuffer[nModuleIndex] != arrPattern[0])
                 continue;
@@ -94,6 +94,7 @@ public class SigScanSharp
             if (PatternCheck(nModuleIndex, arrPattern))
             {
                 lTime = stopwatch.ElapsedMilliseconds;
+                minOffset = nModuleIndex;
                 return IntPtr.Add(g_lpModuleBase, nModuleIndex);
             }
         }

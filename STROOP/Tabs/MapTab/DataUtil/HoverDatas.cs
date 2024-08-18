@@ -155,6 +155,26 @@ namespace STROOP.Tabs.MapTab.MapObjects
                 var radians = -Math.Atan2(lookAt.Z - currentPositionAngle.position.Z, lookAt.X - currentPositionAngle.position.X) + Math.PI / 2;
                 currentPositionAngle.SetAngle(MoreMath.RadiansToAngleUnits(radians));
             }
+
+            public override void AddContextMenuItems(MapTab tab, ContextMenuStrip menu)
+            {
+                base.AddContextMenuItems(tab, menu);
+                if (currentPositionAngle is PositionAngle.IHoldsObjectAddress addressHolder)
+                {
+                    var address = addressHolder.GetAddress();
+                    var item = new ToolStripMenuItem("Open in Object tab");
+                    item.Click += (_, __) =>
+                    {
+                        var mainForm = AccessScope<StroopMainForm>.content;
+                        var objectTab = mainForm.GetTab<ObjectTab>();
+                        var knopf = objectTab.selection;
+                        knopf.Clear();
+                        knopf.Add(address);
+                        mainForm.SwitchTab(objectTab);
+                    };
+                    menu.Items.Add(item);
+                }
+            }
         }
     }
 }

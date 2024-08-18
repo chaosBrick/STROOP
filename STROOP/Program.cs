@@ -44,9 +44,6 @@ namespace STROOP
         {
             StroopMainForm tmpMainForm = null;
             LoadingHandler.LoadingForm.RunLoadingTasks(
-                ("Creating Process Stream",
-                () => Config.Stream = new ProcessStream()
-            ),
                 ("Loading Main Configuration",
                 () =>
                 {
@@ -86,6 +83,9 @@ namespace STROOP
             ),
                 ("Initialize Main Form",
                 () => tmpMainForm = new StroopMainForm(true)
+            ),
+                ("Creating Process Stream",
+                () => Config.Stream = new ProcessStream(tmpMainForm.OnUpdate)
             )
             );
             mainForm = tmpMainForm;

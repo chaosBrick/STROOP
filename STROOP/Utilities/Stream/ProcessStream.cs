@@ -19,27 +19,25 @@ namespace STROOP.Utilities
 
         List<double> _fpsTimes = new List<double>();
         byte[] _ram;
-        bool _lastUpdateBeforePausing = false;
         object _enableLocker = new object();
         object _mStreamProcess = new object();
 
-        public event EventHandler OnUpdate;
         public event EventHandler OnDisconnect;
         public event EventHandler FpsUpdated;
         public event EventHandler WarnReadonlyOff;
+        private Action OnUpdate;
 
         public bool Readonly { get; set; } = false;
         public bool ShowWarning { get; set; } = false;
-        public bool IsEnabled { get; set; } = true;
-        public bool IsRunning { get; private set; } = false;
 
         public byte[] Ram => _ram;
         public string ProcessName => _io?.Name ?? "(No Emulator)";
         public double FpsInPractice => _fpsTimes.Count == 0 ? 0 : 1 / _fpsTimes.Average();
         public double lastFrameTime => _fpsTimes.Count == 0 ? RefreshRateConfig.RefreshRateInterval : _fpsTimes.Last();
 
-        public ProcessStream()
+        public ProcessStream(Action onUpdate)
         {
+            this.OnUpdate = onUpdate;
             _ram = new byte[Config.RamSize];
         }
 
@@ -74,8 +72,6 @@ namespace STROOP.Utilities
         {
             lock (_mStreamProcess)
             {
-                IsRunning = false;
-
                 // Dipose of old process
                 (_io as IDisposable)?.Dispose();
                 if (_io != null)
@@ -95,9 +91,6 @@ namespace STROOP.Utilities
                 {
                     goto Error;
                 }
-
-                IsEnabled = true;
-                IsRunning = true;
 
                 return true;
 
@@ -140,10 +133,7 @@ namespace STROOP.Utilities
             {
                 this.stream = stream;
                 if (stream.suspendCounter == 0)
-                {
                     stream._io?.Suspend();
-                    stream._lastUpdateBeforePausing = true;
-                }
                 stream.suspendCounter++;
             }
             protected override void Close()
@@ -157,7 +147,6 @@ namespace STROOP.Utilities
 
         private void ProcessClosed(object sender, EventArgs e)
         {
-            IsEnabled = false;
             OnDisconnect?.Invoke(this, new EventArgs());
         }
 
@@ -571,18 +560,8 @@ namespace STROOP.Utilities
                 double timeToWait;
                 lock (_mStreamProcess)
                 {
-
-                    if ((!IsEnabled || !IsRunning) && !_lastUpdateBeforePausing)
-                        goto FrameLimitStreamUpdate;
-
-                    _lastUpdateBeforePausing = false;
-
-                    if (!RefreshRam())
-                        goto FrameLimitStreamUpdate;
-
-                    OnUpdate?.Invoke(this, new EventArgs());
-
-                    FrameLimitStreamUpdate:
+                    RefreshRam();
+                    OnUpdate?.Invoke();
 
                     // Calculate delay to match correct FPS
                     frameStopwatch.Stop();
