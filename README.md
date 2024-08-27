@@ -48,6 +48,6 @@ I hope to eventually get STROOP back onto a single track again, whether that be 
 
 I'd love to develop this version of STROOP into something that everyone involved with SM64 TASing and beyond can get great value from.  
 If you are a user of this STROOP version in any capacity, all of your suggestions for improvements will be appreciated (and ideally eventually implemented).
-You may submit your feedback either via an [issue](../../issues) or just speak your mind in this barebones [Discord](https://discord.gg/QdcwCgXn) server.
+You may submit your feedback either via an [issue](../../issues) or just speak your mind in this barebones [Discord](https://discord.gg/YHgau6tg2d) server.
 
 Unfortunately, the source code is a hot mess right now and in dire need of a big cleanup. If you are crazy enough to dive into a big project with little to no documentation and are willing to improve this state, hit this repository with a [pull request](../../pulls) or an [issue](../../issues), be it documentation, new features, repairing broken ones (there are a lot), structural changes on the core or any other feature, or even the general direction this project should be going to.  
