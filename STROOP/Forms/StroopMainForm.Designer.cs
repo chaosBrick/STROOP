@@ -135,9 +135,9 @@ namespace STROOP
             // buttonRefreshAndConnect
             // 
             this.buttonRefreshAndConnect.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonRefreshAndConnect.Location = new System.Drawing.Point(475, 415);
+            this.buttonRefreshAndConnect.Location = new System.Drawing.Point(476, 417);
             this.buttonRefreshAndConnect.Name = "buttonRefreshAndConnect";
-            this.buttonRefreshAndConnect.Size = new System.Drawing.Size(84, 37);
+            this.buttonRefreshAndConnect.Size = new System.Drawing.Size(112, 37);
             this.buttonRefreshAndConnect.TabIndex = 3;
             this.buttonRefreshAndConnect.Text = "Refresh && Connect";
             this.buttonRefreshAndConnect.UseVisualStyleBackColor = true;
@@ -146,9 +146,9 @@ namespace STROOP
             // buttonBypass
             // 
             this.buttonBypass.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonBypass.Location = new System.Drawing.Point(387, 415);
+            this.buttonBypass.Location = new System.Drawing.Point(359, 417);
             this.buttonBypass.Name = "buttonBypass";
-            this.buttonBypass.Size = new System.Drawing.Size(84, 37);
+            this.buttonBypass.Size = new System.Drawing.Size(113, 37);
             this.buttonBypass.TabIndex = 3;
             this.buttonBypass.Text = "Bypass";
             this.buttonBypass.UseVisualStyleBackColor = true;
@@ -157,9 +157,9 @@ namespace STROOP
             // buttonOpenSavestate
             // 
             this.buttonOpenSavestate.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonOpenSavestate.Location = new System.Drawing.Point(387, 456);
+            this.buttonOpenSavestate.Location = new System.Drawing.Point(359, 458);
             this.buttonOpenSavestate.Name = "buttonOpenSavestate";
-            this.buttonOpenSavestate.Size = new System.Drawing.Size(172, 37);
+            this.buttonOpenSavestate.Size = new System.Drawing.Size(229, 37);
             this.buttonOpenSavestate.TabIndex = 3;
             this.buttonOpenSavestate.Text = "Open Savestate";
             this.buttonOpenSavestate.UseVisualStyleBackColor = true;
@@ -168,9 +168,9 @@ namespace STROOP
             // buttonRefresh
             // 
             this.buttonRefresh.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonRefresh.Location = new System.Drawing.Point(387, 374);
+            this.buttonRefresh.Location = new System.Drawing.Point(359, 376);
             this.buttonRefresh.Name = "buttonRefresh";
-            this.buttonRefresh.Size = new System.Drawing.Size(84, 37);
+            this.buttonRefresh.Size = new System.Drawing.Size(113, 37);
             this.buttonRefresh.TabIndex = 3;
             this.buttonRefresh.Text = "Refresh";
             this.buttonRefresh.UseVisualStyleBackColor = true;
@@ -190,9 +190,9 @@ namespace STROOP
             // buttonConnect
             // 
             this.buttonConnect.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonConnect.Location = new System.Drawing.Point(475, 374);
+            this.buttonConnect.Location = new System.Drawing.Point(476, 376);
             this.buttonConnect.Name = "buttonConnect";
-            this.buttonConnect.Size = new System.Drawing.Size(84, 37);
+            this.buttonConnect.Size = new System.Drawing.Size(112, 37);
             this.buttonConnect.TabIndex = 1;
             this.buttonConnect.Text = "Connect";
             this.buttonConnect.UseVisualStyleBackColor = true;
@@ -202,9 +202,9 @@ namespace STROOP
             // 
             this.listBoxProcessesList.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.listBoxProcessesList.FormattingEnabled = true;
-            this.listBoxProcessesList.Location = new System.Drawing.Point(387, 273);
+            this.listBoxProcessesList.Location = new System.Drawing.Point(359, 275);
             this.listBoxProcessesList.Name = "listBoxProcessesList";
-            this.listBoxProcessesList.Size = new System.Drawing.Size(172, 95);
+            this.listBoxProcessesList.Size = new System.Drawing.Size(229, 95);
             this.listBoxProcessesList.TabIndex = 0;
             // 
             // labelFpsCounter
