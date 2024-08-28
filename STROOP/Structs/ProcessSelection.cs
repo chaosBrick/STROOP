@@ -15,7 +15,7 @@ namespace STROOP.Utilities
 
         public override string ToString()
         {
-            return Index + ". " + this.Process.MainWindowTitle;
+            return Index + ". " + Process.MainWindowTitle;
         }
     }
 }
