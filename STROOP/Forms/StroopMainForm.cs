@@ -60,6 +60,11 @@ namespace STROOP
 
         private bool AttachToProcess(Process process)
         {
+            if (process.HasExited)
+            {
+                return false;
+            }
+            
             // Find emulator
             var emulators = Config.Emulators.Where(e => e.ProcessName.ToLower() == process.ProcessName.ToLower()).ToList();
 
