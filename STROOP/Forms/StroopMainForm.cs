@@ -33,9 +33,10 @@ namespace STROOP
         bool _objSlotResizing = false;
         int _resizeObjSlotTime = 0;
         readonly bool isMainForm;
-
+        List<Process> _availableProcesses = new();
+            
         public readonly SearchVariableDialog searchVariableDialog;
-
+        
         public StroopMainForm(bool isMainForm)
         {
             this.searchVariableDialog = new SearchVariableDialog(this);
@@ -442,29 +443,40 @@ namespace STROOP
 
         private void buttonConnect_Click(object sender, EventArgs e)
         {
-            var selectedProcess = (ProcessSelection?)listBoxProcessesList.SelectedItem;
+            Process? selectedProcess;
 
-            // Select the only process if there is one
-            if (!selectedProcess.HasValue && listBoxProcessesList.Items.Count == 1 && AttachToProcess(selectedProcess.Value.Process))
-                selectedProcess = (ProcessSelection)listBoxProcessesList.Items[0];
+            if (listBoxProcessesList.Items.Count == 0)
+            {
+                return;
+            }
+            
+            // If there is no selection, we automatically choose to the first one
+            if (listBoxProcessesList.SelectedIndex == -1)
+            {
+                selectedProcess = _availableProcesses[0];
+            }
+            else
+            {
+                selectedProcess = _availableProcesses[listBoxProcessesList.SelectedIndex];
+            }
 
-            if (!selectedProcess.HasValue || !AttachToProcess(selectedProcess.Value.Process))
+            if (selectedProcess is null || !AttachToProcess(selectedProcess))
             {
                 MessageBox.Show("Could not attach to process!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             panelConnect.Visible = false;
-            labelProcessSelect.Text = $"Connected To: {selectedProcess}";
+            labelProcessSelect.Text = $"Connected To: {selectedProcess.MainWindowTitle}";
         }
 
         private void buttonRefresh_Click(object sender, EventArgs e)
         {
             // Update the process list
             listBoxProcessesList.Items.Clear();
-            var processes = GetAvailableProcesses().OrderBy(p => p.StartTime).ToList();
-            for (int i = 0; i < processes.Count; i++)
-                listBoxProcessesList.Items.Add(new ProcessSelection(processes[i], i + 1));
+            _availableProcesses = GetAvailableProcesses().OrderBy(p => p.StartTime).ToList();
+            foreach (var process in _availableProcesses)
+                listBoxProcessesList.Items.Add(process.MainWindowTitle);
 
             // Pre-select the first process
             if (listBoxProcessesList.Items.Count != 0)
