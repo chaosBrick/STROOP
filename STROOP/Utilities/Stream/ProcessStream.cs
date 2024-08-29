@@ -114,7 +114,7 @@ namespace STROOP.Utilities
                 newIo = newProcess != null ? _ioCreationTable[emulator.IOType](newProcess, emulator) : null;
                 var messages = newIo?.GetLastMessages() ?? string.Empty;
                 if (string.Empty != messages)
-                    MessageBox.Show(messages);
+                    MessageBox.Show(messages, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (DolphinNotRunningGameException e)
             {
