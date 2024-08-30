@@ -126,17 +126,18 @@ namespace STROOP
             this.panelConnect.Controls.Add(this.labelNotConnected);
             this.panelConnect.Controls.Add(this.buttonConnect);
             this.panelConnect.Controls.Add(this.listBoxProcessesList);
-            this.panelConnect.Location = new System.Drawing.Point(246, -3);
+            this.panelConnect.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelConnect.Location = new System.Drawing.Point(0, 0);
             this.panelConnect.Name = "panelConnect";
-            this.panelConnect.Size = new System.Drawing.Size(441, 10);
+            this.panelConnect.Size = new System.Drawing.Size(947, 741);
             this.panelConnect.TabIndex = 17;
             // 
             // buttonRefreshAndConnect
             // 
             this.buttonRefreshAndConnect.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonRefreshAndConnect.Location = new System.Drawing.Point(222, 50);
+            this.buttonRefreshAndConnect.Location = new System.Drawing.Point(476, 417);
             this.buttonRefreshAndConnect.Name = "buttonRefreshAndConnect";
-            this.buttonRefreshAndConnect.Size = new System.Drawing.Size(84, 37);
+            this.buttonRefreshAndConnect.Size = new System.Drawing.Size(112, 37);
             this.buttonRefreshAndConnect.TabIndex = 3;
             this.buttonRefreshAndConnect.Text = "Refresh && Connect";
             this.buttonRefreshAndConnect.UseVisualStyleBackColor = true;
@@ -145,9 +146,9 @@ namespace STROOP
             // buttonBypass
             // 
             this.buttonBypass.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonBypass.Location = new System.Drawing.Point(134, 50);
+            this.buttonBypass.Location = new System.Drawing.Point(359, 417);
             this.buttonBypass.Name = "buttonBypass";
-            this.buttonBypass.Size = new System.Drawing.Size(84, 37);
+            this.buttonBypass.Size = new System.Drawing.Size(113, 37);
             this.buttonBypass.TabIndex = 3;
             this.buttonBypass.Text = "Bypass";
             this.buttonBypass.UseVisualStyleBackColor = true;
@@ -156,9 +157,9 @@ namespace STROOP
             // buttonOpenSavestate
             // 
             this.buttonOpenSavestate.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonOpenSavestate.Location = new System.Drawing.Point(134, 91);
+            this.buttonOpenSavestate.Location = new System.Drawing.Point(359, 458);
             this.buttonOpenSavestate.Name = "buttonOpenSavestate";
-            this.buttonOpenSavestate.Size = new System.Drawing.Size(172, 37);
+            this.buttonOpenSavestate.Size = new System.Drawing.Size(229, 37);
             this.buttonOpenSavestate.TabIndex = 3;
             this.buttonOpenSavestate.Text = "Open Savestate";
             this.buttonOpenSavestate.UseVisualStyleBackColor = true;
@@ -167,9 +168,9 @@ namespace STROOP
             // buttonRefresh
             // 
             this.buttonRefresh.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonRefresh.Location = new System.Drawing.Point(134, 9);
+            this.buttonRefresh.Location = new System.Drawing.Point(359, 376);
             this.buttonRefresh.Name = "buttonRefresh";
-            this.buttonRefresh.Size = new System.Drawing.Size(84, 37);
+            this.buttonRefresh.Size = new System.Drawing.Size(113, 37);
             this.buttonRefresh.TabIndex = 3;
             this.buttonRefresh.Text = "Refresh";
             this.buttonRefresh.UseVisualStyleBackColor = true;
@@ -180,7 +181,7 @@ namespace STROOP
             this.labelNotConnected.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.labelNotConnected.AutoSize = true;
             this.labelNotConnected.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelNotConnected.Location = new System.Drawing.Point(141, -121);
+            this.labelNotConnected.Location = new System.Drawing.Point(394, 244);
             this.labelNotConnected.Name = "labelNotConnected";
             this.labelNotConnected.Size = new System.Drawing.Size(157, 26);
             this.labelNotConnected.TabIndex = 2;
@@ -189,9 +190,9 @@ namespace STROOP
             // buttonConnect
             // 
             this.buttonConnect.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonConnect.Location = new System.Drawing.Point(222, 9);
+            this.buttonConnect.Location = new System.Drawing.Point(476, 376);
             this.buttonConnect.Name = "buttonConnect";
-            this.buttonConnect.Size = new System.Drawing.Size(84, 37);
+            this.buttonConnect.Size = new System.Drawing.Size(112, 37);
             this.buttonConnect.TabIndex = 1;
             this.buttonConnect.Text = "Connect";
             this.buttonConnect.UseVisualStyleBackColor = true;
@@ -201,9 +202,9 @@ namespace STROOP
             // 
             this.listBoxProcessesList.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.listBoxProcessesList.FormattingEnabled = true;
-            this.listBoxProcessesList.Location = new System.Drawing.Point(134, -92);
+            this.listBoxProcessesList.Location = new System.Drawing.Point(359, 275);
             this.listBoxProcessesList.Name = "listBoxProcessesList";
-            this.listBoxProcessesList.Size = new System.Drawing.Size(172, 95);
+            this.listBoxProcessesList.Size = new System.Drawing.Size(229, 95);
             this.listBoxProcessesList.TabIndex = 0;
             // 
             // labelFpsCounter
@@ -591,7 +592,6 @@ namespace STROOP
             this.Name = "StroopMainForm";
             this.Text = "STROOP";
             this.Load += new System.EventHandler(this.StroopMainForm_Load);
-            this.Resize += new System.EventHandler(this.StroopMainForm_Resize);
             this.panelConnect.ResumeLayout(false);
             this.panelConnect.PerformLayout();
             this.splitContainerMain.Panel1.ResumeLayout(false);

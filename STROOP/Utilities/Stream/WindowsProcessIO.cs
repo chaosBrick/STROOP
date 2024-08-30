@@ -139,7 +139,7 @@ namespace STROOP.Utilities
                         break;
                 }
             }
-            messageLogBuilder.AppendLine("Unable to verify or correct RAM start.");
+            messageLogBuilder.AppendLine("Unable to verify or correct RAM start.\r\nVerify that the game is currently running.");
         verified:;
 
             bool VerifyCandidate(UIntPtr candidate)
