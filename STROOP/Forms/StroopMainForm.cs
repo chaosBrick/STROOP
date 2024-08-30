@@ -102,7 +102,12 @@ namespace STROOP
 
         private string GetDisplayNameForProcess(Process process)
         {
-            return $"{process.ProcessName} ({process.Id})";
+            if (process.MainWindowTitle == string.Empty)
+            {
+                return $"{process.ProcessName} ({process.Id})";
+            }
+            
+            return process.MainWindowTitle;
         }
         
         private void StroopMainForm_Load(object sender, EventArgs e)
