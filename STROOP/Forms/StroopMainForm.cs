@@ -33,7 +33,7 @@ namespace STROOP
         bool _objSlotResizing = false;
         int _resizeObjSlotTime = 0;
         readonly bool isMainForm;
-        List<Process> _availableProcesses = new();
+        List<Process> _availableProcesses = new List<Process>();
             
         public readonly SearchVariableDialog searchVariableDialog;
         
@@ -448,7 +448,7 @@ namespace STROOP
 
         private void buttonConnect_Click(object sender, EventArgs e)
         {
-            Process? selectedProcess;
+            Process selectedProcess;
 
             if (listBoxProcessesList.Items.Count == 0)
             {
