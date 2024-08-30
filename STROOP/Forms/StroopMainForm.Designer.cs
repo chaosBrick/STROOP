@@ -206,6 +206,7 @@ namespace STROOP
             this.listBoxProcessesList.Name = "listBoxProcessesList";
             this.listBoxProcessesList.Size = new System.Drawing.Size(229, 95);
             this.listBoxProcessesList.TabIndex = 0;
+            this.listBoxProcessesList.DoubleClick += new System.EventHandler(this.listBoxProcessesList_DoubleClick);
             // 
             // labelFpsCounter
             // 

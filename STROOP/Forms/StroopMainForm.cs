@@ -517,6 +517,11 @@ namespace STROOP
             buttonRefresh_Click(sender, e);
             buttonConnect_Click(sender, e);
         }
+        
+        private void listBoxProcessesList_DoubleClick(object sender, EventArgs e)
+        {
+            buttonConnect_Click(sender, e);
+        }
 
         private void trackBarObjSlotSize_ValueChanged(object sender, EventArgs e)
         {
