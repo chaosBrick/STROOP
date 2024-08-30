@@ -100,6 +100,11 @@ namespace STROOP
             }
         }
 
+        private string GetDisplayNameForProcess(Process process)
+        {
+            return $"{process.ProcessName} ({process.Id})";
+        }
+        
         private void StroopMainForm_Load(object sender, EventArgs e)
         {
             Config.Stream.OnDisconnect += _sm64Stream_OnDisconnect;
@@ -472,7 +477,7 @@ namespace STROOP
             }
 
             panelConnect.Visible = false;
-            labelProcessSelect.Text = $"Connected To: {selectedProcess.MainWindowTitle}";
+            labelProcessSelect.Text = $"Connected To: {GetDisplayNameForProcess(selectedProcess)}";
         }
 
         private void buttonRefresh_Click(object sender, EventArgs e)
@@ -481,7 +486,7 @@ namespace STROOP
             listBoxProcessesList.Items.Clear();
             _availableProcesses = GetAvailableProcesses().OrderBy(p => p.StartTime).ToList();
             foreach (var process in _availableProcesses)
-                listBoxProcessesList.Items.Add(process.MainWindowTitle);
+                listBoxProcessesList.Items.Add(GetDisplayNameForProcess(process));
 
             // Pre-select the first process
             if (listBoxProcessesList.Items.Count != 0)
