@@ -102,7 +102,7 @@ namespace STROOP
 
         private string GetDisplayNameForProcess(Process process)
         {
-            if (process.MainWindowTitle == string.Empty)
+            if (string.IsNullOrWhiteSpace(process.MainWindowTitle))
             {
                 return $"{process.ProcessName} ({process.Id})";
             }
