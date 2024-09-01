@@ -1,11 +1,5 @@
-; register meanings:
-; s4: permanent reference to Mario object
-; s3: Mario animation buffer pointer for currently processed ghost node
-; s2: Currently processed ghost node
-; s1: Pointer to currently processed ghost node
-; s0: Processed ghosts counter
 
-set_mario_animation equ 0x802507e8
+set_mario_animation equ 0x802507E8
 make_gfx_mario_alpha equ 0x802769E0
 
 MarioObjectAddrHi equ 0x8036
@@ -20,17 +14,23 @@ gBodyStatesAddrLo equ 0xA040
 gCurGraphNodeObjectHi equ 0x8033
 gCurGraphNodeObjectLo equ 0xCFA0
 
+gMarioStatesHi equ 0x8033
+gMarioStatesLo equ 0x9e00
 
-.create "ghost_loop_J.bin", 0x00000000
+
+.create "./build/JP_80408000_ghost_loop.bin", 0x00000000
 .include "./ghost_loop.asm"
 .Close
 
-; 80276af4
-.create "geo_mirror_mario_set_alpha_J.bin", 0x00000000
+.create "./build/JP_80276AF4_geo_mirror_mario_set_alpha.bin", 0x00000000
 .include "./geo_mirror_mario_set_alpha.asm"
 .close
 
-; 80277128
-.create "geo_switch_mario_cap_effect_J.bin", 0x00000000
+.create "./build/JP_80277128_geo_switch_mario_cap_effect.bin", 0x00000000
 .include "./geo_switch_mario_cap_effect.asm"
+.close
+
+; this is in the middle of geo_switch_mario_hand_grab_pos and prevents ghosts from updating held objects
+.create "./build/JP_802773D8_avoid_holp_desyncs.bin", 0x00000000
+.include "./avoid_holp_desyncs.asm"
 .close

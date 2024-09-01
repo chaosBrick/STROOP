@@ -14,17 +14,23 @@ gBodyStatesAddrLo equ 0xB3B0
 gCurGraphNodeObjectHi equ 0x8033
 gCurGraphNodeObjectLo equ 0xDF00
 
+gMarioStatesHi equ 0x8033
+gMarioStatesLo equ 0xB170
 
-.create "./build/ghost_loop_U.bin", 0x00000000
+
+.create "./build/US_80408000_ghost_loop.bin", 0x00000000
 .include "./ghost_loop.asm"
 .close
 
-; 802770a4
-.create "./build/geo_mirror_mario_set_alpha_U.bin", 0x00000000
+.create "./build/US_802770A4_geo_mirror_mario_set_alpha.bin", 0x00000000
 .include "./geo_mirror_mario_set_alpha.asm"
 .close
 
-; 802776D8
-.create "./build/geo_switch_mario_cap_effect_U.bin", 0x00000000
+.create "./build/US_802776D8_geo_switch_mario_cap_effect.bin", 0x00000000
 .include "./geo_switch_mario_cap_effect.asm"
+.close
+
+; this is in the middle of geo_switch_mario_hand_grab_pos and prevents ghosts from updating held objects
+.create "./build/US_80277988_avoid_holp_desyncs.bin", 0x00000000
+.include "./avoid_holp_desyncs.asm"
 .close

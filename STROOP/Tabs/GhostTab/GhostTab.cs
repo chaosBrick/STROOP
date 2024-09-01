@@ -17,7 +17,7 @@ namespace STROOP.Tabs.GhostTab
             foreach (var ind in instance.listBoxGhosts.SelectedIndices)
                 yield return (uint)(int)ind;
         }
-
+        
         [InitializeSpecial]
         static void AddSpecialVariables()
         {
@@ -52,7 +52,6 @@ namespace STROOP.Tabs.GhostTab
             listBoxGhosts.KeyDown += listBoxGhosts_KeyDown;
 
             instance = this;
-            ghostHack = new RomHack("Resources/Hacks/GhostHack.hck", "Ghost Hack");
             UpdateFileWatchers();
         }
 
@@ -238,6 +237,10 @@ namespace STROOP.Tabs.GhostTab
 
         bool UpdateHackStatus()
         {
+            var expectedHackName = $"Ghost Hack {RomVersionConfig.Version}";
+            if (ghostHack?.Name != expectedHackName)
+                ghostHack = new RomHack($"Resources/Hacks/GhostHack{RomVersionConfig.Version}.hck", expectedHackName);
+
             var ghostPointer = Config.Stream.GetInt32(0x80407FF8);
             bool ghostsActive = (ghostPointer & 0xFF000000) == 0x80000000;
             bool shouldDisable = Config.Stream.GetByte(0x80407FFC) == 0xFF;
