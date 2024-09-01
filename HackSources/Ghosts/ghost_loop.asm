@@ -39,8 +39,9 @@ andi t1, t0, InitializedGhostsFlag
 bnez t1, @@SKIP_INIT
 
 ; set initialized flag on Mario object
-ori t1, t0, 0x40
+ori t1, t0, InitializedGhostsFlag
 sh t1, 0x2 (RegMarioObject)
+beq r0, r0, @@RETURN
 
 ; clean up (this can cause failure?)
 lui RegPointerToCurrentGhost, ExtendedRAMStartHi
