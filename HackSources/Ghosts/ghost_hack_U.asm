@@ -1,9 +1,3 @@
-; register meanings:
-; s4: permanent reference to Mario object
-; s3: Mario animation buffer pointer for currently processed ghost node
-; s2: Currently processed ghost node
-; s1: Pointer to currently processed ghost node
-; s0: Processed ghosts counter
 
 set_mario_animation equ 0x802509B8
 make_gfx_mario_alpha equ 0x80276F90
