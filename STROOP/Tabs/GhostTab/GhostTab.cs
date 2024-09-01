@@ -44,6 +44,7 @@ namespace STROOP.Tabs.GhostTab
             target.Add<float>("GhostPitch", () => displayGhostVarFloat(frame => frame.oPitch)(), _ => Array.Empty<bool>());
             target.Add<float>("GhostRoll", () => displayGhostVarFloat(frame => frame.oRoll)(), _ => Array.Empty<bool>());
         }
+
         static GhostTab instance;
 
         const uint COLORED_HATS_CODE_TARGET_ADDR = 0x80408200;
@@ -539,78 +540,74 @@ Are you sure you want to continue?";
             //This hack loads the gfx pool addresses from 0x80248068 and 0x8024806C instead of hardcoded addresses
             //0x80248070 is the new GFX_POOL_SIZE
             var hack = new RomHack("Resources\\Hacks\\movable_gfx_pool.hck", "Movable GFX Pool");
-            if (ParsingUtilities.TryParseHex(textBoxPoolAddr1.Text, out var poolAddr1))
+            if (ParseWithValidationMessage(textBoxPoolAddr1.Text, out var poolAddr1, "Pool Address 1")
+                && ParseWithValidationMessage(textBoxPoolAddr2.Text, out var poolAddr2, "Pool Address 2")
+                && ParseWithValidationMessage(textBoxPoolSize.Text, out var poolSize, "Pool Size")
+                )
             {
-                if (ParsingUtilities.TryParseHex(textBoxPoolAddr2.Text, out var poolAddr2))
+                var requiredSpace = poolSize + 0x50;
+                var warningTextBuilder = new System.Text.StringBuilder();
+
+                if (!AssertPoolRange(poolAddr1, "Pool 1"))
+                    return;
+
+                if (!AssertPoolRange(poolAddr2, "Pool 2"))
+                    return;
+
+                if (poolAddr1 < poolAddr2)
                 {
-                    if (ParsingUtilities.TryParseHex(textBoxPoolSize.Text, out var poolSize))
+                    if (poolAddr1 + requiredSpace > poolAddr2)
+                        warningTextBuilder.AppendLine("Warning: Pool 1 overlaps with pool 2");
+                }
+                else
+                    if (poolAddr2 + requiredSpace > poolAddr1)
+                        warningTextBuilder.AppendLine("Warning: Pool 2 overlaps with pool 1");
+
+                DialogResult proceed = DialogResult.Yes;
+                if (warningTextBuilder.Length > 0)
+                    proceed = MessageBox.Show(
+                        $"{warningTextBuilder.ToString()}\n\nDo you wish to proceed anyway?",
+                        "Warning",
+                        MessageBoxButtons.YesNo);
+
+                if (proceed == DialogResult.Yes)
+                    using (Config.Stream.Suspend())
                     {
+                        hack.LoadPayload();
 
-                        var requiredSpace = poolSize + 0x50;
-                        var warningTextBuilder = new System.Text.StringBuilder();
+                        Config.Stream.SetValue(poolAddr1, 0x80248068);
+                        Config.Stream.SetValue(poolAddr2, 0x8024806C);
+                        Config.Stream.SetValue(poolSize, 0x80248070);
+                    }
 
-                        var _poolAddr1 = poolAddr1 & 0x00FFFFFF;
-                        if (_poolAddr1 + requiredSpace > 0x800000)
-                        {
-                            MessageBox.Show("Error: Pool 1 exceeds RAM length.");
-                            return;
-                        }
-                        else
-                            for (uint i = _poolAddr1; i < _poolAddr1 + requiredSpace; i++)
-                                if (Config.Stream.Ram[i] != 0)
-                                {
-                                    warningTextBuilder.AppendLine("Warning: Pool 1 overrides non-zero data.");
-                                    break;
-                                }
-
-                        var _poolAddr2 = poolAddr2 & 0x00FFFFFF;
-                        if (_poolAddr2 + requiredSpace > 0x800000)
-                        {
-                            MessageBox.Show("Error: Pool 2 exceeds RAM length.");
-                            return;
-                        }
-                        for (uint i = _poolAddr2; i < _poolAddr2 + requiredSpace; i++)
+                bool AssertPoolRange(uint poolStart, string poolName)
+                {
+                    poolStart &= 0x00FFFFFF;
+                    if (poolStart + requiredSpace > 0x800000)
+                    {
+                        MessageBox.Show($"Error: {poolName} exceeds RAM length.");
+                        return false;
+                    }
+                    else
+                        for (uint i = poolStart; i < poolStart + requiredSpace; i++)
                             if (Config.Stream.Ram[i] != 0)
                             {
-                                warningTextBuilder.AppendLine("Warning: Pool 2 overrides non-zero data.");
+                                warningTextBuilder.AppendLine($"Warning: {poolName} overrides non-zero data.");
                                 break;
                             }
 
-                        if (poolAddr1 < poolAddr2)
-                        {
-                            if (poolAddr1 + requiredSpace > poolAddr2)
-                                warningTextBuilder.AppendLine("Warning: Pool 1 overlaps with pool 2");
-                        }
-                        else
-                            if (poolAddr2 + requiredSpace > poolAddr1)
-                                warningTextBuilder.AppendLine("Warning: Pool 2 overlaps with pool 1");
-
-                        DialogResult proceed = DialogResult.Yes;
-                        if (warningTextBuilder.Length > 0)
-                            proceed = MessageBox.Show(
-                                warningTextBuilder.ToString() + "\n\nDo you wish to proceed anyway?",
-                                "Warning",
-                                MessageBoxButtons.YesNo);
-
-                        if (proceed == DialogResult.Yes)
-                            using (Config.Stream.Suspend())
-                            {
-                                hack.LoadPayload();
-
-                                Config.Stream.SetValue(poolAddr1, 0x80248068);
-                                Config.Stream.SetValue(poolAddr2, 0x8024806C);
-                                Config.Stream.SetValue(poolSize, 0x80248070);
-                            }
-                    }
-                    else
-                        MessageBox.Show("Invalid value for Pool Size");
+                    return true;
                 }
-                else
-                    MessageBox.Show("Invalid value for Pool Address 2");
             }
-            else
-                MessageBox.Show("Invalid value for Pool Address 1");
 
+            bool ParseWithValidationMessage(string input, out uint value, string valueName)
+            {
+                if (ParsingUtilities.TryParseHex(input, out value))
+                    return true;
+
+                MessageBox.Show($"Invalid value for {valueName}!");
+                return false;
+            }
         }
     }
 }
