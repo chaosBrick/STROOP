@@ -7,6 +7,15 @@ RegCurrentGhost equ s2          ; Memory offset of the currently processed ghost
 RegPointerToCurrentGhost equ s1 ; Pointer to the currently processed ghost node
 RegProcessedGhostCount equ s0   ; Iteration counter for loops that process all ghosts
 
+; hardcoded offsets
+ExtendedRAMStartHi equ 0x8040          ; The Hi part of the address pointing to the start of extended RAM
+NumRequestedGhosts equ 0x7FFF          ; Offset from extended RAM start to the byte indicating the number of ghosts to display. This value is written by STROOP.
+PointerToFirstGhost equ 0x7FF8         ; Offset from extended RAM start to the 4 byte pointer to the first ghost node
+NegativeGhostStructSize equ 0xFF98     ; The negative size of a single ghost node, used to iterate ghosts like a reversed array
+AnimationBufferSize equ 0x4000         ; The number of bytes reserved for animation data for each ghost
+FirstAnimationBufferAddrHi equ 0x8050  ; The Hi part of the address pointing to the animation buffer used by the first ghost
+InitializedGhostsFlag equ 0x40         ; A custom bit flag that can be set on the Mario object, indicating whether the ghost hack is active
+
 .n64
 
 addiu SP, SP, 0xFFC0
@@ -26,7 +35,7 @@ sw RegProcessedGhostCount, 0x20 (SP)
 ; skip initializing if already Mario object is flagged
 or RegMarioObject, r0, t0
 lh t0, 0x2 (RegMarioObject)
-andi t1, t0, 0x40
+andi t1, t0, InitializedGhostsFlag
 bnez t1, @@SKIP_INIT
 
 ; set initialized flag on Mario object
@@ -34,13 +43,13 @@ ori t1, t0, 0x40
 sh t1, 0x2 (RegMarioObject)
 
 ; clean up (this can cause failure?)
-lui RegPointerToCurrentGhost, 0x8040
+lui RegPointerToCurrentGhost, ExtendedRAMStartHi
 beq r0, r0, @@CLEAN_UP_EARLY
-ori RegPointerToCurrentGhost, RegPointerToCurrentGhost, 0x7FF8
+ori RegPointerToCurrentGhost, RegPointerToCurrentGhost, PointerToFirstGhost
 @@SKIP_INIT:
 
 ; set up dummy Mario struct
-lui RegAnimationBuffer, 0x8050
+lui RegAnimationBuffer, FirstAnimationBufferAddrHi
 lui t8, 0x8037
 ori at, r0, 0xBD
 sh at, 0x5A8 (t8)
@@ -51,9 +60,9 @@ sw at, 0x5B8 (t8)
 
 ; clean up if no ghosts are requested
 or RegProcessedGhostCount, r0, r0
-lui at, 0x8040
-ori RegPointerToCurrentGhost, at, 0x7FF8
-lb at, 0x7FFF (at)
+lui at, ExtendedRAMStartHi
+ori RegPointerToCurrentGhost, at, PointerToFirstGhost
+lb at, NumRequestedGhosts (at)
 beq r0, at, @@CLEAN_UP_EARLY
 nop
 
@@ -83,11 +92,11 @@ or a1, v0, r0
 
 @@GHOST_EXISTS:
 
-; copy Mario's area and something else into the ghost node
+; copy Mario's area and animation ID into the ghost node
 lw RegCurrentGhost, 0x0 (RegPointerToCurrentGhost)
-lb t1, 0x18 (RegMarioObject)
+lb t1, 0x18 (RegMarioObject)    ; area index
 sb t1, 0x18 (RegCurrentGhost)
-lw t1, 0x38 (RegMarioObject)
+lw t1, 0x38 (RegMarioObject)     ; anim Id
 sw t1, 0x38 (RegCurrentGhost)
 
 ; find offset in ghost data buffer
@@ -134,11 +143,11 @@ lh t1, 0x38 (SP)
 sh t1, 0x40 (RegCurrentGhost)
 
 ; move on to next ghost
-addiu RegAnimationBuffer, RegAnimationBuffer, 0x4000
-addiu RegPointerToCurrentGhost, RegPointerToCurrentGhost, 0xFF98
+addiu RegAnimationBuffer, RegAnimationBuffer, AnimationBufferSize
+addiu RegPointerToCurrentGhost, RegPointerToCurrentGhost, NegativeGhostStructSize
 addiu RegProcessedGhostCount, RegProcessedGhostCount, 0x1
-lui at, 0x8040
-lb at, 0x7FFF (at)
+lui at, ExtendedRAMStartHi
+lb at, NumRequestedGhosts (at)
 sltu t0, RegProcessedGhostCount, at
 bnez t0, @@ITERATE_GHOSTS
 sb RegProcessedGhostCount, 0x60 (RegCurrentGhost)
@@ -153,7 +162,7 @@ sw r0, 0x0 (RegPointerToCurrentGhost)
 @@CLEAN_UP_EARLY:
 lw a0, 0x0 (RegPointerToCurrentGhost)
 bnez a0, @@CLEAN_UP_LOOP
-addiu RegPointerToCurrentGhost, RegPointerToCurrentGhost, 0xFF98
+addiu RegPointerToCurrentGhost, RegPointerToCurrentGhost, NegativeGhostStructSize
 
 @@RETURN:
 
