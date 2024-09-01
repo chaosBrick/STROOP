@@ -211,10 +211,10 @@ namespace STROOP.Tabs.GhostTab
             labelGhostPlaybackStart.Text = $"Original playback start: {originalPlaybackStartValue ?? "-"}";
 
             if (originalPlaybackStartValue != MULTIPLE_VALUES)
-                numericUpDownStartOfPlayback.Value = uint.Parse(originalPlaybackStartValue);
+                numericUpDownStartOfPlayback.Value = originalPlaybackStartValue == null ? 0 : uint.Parse(originalPlaybackStartValue);
 
             if (playbackOffset != MULTIPLE_VALUES)
-                numericUpDownPlaybackOffset.Value = long.Parse(playbackOffset);
+                numericUpDownPlaybackOffset.Value = playbackOffset == null ? 0 : long.Parse(playbackOffset);
 
             if (uint.TryParse(playbackStartValue, out uint val))
                 numericUpDownStartOfPlayback.Value = val;
