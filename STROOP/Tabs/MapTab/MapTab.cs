@@ -11,6 +11,7 @@ using OpenTK.Graphics;
 using STROOP.Structs.Configurations;
 using STROOP.Tabs.MapTab.MapObjects;
 using System.Xml.Linq;
+using STROOP.Controls;
 
 namespace STROOP.Tabs.MapTab
 {

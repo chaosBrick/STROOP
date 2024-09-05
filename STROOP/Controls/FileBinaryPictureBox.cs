@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace STROOP
+namespace STROOP.Controls
 {
     public class FileBinaryPictureBox : FilePictureBox
     {

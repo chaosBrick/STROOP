@@ -8,6 +8,7 @@ using System.Drawing;
 using STROOP.Structs.Configurations;
 using STROOP.Models;
 using System.Collections.ObjectModel;
+using STROOP.Controls;
 
 namespace STROOP.Managers
 {

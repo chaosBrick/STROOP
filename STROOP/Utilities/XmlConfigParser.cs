@@ -9,6 +9,7 @@ using STROOP.Structs;
 using System.Drawing;
 using STROOP.Extensions;
 using System.Xml;
+using STROOP.Controls;
 using STROOP.Structs.Configurations;
 using STROOP.Tabs.MapTab;
 using STROOP.Core.Variables;

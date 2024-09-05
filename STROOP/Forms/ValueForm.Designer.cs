@@ -1,4 +1,6 @@
-﻿namespace STROOP.Forms
+﻿using STROOP.Controls;
+
+namespace STROOP.Forms
 {
     partial class ValueForm
     {
@@ -32,7 +34,7 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.label1 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
-            this.textBox1 = new STROOP.BetterTextbox();
+            this.textBox1 = new BetterTextbox();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 

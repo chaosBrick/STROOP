@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.panelColorSelector = new System.Windows.Forms.Panel();
-            this.textBoxColorSelector = new STROOP.BetterTextbox();
+            this.textBoxColorSelector = new BetterTextbox();
             this.panelColorSelector.SuspendLayout();
             this.SuspendLayout();
             // 

@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class CustomTab
     {
@@ -28,13 +30,13 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.splitContainerCustom = new STROOP.BetterSplitContainer();
+            this.splitContainerCustom = new BetterSplitContainer();
             this.labelCustomRecordingGapsValue = new System.Windows.Forms.Label();
             this.labelCustomRecordingFrequencyValue = new System.Windows.Forms.Label();
             this.labelCustomRecordingGapsLabel = new System.Windows.Forms.Label();
             this.labelCustomRecordingFrequencyLabel = new System.Windows.Forms.Label();
             this.checkBoxUseValueAtStartOfGlobalTimer = new System.Windows.Forms.CheckBox();
-            this.textBoxRecordValuesCount = new STROOP.BetterTextbox();
+            this.textBoxRecordValuesCount = new BetterTextbox();
             this.buttonCustomClearValues = new System.Windows.Forms.Button();
             this.buttonCustomShowValues = new System.Windows.Forms.Button();
             this.checkBoxCustomRecordValues = new System.Windows.Forms.CheckBox();

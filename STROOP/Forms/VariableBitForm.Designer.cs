@@ -1,4 +1,6 @@
-﻿namespace STROOP.Forms
+﻿using STROOP.Controls;
+
+namespace STROOP.Forms
 {
     partial class VariableBitForm
     {
@@ -46,10 +48,10 @@
             this.Bit2 = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.Bit1 = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.Bit0 = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this._textBoxHexValue = new STROOP.BetterTextbox();
-            this._textBoxDecValue = new STROOP.BetterTextbox();
-            this._textBoxVarName = new STROOP.BetterTextbox();
-            this._textBoxBinaryValue = new STROOP.BetterTextbox();
+            this._textBoxHexValue = new BetterTextbox();
+            this._textBoxDecValue = new BetterTextbox();
+            this._textBoxVarName = new BetterTextbox();
+            this._textBoxBinaryValue = new BetterTextbox();
             this._tableLayoutPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._dataGridViewBits)).BeginInit();
             this.SuspendLayout();

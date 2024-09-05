@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class SoundTab
     {
@@ -28,14 +30,14 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.splitContainerSound = new STROOP.BetterSplitContainer();
-            this.splitContainerSoundMusic = new STROOP.BetterSplitContainer();
+            this.splitContainerSound = new BetterSplitContainer();
+            this.splitContainerSoundMusic = new BetterSplitContainer();
             this.listBoxSoundMusic = new System.Windows.Forms.ListBox();
-            this.textBoxSoundMusic = new STROOP.BetterTextbox();
+            this.textBoxSoundMusic = new BetterTextbox();
             this.buttonSoundPlayMusic = new System.Windows.Forms.Button();
-            this.splitContainerSoundSoundEffect = new STROOP.BetterSplitContainer();
+            this.splitContainerSoundSoundEffect = new BetterSplitContainer();
             this.listBoxSoundSoundEffect = new System.Windows.Forms.ListBox();
-            this.textBoxSoundSoundEffect = new STROOP.BetterTextbox();
+            this.textBoxSoundSoundEffect = new BetterTextbox();
             this.buttonSoundPlaySoundEffect = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerSound)).BeginInit();
             this.splitContainerSound.Panel1.SuspendLayout();

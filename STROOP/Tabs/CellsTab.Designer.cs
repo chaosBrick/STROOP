@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class CellsTab
     {
@@ -29,8 +31,8 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.splitContainerCells = new STROOP.BetterSplitContainer();
-            this.splitContainerCellsControls = new STROOP.BetterSplitContainer();
+            this.splitContainerCells = new BetterSplitContainer();
+            this.splitContainerCellsControls = new BetterSplitContainer();
             this.buttonCellsBuildTree = new System.Windows.Forms.Button();
             this.treeViewCells = new System.Windows.Forms.TreeView();
             this.watchVariablePanelCells = new STROOP.Controls.VariablePanel.WatchVariablePanel();

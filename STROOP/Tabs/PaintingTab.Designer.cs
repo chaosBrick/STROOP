@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class PaintingTab
     {
@@ -29,7 +31,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.splitContainerPainting = new STROOP.BetterSplitContainer();
+            this.splitContainerPainting = new BetterSplitContainer();
             this.listBoxPainting = new System.Windows.Forms.ListBox();
             this.watchVariablePanelPainting = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerPainting)).BeginInit();

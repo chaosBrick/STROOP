@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class M64Tab
     {
@@ -30,24 +32,24 @@
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.splitContainerM64 = new STROOP.BetterSplitContainer();
+            this.splitContainerM64 = new BetterSplitContainer();
             this.buttonM64AddPauseBufferFrames = new System.Windows.Forms.Button();
             this.checkBoxMaxOutViCount = new System.Windows.Forms.CheckBox();
             this.comboBoxM64FrameInputRelation = new System.Windows.Forms.ComboBox();
-            this.textBoxM64PasteMultiplicity = new STROOP.BetterTextbox();
+            this.textBoxM64PasteMultiplicity = new BetterTextbox();
             this.listBoxM64Copied = new System.Windows.Forms.ListBox();
             this.groupBoxM64QuickDuplication = new System.Windows.Forms.GroupBox();
             this.buttonM64QuickDuplicationDuplicate = new System.Windows.Forms.Button();
-            this.textBoxM64QuickDuplicationTotalIterations = new STROOP.BetterTextbox();
-            this.textBoxM64QuickDuplication2ndIterationStart = new STROOP.BetterTextbox();
-            this.textBoxM64QuickDuplication1stIterationStart = new STROOP.BetterTextbox();
+            this.textBoxM64QuickDuplicationTotalIterations = new BetterTextbox();
+            this.textBoxM64QuickDuplication2ndIterationStart = new BetterTextbox();
+            this.textBoxM64QuickDuplication1stIterationStart = new BetterTextbox();
             this.labelM64QuickDuplicationTotalIterations = new System.Windows.Forms.Label();
             this.labelM64QuickDuplication2ndIterationStart = new System.Windows.Forms.Label();
             this.labelM64QuickDuplication1stIterationStart = new System.Windows.Forms.Label();
             this.groupBoxM64Selection = new System.Windows.Forms.GroupBox();
-            this.textBoxM64SelectionInputs = new STROOP.BetterTextbox();
-            this.textBoxM64SelectionEndFrame = new STROOP.BetterTextbox();
-            this.textBoxM64SelectionStartFrame = new STROOP.BetterTextbox();
+            this.textBoxM64SelectionInputs = new BetterTextbox();
+            this.textBoxM64SelectionEndFrame = new BetterTextbox();
+            this.textBoxM64SelectionStartFrame = new BetterTextbox();
             this.labelM64SelectionInputs = new System.Windows.Forms.Label();
             this.labelM64SelectionEndFrame = new System.Windows.Forms.Label();
             this.labelM64SelectionStartFrame = new System.Windows.Forms.Label();
@@ -58,8 +60,8 @@
             this.labelM64FileName = new System.Windows.Forms.Label();
             this.labelM64FileLabel = new System.Windows.Forms.Label();
             this.buttonM64Goto = new System.Windows.Forms.Button();
-            this.textBoxM64OnValue = new STROOP.BetterTextbox();
-            this.textBoxM64Goto = new STROOP.BetterTextbox();
+            this.textBoxM64OnValue = new BetterTextbox();
+            this.textBoxM64Goto = new BetterTextbox();
             this.buttonM64PasteOverwrite = new System.Windows.Forms.Button();
             this.buttonM64PasteInsert = new System.Windows.Forms.Button();
             this.buttonM64CopyInputRange = new System.Windows.Forms.Button();

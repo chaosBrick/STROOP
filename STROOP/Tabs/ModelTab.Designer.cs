@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class ModelTab
     {
@@ -28,7 +30,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.splitContainerModel = new STROOP.BetterSplitContainer();
+            this.splitContainerModel = new BetterSplitContainer();
             this.checkBoxModelLevel = new System.Windows.Forms.CheckBox();
             this.groupBoxTransformation = new System.Windows.Forms.GroupBox();
             this.labelTransScaleValue = new System.Windows.Forms.Label();
@@ -38,22 +40,22 @@
             this.groupBoxTransScale = new System.Windows.Forms.GroupBox();
             this.checkBoxTransScaleMultiply = new System.Windows.Forms.CheckBox();
             this.checkBoxTransScaleAggregate = new System.Windows.Forms.CheckBox();
-            this.textbpxTransScaleDValue = new STROOP.BetterTextbox();
-            this.textbpxTransScaleHValue = new STROOP.BetterTextbox();
-            this.textbpxTransScaleWValue = new STROOP.BetterTextbox();
+            this.textbpxTransScaleDValue = new BetterTextbox();
+            this.textbpxTransScaleHValue = new BetterTextbox();
+            this.textbpxTransScaleWValue = new BetterTextbox();
             this.buttonTransScaleDn = new System.Windows.Forms.Button();
             this.buttonTransScaleHn = new System.Windows.Forms.Button();
             this.buttonTransScaleWn = new System.Windows.Forms.Button();
             this.buttonTransScaleDp = new System.Windows.Forms.Button();
             this.buttonTransScaleHp = new System.Windows.Forms.Button();
             this.buttonTransScaleWp = new System.Windows.Forms.Button();
-            this.betterTextbox4 = new STROOP.BetterTextbox();
+            this.betterTextbox4 = new BetterTextbox();
             this.button8 = new System.Windows.Forms.Button();
             this.button9 = new System.Windows.Forms.Button();
             this.groupBoxTransAngle = new System.Windows.Forms.GroupBox();
-            this.textboxTransAngleRValue = new STROOP.BetterTextbox();
-            this.textboxTransAnglePValue = new STROOP.BetterTextbox();
-            this.textboxTransAngleYValue = new STROOP.BetterTextbox();
+            this.textboxTransAngleRValue = new BetterTextbox();
+            this.textboxTransAnglePValue = new BetterTextbox();
+            this.textboxTransAngleYValue = new BetterTextbox();
             this.buttonTransAngleRn = new System.Windows.Forms.Button();
             this.buttonTransAnglePn = new System.Windows.Forms.Button();
             this.buttonTransAngleYn = new System.Windows.Forms.Button();
@@ -62,11 +64,11 @@
             this.buttonTransAngleYp = new System.Windows.Forms.Button();
             this.groupBoxTransPos = new System.Windows.Forms.GroupBox();
             this.checkBoxTransPosRel = new System.Windows.Forms.CheckBox();
-            this.textboxTransPosYValue = new STROOP.BetterTextbox();
+            this.textboxTransPosYValue = new BetterTextbox();
             this.buttonTransPosYp = new System.Windows.Forms.Button();
             this.buttonTransPosYn = new System.Windows.Forms.Button();
             this.buttonTransPosXpZp = new System.Windows.Forms.Button();
-            this.textboxTransPosXZValue = new STROOP.BetterTextbox();
+            this.textboxTransPosXZValue = new BetterTextbox();
             this.buttonTransPosXp = new System.Windows.Forms.Button();
             this.buttonTransPosXpZn = new System.Windows.Forms.Button();
             this.buttonTransPosZn = new System.Windows.Forms.Button();
@@ -75,7 +77,7 @@
             this.buttonTransPosXn = new System.Windows.Forms.Button();
             this.buttonTransPosXnZn = new System.Windows.Forms.Button();
             this.buttonTransReset = new System.Windows.Forms.Button();
-            this.splitContainerModelTables = new STROOP.BetterSplitContainer();
+            this.splitContainerModelTables = new BetterSplitContainer();
             this.labelModelVertices = new System.Windows.Forms.Label();
             this.dataGridViewVertices = new System.Windows.Forms.DataGridView();
             this.Index = new System.Windows.Forms.DataGridViewTextBoxColumn();

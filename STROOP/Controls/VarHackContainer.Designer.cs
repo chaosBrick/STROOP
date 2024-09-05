@@ -30,12 +30,12 @@
         {
             this.tableLayoutPanelVarHack = new STROOP.Controls.BorderedTableLayoutPanel();
             this.checkBoxUsePointer = new System.Windows.Forms.CheckBox();
-            this.textBoxNameValue = new STROOP.BetterTextbox();
-            this.textBoxNameLabel = new STROOP.BetterTextbox();
-            this.textBoxAddressLabel = new STROOP.BetterTextbox();
-            this.textBoxAddressValue = new STROOP.BetterTextbox();
-            this.textBoxPointerOffsetLabel = new STROOP.BetterTextbox();
-            this.textBoxPointerOffsetValue = new STROOP.BetterTextbox();
+            this.textBoxNameValue = new BetterTextbox();
+            this.textBoxNameLabel = new BetterTextbox();
+            this.textBoxAddressLabel = new BetterTextbox();
+            this.textBoxAddressValue = new BetterTextbox();
+            this.textBoxPointerOffsetLabel = new BetterTextbox();
+            this.textBoxPointerOffsetValue = new BetterTextbox();
             this.radioButtonSByte = new System.Windows.Forms.RadioButton();
             this.radioButtonByte = new System.Windows.Forms.RadioButton();
             this.radioButtonShort = new System.Windows.Forms.RadioButton();
@@ -45,13 +45,13 @@
             this.radioButtonFloat = new System.Windows.Forms.RadioButton();
             this.checkBoxUseHex = new System.Windows.Forms.CheckBox();
             this.checkBoxNoNumber = new System.Windows.Forms.CheckBox();
-            this.textBoxYPosValue = new STROOP.BetterTextbox();
-            this.textBoxXPosValue = new STROOP.BetterTextbox();
+            this.textBoxYPosValue = new BetterTextbox();
+            this.textBoxXPosValue = new BetterTextbox();
             this.pictureBoxRedX = new System.Windows.Forms.PictureBox();
             this.pictureBoxDownArrow = new System.Windows.Forms.PictureBox();
-            this.textBoxYPosLabel = new STROOP.BetterTextbox();
+            this.textBoxYPosLabel = new BetterTextbox();
             this.pictureBoxUpArrow = new System.Windows.Forms.PictureBox();
-            this.textBoxXPosLabel = new STROOP.BetterTextbox();
+            this.textBoxXPosLabel = new BetterTextbox();
             this.tableLayoutPanelVarHack.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxRedX)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxDownArrow)).BeginInit();

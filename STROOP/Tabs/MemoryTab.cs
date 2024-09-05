@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Input;
+using STROOP.Controls;
 using STROOP.Core.Variables;
 
 namespace STROOP.Tabs

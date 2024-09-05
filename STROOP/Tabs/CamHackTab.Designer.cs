@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class CamHackTab
     {
@@ -29,14 +31,14 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.splitContainerCamHack = new STROOP.BetterSplitContainer();
+            this.splitContainerCamHack = new BetterSplitContainer();
             this.groupBoxCameraHackBothPos = new System.Windows.Forms.GroupBox();
             this.checkBoxCameraHackBothPosRelative = new System.Windows.Forms.CheckBox();
-            this.textBoxCameraHackBothPosY = new STROOP.BetterTextbox();
+            this.textBoxCameraHackBothPosY = new BetterTextbox();
             this.buttonCameraHackBothPosYp = new System.Windows.Forms.Button();
             this.buttonCameraHackBothPosYn = new System.Windows.Forms.Button();
             this.buttonCameraHackBothPosXpZp = new System.Windows.Forms.Button();
-            this.textBoxCameraHackBothPosXZ = new STROOP.BetterTextbox();
+            this.textBoxCameraHackBothPosXZ = new BetterTextbox();
             this.buttonCameraHackBothPosXp = new System.Windows.Forms.Button();
             this.buttonCameraHackBothPosXpZn = new System.Windows.Forms.Button();
             this.buttonCameraHackBothPosZn = new System.Windows.Forms.Button();
@@ -45,11 +47,11 @@
             this.buttonCameraHackBothPosXn = new System.Windows.Forms.Button();
             this.buttonCameraHackBothPosXnZn = new System.Windows.Forms.Button();
             this.groupBoxCameraHackSphericalFocusPos = new System.Windows.Forms.GroupBox();
-            this.textBoxCameraHackSphericalFocusPosR = new STROOP.BetterTextbox();
+            this.textBoxCameraHackSphericalFocusPosR = new BetterTextbox();
             this.buttonCameraHackSphericalFocusPosRp = new System.Windows.Forms.Button();
             this.buttonCameraHackSphericalFocusPosRn = new System.Windows.Forms.Button();
             this.buttonCameraHackSphericalFocusPosTnPn = new System.Windows.Forms.Button();
-            this.textBoxCameraHackSphericalFocusPosTP = new STROOP.BetterTextbox();
+            this.textBoxCameraHackSphericalFocusPosTP = new BetterTextbox();
             this.buttonCameraHackSphericalFocusPosTn = new System.Windows.Forms.Button();
             this.buttonCameraHackSphericalFocusPosTnPp = new System.Windows.Forms.Button();
             this.buttonCameraHackSphericalFocusPosPp = new System.Windows.Forms.Button();
@@ -59,11 +61,11 @@
             this.buttonCameraHackSphericalFocusPosTpPp = new System.Windows.Forms.Button();
             this.groupBoxCameraHackFocusPos = new System.Windows.Forms.GroupBox();
             this.checkBoxCameraHackFocusPosRelative = new System.Windows.Forms.CheckBox();
-            this.textBoxCameraHackFocusPosY = new STROOP.BetterTextbox();
+            this.textBoxCameraHackFocusPosY = new BetterTextbox();
             this.buttonCameraHackFocusPosYp = new System.Windows.Forms.Button();
             this.buttonCameraHackFocusPosYn = new System.Windows.Forms.Button();
             this.buttonCameraHackFocusPosXpZp = new System.Windows.Forms.Button();
-            this.textBoxCameraHackFocusPosXZ = new STROOP.BetterTextbox();
+            this.textBoxCameraHackFocusPosXZ = new BetterTextbox();
             this.buttonCameraHackFocusPosXp = new System.Windows.Forms.Button();
             this.buttonCameraHackFocusPosXpZn = new System.Windows.Forms.Button();
             this.buttonCameraHackFocusPosZn = new System.Windows.Forms.Button();
@@ -72,11 +74,11 @@
             this.buttonCameraHackFocusPosXn = new System.Windows.Forms.Button();
             this.buttonCameraHackFocusPosXnZn = new System.Windows.Forms.Button();
             this.groupBoxCameraHackSphericalPos = new System.Windows.Forms.GroupBox();
-            this.textBoxCameraHackSphericalPosR = new STROOP.BetterTextbox();
+            this.textBoxCameraHackSphericalPosR = new BetterTextbox();
             this.buttonCameraHackSphericalPosRn = new System.Windows.Forms.Button();
             this.buttonCameraHackSphericalPosRp = new System.Windows.Forms.Button();
             this.buttonCameraHackSphericalPosTpPp = new System.Windows.Forms.Button();
-            this.textBoxCameraHackSphericalPosTP = new STROOP.BetterTextbox();
+            this.textBoxCameraHackSphericalPosTP = new BetterTextbox();
             this.buttonCameraHackSphericalPosTp = new System.Windows.Forms.Button();
             this.buttonCameraHackSphericalPosTpPn = new System.Windows.Forms.Button();
             this.buttonCameraHackSphericalPosPn = new System.Windows.Forms.Button();
@@ -86,11 +88,11 @@
             this.buttonCameraHackSphericalPosTnPn = new System.Windows.Forms.Button();
             this.groupBoxCameraHackPos = new System.Windows.Forms.GroupBox();
             this.checkBoxCameraHackPosRelative = new System.Windows.Forms.CheckBox();
-            this.textBoxCameraHackPosY = new STROOP.BetterTextbox();
+            this.textBoxCameraHackPosY = new BetterTextbox();
             this.buttonCameraHackPosYp = new System.Windows.Forms.Button();
             this.buttonCameraHackPosYn = new System.Windows.Forms.Button();
             this.buttonCameraHackPosXpZp = new System.Windows.Forms.Button();
-            this.textBoxCameraHackPosXZ = new STROOP.BetterTextbox();
+            this.textBoxCameraHackPosXZ = new BetterTextbox();
             this.buttonCameraHackPosXp = new System.Windows.Forms.Button();
             this.buttonCameraHackPosXpZn = new System.Windows.Forms.Button();
             this.buttonCameraHackPosZn = new System.Windows.Forms.Button();

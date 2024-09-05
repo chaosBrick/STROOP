@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
 using System.Drawing;
-using STROOP.Managers;
-using STROOP.Utilities;
-using STROOP.Structs;
-using STROOP.Extensions;
 using System.Drawing.Drawing2D;
-using STROOP.Structs.Configurations;
-using STROOP.Models;
-using static STROOP.Managers.ObjectSlotsManager;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Xml.Linq;
+using STROOP.Extensions;
+using STROOP.Managers;
+using STROOP.Models;
+using STROOP.Structs;
+using STROOP.Structs.Configurations;
+using STROOP.Utilities;
+using static STROOP.Managers.ObjectSlotsManager;
 
-namespace STROOP
+namespace STROOP.Controls
 {
     public class ObjectSlot : Panel
     {

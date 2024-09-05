@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class ActionsTab
     {
@@ -29,8 +31,8 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.textBoxAnimationDescription = new STROOP.BetterTextbox();
-            this.textBoxActionDescription = new STROOP.BetterTextbox();
+            this.textBoxAnimationDescription = new BetterTextbox();
+            this.textBoxActionDescription = new BetterTextbox();
             this.watchVariablePanelActions = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             this.SuspendLayout();
             // 

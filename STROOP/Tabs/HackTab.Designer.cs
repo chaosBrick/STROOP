@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class HackTab
     {
@@ -28,7 +30,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.splitContainerHacks = new STROOP.BetterSplitContainer();
+            this.splitContainerHacks = new BetterSplitContainer();
             this.groupBoxHackRam = new System.Windows.Forms.GroupBox();
             this.labelInGameFunctionCalls = new System.Windows.Forms.Label();
             this.labelInjectLevelScriptCommand = new System.Windows.Forms.Label();
@@ -47,13 +49,13 @@
             this.checkedListBoxHacks = new System.Windows.Forms.CheckedListBox();
             this.groupBoxHackSpawn = new System.Windows.Forms.GroupBox();
             this.labelSpawnBehavior = new System.Windows.Forms.Label();
-            this.textBoxSpawnBehavior = new STROOP.BetterTextbox();
+            this.textBoxSpawnBehavior = new BetterTextbox();
             this.labelSpawnHint = new System.Windows.Forms.Label();
             this.buttonSpawnReset = new System.Windows.Forms.Button();
             this.labelSpawnExtra = new System.Windows.Forms.Label();
             this.labelSpawnGfxId = new System.Windows.Forms.Label();
-            this.textBoxSpawnExtra = new STROOP.BetterTextbox();
-            this.textBoxSpawnGfxId = new STROOP.BetterTextbox();
+            this.textBoxSpawnExtra = new BetterTextbox();
+            this.textBoxSpawnGfxId = new BetterTextbox();
             this.buttonHackSpawn = new System.Windows.Forms.Button();
             this.listBoxSpawn = new System.Windows.Forms.ListBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerHacks)).BeginInit();

@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class TrianglesTab
     {
@@ -29,14 +31,14 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.splitContainerTriangles = new STROOP.BetterSplitContainer();
+            this.splitContainerTriangles = new BetterSplitContainer();
             this.groupBoxTrianglePos = new System.Windows.Forms.GroupBox();
             this.checkBoxTrianglePosRelative = new System.Windows.Forms.CheckBox();
-            this.textBoxTrianglePosY = new STROOP.BetterTextbox();
+            this.textBoxTrianglePosY = new BetterTextbox();
             this.buttonTrianglePosYp = new System.Windows.Forms.Button();
             this.buttonTrianglePosYn = new System.Windows.Forms.Button();
             this.buttonTrianglePosXpZp = new System.Windows.Forms.Button();
-            this.textBoxTrianglePosXZ = new STROOP.BetterTextbox();
+            this.textBoxTrianglePosXZ = new BetterTextbox();
             this.buttonTrianglePosXp = new System.Windows.Forms.Button();
             this.buttonTrianglePosXpZn = new System.Windows.Forms.Button();
             this.buttonTrianglePosZn = new System.Windows.Forms.Button();
@@ -45,15 +47,15 @@
             this.buttonTrianglePosXn = new System.Windows.Forms.Button();
             this.buttonTrianglePosXnZn = new System.Windows.Forms.Button();
             this.groupBoxTriangleTypeConversion = new System.Windows.Forms.GroupBox();
-            this.textBoxTriangleTypeConversionToType = new STROOP.BetterTextbox();
+            this.textBoxTriangleTypeConversionToType = new BetterTextbox();
             this.labelTriangleTypeConversionToType = new System.Windows.Forms.Label();
-            this.textBoxTriangleTypeConversionFromType = new STROOP.BetterTextbox();
+            this.textBoxTriangleTypeConversionFromType = new BetterTextbox();
             this.labelTriangleTypeConversionFromType = new System.Windows.Forms.Label();
             this.labelTriangleTypeConversionConvert = new System.Windows.Forms.Label();
             this.comboBoxTriangleTypeConversionConvert = new System.Windows.Forms.ComboBox();
             this.buttonTriangleTypeConversionConvert = new System.Windows.Forms.Button();
             this.groupBoxTriangleNormal = new System.Windows.Forms.GroupBox();
-            this.textBoxTriangleNormal = new STROOP.BetterTextbox();
+            this.textBoxTriangleNormal = new BetterTextbox();
             this.buttonTriangleNormalN = new System.Windows.Forms.Button();
             this.buttonTriangleNormalP = new System.Windows.Forms.Button();
             this.radioButtonTriCustom = new System.Windows.Forms.RadioButton();
@@ -77,7 +79,7 @@
             this.checkBoxNeutralizeTriangle = new System.Windows.Forms.CheckBox();
             this.checkBoxRecordTriangleData = new System.Windows.Forms.CheckBox();
             this.checkBoxVertexMisalignment = new System.Windows.Forms.CheckBox();
-            this.textBoxCustomTriangle = new STROOP.BetterTextbox();
+            this.textBoxCustomTriangle = new BetterTextbox();
             this.buttonTriangleShowEquation = new System.Windows.Forms.Button();
             this.buttonRetrieveTriangle = new System.Windows.Forms.Button();
             this.labelRecordTriangleCount = new System.Windows.Forms.Label();

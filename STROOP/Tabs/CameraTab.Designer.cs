@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class CameraTab
     {
@@ -29,13 +31,13 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.splitContainerCamera = new STROOP.BetterSplitContainer();
+            this.splitContainerCamera = new BetterSplitContainer();
             this.groupBoxCameraFocusSphericalPos = new System.Windows.Forms.GroupBox();
-            this.textBoxCameraFocusSphericalPosR = new STROOP.BetterTextbox();
+            this.textBoxCameraFocusSphericalPosR = new BetterTextbox();
             this.buttonCameraFocusSphericalPosRp = new System.Windows.Forms.Button();
             this.buttonCameraFocusSphericalPosRn = new System.Windows.Forms.Button();
             this.buttonCameraFocusSphericalPosTnPn = new System.Windows.Forms.Button();
-            this.textBoxCameraFocusSphericalPosTP = new STROOP.BetterTextbox();
+            this.textBoxCameraFocusSphericalPosTP = new BetterTextbox();
             this.buttonCameraFocusSphericalPosTn = new System.Windows.Forms.Button();
             this.buttonCameraFocusSphericalPosTnPp = new System.Windows.Forms.Button();
             this.buttonCameraFocusSphericalPosPp = new System.Windows.Forms.Button();
@@ -45,11 +47,11 @@
             this.buttonCameraFocusSphericalPosTpPp = new System.Windows.Forms.Button();
             this.groupBoxCameraFocusPos = new System.Windows.Forms.GroupBox();
             this.checkBoxCameraFocusPosRelative = new System.Windows.Forms.CheckBox();
-            this.textBoxCameraFocusPosY = new STROOP.BetterTextbox();
+            this.textBoxCameraFocusPosY = new BetterTextbox();
             this.buttonCameraFocusPosYp = new System.Windows.Forms.Button();
             this.buttonCameraFocusPosYn = new System.Windows.Forms.Button();
             this.buttonCameraFocusPosXpZp = new System.Windows.Forms.Button();
-            this.textBoxCameraFocusPosXZ = new STROOP.BetterTextbox();
+            this.textBoxCameraFocusPosXZ = new BetterTextbox();
             this.buttonCameraFocusPosXp = new System.Windows.Forms.Button();
             this.buttonCameraFocusPosXpZn = new System.Windows.Forms.Button();
             this.buttonCameraFocusPosZn = new System.Windows.Forms.Button();
@@ -57,14 +59,14 @@
             this.buttonCameraFocusPosXnZp = new System.Windows.Forms.Button();
             this.buttonCameraFocusPosXn = new System.Windows.Forms.Button();
             this.buttonCameraFocusPosXnZn = new System.Windows.Forms.Button();
-            this.buttonDisableFOVFunctions = new STROOP.BinaryButton();
+            this.buttonDisableFOVFunctions = new BinaryButton();
             this.groupBoxCameraSphericalPos = new System.Windows.Forms.GroupBox();
             this.checkBoxCameraSphericalPosPivotOnFocus = new System.Windows.Forms.CheckBox();
-            this.textBoxCameraSphericalPosR = new STROOP.BetterTextbox();
+            this.textBoxCameraSphericalPosR = new BetterTextbox();
             this.buttonCameraSphericalPosRn = new System.Windows.Forms.Button();
             this.buttonCameraSphericalPosRp = new System.Windows.Forms.Button();
             this.buttonCameraSphericalPosTpPp = new System.Windows.Forms.Button();
-            this.textBoxCameraSphericalPosTP = new STROOP.BetterTextbox();
+            this.textBoxCameraSphericalPosTP = new BetterTextbox();
             this.buttonCameraSphericalPosTp = new System.Windows.Forms.Button();
             this.buttonCameraSphericalPosTpPn = new System.Windows.Forms.Button();
             this.buttonCameraSphericalPosPn = new System.Windows.Forms.Button();
@@ -76,11 +78,11 @@
             this.pictureBoxCamera = new STROOP.Controls.IntPictureBox();
             this.groupBoxCameraPos = new System.Windows.Forms.GroupBox();
             this.checkBoxCameraPosRelative = new System.Windows.Forms.CheckBox();
-            this.textBoxCameraPosY = new STROOP.BetterTextbox();
+            this.textBoxCameraPosY = new BetterTextbox();
             this.buttonCameraPosYp = new System.Windows.Forms.Button();
             this.buttonCameraPosYn = new System.Windows.Forms.Button();
             this.buttonCameraPosXpZp = new System.Windows.Forms.Button();
-            this.textBoxCameraPosXZ = new STROOP.BetterTextbox();
+            this.textBoxCameraPosXZ = new BetterTextbox();
             this.buttonCameraPosXp = new System.Windows.Forms.Button();
             this.buttonCameraPosXpZn = new System.Windows.Forms.Button();
             this.buttonCameraPosZn = new System.Windows.Forms.Button();

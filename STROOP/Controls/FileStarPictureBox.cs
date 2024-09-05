@@ -1,5 +1,6 @@
 ﻿using System.Windows.Forms;
 using System.Drawing;
+using STROOP.Controls;
 using STROOP.Structs;
 
 namespace STROOP

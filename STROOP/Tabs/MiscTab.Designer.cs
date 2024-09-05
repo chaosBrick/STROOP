@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class MiscTab
     {
@@ -29,16 +31,16 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.splitContainerMisc = new STROOP.BetterSplitContainer();
+            this.splitContainerMisc = new BetterSplitContainer();
             this.groupBoxRNGIndexTester = new System.Windows.Forms.GroupBox();
-            this.textBoxRNGIndexTester = new STROOP.BetterTextbox();
+            this.textBoxRNGIndexTester = new BetterTextbox();
             this.buttonRNGIndexTester = new System.Windows.Forms.Button();
             this.buttonMiscGoToCourse = new System.Windows.Forms.Button();
             this.checkBoxTurnOffMusic = new System.Windows.Forms.CheckBox();
             this.panelMiscBorder = new System.Windows.Forms.Panel();
             this.pictureBoxMisc = new STROOP.Controls.IntPictureBox();
             this.watchVariablePanelMisc = new STROOP.Controls.VariablePanel.WatchVariablePanel();
-            this.txtRNGIncrement = new STROOP.BetterTextbox();
+            this.txtRNGIncrement = new BetterTextbox();
             this.labelRNGIncrement = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMisc)).BeginInit();
             this.splitContainerMisc.Panel1.SuspendLayout();

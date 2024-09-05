@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class VarHackTab
     {
@@ -28,16 +30,16 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.splitContainerVarHack = new STROOP.BetterSplitContainer();
+            this.splitContainerVarHack = new BetterSplitContainer();
             this.buttonVarHackApplyVariablesToMemory = new System.Windows.Forms.Button();
-            this.buttonEnableDisableRomHack = new STROOP.BinaryButton();
+            this.buttonEnableDisableRomHack = new BinaryButton();
             this.buttonVarHackClearVariablesInMemory = new System.Windows.Forms.Button();
-            this.textBoxYDeltaValue = new STROOP.BetterTextbox();
-            this.textBoxYPosValue = new STROOP.BetterTextbox();
-            this.textBoxYDeltaChange = new STROOP.BetterTextbox();
-            this.textBoxYPosChange = new STROOP.BetterTextbox();
-            this.textBoxXPosChange = new STROOP.BetterTextbox();
-            this.textBoxXPosValue = new STROOP.BetterTextbox();
+            this.textBoxYDeltaValue = new BetterTextbox();
+            this.textBoxYPosValue = new BetterTextbox();
+            this.textBoxYDeltaChange = new BetterTextbox();
+            this.textBoxYPosChange = new BetterTextbox();
+            this.textBoxXPosChange = new BetterTextbox();
+            this.textBoxXPosValue = new BetterTextbox();
             this.labelVarHackYDeltaLabel = new System.Windows.Forms.Label();
             this.labelVarHackYPosLabel = new System.Windows.Forms.Label();
             this.labelVarHackXPosLabel = new System.Windows.Forms.Label();

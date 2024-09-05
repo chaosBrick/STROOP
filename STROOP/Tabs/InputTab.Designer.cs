@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class InputTab
     {
@@ -29,8 +31,8 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.splitContainerInput = new STROOP.BetterSplitContainer();
-            this.inputDisplayPanel = new STROOP.InputDisplayPanel();
+            this.splitContainerInput = new BetterSplitContainer();
+            this.inputDisplayPanel = new InputDisplayPanel();
             this.watchVariablePanelInput = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerInput)).BeginInit();
             this.splitContainerInput.Panel1.SuspendLayout();

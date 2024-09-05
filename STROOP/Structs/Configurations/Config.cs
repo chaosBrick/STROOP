@@ -3,6 +3,7 @@ using STROOP.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using STROOP.Controls;
 
 namespace STROOP.Structs.Configurations
 {

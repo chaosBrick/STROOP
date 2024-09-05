@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class DebugTab
     {
@@ -29,7 +31,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.splitContainerDebug = new STROOP.BetterSplitContainer();
+            this.splitContainerDebug = new BetterSplitContainer();
             this.panelDebugBorder = new System.Windows.Forms.Panel();
             this.pictureBoxDebug = new STROOP.Controls.IntPictureBox();
             this.groupBoxMiscDebug = new System.Windows.Forms.GroupBox();

@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class MusicTab
     {
@@ -29,7 +31,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.splitContainerMusic = new STROOP.BetterSplitContainer();
+            this.splitContainerMusic = new BetterSplitContainer();
             this.listBoxMusic = new System.Windows.Forms.ListBox();
             this.watchVariablePanelMusic = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMusic)).BeginInit();

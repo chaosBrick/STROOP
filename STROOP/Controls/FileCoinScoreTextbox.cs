@@ -1,6 +1,6 @@
 ﻿using STROOP.Structs.Configurations;
 
-namespace STROOP
+namespace STROOP.Controls
 {
     public class FileCoinScoreTextbox : FileTextbox
     {

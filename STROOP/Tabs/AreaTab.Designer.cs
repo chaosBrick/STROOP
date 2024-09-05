@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class AreaTab
     {
@@ -29,7 +31,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.splitContainerArea = new STROOP.BetterSplitContainer();
+            this.splitContainerArea = new BetterSplitContainer();
             this.labelSelectedArea = new System.Windows.Forms.Label();
             this.radioButtonArea7 = new System.Windows.Forms.RadioButton();
             this.radioButtonArea4 = new System.Windows.Forms.RadioButton();

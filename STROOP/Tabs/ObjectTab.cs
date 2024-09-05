@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using STROOP.Controls;
 using STROOP.Structs.Configurations;
 using STROOP.Forms;
 using STROOP.Models;

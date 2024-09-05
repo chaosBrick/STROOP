@@ -1,7 +1,8 @@
-﻿using STROOP.Structs.Configurations;
-using System;
+﻿using System;
+using STROOP.Structs;
+using STROOP.Structs.Configurations;
 
-namespace STROOP.Structs
+namespace STROOP.Controls
 {
     public class VarHackContainerDefaults
     {

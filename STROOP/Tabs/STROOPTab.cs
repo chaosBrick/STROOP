@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-
+using STROOP.Controls;
 using STROOP.Controls.VariablePanel;
 
 namespace STROOP.Tabs

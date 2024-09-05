@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
 using System.Drawing;
-using STROOP.Structs;
-using STROOP.Extensions;
 using System.Drawing.Drawing2D;
+using System.Windows.Forms;
+using STROOP.Extensions;
+using STROOP.Structs;
 using STROOP.Structs.Configurations;
 
-namespace STROOP
+namespace STROOP.Controls
 {
     public class InputDisplayPanel : Panel
     {

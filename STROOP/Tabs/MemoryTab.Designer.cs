@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class MemoryTab
     {
@@ -30,15 +32,15 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MemoryTab));
-            this.splitContainerMemory = new STROOP.BetterSplitContainer();
-            this.splitContainerMemoryControls = new STROOP.BetterSplitContainer();
+            this.splitContainerMemory = new BetterSplitContainer();
+            this.splitContainerMemoryControls = new BetterSplitContainer();
             this.comboBoxMemoryTypes = new System.Windows.Forms.ComboBox();
             this.checkBoxMemoryObj = new System.Windows.Forms.CheckBox();
             this.labelMemoryMemorySize = new System.Windows.Forms.Label();
             this.labelMemoryBaseAddress = new System.Windows.Forms.Label();
             this.checkBoxMemoryHex = new System.Windows.Forms.CheckBox();
-            this.textBoxMemoryMemorySize = new STROOP.BetterTextbox();
-            this.textBoxMemoryBaseAddress = new STROOP.BetterTextbox();
+            this.textBoxMemoryMemorySize = new BetterTextbox();
+            this.textBoxMemoryBaseAddress = new BetterTextbox();
             this.checkBoxMemoryRelativeAddresses = new System.Windows.Forms.CheckBox();
             this.checkBoxMemoryUseObjAddress = new System.Windows.Forms.CheckBox();
             this.buttonMemoryMoveUpContinuously = new System.Windows.Forms.Button();
@@ -50,7 +52,7 @@
             this.buttonMemoryMoveDownOnce = new System.Windows.Forms.Button();
             this.checkBoxMemoryUpdateContinuously = new System.Windows.Forms.CheckBox();
             this.checkBoxMemoryLittleEndian = new System.Windows.Forms.CheckBox();
-            this.splitContainerMemoryControlsDisplays = new STROOP.BetterSplitContainer();
+            this.splitContainerMemoryControlsDisplays = new BetterSplitContainer();
             this.richTextBoxMemoryAddresses = new STROOP.Controls.RichTextBoxEx();
             this.richTextBoxMemoryValues = new STROOP.Controls.RichTextBoxEx();
             this.watchVariablePanelMemory = new STROOP.Controls.VariablePanel.WatchVariablePanel();
