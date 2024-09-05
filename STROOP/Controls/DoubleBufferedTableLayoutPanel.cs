@@ -2,7 +2,7 @@
 
 namespace STROOP.Controls
 {
-    class DoubleBufferedTableLayoutPanel : TableLayoutPanel
+    sealed class DoubleBufferedTableLayoutPanel : TableLayoutPanel
     {
         public DoubleBufferedTableLayoutPanel()
         {
