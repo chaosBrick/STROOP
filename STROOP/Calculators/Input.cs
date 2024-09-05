@@ -1,7 +1,7 @@
-﻿using STROOP.Utilities;
-using System;
+﻿using System;
+using STROOP.Utilities;
 
-namespace STROOP.Structs
+namespace STROOP.Calculators
 {
     // Y value is inputted and stored in sm64 convention
     // Y value is displayed in mupen convention

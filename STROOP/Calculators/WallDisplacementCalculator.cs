@@ -1,7 +1,7 @@
-﻿using STROOP.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using STROOP.Models;
 
-namespace STROOP.Structs
+namespace STROOP.Calculators
 {
     public static class WallDisplacementCalculator
     {

@@ -1,6 +1,6 @@
 ﻿using STROOP.Utilities;
 
-namespace STROOP.Structs
+namespace STROOP.Calculators
 {
     public class MutableMarioState
     {

@@ -1,7 +1,7 @@
-﻿using STROOP.Utilities;
-using System;
+﻿using System;
+using STROOP.Utilities;
 
-namespace STROOP.Structs
+namespace STROOP.Calculators
 {
     public static class ObjectCalculator
     {

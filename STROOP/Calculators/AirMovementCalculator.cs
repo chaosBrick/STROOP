@@ -1,9 +1,10 @@
-﻿using STROOP.Models;
-using STROOP.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using STROOP.Models;
+using STROOP.Structs;
+using STROOP.Utilities;
 
-namespace STROOP.Structs
+namespace STROOP.Calculators
 {
     public static class AirMovementCalculator
     {
