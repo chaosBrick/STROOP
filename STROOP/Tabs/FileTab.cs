@@ -4,6 +4,7 @@ using STROOP.Structs;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using System.Drawing;
+using STROOP.Controls;
 
 namespace STROOP.Tabs
 {

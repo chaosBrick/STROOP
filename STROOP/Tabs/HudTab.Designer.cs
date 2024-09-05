@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class HudTab
     {
@@ -29,7 +31,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.splitContainerHud = new STROOP.BetterSplitContainer();
+            this.splitContainerHud = new BetterSplitContainer();
             this.checkBoxFullHP = new System.Windows.Forms.CheckBox();
             this.button99Coins = new System.Windows.Forms.Button();
             this.buttonGameOver = new System.Windows.Forms.Button();
@@ -38,8 +40,8 @@
             this.panelHudBorder = new System.Windows.Forms.Panel();
             this.pictureBoxHud = new STROOP.Controls.IntPictureBox();
             this.buttonDie = new System.Windows.Forms.Button();
-            this.button100Lives = new STROOP.BinaryButton();
-            this.buttonTurnOnOffHud = new STROOP.BinaryButton();
+            this.button100Lives = new BinaryButton();
+            this.buttonTurnOnOffHud = new BinaryButton();
             this.buttonFullHp = new System.Windows.Forms.Button();
             this.watchVariablePanelHud = new STROOP.Controls.VariablePanel.WatchVariablePanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerHud)).BeginInit();

@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class SearchTab
     {
@@ -32,8 +34,8 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.splitContainerSearch = new STROOP.BetterSplitContainer();
-            this.splitContainerSearchOptions = new STROOP.BetterSplitContainer();
+            this.splitContainerSearch = new BetterSplitContainer();
+            this.splitContainerSearchOptions = new BetterSplitContainer();
             this.labelSearchProgress = new System.Windows.Forms.Label();
             this.progressBarSearch = new System.Windows.Forms.ProgressBar();
             this.buttonSearchAddAllAsVars = new System.Windows.Forms.Button();
@@ -41,7 +43,7 @@
             this.labelSearchNumResults = new System.Windows.Forms.Label();
             this.comboBoxSearchValueRelationship = new System.Windows.Forms.ComboBox();
             this.comboBoxSearchMemoryType = new System.Windows.Forms.ComboBox();
-            this.textBoxSearchValue = new STROOP.BetterTextbox();
+            this.textBoxSearchValue = new BetterTextbox();
             this.buttonSearchUndoScan = new System.Windows.Forms.Button();
             this.buttonSearchClearResults = new System.Windows.Forms.Button();
             this.buttonSearchNextScan = new System.Windows.Forms.Button();

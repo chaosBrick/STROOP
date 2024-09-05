@@ -50,8 +50,8 @@ namespace STROOP
             this.labelDebugText = new System.Windows.Forms.Label();
             this.openFileDialogSt = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialogSt = new System.Windows.Forms.SaveFileDialog();
-            this.splitContainerMain = new STROOP.BetterSplitContainer();
-            this.tabControlMain = new STROOP.TabControlEx();
+            this.splitContainerMain = new BetterSplitContainer();
+            this.tabControlMain = new TabControlEx();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBoxObjects = new System.Windows.Forms.GroupBox();
             this.comboBoxSelectionMethod = new System.Windows.Forms.ComboBox();

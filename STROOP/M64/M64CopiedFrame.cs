@@ -21,7 +21,7 @@
 
         public readonly uint RawValue;
 
-        public M64CopiedFrame(
+        private M64CopiedFrame(
             sbyte? X = null,
             sbyte? Y = null,
             bool? A = null,

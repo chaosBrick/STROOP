@@ -1,4 +1,6 @@
-﻿namespace STROOP.Forms
+﻿using STROOP.Controls;
+
+namespace STROOP.Forms
 {
     partial class VariableControllerForm
     {
@@ -36,10 +38,10 @@
             this._checkBoxLock = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this._checkBoxFixAddress = new System.Windows.Forms.CheckBox();
-            this._textBoxGetSet = new STROOP.BetterTextbox();
-            this._textBoxAddSubtract = new STROOP.BetterTextbox();
-            this._textBoxCurrentValue = new STROOP.BetterTextbox();
-            this._textBoxVarName = new STROOP.BetterTextbox();
+            this._textBoxGetSet = new BetterTextbox();
+            this._textBoxAddSubtract = new BetterTextbox();
+            this._textBoxCurrentValue = new BetterTextbox();
+            this._textBoxVarName = new BetterTextbox();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 

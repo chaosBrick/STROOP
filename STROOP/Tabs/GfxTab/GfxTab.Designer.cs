@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs.GfxTab
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs.GfxTab
 {
     partial class GfxTab
     {
@@ -29,10 +31,10 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.splitContainerGfxLeft = new STROOP.BetterSplitContainer();
+            this.splitContainerGfxLeft = new BetterSplitContainer();
             this.treeViewGfx = new System.Windows.Forms.TreeView();
-            this.splitContainerGfxRight = new STROOP.BetterSplitContainer();
-            this.splitContainerGfxMiddle = new STROOP.BetterSplitContainer();
+            this.splitContainerGfxRight = new BetterSplitContainer();
+            this.splitContainerGfxMiddle = new BetterSplitContainer();
             this.buttonGfxHitboxHack = new System.Windows.Forms.Button();
             this.buttonGfxDumpDisplayList = new System.Windows.Forms.Button();
             this.buttonGfxRefreshObject = new System.Windows.Forms.Button();

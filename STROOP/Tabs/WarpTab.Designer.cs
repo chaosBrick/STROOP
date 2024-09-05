@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class WarpTab
     {
@@ -29,8 +31,8 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.splitContainerWarp = new STROOP.BetterSplitContainer();
-            this.splitContainerWarpLeft = new STROOP.BetterSplitContainer();
+            this.splitContainerWarp = new BetterSplitContainer();
+            this.splitContainerWarpLeft = new BetterSplitContainer();
             this.buttonWarpInstructions = new System.Windows.Forms.Button();
             this.buttonWarpHookUpTeleporters = new System.Windows.Forms.Button();
             this.watchVariablePanelWarp = new STROOP.Controls.VariablePanel.WatchVariablePanel();

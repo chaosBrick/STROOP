@@ -1,4 +1,6 @@
-﻿namespace STROOP.Forms
+﻿using STROOP.Controls;
+
+namespace STROOP.Forms
 {
     partial class CoinRingDisplayForm
     {

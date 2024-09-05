@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using STROOP.Controls;
 using STROOP.Structs.Configurations;
 
 namespace STROOP.Tabs

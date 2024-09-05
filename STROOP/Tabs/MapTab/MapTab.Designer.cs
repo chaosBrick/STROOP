@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs.MapTab
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs.MapTab
 {
     partial class MapTab
     {
@@ -29,14 +31,14 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MapTab));
-            this.splitContainerMap = new STROOP.BetterSplitContainer();
-            this.splitContainerMapLeft = new STROOP.BetterSplitContainer();
+            this.splitContainerMap = new BetterSplitContainer();
+            this.splitContainerMapLeft = new BetterSplitContainer();
             this.tabControlMap = new System.Windows.Forms.TabControl();
             this.tabPageMapOptions = new System.Windows.Forms.TabPage();
             this.comboBoxViewMode = new System.Windows.Forms.ComboBox();
             this.comboBoxMapOptionsBackground = new System.Windows.Forms.ComboBox();
             this.comboBoxMapOptionsLevel = new System.Windows.Forms.ComboBox();
-            this.textBoxMapOptionsGlobalIconSize = new STROOP.BetterTextbox();
+            this.textBoxMapOptionsGlobalIconSize = new BetterTextbox();
             this.labelMapOptionsGlobalIconSize = new System.Windows.Forms.Label();
             this.labelMapOptionsBackground = new System.Windows.Forms.Label();
             this.labelViewMode = new System.Windows.Forms.Label();
@@ -56,11 +58,11 @@
             this.checkBoxMapOptionsTrackCamera = new System.Windows.Forms.CheckBox();
             this.checkBoxMapOptionsTrackHolp = new System.Windows.Forms.CheckBox();
             this.checkBoxMapOptionsTrackMario = new System.Windows.Forms.CheckBox();
-            this.trackBarMapOptionsGlobalIconSize = new STROOP.TrackBarEx();
+            this.trackBarMapOptionsGlobalIconSize = new TrackBarEx();
             this.tabPageMapControllers = new System.Windows.Forms.TabPage();
             this.groupBoxMapControllersAngle = new System.Windows.Forms.GroupBox();
-            this.textBoxMapControllersAngleChange = new STROOP.BetterTextbox();
-            this.textBoxMapControllersAngleCustom = new STROOP.BetterTextbox();
+            this.textBoxMapControllersAngleChange = new BetterTextbox();
+            this.textBoxMapControllersAngleCustom = new BetterTextbox();
             this.buttonMapControllersAngleCCW = new System.Windows.Forms.Button();
             this.radioButtonMapControllersAngleCentripetal = new System.Windows.Forms.RadioButton();
             this.radioButtonMapControllersAngleCamera = new System.Windows.Forms.RadioButton();
@@ -73,8 +75,8 @@
             this.radioButtonMapControllersAngle32768 = new System.Windows.Forms.RadioButton();
             this.groupBoxMapControllersCenter = new System.Windows.Forms.GroupBox();
             this.checkBoxMapControllersCenterChangeByPixels = new System.Windows.Forms.CheckBox();
-            this.textBoxMapControllersCenterCustom = new STROOP.BetterTextbox();
-            this.textBoxMapControllersCenterChange = new STROOP.BetterTextbox();
+            this.textBoxMapControllersCenterCustom = new BetterTextbox();
+            this.textBoxMapControllersCenterChange = new BetterTextbox();
             this.radioButtonMapControllersCenterMario = new System.Windows.Forms.RadioButton();
             this.radioButtonMapControllersCenterOrigin = new System.Windows.Forms.RadioButton();
             this.buttonMapControllersCenterDownRight = new System.Windows.Forms.Button();
@@ -88,9 +90,9 @@
             this.buttonMapControllersCenterUpRight = new System.Windows.Forms.Button();
             this.buttonMapControllersCenterUp = new System.Windows.Forms.Button();
             this.groupBoxMapControllersScale = new System.Windows.Forms.GroupBox();
-            this.textBoxMapControllersScaleCustom = new STROOP.BetterTextbox();
-            this.textBoxMapControllersScaleChange2 = new STROOP.BetterTextbox();
-            this.textBoxMapControllersScaleChange = new STROOP.BetterTextbox();
+            this.textBoxMapControllersScaleCustom = new BetterTextbox();
+            this.textBoxMapControllersScaleChange2 = new BetterTextbox();
+            this.textBoxMapControllersScaleChange = new BetterTextbox();
             this.radioButtonMapControllersScaleMaxCourseSize = new System.Windows.Forms.RadioButton();
             this.radioButtonMapControllersScaleCourseDefault = new System.Windows.Forms.RadioButton();
             this.buttonMapControllersScaleDivide = new System.Windows.Forms.Button();

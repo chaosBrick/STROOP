@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class ObjectTab
     {
@@ -29,19 +31,19 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.splitContainerObject = new STROOP.BetterSplitContainer();
+            this.splitContainerObject = new BetterSplitContainer();
             this.panelObj = new STROOP.Controls.PanelEx();
-            this.buttonObjRide = new STROOP.BinaryButton();
+            this.buttonObjRide = new BinaryButton();
             this.buttonObjUkikipedia = new System.Windows.Forms.Button();
-            this.buttonObjRelease = new STROOP.BinaryButton();
-            this.buttonObjInteract = new STROOP.BinaryButton();
+            this.buttonObjRelease = new BinaryButton();
+            this.buttonObjInteract = new BinaryButton();
             this.groupBoxObjHome = new System.Windows.Forms.GroupBox();
             this.checkBoxObjHomeRelative = new System.Windows.Forms.CheckBox();
-            this.textBoxObjHomeY = new STROOP.BetterTextbox();
+            this.textBoxObjHomeY = new BetterTextbox();
             this.buttonObjHomeYp = new System.Windows.Forms.Button();
             this.buttonObjHomeYn = new System.Windows.Forms.Button();
             this.buttonObjHomeXpZp = new System.Windows.Forms.Button();
-            this.textBoxObjHomeXZ = new STROOP.BetterTextbox();
+            this.textBoxObjHomeXZ = new BetterTextbox();
             this.buttonObjHomeXp = new System.Windows.Forms.Button();
             this.buttonObjHomeXpZn = new System.Windows.Forms.Button();
             this.buttonObjHomeZn = new System.Windows.Forms.Button();
@@ -52,22 +54,22 @@
             this.groupBoxObjScale = new System.Windows.Forms.GroupBox();
             this.checkBoxObjScaleMultiply = new System.Windows.Forms.CheckBox();
             this.checkBoxObjScaleAggregate = new System.Windows.Forms.CheckBox();
-            this.textBoxObjScaleDepth = new STROOP.BetterTextbox();
-            this.textBoxObjScaleHeight = new STROOP.BetterTextbox();
-            this.textBoxObjScaleWidth = new STROOP.BetterTextbox();
+            this.textBoxObjScaleDepth = new BetterTextbox();
+            this.textBoxObjScaleHeight = new BetterTextbox();
+            this.textBoxObjScaleWidth = new BetterTextbox();
             this.buttonObjScaleDepthN = new System.Windows.Forms.Button();
             this.buttonObjScaleHeightN = new System.Windows.Forms.Button();
             this.buttonObjScaleWidthN = new System.Windows.Forms.Button();
             this.buttonObjScaleDepthP = new System.Windows.Forms.Button();
             this.buttonObjScaleHeightP = new System.Windows.Forms.Button();
             this.buttonObjScaleWidthP = new System.Windows.Forms.Button();
-            this.textBoxObjScaleAggregate = new STROOP.BetterTextbox();
+            this.textBoxObjScaleAggregate = new BetterTextbox();
             this.buttonObjScaleAggregateN = new System.Windows.Forms.Button();
             this.buttonObjScaleAggregateP = new System.Windows.Forms.Button();
             this.groupBoxObjAngle = new System.Windows.Forms.GroupBox();
-            this.textBoxObjAngleRoll = new STROOP.BetterTextbox();
-            this.textBoxObjAnglePitch = new STROOP.BetterTextbox();
-            this.textBoxObjAngleYaw = new STROOP.BetterTextbox();
+            this.textBoxObjAngleRoll = new BetterTextbox();
+            this.textBoxObjAnglePitch = new BetterTextbox();
+            this.textBoxObjAngleYaw = new BetterTextbox();
             this.buttonObjAngleRollN = new System.Windows.Forms.Button();
             this.buttonObjAnglePitchN = new System.Windows.Forms.Button();
             this.buttonObjAngleYawN = new System.Windows.Forms.Button();
@@ -76,11 +78,11 @@
             this.buttonObjAngleYawP = new System.Windows.Forms.Button();
             this.groupBoxObjPos = new System.Windows.Forms.GroupBox();
             this.checkBoxObjPosRelative = new System.Windows.Forms.CheckBox();
-            this.textBoxObjPosY = new STROOP.BetterTextbox();
+            this.textBoxObjPosY = new BetterTextbox();
             this.buttonObjPosYp = new System.Windows.Forms.Button();
             this.buttonObjPosYn = new System.Windows.Forms.Button();
             this.buttonObjPosXpZp = new System.Windows.Forms.Button();
-            this.textBoxObjPosXZ = new STROOP.BetterTextbox();
+            this.textBoxObjPosXZ = new BetterTextbox();
             this.buttonObjPosXp = new System.Windows.Forms.Button();
             this.buttonObjPosXpZn = new System.Windows.Forms.Button();
             this.buttonObjPosZn = new System.Windows.Forms.Button();
@@ -92,8 +94,8 @@
             this.buttonObjRetrieve = new System.Windows.Forms.Button();
             this.buttonObjRetrieveHome = new System.Windows.Forms.Button();
             this.buttonObjGoto = new System.Windows.Forms.Button();
-            this.buttonObjClone = new STROOP.BinaryButton();
-            this.buttonObjUnload = new STROOP.BinaryButton();
+            this.buttonObjClone = new BinaryButton();
+            this.buttonObjUnload = new BinaryButton();
             this.textBoxObjName = new System.Windows.Forms.TextBox();
             this.labelObjAddValue = new System.Windows.Forms.Label();
             this.labelObjSlotIndValue = new System.Windows.Forms.Label();

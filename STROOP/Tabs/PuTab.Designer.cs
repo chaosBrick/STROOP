@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class PuTab
     {
@@ -29,14 +31,14 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.splitContainerPu = new STROOP.BetterSplitContainer();
+            this.splitContainerPu = new BetterSplitContainer();
             this.groupBoxMarioPu = new System.Windows.Forms.GroupBox();
             this.checkBoxMarioPuQpu = new System.Windows.Forms.CheckBox();
-            this.textBoxMarioPuY = new STROOP.BetterTextbox();
+            this.textBoxMarioPuY = new BetterTextbox();
             this.buttonMarioPuYp = new System.Windows.Forms.Button();
             this.buttonMarioPuYn = new System.Windows.Forms.Button();
             this.buttonMarioPuXpZp = new System.Windows.Forms.Button();
-            this.textBoxMarioPuXZ = new STROOP.BetterTextbox();
+            this.textBoxMarioPuXZ = new BetterTextbox();
             this.buttonMarioPuXp = new System.Windows.Forms.Button();
             this.buttonMarioPuXpZn = new System.Windows.Forms.Button();
             this.buttonMarioPuZn = new System.Windows.Forms.Button();

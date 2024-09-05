@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class SnowTab
     {
@@ -29,16 +31,16 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.splitContainerSnow = new STROOP.BetterSplitContainer();
-            this.textBoxSnowIndex = new STROOP.BetterTextbox();
+            this.splitContainerSnow = new BetterSplitContainer();
+            this.textBoxSnowIndex = new BetterTextbox();
             this.buttonSnowRetrieve = new System.Windows.Forms.Button();
             this.groupBoxSnowPosition = new System.Windows.Forms.GroupBox();
             this.checkBoxSnowPositionRelative = new System.Windows.Forms.CheckBox();
-            this.textBoxSnowPositionY = new STROOP.BetterTextbox();
+            this.textBoxSnowPositionY = new BetterTextbox();
             this.buttonSnowPositionYp = new System.Windows.Forms.Button();
             this.buttonSnowPositionYn = new System.Windows.Forms.Button();
             this.buttonSnowPositionXpZp = new System.Windows.Forms.Button();
-            this.textBoxSnowPositionXZ = new STROOP.BetterTextbox();
+            this.textBoxSnowPositionXZ = new BetterTextbox();
             this.buttonSnowPositionXp = new System.Windows.Forms.Button();
             this.buttonSnowPositionXpZn = new System.Windows.Forms.Button();
             this.buttonSnowPositionZn = new System.Windows.Forms.Button();

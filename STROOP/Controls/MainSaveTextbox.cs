@@ -1,7 +1,7 @@
 ﻿using System.Windows.Forms;
 using STROOP.Structs.Configurations;
 
-namespace STROOP
+namespace STROOP.Controls
 {
     public class MainSaveTextbox : TextBox
     {

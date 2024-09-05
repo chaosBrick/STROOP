@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class MarioTab
     {
@@ -29,12 +31,12 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.splitContainerMario = new STROOP.BetterSplitContainer();
+            this.splitContainerMario = new BetterSplitContainer();
             this.groupBoxMarioSlidingSpeed = new System.Windows.Forms.GroupBox();
-            this.textBoxMarioSlidingSpeedYaw = new STROOP.BetterTextbox();
-            this.textBoxMarioSlidingSpeedH = new STROOP.BetterTextbox();
-            this.textBoxMarioSlidingSpeedZ = new STROOP.BetterTextbox();
-            this.textBoxMarioSlidingSpeedX = new STROOP.BetterTextbox();
+            this.textBoxMarioSlidingSpeedYaw = new BetterTextbox();
+            this.textBoxMarioSlidingSpeedH = new BetterTextbox();
+            this.textBoxMarioSlidingSpeedZ = new BetterTextbox();
+            this.textBoxMarioSlidingSpeedX = new BetterTextbox();
             this.buttonMarioSlidingSpeedYawN = new System.Windows.Forms.Button();
             this.buttonMarioSlidingSpeedHn = new System.Windows.Forms.Button();
             this.buttonMarioSlidingSpeedZn = new System.Windows.Forms.Button();
@@ -44,9 +46,9 @@
             this.buttonMarioSlidingSpeedZp = new System.Windows.Forms.Button();
             this.buttonMarioSlidingSpeedXp = new System.Windows.Forms.Button();
             this.groupBoxMarioStats = new System.Windows.Forms.GroupBox();
-            this.textBoxMarioStatsVspd = new STROOP.BetterTextbox();
-            this.textBoxMarioStatsHspd = new STROOP.BetterTextbox();
-            this.textBoxMarioStatsYaw = new STROOP.BetterTextbox();
+            this.textBoxMarioStatsVspd = new BetterTextbox();
+            this.textBoxMarioStatsHspd = new BetterTextbox();
+            this.textBoxMarioStatsYaw = new BetterTextbox();
             this.buttonMarioStatsVspdN = new System.Windows.Forms.Button();
             this.buttonMarioStatsHspdN = new System.Windows.Forms.Button();
             this.buttonMarioStatsYawN = new System.Windows.Forms.Button();
@@ -55,11 +57,11 @@
             this.buttonMarioStatsYawP = new System.Windows.Forms.Button();
             this.groupBoxMarioHOLP = new System.Windows.Forms.GroupBox();
             this.checkBoxMarioHOLPRelative = new System.Windows.Forms.CheckBox();
-            this.textBoxMarioHOLPY = new STROOP.BetterTextbox();
+            this.textBoxMarioHOLPY = new BetterTextbox();
             this.buttonMarioHOLPYp = new System.Windows.Forms.Button();
             this.buttonMarioHOLPYn = new System.Windows.Forms.Button();
             this.buttonMarioHOLPXpZp = new System.Windows.Forms.Button();
-            this.textBoxMarioHOLPXZ = new STROOP.BetterTextbox();
+            this.textBoxMarioHOLPXZ = new BetterTextbox();
             this.buttonMarioHOLPXp = new System.Windows.Forms.Button();
             this.buttonMarioHOLPXpZn = new System.Windows.Forms.Button();
             this.buttonMarioHOLPZn = new System.Windows.Forms.Button();
@@ -71,11 +73,11 @@
             this.pictureBoxMario = new STROOP.Controls.IntPictureBox();
             this.groupBoxMarioPos = new System.Windows.Forms.GroupBox();
             this.checkBoxMarioPosRelative = new System.Windows.Forms.CheckBox();
-            this.textBoxMarioPosY = new STROOP.BetterTextbox();
+            this.textBoxMarioPosY = new BetterTextbox();
             this.buttonMarioPosYp = new System.Windows.Forms.Button();
             this.buttonMarioPosYn = new System.Windows.Forms.Button();
             this.buttonMarioPosXpZp = new System.Windows.Forms.Button();
-            this.textBoxMarioPosXZ = new STROOP.BetterTextbox();
+            this.textBoxMarioPosXZ = new BetterTextbox();
             this.buttonMarioPosXp = new System.Windows.Forms.Button();
             this.buttonMarioPosXpZn = new System.Windows.Forms.Button();
             this.buttonMarioPosZn = new System.Windows.Forms.Button();

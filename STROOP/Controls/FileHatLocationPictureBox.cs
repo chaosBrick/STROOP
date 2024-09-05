@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Drawing;
-using STROOP.Utilities;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
+using STROOP.Utilities;
 
-namespace STROOP
+namespace STROOP.Controls
 {
     public class FileHatLocationPictureBox : FilePictureBox
     {

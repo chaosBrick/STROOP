@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Windows.Forms;
 using System.Drawing;
-using STROOP.Utilities;
+using System.Windows.Forms;
 using STROOP.Structs.Configurations;
+using STROOP.Utilities;
 
-namespace STROOP
+namespace STROOP.Controls
 {
     public abstract class FilePictureBox : PictureBox
     {

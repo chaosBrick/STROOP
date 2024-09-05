@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace STROOP
+namespace STROOP.Controls
 {
     public abstract class FileTextbox : TextBox
     {

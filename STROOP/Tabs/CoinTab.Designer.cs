@@ -1,4 +1,6 @@
-﻿namespace STROOP.Tabs
+﻿using STROOP.Controls;
+
+namespace STROOP.Tabs
 {
     partial class CoinTab
     {
@@ -35,31 +37,31 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.splitContainerCoin = new STROOP.BetterSplitContainer();
+            this.splitContainerCoin = new BetterSplitContainer();
             this.buttonCoinCalculate = new System.Windows.Forms.Button();
             this.buttonCoinClear = new System.Windows.Forms.Button();
             this.groupBoxCoinFilter = new System.Windows.Forms.GroupBox();
-            this.textBoxCoinFilterRequiredNumOfQualifiedCoins = new STROOP.BetterTextbox();
-            this.textBoxCoinFilterAngleMin = new STROOP.BetterTextbox();
-            this.textBoxCoinFilterAngleMax = new STROOP.BetterTextbox();
+            this.textBoxCoinFilterRequiredNumOfQualifiedCoins = new BetterTextbox();
+            this.textBoxCoinFilterAngleMin = new BetterTextbox();
+            this.textBoxCoinFilterAngleMax = new BetterTextbox();
             this.labelCoinFilterHSpeedFrom = new System.Windows.Forms.Label();
-            this.textBoxCoinFilterVSpeedMax = new STROOP.BetterTextbox();
+            this.textBoxCoinFilterVSpeedMax = new BetterTextbox();
             this.labelCoinFilterMin = new System.Windows.Forms.Label();
             this.labelCoinFilterMax = new System.Windows.Forms.Label();
-            this.textBoxCoinFilterVSpeedMin = new STROOP.BetterTextbox();
+            this.textBoxCoinFilterVSpeedMin = new BetterTextbox();
             this.labelCoinFilterHSpeedTo = new System.Windows.Forms.Label();
-            this.textBoxCoinFilterHSpeedMax = new STROOP.BetterTextbox();
+            this.textBoxCoinFilterHSpeedMax = new BetterTextbox();
             this.labelCoinFilterVSpeedFrom = new System.Windows.Forms.Label();
             this.labelCoinFilterVSpeedTo = new System.Windows.Forms.Label();
-            this.textBoxCoinFilterHSpeedMin = new STROOP.BetterTextbox();
+            this.textBoxCoinFilterHSpeedMin = new BetterTextbox();
             this.labelCoinFilterAngleFrom = new System.Windows.Forms.Label();
             this.labelCoinFilterAngleTo = new System.Windows.Forms.Label();
             this.labelCoinFilterRequiredNumOfQualifiedCoins = new System.Windows.Forms.Label();
-            this.textBoxCoinNumCoins = new STROOP.BetterTextbox();
-            this.textBoxCoinParamOrder = new STROOP.BetterTextbox();
-            this.textBoxCoinVSpeedOffset = new STROOP.BetterTextbox();
-            this.textBoxCoinVSpeedScale = new STROOP.BetterTextbox();
-            this.textBoxCoinHSpeedScale = new STROOP.BetterTextbox();
+            this.textBoxCoinNumCoins = new BetterTextbox();
+            this.textBoxCoinParamOrder = new BetterTextbox();
+            this.textBoxCoinVSpeedOffset = new BetterTextbox();
+            this.textBoxCoinVSpeedScale = new BetterTextbox();
+            this.textBoxCoinHSpeedScale = new BetterTextbox();
             this.labelCoinNumCoins = new System.Windows.Forms.Label();
             this.labelCoinVSpeedRange = new System.Windows.Forms.Label();
             this.labelCoinParamOrder = new System.Windows.Forms.Label();
@@ -71,10 +73,10 @@
             this.listBoxCoinObjects = new System.Windows.Forms.ListBox();
             this.groupBoxCoinCustomization = new System.Windows.Forms.GroupBox();
             this.checkBoxCoinCustomizatonDisplayNonQualifiedCoinsOfAQualifiedCoinGroup = new System.Windows.Forms.CheckBox();
-            this.textBoxCoinCustomizatonStartingRngIndex = new STROOP.BetterTextbox();
+            this.textBoxCoinCustomizatonStartingRngIndex = new BetterTextbox();
             this.labelCoinCustomizatonNumDecimalDigits = new System.Windows.Forms.Label();
             this.labelCoinCustomizatonStartingRngIndex = new System.Windows.Forms.Label();
-            this.textBoxCoinCustomizatonNumDecimalDigits = new STROOP.BetterTextbox();
+            this.textBoxCoinCustomizatonNumDecimalDigits = new BetterTextbox();
             this.dataGridViewCoin = new System.Windows.Forms.DataGridView();
             this.rngIndex = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.rngValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
