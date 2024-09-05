@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using STROOP.Controls.VariablePanel;
 
 using STROOP.Core.Variables;
+using STROOP.Core.WatchVariables;
 using STROOP.Structs;
 using STROOP.Utilities;
 

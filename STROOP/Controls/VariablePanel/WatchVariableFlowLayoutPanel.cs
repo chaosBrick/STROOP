@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System.Xml.Linq;
 
 using STROOP.Core.Variables;
+using STROOP.Core.WatchVariables;
 using STROOP.Forms;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;

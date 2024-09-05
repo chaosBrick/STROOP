@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using STROOP.Controls;
 using STROOP.Core.Variables;
+using STROOP.Core.WatchVariables;
 
 namespace STROOP.Tabs
 {

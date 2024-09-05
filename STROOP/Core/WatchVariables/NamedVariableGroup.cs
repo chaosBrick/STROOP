@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
-
+using STROOP.Core.WatchVariables;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 

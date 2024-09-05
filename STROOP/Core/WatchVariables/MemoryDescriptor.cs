@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using STROOP.Utilities;
+using System.Xml.Linq;
+using STROOP.Core.Variables;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
-using System.Xml.Linq;
+using STROOP.Utilities;
 
-namespace STROOP.Core.Variables
+namespace STROOP.Core.WatchVariables
 {
     public class MemoryDescriptor
     {
