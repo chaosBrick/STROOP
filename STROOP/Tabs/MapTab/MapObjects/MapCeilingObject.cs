@@ -2,6 +2,7 @@
 using System.Drawing;
 using OpenTK;
 using STROOP.Models;
+using OpenTK.Mathematics;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {

@@ -5,19 +5,23 @@ using System.Drawing;
 using System;
 using System.Reflection;
 using STROOP.Utilities;
+using OpenTK.Mathematics;
 
 namespace STROOP.Tabs.MapTab.Renderers
 {
+
+    // TODO: Types removed, reimplement another way
+
     public class TextRenderer : Renderer
     {
         struct TextBlock
         {
             public bool screenSpace;
             public Matrix4 transform;
-            public QFontDrawingPrimitive primitive;
+            //public QFontDrawingPrimitive primitive;
         }
 
-        QFontDrawing drawing;
+        //QFontDrawing drawing;
         QFont defaultFont;
         List<TextBlock> primitiveBuffer = new List<TextBlock>();
         bool textRenderingBroken => defaultFont == null;
@@ -26,7 +30,7 @@ namespace STROOP.Tabs.MapTab.Renderers
         {
             AccessScope<MapTab>.content.graphics.DoGLInit(() =>
             {
-                drawing = new QFontDrawing(false, null);
+                //drawing = new QFontDrawing(false, null);
                 defaultFont = CreateDefaultFont();
             });
         }
@@ -41,8 +45,8 @@ namespace STROOP.Tabs.MapTab.Renderers
                 return new QFont(
                     "Resources/Fonts/dejavu-markup/DejaVuMarkup.ttf",
                     16,
-                    new QuickFont.Configuration.QFontBuilderConfiguration(),
-                    FontStyle.Regular
+                    FontStyle.Regular,
+                    new QFontBuilderConfiguration()
                     );
             }
             catch (Exception ex)
@@ -64,11 +68,11 @@ namespace STROOP.Tabs.MapTab.Renderers
             if (textRenderingBroken)
                 return;
 
-            var prim = new QFontDrawingPrimitive(defaultFont);
-            prim.Options.Colour = color;
-            foreach (var v in textBlock)
-                prim.Print(v.text, v.offset, align);
-            primitiveBuffer.Add(new TextBlock { primitive = prim, transform = transform, screenSpace = screenSpace });
+            //var prim = new QFontDrawingPrimitive(defaultFont);
+            //prim.Options.Colour = color;
+            //foreach (var v in textBlock)
+            //    prim.Print(v.text, v.offset, align);
+            //primitiveBuffer.Add(new TextBlock { primitive = prim, transform = transform, screenSpace = screenSpace });
         }
 
         public override void SetDrawCalls(MapGraphics graphics)
@@ -77,24 +81,24 @@ namespace STROOP.Tabs.MapTab.Renderers
                 return;
 
             primitiveBuffer.Clear();
-            graphics.drawLayers[(int)MapGraphics.DrawLayers.Overlay].Add(() =>
-            {
-                drawing.DrawingPrimitives.Clear();
-                foreach (var primitive in primitiveBuffer)
-                {
-                    var knack = primitive.transform;
-                    if (!primitive.screenSpace)
-                        knack *= graphics.ViewMatrix;
-                    else
-                        primitive.primitive.Options.LockToPixel = true;
-                    primitive.primitive.ModelViewMatrix = knack;
-                    drawing.DrawingPrimitives.Add(primitive.primitive);
-                }
-                drawing.ProjectionMatrix = Matrix4.Identity;
-                drawing.RefreshBuffers();
-                drawing.Draw();
-                drawing.DisableShader();
-            });
+            //graphics.drawLayers[(int)MapGraphics.DrawLayers.Overlay].Add(() =>
+            //{
+            //    drawing.DrawingPrimitives.Clear();
+            //    foreach (var primitive in primitiveBuffer)
+            //    {
+            //        var knack = primitive.transform;
+            //        if (!primitive.screenSpace)
+            //            knack *= graphics.ViewMatrix;
+            //        else
+            //            primitive.primitive.Options.LockToPixel = true;
+            //        primitive.primitive.ModelViewMatrix = knack;
+            //        drawing.DrawingPrimitives.Add(primitive.primitive);
+            //    }
+            //    drawing.ProjectionMatrix = Matrix4.Identity;
+            //    drawing.RefreshBuffers();
+            //    drawing.Draw();
+            //    drawing.DisableShader();
+            //});
         }
     }
 }

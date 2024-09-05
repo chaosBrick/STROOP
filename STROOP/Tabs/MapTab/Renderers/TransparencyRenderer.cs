@@ -3,6 +3,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK;
 using System.Collections.Generic;
 using STROOP.Utilities;
+using OpenTK.Mathematics;
 
 namespace STROOP.Tabs.MapTab.Renderers
 {

@@ -8,6 +8,7 @@ using STROOP.Tabs.MapTab;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 using STROOP.Core.Variables;
+using OpenTK.Mathematics;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers
 {

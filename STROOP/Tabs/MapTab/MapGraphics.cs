@@ -7,6 +7,9 @@ using System.Drawing;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
+using OpenTK.Mathematics;
+using OpenTK.GLControl;
+using OpenTK.Windowing.Common;
 
 namespace STROOP.Tabs.MapTab
 {
@@ -157,8 +160,8 @@ namespace STROOP.Tabs.MapTab
         public bool IsMouseDown(int button) => mouseDown[button];
 
 
-        Func<OpenTK.Graphics.IGraphicsContext> getContext;
-        public MapGraphics(MapTab mapTab, GLControl glControl, Func<OpenTK.Graphics.IGraphicsContext> getContext = null)
+        Func<IGraphicsContext> getContext;
+        public MapGraphics(MapTab mapTab, GLControl glControl, Func<IGraphicsContext> getContext = null)
         {
             this.mapTab = mapTab;
             this.glControl = glControl;
@@ -307,7 +310,9 @@ namespace STROOP.Tabs.MapTab
                 if (glControl.Cursor != cursor)
                     glControl.Cursor = cursor;
 
-                (getContext != null ? getContext() : glControl.Context).MakeCurrent(glControl.WindowInfo);
+                //(getContext != null ? getContext() : glControl.Context).MakeCurrent(glControl.WindowInfo);
+                (getContext != null ? getContext() : glControl.Context).MakeCurrent();
+
                 UpdateMapView();
 
                 GL.BindFramebuffer(FramebufferTarget.Framebuffer, mainFrameBuffer);

@@ -4,6 +4,7 @@ using OpenTK;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 using STROOP.Structs;
+using OpenTK.Mathematics;
 
 namespace STROOP.Models
 {

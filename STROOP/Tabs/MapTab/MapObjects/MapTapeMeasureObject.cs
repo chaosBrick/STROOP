@@ -5,6 +5,7 @@ using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using System.Windows.Forms;
 using OpenTK;
+using OpenTK.Mathematics;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {
@@ -190,7 +191,8 @@ namespace STROOP.Tabs.MapTab.MapObjects
                     graphics.lineRenderer.Add(p1, p2, ColorUtilities.ColorToVec4(lineColor), OutlineWidth);
 
                     Vector3 middlePoint = (p1 + p2) * 0.5f;
-                    var ssp = Vector4.Transform(new Vector4(middlePoint.X, middlePoint.Y, middlePoint.Z, 1), graphics.ViewMatrix);
+                    // FIXME: Should this be a column transform?
+                    var ssp = Vector4.TransformRow(new Vector4(middlePoint.X, middlePoint.Y, middlePoint.Z, 1), graphics.ViewMatrix);
 
                     Vector3 screenspacePoint = ssp.Xyz / ssp.W;
                     if (ssp.W < 0)

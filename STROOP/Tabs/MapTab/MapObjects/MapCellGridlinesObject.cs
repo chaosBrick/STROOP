@@ -4,6 +4,7 @@ using System.Drawing;
 using OpenTK;
 using STROOP.Structs.Configurations;
 using STROOP.Structs;
+using OpenTK.Mathematics;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {

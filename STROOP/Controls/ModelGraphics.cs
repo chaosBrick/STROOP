@@ -7,6 +7,10 @@ using OpenTK.Input;
 using System.Windows.Forms;
 using System.Drawing;
 using STROOP.Utilities;
+using OpenTK.Mathematics;
+using OpenTK.GLControl;
+using OpenTK.Windowing.GraphicsLibraryFramework;
+using System.Windows.Input;
 
 namespace STROOP.Controls
 {
@@ -44,6 +48,7 @@ namespace STROOP.Controls
         {
             if (!ManualMode)
             {
+#if false
                 KeyboardState keyState = Keyboard.GetState();
 
                 float speed = 0.01f;
@@ -55,6 +60,7 @@ namespace STROOP.Controls
                     speed = 0.003f;
 
                 _cameraAngle += speed;
+#endif
             }
 
             CameraFly();
@@ -62,6 +68,8 @@ namespace STROOP.Controls
 
         public void Load()
         {
+#if false
+
             Control.MakeCurrent();
             Control.Context.LoadAll();
 
@@ -75,6 +83,7 @@ namespace STROOP.Controls
             _timer.Enabled = true;
 
             SetupViewport();
+#endif
         }
 
         volatile bool _mousePressedWithin = false;
@@ -89,7 +98,8 @@ namespace STROOP.Controls
         float? _pMouseScroll = null;
         public void CameraFly()
         {
-            KeyboardState keyState = Keyboard.GetState();
+#if false
+            KeyboardState keyState = KeyboardState;
 
             // Calculate key speed multiplier
             float speedMul = 1f;
@@ -198,6 +208,7 @@ namespace STROOP.Controls
             _cameraPosition += Vector3.Cross(Vector3.UnitY, _cameraLook) * relDeltaPos.X
                 + Vector3.UnitY * relDeltaPos.Y
                 + _cameraLook * relDeltaPos.Z;
+#endif
         }
 
         public void OnPaint(object sender, EventArgs e)

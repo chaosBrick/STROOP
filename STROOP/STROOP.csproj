@@ -1,23 +1,12 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D309A4ED-54AF-4BC7-83CA-BCD38543AEB3}</ProjectGuid>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>STROOP</RootNamespace>
-    <AssemblyName>STROOP</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -32,30 +21,10 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>icon.ico</ApplicationIcon>
@@ -63,1120 +32,1460 @@
   <PropertyGroup>
     <SignManifests>false</SignManifests>
   </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Build|AnyCPU'">
     <OutputPath>..\..\Windows Build\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>none</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup />
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Build|x86'">
     <OutputPath>bin\x86\Windows Build\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows Build|x64'">
     <OutputPath>bin\x64\Windows Build\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing.Design" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <Reference Include="UIAutomationProvider" />
-    <Reference Include="WindowsBase" />
-    <Reference Include="WindowsFormsIntegration" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Calculators\Input.cs" />
-    <Compile Include="Calculators\MutableMarioState.cs" />
-    <Compile Include="Calculators\MarioState.cs" />
-    <Compile Include="Calculators\ObjectCalculator.cs" />
-    <Compile Include="Controls\BetterSplitContainer.cs">
+    <Compile Update="Controls\BetterSplitContainer.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\DoubleBufferedTableLayoutPanel.cs">
+    <Compile Update="Controls\DoubleBufferedTableLayoutPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\CoinRingDisplayPanel.cs">
+    <Compile Update="Controls\CoinRingDisplayPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\ReorderFlowLayoutPanel.cs">
+    <Compile Update="Controls\ReorderFlowLayoutPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\TrackBarEx.cs">
+    <Compile Update="Controls\TrackBarEx.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\TabControlEx.cs">
+    <Compile Update="Controls\TabControlEx.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\CarretlessTextBox.cs">
+    <Compile Update="Controls\CarretlessTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\MainSaveTextbox.cs">
+    <Compile Update="Controls\MainSaveTextbox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\ColorSelector.cs">
+    <Compile Update="Controls\ColorSelector.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\ColorSelector.Designer.cs">
-      <DependentUpon>ColorSelector.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\ObjectSlotFlowLayoutPanel.cs">
+    <Compile Update="Controls\ObjectSlotFlowLayoutPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\PanelEx.cs">
+    <Compile Update="Controls\PanelEx.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Core\WatchVariables\DescribedMemoryState.cs" />
-    <Compile Include="Core\WatchVariables\NamedVariableGroup.cs" />
-    <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableAddressWrapper.cs" />
-    <Compile Include="Controls\VariablePanel\WatchVariablePanelRenderer.cs">
+    <Compile Update="Controls\VariablePanel\WatchVariablePanelRenderer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableNullableWrapper.cs" />
-    <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableSelectionWrapper.cs" />
-    <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableSetting.cs" />
-    <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableTriangleWrapper.cs" />
-    <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableStringWrapper.cs" />
-    <Compile Include="Enums\AggregateMathOperation.cs" />
-    <Compile Include="Enums\CoordinateAngle.cs" />
-    <Compile Include="Enums\CopyTypeEnum.cs" />
-    <Compile Include="Enums\MapTrackerIconType.cs" />
-    <Compile Include="Enums\BinaryMathOperation.cs" />
-    <Compile Include="Enums\PaintingListTypeEnum.cs" />
-    <Compile Include="Enums\FrameInputRelationType.cs" />
-    <Compile Include="Enums\CellSelectionType.cs" />
-    <Compile Include="Enums\InputDisplayTypeEnum.cs" />
-    <Compile Include="Enums\CoinParamsOrder.cs" />
-    <Compile Include="Enums\RelativeDirection.cs" />
-    <Compile Include="Enums\RomVersionSelection.cs" />
-    <Compile Include="Enums\TriangleClassificationExtended.cs" />
-    <Compile Include="Exceptions\DolphinNotRunningGameException.cs" />
-    <Compile Include="Extensions\FormExtensions.cs" />
-    <Compile Include="Forms\ImageForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\ImageForm.Designer.cs">
-      <DependentUpon>ImageForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\SearchVariableDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\SearchVariableDialog.Designer.cs">
-      <DependentUpon>SearchVariableDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\TriangleListForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\TriangleListForm.Designer.cs">
-      <DependentUpon>TriangleListForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\FormManager.cs" />
-    <Compile Include="Forms\IUpdatableForm.cs" />
-    <Compile Include="Forms\TabForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\TabForm.Designer.cs">
-      <DependentUpon>TabForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\CoinRingDisplayForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\CoinRingDisplayForm.Designer.cs">
-      <DependentUpon>CoinRingDisplayForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\ValueSplitForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\ValueSplitForm.Designer.cs">
-      <DependentUpon>ValueSplitForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\ValueForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\ValueForm.Designer.cs">
-      <DependentUpon>ValueForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\ActionForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\ActionForm.Designer.cs">
-      <DependentUpon>ActionForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\VariablePopOutForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\VariablePopOutForm.Designer.cs">
-      <DependentUpon>VariablePopOutForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\SelectionForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\SelectionForm.Designer.cs">
-      <DependentUpon>SelectionForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\VariableBitForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\VariableBitForm.Designer.cs">
-      <DependentUpon>VariableBitForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\VariableCreationForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\VariableCreationForm.Designer.cs">
-      <DependentUpon>VariableCreationForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Interfaces\IUpdatable.cs" />
-    <Compile Include="Controls\VariablePanel\WatchVariableControl.cs" />
-    <Compile Include="Controls\VarHackContainer.cs">
+    <Compile Update="Controls\VarHackContainer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\VarHackContainer.Designer.cs">
-      <DependentUpon>VarHackContainer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\NoTearFlowLayoutPanel.cs">
+    <Compile Update="Controls\NoTearFlowLayoutPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\VisualLinkLineText.cs" />
-    <Compile Include="Controls\VisualRegexLinkGenerator.cs" />
-    <Compile Include="Controls\BorderedTableLayoutPanel.cs">
+    <Compile Update="Controls\BorderedTableLayoutPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\BinaryButton.cs">
+    <Compile Update="Controls\BinaryButton.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\BetterTextbox.cs">
+    <Compile Update="Controls\BetterTextbox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\DecompilerView.xaml.cs">
-      <DependentUpon>DecompilerView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Core\WatchVariables\MemoryDescriptor.cs" />
-    <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableBooleanWrapper.cs" />
-    <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableObjectWrapper.cs" />
-    <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableAngleWrapper.cs" />
-    <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableNumberWrapper.cs" />
-    <Compile Include="Controls\VarHackFlowLayoutPanel.cs">
+    <Compile Update="Controls\VarHackFlowLayoutPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableWrapper.cs" />
-    <Compile Include="Controls\InputDisplayPanel.cs">
+    <Compile Update="Controls\InputDisplayPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\FileHatPositionTextbox.cs">
+    <Compile Update="Controls\FileHatPositionTextbox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\FileTextbox.cs">
+    <Compile Update="Controls\FileTextbox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\FileHatLocationPictureBox.cs">
+    <Compile Update="Controls\FileHatLocationPictureBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\FileKeyDoorPictureBox.cs">
+    <Compile Update="Controls\FileKeyDoorPictureBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\FileCourseLabel.cs">
+    <Compile Update="Controls\FileCourseLabel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\FileCoinScoreTextbox.cs">
+    <Compile Update="Controls\FileCoinScoreTextbox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\FilePictureBox.cs">
+    <Compile Update="Controls\FilePictureBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\FileBinaryPictureBox.cs">
+    <Compile Update="Controls\FileBinaryPictureBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\FileStarPictureBox.cs">
+    <Compile Update="Controls\FileStarPictureBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\ModelGraphics.cs" />
-    <Compile Include="Controls\IntPictureBox.cs">
+    <Compile Update="Controls\IntPictureBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\VariablePanel\WatchVariableFlowLayoutPanel.cs">
+    <Compile Update="Controls\VariablePanel\WatchVariableFlowLayoutPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\RichTextBoxEx.cs">
+    <Compile Update="Controls\RichTextBoxEx.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Enums\FileType.cs" />
-    <Compile Include="Enums\CoordinateSystem.cs" />
-    <Compile Include="Enums\CamHackMode.cs" />
-    <Compile Include="Enums\MapTrackerVisibilityType.cs" />
-    <Compile Include="Enums\ReadWriteMode.cs" />
-    <Compile Include="Enums\RomVersion.cs" />
-    <Compile Include="Enums\PositionControllerRelativity.cs" />
-    <Compile Include="Enums\HatLocation.cs" />
-    <Compile Include="Enums\MapTrackerOrderType.cs" />
-    <Compile Include="Extensions\BitmapExtensions.cs" />
-    <Compile Include="Extensions\ControlCollectionsExtensions.cs" />
-    <Compile Include="Extensions\IEnumerableExtensions.cs" />
-    <Compile Include="Extensions\RectangleExtensions.cs" />
-    <Compile Include="Forms\MainLoadingForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\MainLoadingForm.Designer.cs">
-      <DependentUpon>MainLoadingForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="LoadingHandler.cs" />
-    <Compile Include="Tabs\BruteforceTab\BF_Utilities\BF_VariableUtilties.cs" />
-    <Compile Include="Tabs\BruteforceTab\BruteforceTab.cs">
+    <Compile Update="Tabs\BruteforceTab\BruteforceTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\BruteforceTab\BruteforceTab.Designer.cs">
-      <DependentUpon>BruteforceTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\BruteforceTab\BruteforceVariableView.cs" />
-    <Compile Include="Tabs\BruteforceTab\Json.cs" />
-    <Compile Include="Tabs\BruteforceTab\Surface.cs" />
-    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\GeneralPurpose.cs">
+    <Compile Update="Tabs\BruteforceTab\Surfaces\GeneralPurpose\GeneralPurpose.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\GeneralPurpose.Designer.cs">
-      <DependentUpon>GeneralPurpose.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\IMethodController.cs" />
-    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\MethodControllers\CheckAction.cs" />
-    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\MethodControllers\ITrackerMethodMapObject.cs" />
-    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\MethodControllers\RestrictHPosition.cs" />
-    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\MethodControllers\TrackerMethodControllerBase.cs" />
-    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\MethodControllers\XZRadialLimit.cs" />
-    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\Perturbator.cs">
+    <Compile Update="Tabs\BruteforceTab\Surfaces\GeneralPurpose\Perturbator.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\Perturbator.Designer.cs">
-      <DependentUpon>Perturbator.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\ScoringFunc.cs">
+    <Compile Update="Tabs\BruteforceTab\Surfaces\GeneralPurpose\ScoringFunc.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\ScoringFunc.Designer.cs">
-      <DependentUpon>ScoringFunc.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\BruteforceTab\BF_Utilities\BF_ObjectUtilities.cs" />
-    <Compile Include="Tabs\BruteforceTab\ValueGetters.cs" />
-    <Compile Include="Tabs\GhostTab\FileWatchers.cs">
+    <Compile Update="Tabs\GhostTab\FileWatchers.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\GhostTab\GhostTabHelp.cs">
+    <Compile Update="Tabs\GhostTab\GhostTabHelp.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\MapTab\DataUtil\CollisionStructure.cs" />
-    <Compile Include="Tabs\MapTab\DataUtil\ObjectTrianglePrediction.cs" />
-    <Compile Include="Tabs\MapTab\GraphicsUtil.cs" />
-    <Compile Include="Tabs\MapTab\IHoverData.cs" />
-    <Compile Include="Tabs\MapTab\MapAssociations.cs" />
-    <Compile Include="Tabs\MapTab\MapLayout.cs" />
-    <Compile Include="Tabs\MapTab\DataUtil\CustomTriangleList.cs" />
-    <Compile Include="Tabs\MapTab\DataUtil\HoverDatas.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapBruteforceTriangles.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapCustomIconPoints.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapAllObjectCeilingObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapAllObjectFloorObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapAllObjectWallObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapCustomCameraPath.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapIwerlipsesObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapNearbyObjectsObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapObjectTrianglePrediction.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapTapeMeasureObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapNearbyUnits.cs" />
-    <Compile Include="Tabs\MapTab\MapPopout.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Tabs\MapTab\MapPopout.Designer.cs">
-      <DependentUpon>MapPopout.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\MapTab\MapView.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapWatersObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapCustomSpherePointsObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapFacingDividerObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapSectorObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapMultipleObjectsObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapPunchDetectorObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapHomeLineObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapCeilingObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapBackgroundObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapAngleRangeObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapMarioWallObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapLineSegmentObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapGhostObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapPunchFloorObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapCustomCylinderPointsObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapCUpFloorObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapPreviousPositionsObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapArrowObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapMapObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapCustomPositionAngleObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapSphereObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapCylinderObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapFloorObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapTriangleObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapGridlinesObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapCustomBackgroundObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapLevelCeilingObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapLevelFloorObject.cs" />
-    <Compile Include="Tabs\MapTab\IMapLevelTriangleObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapLevelWallObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapCustomMapObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapPathObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapCustomCeilingObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapCustomWallObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapMarioCeilingObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapObjectCylinderObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapCustomFloorObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapObjectFloorObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapNextPositionsObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapPuGridlinesObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapDrawingObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapWallObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapObjectSphereObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapCurrentUnitObject.cs" />
-    <Compile Include="Tabs\MapTab\MapGraphics.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapLineObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapCellGridlinesObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapCurrentBackgroundObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapCameraObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapMarioFloorObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapObjectObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapCurrentCellObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapCircleObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapQuadObject.cs" />
-    <Compile Include="Tabs\MapTab\MapUtilities.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapHorizontalTriangleObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapCurrentMapObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapIconRectangleObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapIconPointObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapHolpObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapMarioObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapIconObject.cs" />
-    <Compile Include="Tabs\MapTab\MapObjects\MapObject.cs" />
-    <Compile Include="Tabs\MapTab\MapTracker.cs">
+    <Compile Update="Tabs\MapTab\MapTracker.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\MapTab\MapTracker.Designer.cs">
-      <DependentUpon>MapTracker.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\MapTab\MapTrackerFlowLayoutPanel.cs">
+    <Compile Update="Tabs\MapTab\MapTrackerFlowLayoutPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Models\PanModel.cs" />
-    <Compile Include="Structs\Configurations\MainSaveConfig.cs" />
-    <Compile Include="Structs\Configurations\TtcObjectConfig.cs" />
-    <Compile Include="Structs\Configurations\PaintingConfig.cs" />
-    <Compile Include="Structs\Configurations\MappingConfig.cs" />
-    <Compile Include="Structs\Configurations\SnowConfig.cs" />
-    <Compile Include="Structs\Gui\ObjectSlotManagerGui.cs" />
-    <Compile Include="Structs\InitializeSpecialAttribute.cs" />
-    <Compile Include="Structs\InputFrame.cs" />
-    <Compile Include="Tabs\GhostTab\BackgroundImage.cs" />
-    <Compile Include="Structs\MusicEntry.cs" />
-    <Compile Include="Structs\MusicTable.cs" />
-    <Compile Include="Structs\PushHitbox.cs" />
-    <Compile Include="Structs\TriangleInfoTable.cs" />
-    <Compile Include="Structs\PointTable.cs" />
-    <Compile Include="Tabs\ActionsTab.cs">
+    <Compile Update="Tabs\ActionsTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\ActionsTab.Designer.cs">
-      <DependentUpon>ActionsTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\AreaTab.cs">
+    <Compile Update="Tabs\AreaTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\AreaTab.Designer.cs">
-      <DependentUpon>AreaTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\CameraTab.cs">
+    <Compile Update="Tabs\CameraTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\CameraTab.Designer.cs">
-      <DependentUpon>CameraTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\CamHackTab.cs">
+    <Compile Update="Tabs\CamHackTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\CamHackTab.Designer.cs">
-      <DependentUpon>CamHackTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\CellsTab.cs">
+    <Compile Update="Tabs\CellsTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\CellsTab.Designer.cs">
-      <DependentUpon>CellsTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\CoinTab.cs">
+    <Compile Update="Tabs\CoinTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\CoinTab.Designer.cs">
-      <DependentUpon>CoinTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\CustomTab.cs">
+    <Compile Update="Tabs\CustomTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\CustomTab.Designer.cs">
-      <DependentUpon>CustomTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\DebugTab.cs">
+    <Compile Update="Tabs\DebugTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\DebugTab.Designer.cs">
-      <DependentUpon>DebugTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\DisassemblyTab.cs">
+    <Compile Update="Tabs\DisassemblyTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\DisassemblyTab.Designer.cs">
-      <DependentUpon>DisassemblyTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\FileTab.cs">
+    <Compile Update="Tabs\FileTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\FileTab.Designer.cs">
-      <DependentUpon>FileTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\GfxTab\GfxNode.cs" />
-    <Compile Include="Tabs\GfxTab\GfxTab.cs">
+    <Compile Update="Tabs\GfxTab\GfxTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\GfxTab\GfxTab.Designer.cs">
-      <DependentUpon>GfxTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\GhostTab\Ghost.cs" />
-    <Compile Include="Tabs\GhostTab\GhostFrame.cs" />
-    <Compile Include="Tabs\GhostTab\GhostTab.cs">
+    <Compile Update="Tabs\GhostTab\GhostTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\GhostTab\GhostTab.Designer.cs">
-      <DependentUpon>GhostTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\HackTab.cs">
+    <Compile Update="Tabs\HackTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\HackTab.Designer.cs">
-      <DependentUpon>HackTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\HudTab.cs">
+    <Compile Update="Tabs\HudTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\HudTab.Designer.cs">
-      <DependentUpon>HudTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\InputTab.cs">
+    <Compile Update="Tabs\InputTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\InputTab.Designer.cs">
-      <DependentUpon>InputTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\M64Tab.cs">
+    <Compile Update="Tabs\M64Tab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\M64Tab.Designer.cs">
-      <DependentUpon>M64Tab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\MainSaveTab.cs">
+    <Compile Update="Tabs\MainSaveTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\MainSaveTab.Designer.cs">
-      <DependentUpon>MainSaveTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\MapTab\MapTab.cs">
+    <Compile Update="Tabs\MapTab\MapTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\MapTab\MapTab.Designer.cs">
-      <DependentUpon>MapTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\MapTab\ObjectDescriptionAttribute.cs" />
-    <Compile Include="Tabs\MapTab\Renderers\CircleRenderer.cs" />
-    <Compile Include="Tabs\MapTab\Renderers\GeometryRenderer.cs" />
-    <Compile Include="Tabs\MapTab\Renderers\InstanceRenderer.cs" />
-    <Compile Include="Tabs\MapTab\Renderers\LineRenderer.cs" />
-    <Compile Include="Tabs\MapTab\Renderers\Renderer.cs" />
-    <Compile Include="Tabs\MapTab\Renderers\RendererCollection.cs" />
-    <Compile Include="Tabs\MapTab\Renderers\SpriteRenderer.cs" />
-    <Compile Include="Tabs\MapTab\Renderers\TextRenderer.cs" />
-    <Compile Include="Tabs\MapTab\Renderers\TransparencyRenderer.cs" />
-    <Compile Include="Tabs\MapTab\Renderers\TriangleRenderer.cs" />
-    <Compile Include="Tabs\MarioTab.cs">
+    <Compile Update="Tabs\MarioTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\MarioTab.Designer.cs">
-      <DependentUpon>MarioTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\MemoryTab.cs">
+    <Compile Update="Tabs\MemoryTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\MemoryTab.Designer.cs">
-      <DependentUpon>MemoryTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\MiscTab.cs">
+    <Compile Update="Tabs\MiscTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\MiscTab.Designer.cs">
-      <DependentUpon>MiscTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\ModelTab.cs">
+    <Compile Update="Tabs\ModelTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\ModelTab.Designer.cs">
-      <DependentUpon>ModelTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\MusicTab.cs">
+    <Compile Update="Tabs\MusicTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\MusicTab.Designer.cs">
-      <DependentUpon>MusicTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\ObjectTab.cs">
+    <Compile Update="Tabs\ObjectTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\ObjectTab.Designer.cs">
-      <DependentUpon>ObjectTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\OptionsTab.cs">
+    <Compile Update="Tabs\OptionsTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\OptionsTab.Designer.cs">
-      <DependentUpon>OptionsTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\PaintingTab.cs">
+    <Compile Update="Tabs\PaintingTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\PaintingTab.Designer.cs">
-      <DependentUpon>PaintingTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\PuTab.cs">
+    <Compile Update="Tabs\PuTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\PuTab.Designer.cs">
-      <DependentUpon>PuTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\QuarterFramesTab.cs">
+    <Compile Update="Tabs\QuarterFramesTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\QuarterFramesTab.Designer.cs">
-      <DependentUpon>QuarterFramesTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\SearchTab.cs">
+    <Compile Update="Tabs\SearchTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\SearchTab.Designer.cs">
-      <DependentUpon>SearchTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\SnowTab.cs">
+    <Compile Update="Tabs\SnowTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\SnowTab.Designer.cs">
-      <DependentUpon>SnowTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\SoundTab.cs">
+    <Compile Update="Tabs\SoundTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\SoundTab.Designer.cs">
-      <DependentUpon>SoundTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\STROOPTab.cs">
+    <Compile Update="Tabs\STROOPTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\STROOPTab.Designer.cs">
-      <DependentUpon>STROOPTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\TrianglesTab.cs">
+    <Compile Update="Tabs\TrianglesTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\TrianglesTab.Designer.cs">
-      <DependentUpon>TrianglesTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\VarHackTab.cs">
+    <Compile Update="Tabs\VarHackTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\VarHackTab.Designer.cs">
-      <DependentUpon>VarHackTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\WarpTab.cs">
+    <Compile Update="Tabs\WarpTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\WarpTab.Designer.cs">
-      <DependentUpon>WarpTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Tabs\WaterTab.cs">
+    <Compile Update="Tabs\WaterTab.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Tabs\WaterTab.Designer.cs">
-      <DependentUpon>WaterTab.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Ttc\TtcPendulum2.cs" />
-    <Compile Include="Ttc\TtcRng2.cs" />
-    <Compile Include="Ttc\TtcSaveStateByteIterator.cs" />
-    <Compile Include="Ttc\TtcUtilities.cs" />
-    <Compile Include="Ttc\TtcSimulation.cs" />
-    <Compile Include="Ttc\TtcRng.cs" />
-    <Compile Include="Ttc\TtcMain.cs" />
-    <Compile Include="Ttc\TtcSaveState.cs" />
-    <Compile Include="Ttc\TtcWheel.cs" />
-    <Compile Include="Ttc\TtcTreadmill.cs" />
-    <Compile Include="Ttc\TtcThwomp.cs" />
-    <Compile Include="Ttc\TtcSpinningTriangle.cs" />
-    <Compile Include="Ttc\TtcSpinner.cs" />
-    <Compile Include="Ttc\TtcRotatingTriangularPrism.cs" />
-    <Compile Include="Ttc\TtcPusher.cs" />
-    <Compile Include="Ttc\TtcRotatingBlock.cs" />
-    <Compile Include="Ttc\TtcPitBlock.cs" />
-    <Compile Include="Ttc\TtcPendulum.cs" />
-    <Compile Include="Ttc\TtcHand.cs" />
-    <Compile Include="Ttc\TtcElevator.cs" />
-    <Compile Include="Ttc\TtcDust.cs" />
-    <Compile Include="Ttc\TtcCog.cs" />
-    <Compile Include="Ttc\TtcBobomb.cs" />
-    <Compile Include="Ttc\TtcAmp.cs" />
-    <Compile Include="Ttc\TtcObject.cs" />
-    <Compile Include="M64\M64CopiedFrame.cs" />
-    <Compile Include="M64\M64File.cs" />
-    <Compile Include="M64\M64InputCell.cs" />
-    <Compile Include="M64\M64CopiedData.cs" />
-    <Compile Include="M64\M64Utilities.cs" />
-    <Compile Include="M64\M64Stats.cs" />
-    <Compile Include="M64\M64Header.cs" />
-    <Compile Include="M64\M64InputFrame.cs" />
-    <Compile Include="Managers\InjectionManager.cs" />
-    <Compile Include="Controls\ObjectSlot.cs">
+    <Compile Update="Controls\ObjectSlot.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Managers\ObjectSlotsManager.cs" />
-    <Compile Include="Models\CameraDataModel.cs" />
-    <Compile Include="Models\MarioDataModel.cs" />
-    <Compile Include="Models\DataModels.cs" />
-    <Compile Include="Models\ObjectDataModel.cs" />
-    <Compile Include="Models\IUpdatableDataModel.cs" />
-    <Compile Include="Models\LevelDataModel.cs" />
-    <Compile Include="Models\ObjectProcessorDataModel.cs" />
-    <Compile Include="Models\ByteModel.cs" />
-    <Compile Include="Models\TriangleShape.cs" />
-    <Compile Include="Structs\Configurations\AreaConfig.cs" />
-    <Compile Include="Structs\Configurations\TestingConfig.cs" />
-    <Compile Include="Structs\Configurations\LockConfig.cs" />
-    <Compile Include="Structs\Configurations\RomVersionConfig.cs" />
-    <Compile Include="Structs\Configurations\M64Config.cs" />
-    <Compile Include="Structs\Configurations\SavedSettingsConfig.cs" />
-    <Compile Include="Structs\Configurations\SpecialConfig.cs" />
-    <Compile Include="Structs\Configurations\RefreshRateConfig.cs" />
-    <Compile Include="Structs\Configurations\MarioObjectConfig.cs" />
-    <Compile Include="Structs\Configurations\TableConfig.cs" />
-    <Compile Include="Structs\Configurations\OverlayConfig.cs" />
-    <Compile Include="Structs\Configurations\MiscConfig.cs" />
-    <Compile Include="Structs\Configurations\VarHackConfig.cs" />
-    <Compile Include="Structs\Configurations\PositionControllerRelativityConfig.cs" />
-    <Compile Include="Structs\Configurations\TriangleConfig.cs" />
-    <Compile Include="Structs\Configurations\WaypointConfig.cs" />
-    <Compile Include="Enums\EndiannessType.cs" />
-    <Compile Include="Structs\FlyGuyDataTable.cs" />
-    <Compile Include="Structs\CourseDataTable.cs" />
-    <Compile Include="Structs\Configurations\FileConfig.cs" />
-    <Compile Include="Structs\Configurations\GotoRetrieveConfig.cs" />
-    <Compile Include="Structs\Configurations\CamHackConfig.cs" />
-    <Compile Include="Structs\Configurations\InputConfig.cs" />
-    <Compile Include="Structs\Gui\FileImageGui.cs" />
-    <Compile Include="Structs\Gui\InputImageGui.cs" />
-    <Compile Include="Structs\MissionTable.cs" />
-    <Compile Include="Enums\TriangleClassification.cs" />
-    <Compile Include="Models\TriangleDataModel.cs" />
-    <Compile Include="Controls\VarHackContainerDefaults.cs" />
-    <Compile Include="Structs\WaypointTable.cs" />
-    <Compile Include="Structs\PendulumSwingTable.cs" />
-    <Compile Include="Structs\AnimationTable.cs" />
-    <Compile Include="Structs\ActionTable.cs" />
-    <Compile Include="Structs\BehaviorCriteria.cs" />
-    <Compile Include="Structs\Configurations\CameraConfig.cs" />
-    <Compile Include="Structs\Configurations\DebugConfig.cs" />
-    <Compile Include="Structs\Configurations\HackConfig.cs" />
-    <Compile Include="Structs\Configurations\HudConfig.cs" />
-    <Compile Include="Structs\Configurations\TriangleOffsetsConfig.cs" />
-    <Compile Include="Structs\Emulator.cs" />
-    <Compile Include="Structs\GameScript.cs" />
-    <Compile Include="Structs\Configurations\MarioConfig.cs" />
-    <Compile Include="Structs\ObjectBehaviorAssociation.cs" />
-    <Compile Include="Structs\ObjectAssociations.cs" />
-    <Compile Include="Structs\Configurations\ObjectConfig.cs" />
-    <Compile Include="Structs\Configurations\ObjectSlotsConfig.cs" />
-    <Compile Include="Extensions\ColorExtensions.cs" />
-    <Compile Include="Structs\RomHack.cs" />
-    <Compile Include="Structs\SpawnHack.cs" />
-    <Compile Include="Enums\AngleUnitType.cs" />
-    <Compile Include="Utilities\Scopes.cs" />
-    <Compile Include="Utilities\AnimationUtilities.cs" />
-    <Compile Include="Utilities\CellUtilities.cs" />
-    <Compile Include="Structs\ObjectAngleTable.cs" />
-    <Compile Include="Utilities\CopyUtilities.cs" />
-    <Compile Include="Utilities\DrawingUtilities.cs" />
-    <Compile Include="Utilities\EasingUtilities.cs" />
-    <Compile Include="Utilities\EnumUtilities.cs" />
-    <Compile Include="Utilities\ErrorUtilities.cs" />
-    <Compile Include="Utilities\FlyingUtilities.cs" />
-    <Compile Include="Utilities\FormsUtilities.cs" />
-    <Compile Include="Utilities\GeneralUtilities.cs" />
-    <Compile Include="Utilities\InGameFunctionCall.cs" />
-    <Compile Include="Utilities\MathOperationUtilities.cs" />
-    <Compile Include="Calculators\WallDisplacementCalculator.cs" />
-    <Compile Include="Utilities\MouseUtility.cs" />
-    <Compile Include="Utilities\ObjectRngUtilities.cs" />
-    <Compile Include="Utilities\PlushUtilities.cs" />
-    <Compile Include="Utilities\PositionAngle\PositionAngle.Commons.cs" />
-    <Compile Include="Utilities\PositionAngle\PositionAngle.Misc.cs" />
-    <Compile Include="Utilities\SegmentationUtilities.cs" />
-    <Compile Include="Utilities\BoolUtilities.cs" />
-    <Compile Include="Utilities\CamHackUtilities.cs" />
-    <Compile Include="Utilities\CoinTrajectoryFilter.cs" />
-    <Compile Include="Utilities\CoinTrajejctory.cs" />
-    <Compile Include="Utilities\CoinObject.cs" />
-    <Compile Include="Utilities\CoinMovementCalculator.cs" />
-    <Compile Include="Utilities\ImageUtilities.cs" />
-    <Compile Include="Utilities\ObjectUtilities.cs" />
-    <Compile Include="Utilities\ObjectSnapshot.cs" />
-    <Compile Include="Utilities\ObjectOrderingUtilities.cs" />
-    <Compile Include="Utilities\PositionAngle\PositionAngle.cs" />
-    <Compile Include="Utilities\EndiannessUtilities.cs" />
-    <Compile Include="Utilities\EndianUtilities.cs" />
-    <Compile Include="Utilities\CogUtilities.cs" />
-    <Compile Include="Utilities\Serialization.cs" />
-    <Compile Include="Utilities\SortedList.cs" />
-    <Compile Include="Utilities\Stream\DolphinProcessIO.cs" />
-    <Compile Include="Utilities\Stream\BaseProcessIO.cs" />
-    <Compile Include="Utilities\Stream\SigScanSharp.cs" />
-    <Compile Include="Utilities\Stream\StFileIO.cs" />
-    <Compile Include="Utilities\Stream\WindowsProcessIO.cs" />
-    <Compile Include="Utilities\HexUtilities.cs" />
-    <Compile Include="Utilities\DictionaryUtilities.cs" />
-    <Compile Include="Utilities\Stream\IEmuRamIO.cs" />
-    <Compile Include="Utilities\KeyboardUtilities.cs" />
-    <Compile Include="Utilities\HelpfulHintUtilities.cs" />
-    <Compile Include="Utilities\ColorUtilities.cs" />
-    <Compile Include="Managers\WatchVariableLockManager.cs" />
-    <Compile Include="Enums\Coordinate.cs" />
-    <Compile Include="Enums\WatchVariableSubclass.cs" />
-    <Compile Include="Enums\VariableGroup.cs" />
-    <Compile Include="Enums\BaseAddressTypeEnum.cs" />
-    <Compile Include="Utilities\DecompilerFunctionUtilities.cs" />
-    <Compile Include="Utilities\Fast3DDecoder.cs" />
-    <Compile Include="Utilities\MupenUtilities.cs" />
-    <Compile Include="Utilities\InGameTrigUtilities.cs" />
-    <Compile Include="Utilities\BitfsPlatformGroupTable.cs" />
-    <Compile Include="Utilities\ProcessGroupUtilities.cs" />
-    <Compile Include="Utilities\SubtitleUtilities.cs" />
-    <Compile Include="Utilities\WaterUtilities.cs" />
-    <Compile Include="Utilities\ZipUtilities.cs" />
-    <Compile Include="Utilities\StringUtilities.cs" />
-    <Compile Include="Utilities\DemoCounterUtilities.cs" />
-    <Compile Include="Utilities\TtcSpeedSettingUtilities.cs" />
-    <Compile Include="Calculators\AirMovementCalculator.cs" />
-    <Compile Include="Utilities\VarHackSpecialUtilities.cs" />
-    <Compile Include="Core\WatchVariables\WatchVariableSpecialDictionary.cs" />
-    <Compile Include="Utilities\WatchVariableSelectionUtilities.cs" />
-    <Compile Include="Utilities\WatchVariableSpecialUtilities.cs" />
-    <Compile Include="Utilities\AreaUtilities.cs" />
-    <Compile Include="Utilities\DialogUtilities.cs" />
-    <Compile Include="Utilities\TypeUtilities.cs" />
-    <Compile Include="Utilities\WatchVariableUtilities.cs" />
-    <Compile Include="Utilities\BehaviorDecoder.cs" />
-    <Compile Include="Utilities\Kernal32NativeMethods.cs" />
-    <Compile Include="Utilities\MoreMath.cs" />
-    <Compile Include="Utilities\ControlUtilities.cs" />
-    <Compile Include="Utilities\TriangleUtilities.cs" />
-    <Compile Include="Utilities\ScriptParser.cs" />
-    <Compile Include="Utilities\N64Disassembler.cs" />
-    <Compile Include="Utilities\ButtonUtilities.cs" />
-    <Compile Include="Forms\StroopMainForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\StroopMainForm.Designer.cs">
-      <DependentUpon>StroopMainForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utilities\Stream\ProcessStream.cs" />
-    <Compile Include="Utilities\ParsingUtilities.cs" />
-    <Compile Include="Structs\Configurations\Config.cs" />
-    <Compile Include="Extensions\RichTextBoxExtensions.cs" />
-    <Compile Include="Extensions\SizeExtensions.cs" />
-    <Compile Include="Utilities\PuUtilities.cs" />
-    <Compile Include="Utilities\RngIndexer.cs" />
-    <Compile Include="Utilities\XmlConfigParser.cs" />
-    <Compile Include="Forms\InfoForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\InfoForm.Designer.cs">
-      <DependentUpon>InfoForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\VariableControllerForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\VariableControllerForm.Designer.cs">
-      <DependentUpon>VariableControllerForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\VariableViewerForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\VariableViewerForm.Designer.cs">
-      <DependentUpon>VariableViewerForm.cs</DependentUpon>
-    </Compile>
-    <EmbeddedResource Include="Forms\SearchVariableDialog.resx">
-      <DependentUpon>SearchVariableDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\ActionsTab.resx">
-      <DependentUpon>ActionsTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\AreaTab.resx">
-      <DependentUpon>AreaTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\BruteforceTab\BruteforceTab.resx">
-      <DependentUpon>BruteforceTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\GeneralPurpose.resx">
-      <DependentUpon>GeneralPurpose.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\Perturbator.resx">
-      <DependentUpon>Perturbator.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\BruteforceTab\Surfaces\GeneralPurpose\ScoringFunc.resx">
-      <DependentUpon>ScoringFunc.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\CameraTab.resx">
-      <DependentUpon>CameraTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\CamHackTab.resx">
-      <DependentUpon>CamHackTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\CellsTab.resx">
-      <DependentUpon>CellsTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\CoinTab.resx">
-      <DependentUpon>CoinTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\CustomTab.resx">
-      <DependentUpon>CustomTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\DebugTab.resx">
-      <DependentUpon>DebugTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\DisassemblyTab.resx">
-      <DependentUpon>DisassemblyTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\FileTab.resx">
-      <DependentUpon>FileTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\GfxTab\GfxTab.resx">
-      <DependentUpon>GfxTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\GhostTab\GhostTab.resx">
-      <DependentUpon>GhostTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\HackTab.resx">
-      <DependentUpon>HackTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\HudTab.resx">
-      <DependentUpon>HudTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\InputTab.resx">
-      <DependentUpon>InputTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\M64Tab.resx">
-      <DependentUpon>M64Tab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\MainSaveTab.resx">
-      <DependentUpon>MainSaveTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\MapTab\MapTab.resx">
-      <DependentUpon>MapTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\MarioTab.resx">
-      <DependentUpon>MarioTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\MemoryTab.resx">
-      <DependentUpon>MemoryTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\MiscTab.resx">
-      <DependentUpon>MiscTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\ModelTab.resx">
-      <DependentUpon>ModelTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\MusicTab.resx">
-      <DependentUpon>MusicTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\ObjectTab.resx">
-      <DependentUpon>ObjectTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\OptionsTab.resx">
-      <DependentUpon>OptionsTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\PaintingTab.resx">
-      <DependentUpon>PaintingTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\PuTab.resx">
-      <DependentUpon>PuTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\QuarterFramesTab.resx">
-      <DependentUpon>QuarterFramesTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\SearchTab.resx">
-      <DependentUpon>SearchTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\SnowTab.resx">
-      <DependentUpon>SnowTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\SoundTab.resx">
-      <DependentUpon>SoundTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\STROOPTab.resx">
-      <DependentUpon>STROOPTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\TrianglesTab.resx">
-      <DependentUpon>TrianglesTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\VarHackTab.resx">
-      <DependentUpon>VarHackTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\WarpTab.resx">
-      <DependentUpon>WarpTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\WaterTab.resx">
-      <DependentUpon>WaterTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <None Include="app.manifest" />
-    <None Include="Mappings\MappingJP.map">
+    <None Update="dep\dep_x64\freetype6.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Mappings\MappingUS.map">
+    <None Update="Mappings\MappingJP.map">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Resources\lock_blue.png" />
-    <None Include="Resources\cog.png" />
-    <None Include="Resources\image_eye_closed2.png" />
-    <None Include="Resources\image_eye_open2.png" />
-    <None Include="Resources\image_eye_closed.png" />
-    <None Include="Resources\image_eye_open.png" />
-    <None Include="Resources\image_upright.png" />
-    <None Include="Resources\image_upleft.png" />
-    <None Include="Resources\image_up.png" />
-    <None Include="Resources\image_right.png" />
-    <None Include="Resources\image_plus.png" />
-    <None Include="Resources\image_minus.png" />
-    <None Include="Resources\image_left.png" />
-    <None Include="Resources\image_downright.png" />
-    <None Include="Resources\image_downleft.png" />
-    <None Include="Resources\image_down.png" />
-    <None Include="Resources\image_counterclockwise.png" />
-    <None Include="Resources\image_clockwise.png" />
-    <None Include="App.config">
-      <SubType>Designer</SubType>
+    <None Update="Mappings\MappingUS.map">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <EmbeddedResource Include="Controls\ColorSelector.resx">
-      <DependentUpon>ColorSelector.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\VarHackContainer.resx">
-      <DependentUpon>VarHackContainer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ImageForm.resx">
-      <DependentUpon>ImageForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\TriangleListForm.resx">
-      <DependentUpon>TriangleListForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\TabForm.resx">
-      <DependentUpon>TabForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\CoinRingDisplayForm.resx">
-      <DependentUpon>CoinRingDisplayForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ValueSplitForm.resx">
-      <DependentUpon>ValueSplitForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ValueForm.resx">
-      <DependentUpon>ValueForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ActionForm.resx">
-      <DependentUpon>ActionForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\VariablePopOutForm.resx">
-      <DependentUpon>VariablePopOutForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\SelectionForm.resx">
-      <DependentUpon>SelectionForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\MainLoadingForm.resx">
-      <DependentUpon>MainLoadingForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
+    <None Update="MapTrackers.default.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="recordghost.lua">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\AutoDetectFile JP.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\AutoDetectFile US.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\cog.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\direction_in.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\direction_out.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Cannon Lid.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Cannon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Cap Switch Blue Pressed.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Cap Switch Blue Unpressed.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Cap Switch Green Pressed.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Cap Switch Green Unpressed.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Cap Switch Red Pressed.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Cap Switch Red Unpressed.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\DDD Painting Moved Back.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\DDD Painting Not Moved Back.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Door 1 Star.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Door 3 Star.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Door Black.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\File Not Started.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\File Started.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Hat on Ground in SL Grey.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Hat on Ground in SL.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Hat on Ground in SSL Grey.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Hat on Ground in SSL.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Hat on Ground in TTM Grey.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Hat on Ground in TTM.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Hat on Klepto Grey.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Hat on Klepto.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Hat on Mario Grey.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Hat on Mario.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Hat on Mr Blizzard.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Hat on Snowman Grey.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Hat on Snowman.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Hat on Ukiki Grey.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Hat on Ukiki.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Key Door Closed Key.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Key Door Closed.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Key Door Open Key.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Key Door Open.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Moat Drained.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Moat Not Drained.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Power Star Black.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Power Star.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Star Door Closed.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\File Images\Star Door Open.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Fonts\dejavu-markup\DejaVuMarkup-Bold.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Fonts\dejavu-markup\DejaVuMarkup-BoldOblique.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Fonts\dejavu-markup\DejaVuMarkup-Oblique.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Fonts\dejavu-markup\DejaVuMarkup.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Fonts\dejavu-markup\FONTLOG.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Fonts\dejavu-markup\LICENSE">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Hacks\Camera45Hack.hck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Hacks\CameraControl.hck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Hacks\DisplayVariable.hck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Hacks\DisplayVariable2.hck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Hacks\gfx_generate_colored_hats.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Hacks\GhostHack.hck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Hacks\HitboxViewJ.hck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Hacks\HitboxViewU.hck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Hacks\movable_gfx_pool.hck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Hacks\NumRngUsagesJ.hck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Hacks\NumRngUsagesU.hck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Hacks\PreviousPositionsJ.hck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Hacks\PreviousPositionsROMHacks.hck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Hacks\PreviousPositionsU.hck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Hacks\PuVisible.hck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Hacks\QFrameInfoHack.hck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Hacks\RcpCrashJ.hck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Hacks\RcpCrashU.hck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Hacks\ReenableDebugControlsJ.hck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Hacks\ReenableDebugControlsU.hck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Hacks\SpawnHack.hck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\image_clockwise.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\image_counterclockwise.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\image_divide.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\image_down.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\image_downleft.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\image_downright.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\image_eye_closed.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\image_eye_closed2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\image_eye_open.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\image_eye_open2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\image_left.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\image_minus.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\image_plus.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\image_plus_green.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\image_right.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\image_times.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\image_up.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\image_upleft.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\image_upright.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Classic\ButtonA.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Classic\ButtonB.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Classic\ButtonCDown.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Classic\ButtonCLeft.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Classic\ButtonCRight.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Classic\ButtonCUp.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Classic\ButtonDDown.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Classic\ButtonDLeft.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Classic\ButtonDRight.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Classic\ButtonDUp.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Classic\ButtonL.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Classic\ButtonR.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Classic\ButtonStart.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Classic\ButtonU1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Classic\ButtonU2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Classic\ButtonZ.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Classic\Controller.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Classic\ControlStick.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Sleek\ButtonA.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Sleek\ButtonB.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Sleek\ButtonCDown.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Sleek\ButtonCLeft.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Sleek\ButtonCRight.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Sleek\ButtonCUp.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Sleek\ButtonDDown.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Sleek\ButtonDLeft.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Sleek\ButtonDRight.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Sleek\ButtonDUp.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Sleek\ButtonL.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Sleek\ButtonR.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Sleek\ButtonStart.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Sleek\ButtonU1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Sleek\ButtonU2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Sleek\ButtonZ.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Sleek\Controller.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Sleek\ControlStick.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Vertical\ButtonA.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Vertical\ButtonB.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Vertical\ButtonCDown.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Vertical\ButtonCLeft.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Vertical\ButtonCRight.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Vertical\ButtonCUp.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Vertical\ButtonDDown.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Vertical\ButtonDLeft.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Vertical\ButtonDRight.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Vertical\ButtonDUp.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Vertical\ButtonL.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Vertical\ButtonR.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Vertical\ButtonStart.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Vertical\ButtonU1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Vertical\ButtonU2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Vertical\ButtonZ.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Vertical\Controller.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Input Images\Vertical\ControlStick.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\lock_blue.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Background Images\Black Background.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Background Images\Blue Background.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Background Images\Cloud Background.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Background Images\Gridline Background.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Background Images\Lava Background.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Background Images\Purple Background.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Background Images\Snow Background.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Background Images\Stalagmite Background.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Background Images\Transparent Background.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Background Images\White Background.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\broken.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\downloading.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Map Images\default.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Map Images\transparent.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\! Switch Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Amp Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Arrow Lift Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Arrow Platform Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Arrow.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Big Boo Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Big Bully Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bird Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Black Circle.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Blue Coin Block Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Blue Fish Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bob-omb Buddy Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bob-omb Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Boo Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bowser Puzzle Piece 1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bowser Puzzle Piece 10.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bowser Puzzle Piece 11.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bowser Puzzle Piece 12.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bowser Puzzle Piece 13.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bowser Puzzle Piece 14.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bowser Puzzle Piece 2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bowser Puzzle Piece 3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bowser Puzzle Piece 4.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bowser Puzzle Piece 5.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bowser Puzzle Piece 6.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bowser Puzzle Piece 7.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bowser Puzzle Piece 8.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bowser Puzzle Piece 9.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bowser Puzzle Piece Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bowser Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bowser%27s Sub Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bub Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bubba Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bullet Bill Blaster Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bullet Bill Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Bully Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Butterfly Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Camera.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Cannon Lid Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Cap Switch Base Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Cap Switch Button Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Cell Gridlines.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Chain Chomp Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Chest Bottom Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Chest Top Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Chest Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Chill Bully Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Chuckya Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Clam Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Cork Box Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Crazy Box Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Crown 1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Crown 2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Crown 3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Crown 4.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Crystal Tap Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Current Cell.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Current Unit.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Custom Gridlines.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Custom Points.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Cylinder.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\DDD Pole Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Door Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Dorrie Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Express Elevator Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Fire Bar Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Floating Mine Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Fly Guy Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Goomba Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Goomba1 Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Goomba2 Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Goomba3 Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Grindel Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Heave-Ho Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Hidden Wooden Block Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Hitbox Hack Tris.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\HMC Directional Elevator Button Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\HMC Directional Elevator Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\HOLP Green.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\HOLP.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Home.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Hoot Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Intended Next Position.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Item Block Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Iwerlipses.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\JRB Rock Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\King Bob-omb Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\King Whomp Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Klepto Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Koopa Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Lakitu Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\LLL Back and Forth Platform Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\LLL Drawbridge Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\LLL Metal Mesh Platform Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\LLL Rotating Hexagonal Platform Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\LLL Sinking Stone Platform Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\LLL Tilting Inverted Pyramid Platform Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\LLL Transporting Cage Platform Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Long Wooden Board Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Loose Floor Panel Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Mad Piano Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Manta Ray Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Mario Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Merry-Go-Round Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Mesh Elevator Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Metal Cap Block Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Metal Cap Switch Button Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\MIPS Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Moneybag Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Monkey Cage Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Monty Mole Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Mr. Blizzard Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Mr. I Pupil Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Mr. I Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Next Positions.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Path.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Peach Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Penguin Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Piranha Plant Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Pokey Body Part Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Pokey Head Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Post Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Pushable Block Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Pyramid Top Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Red Fish Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Revolving Diamond Platform Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Rising and Lowering 3-Platform Group Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Rising and Lowering 4-Platform Group Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Rising and Lowering Long Platform Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Rising and Lowering Mesh Platform Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Rising and Lowering Wood Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Rolling Log Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Rotating Volcano Platform Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Scuttlebug Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Seesaw Platform BitDW Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Seesaw Platform BitFS Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Seesaw Platform BitS 2 Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Seesaw Platform BitS Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Seesaw Platform BoB Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Seesaw Platform RR Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Seesaw Platform VCutM Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Shell Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Short Wooden Board Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Sign Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Skeeter Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Sphere.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Spindel Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Spindrift Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Spiny Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Star Door Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Sushi Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Swooper Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Thwomp Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Toad Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Tox Box Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Triangle Ceiling.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Triangle Floor.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Triangle Other.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Triangle Wall.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\TTC 2D Cog Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\TTC Moving Bar Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\TTC Rotating Block Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\TTC Rotating Cog Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\TTC Rotating Hand Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\TTC Rotating Triangle Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\TTC Rotating Triangular Prism Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Ukiki Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Unagi Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Unit Gridlines.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Vanish Cap Block Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Vanish Cap Switch Button Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Warp Door Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Warp Pipe Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\WDW Rotating Platform Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\WF Floating Island Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\WF Rotating Bridge Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\WF Tower Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Whomp Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Wiggler Body Part Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Wiggler Head Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Wing Cap Block Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Wing Cap Switch Button Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Yellow Switch Button Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Maps\Object Images\Yoshi Top.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\Camera.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\CameraHack.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\Ceiling.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\Child.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\Closest.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\Collision1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\Collision2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\Collision3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\Collision4.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\Floor.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\Held.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\HitboxOverlap.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\Interaction.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\LockDisabled.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\Locked.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\LockReadOnly.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\Memory.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\Model.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\Parent.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\ParentNone.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\ParentUnused.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\Ridden.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\Selected.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\StoodOn.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\TrackedAndShown.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\TrackedNotShown.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\Used.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Overlays\Wall.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Scripts\FrameProc.src64">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Scripts\ObjectEndProc.src64">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Scripts\ObjectStartProc.src64">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Shaders\BlendTransparency.frag.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Shaders\Circles.frag.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Shaders\Circles.vert.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Shaders\DepthMask.frag.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Shaders\FragmentShader.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Shaders\Lines.frag.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Shaders\Lines.geom.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Shaders\Lines.vert.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Shaders\Meshes.frag.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Shaders\Meshes.vert.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Shaders\Sprites.vert.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Shaders\Texture.frag.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Shaders\Triangles.frag.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Shaders\Triangles.geom.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Shaders\Triangles.vert.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Shaders\VertexShader.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Content Include="Config\MapTrackerOrder.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -1299,53 +1608,12 @@
     <Content Include="Config\WaterData.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="Forms\StroopMainForm.resx">
-      <DependentUpon>StroopMainForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\VariableBitForm.resx">
-      <DependentUpon>VariableBitForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\VariableCreationForm.resx">
-      <DependentUpon>VariableCreationForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tabs\MapTab\MapTracker.resx">
-      <DependentUpon>MapTracker.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <EmbeddedResource Include="Schemas\ConfigSchema.xsd">
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <Content Include="Config\Hacks.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="Forms\InfoForm.resx">
-      <DependentUpon>InfoForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\VariableControllerForm.resx">
-      <DependentUpon>VariableControllerForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\VariableViewerForm.resx">
-      <DependentUpon>VariableViewerForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
     <EmbeddedResource Include="Schemas\MiscDataSchema.xsd">
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -1412,8 +1680,6 @@
     <EmbeddedResource Include="Schemas\TriangleInfoTableSchema.xsd">
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <Compile Include="Tabs\MapTab\MapGraphics.LegacyControlScheme.cs" />
-    <Compile Include="Utilities\PositionAngle\PositionAngle.Derivatives.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
@@ -1426,12 +1692,6 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Controls\DecompilerView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Config\CameraData.xml">
@@ -1467,11 +1727,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
-    <None Include="EmbeddedResources\checkbox-checked.png" />
-    <None Include="EmbeddedResources\checkbox-indeterminate.png" />
-    <None Include="EmbeddedResources\checkbox-unchecked.png" />
-    <None Include="EmbeddedResources\dropdown-box-hover.png" />
-    <None Include="EmbeddedResources\dropdown-box.png" />
     <Content Include="icon.ico" />
     <Content Include="Licenses.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -1481,23 +1736,21 @@
     <PackageReference Include="AvalonEdit">
       <Version>6.1.1</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.WindowsAPICodePack.Shell">
       <Version>1.1.0</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>9.0.1</Version>
+      <Version>13.0.3</Version>
     </PackageReference>
     <PackageReference Include="OpenTK">
-      <Version>3.0.1</Version>
+      <Version>4.8.2</Version>
     </PackageReference>
     <PackageReference Include="OpenTK.GLControl">
-      <Version>3.0.1</Version>
-    </PackageReference>
-    <PackageReference Include="QuickFont.Desktop">
-      <Version>4.5.7053.25687</Version>
+      <Version>4.0.1</Version>
     </PackageReference>
     <PackageReference Include="SharpFont">
-      <Version>4.0.1</Version>
+      <Version>1.0.2</Version>
     </PackageReference>
     <PackageReference Include="SharpFont.Dependencies">
       <Version>2.6.0</Version>
@@ -1505,15 +1758,31 @@
     <PackageReference Include="SharpZipLib">
       <Version>1.0.0</Version>
     </PackageReference>
-    <PackageReference Include="System.ValueTuple">
-      <Version>4.5.0</Version>
-    </PackageReference>
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
   </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>del "$(TargetDir)OpenTK.dll.config"
-del "$(TargetDir)STROOP.exe.config"
+  <ItemGroup>
+    <Compile Remove="Forms\MapPopOutForm.cs" />
+    <Compile Remove="Forms\MapPopOutForm.Designer.cs" />
+    <Compile Remove="Managers\IVariableAdder.cs" />
+    <Compile Remove="Tabs\MapTab\Simulations\Collision.cs" />
+    <Compile Remove="Tabs\MapTab\Simulations\CollisionStructure.cs" />
+    <Compile Remove="Tabs\MapTab\Simulations\CorkBox.cs" />
+    <Compile Remove="Tabs\MapTab\Simulations\CorkBoxBreakerTracker.cs" />
+    <Compile Remove="Tabs\SimulationsTab\SimulationsTab.cs" />
+    <Compile Remove="Tabs\SimulationsTab\SimulationsTab.Designer.cs" />
+    <Compile Remove="Utilities\Stream\IProcessMemory.cs" />
+    <EmbeddedResource Remove="Forms\MapPopOutForm.resx" />
+    <EmbeddedResource Remove="Tabs\SimulationsTab\SimulationsTab.resx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\QuickFont\QuickFont.csproj" />
+  </ItemGroup>
+
+  <!--<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="del &quot;$(TargetDir)OpenTK.dll.config&quot; &#xD;&#xA; del &quot;$(TargetDir)STROOP.exe.config&quot; ">
+		<Command>
+
+
 
 del "$(TargetDir)OpenTK.GLControl.xml"
 del "$(TargetDir)OpenTK.xml"
@@ -1522,18 +1791,19 @@ del "$(TargetDir)ICSharpCode.AvalonEdit.xml"
 del "$(TargetDir)Newtonsoft.Json.xml"
 del "$(TargetDir)System.ValueTuple.xml"
 
-xcopy /E /Y /I "$(SolutionDir)dep/dep_x64" "$(TargetDir)" /D</PostBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PreBuildEvent>xcopy /E /Y /I "$(ProjectDir)Resources" "$(TargetDir)Resources" /D
+xcopy /E /Y /I "$(SolutionDir)dep/dep_x64" "$(TargetDir)" /D
+      </Command>
+    </Exec>
+  </Target>
+  
+  <Target Name="PreBuild" AfterTargets="PreBuildEvent">
+    <Exec>
+      <Command>
+xcopy /E /Y /I "$(ProjectDir)Resources" "$(TargetDir)Resources" /D
 copy /Y "$(ProjectDir)recordghost.lua" "$(TargetDir)recordghost.lua"
-copy /Y "$(ProjectDir)MapTrackers.default.xml" "$(TargetDir)MapTrackers.default.xml"</PreBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+copy /Y "$(ProjectDir)MapTrackers.default.xml" "$(TargetDir)MapTrackers.default.xml"
+      </Command>
+    </Exec>
+  </Target>-->
+  
 </Project>
