@@ -1,6 +1,7 @@
 ﻿using STROOP.Structs;
 using STROOP.Utilities;
 using System.Collections.Generic;
+using STROOP.Enums;
 
 namespace STROOP.Tabs
 {

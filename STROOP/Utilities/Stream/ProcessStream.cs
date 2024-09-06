@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using STROOP.Enums;
 
 namespace STROOP.Utilities
 {

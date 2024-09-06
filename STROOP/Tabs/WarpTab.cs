@@ -3,6 +3,7 @@ using System.Linq;
 
 using STROOP.Controls.VariablePanel;
 using STROOP.Core.Variables;
+using STROOP.Enums;
 using STROOP.Forms;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;

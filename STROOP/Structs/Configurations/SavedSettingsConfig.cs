@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using System;
+using STROOP.Enums;
 
 namespace STROOP.Structs.Configurations
 {

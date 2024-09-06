@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using STROOP.Enums;
 using STROOP.Models;
 using STROOP.Structs.Configurations;
 
@@ -129,8 +130,8 @@ namespace STROOP.Tabs.MapTab.DataUtil
             for (int y = 0; y < NUM_CELLS; y++)
                 for (int x = 0; x < NUM_CELLS; x++)
                 {
-                    static_cells[x, y].Sort((a, b) => a.Y1 == b.Y1 ? 0 : (b.Y1 > a.Y1 ? 1 : -1) * (a.Classification == Structs.TriangleClassification.Floor ? 1 : -1));
-                    dynamic_cells[x, y].Sort((a, b) => a.Y1 == b.Y1 ? 0 : (b.Y1 > a.Y1 ? 1 : -1) * (a.Classification == Structs.TriangleClassification.Floor ? 1 : -1));
+                    static_cells[x, y].Sort((a, b) => a.Y1 == b.Y1 ? 0 : (b.Y1 > a.Y1 ? 1 : -1) * (a.Classification == TriangleClassification.Floor ? 1 : -1));
+                    dynamic_cells[x, y].Sort((a, b) => a.Y1 == b.Y1 ? 0 : (b.Y1 > a.Y1 ? 1 : -1) * (a.Classification == TriangleClassification.Floor ? 1 : -1));
                 }
         }
 
@@ -146,7 +147,7 @@ namespace STROOP.Tabs.MapTab.DataUtil
             return lst;
         }
 
-        public CollisionStructure(Structs.TriangleClassification classification)
+        public CollisionStructure(TriangleClassification classification)
         {
             int typeSize = 2 * 4;
             int xSize = 3 * typeSize;

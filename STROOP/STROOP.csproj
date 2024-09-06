@@ -207,7 +207,6 @@
     <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableTriangleWrapper.cs" />
     <Compile Include="Controls\VariablePanel\Wrappers\WatchVariableStringWrapper.cs" />
     <Compile Include="Enums\AggregateMathOperation.cs" />
-    <Compile Include="Enums\CoordinateAngle.cs" />
     <Compile Include="Enums\CopyTypeEnum.cs" />
     <Compile Include="Enums\MapTrackerIconType.cs" />
     <Compile Include="Enums\BinaryMathOperation.cs" />
@@ -218,7 +217,6 @@
     <Compile Include="Enums\CoinParamsOrder.cs" />
     <Compile Include="Enums\RelativeDirection.cs" />
     <Compile Include="Enums\RomVersionSelection.cs" />
-    <Compile Include="Enums\TriangleClassificationExtended.cs" />
     <Compile Include="Exceptions\DolphinNotRunningGameException.cs" />
     <Compile Include="Extensions\FormExtensions.cs" />
     <Compile Include="Forms\ImageForm.cs">

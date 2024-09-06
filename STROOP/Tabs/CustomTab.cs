@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using STROOP.Structs;
 using System.Windows.Forms;
+using STROOP.Enums;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using STROOP.Forms;

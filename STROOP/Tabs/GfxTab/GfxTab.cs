@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 
 using STROOP.Controls.VariablePanel;
+using STROOP.Enums;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
@@ -69,11 +70,11 @@ namespace STROOP.Tabs.GfxTab
             RomHack hck = null;
             try
             {
-                if (RomVersionConfig.Version == Structs.RomVersion.US)
+                if (RomVersionConfig.Version == RomVersion.US)
                 {
                     hck = new RomHack("Resources\\Hacks\\HitboxViewU.hck", "HitboxView");
                 }
-                else if (RomVersionConfig.Version == Structs.RomVersion.JP)
+                else if (RomVersionConfig.Version == RomVersion.JP)
                 {
                     hck = new RomHack("Resources\\Hacks\\HitboxViewJ.hck", "HitboxView");
                 }

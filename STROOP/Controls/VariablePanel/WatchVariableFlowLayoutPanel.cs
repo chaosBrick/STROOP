@@ -10,6 +10,7 @@ using System.Xml.Linq;
 
 using STROOP.Core.Variables;
 using STROOP.Core.WatchVariables;
+using STROOP.Enums;
 using STROOP.Forms;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;

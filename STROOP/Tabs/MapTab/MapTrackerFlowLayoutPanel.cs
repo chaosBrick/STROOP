@@ -3,6 +3,7 @@ using STROOP.Structs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using STROOP.Enums;
 using STROOP.Tabs.MapTab.MapObjects;
 
 namespace STROOP.Tabs.MapTab

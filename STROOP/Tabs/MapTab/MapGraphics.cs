@@ -4,6 +4,7 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System.Windows.Forms;
 using System.Drawing;
+using STROOP.Enums;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;

@@ -6,6 +6,7 @@ using System.Xml.Linq;
 using STROOP.Controls;
 using STROOP.Controls.VariablePanel;
 using STROOP.Core.Variables;
+using STROOP.Enums;
 using STROOP.Models;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;

@@ -7,6 +7,7 @@ using STROOP.Structs;
 using System;
 using System.Windows.Forms;
 using STROOP.Calculators;
+using STROOP.Enums;
 
 namespace STROOP.Tabs.MapTab.MapObjects
 {

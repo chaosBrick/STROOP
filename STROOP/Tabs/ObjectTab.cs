@@ -11,6 +11,7 @@ using STROOP.Structs.Configurations;
 using STROOP.Forms;
 using STROOP.Models;
 using STROOP.Core.Variables;
+using STROOP.Enums;
 
 namespace STROOP.Tabs
 {

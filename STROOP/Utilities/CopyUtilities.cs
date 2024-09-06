@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using OpenTK;
 
 using STROOP.Controls.VariablePanel;
+using STROOP.Enums;
 using STROOP.Structs;
 
 namespace STROOP.Utilities

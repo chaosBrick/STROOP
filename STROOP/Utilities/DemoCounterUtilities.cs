@@ -1,6 +1,7 @@
 ﻿using STROOP.Structs.Configurations;
 using System;
 using System.Collections.Generic;
+using STROOP.Enums;
 
 namespace STROOP.Structs
 {

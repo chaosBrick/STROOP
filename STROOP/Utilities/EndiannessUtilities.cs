@@ -1,6 +1,7 @@
 ﻿using STROOP.Structs;
 using System;
 using System.Linq;
+using STROOP.Enums;
 
 namespace STROOP.Utilities
 {

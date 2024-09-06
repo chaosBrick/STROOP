@@ -6,6 +6,7 @@ using STROOP.Structs.Configurations;
 using STROOP.Structs;
 using STROOP.Models;
 using System.Windows.Forms;
+using STROOP.Enums;
 using STROOP.Forms;
 
 namespace STROOP.Tabs.MapTab.MapObjects

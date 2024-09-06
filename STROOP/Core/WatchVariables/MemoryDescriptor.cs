@@ -53,7 +53,7 @@ namespace STROOP.Core.WatchVariables
         public readonly bool HandleMapping;
 
         public int? NibbleCount => ByteCount.HasValue ? (int?)(ByteCount.Value * 2) : null;
-        public bool UseAbsoluteAddressing { get => BaseAddressType == Structs.BaseAddressType.Absolute; }
+        public bool UseAbsoluteAddressing { get => BaseAddressType == Enums.BaseAddressType.Absolute; }
 
         public uint Offset
         {

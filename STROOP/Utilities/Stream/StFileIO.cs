@@ -3,6 +3,7 @@ using STROOP.Structs;
 using ICSharpCode.SharpZipLib.GZip;
 using System.IO;
 using System.Diagnostics;
+using STROOP.Enums;
 
 namespace STROOP.Utilities
 {

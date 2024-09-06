@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using OpenTK;
+using STROOP.Enums;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 using STROOP.Structs;

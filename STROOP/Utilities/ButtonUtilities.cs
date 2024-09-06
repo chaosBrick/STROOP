@@ -5,6 +5,7 @@ using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using STROOP.Models;
 using System.Diagnostics;
+using STROOP.Enums;
 
 namespace STROOP.Utilities
 {

@@ -2,6 +2,7 @@
 using STROOP.Utilities;
 using System.Drawing;
 using System.Windows.Forms;
+using STROOP.Enums;
 
 namespace STROOP.Forms
 {

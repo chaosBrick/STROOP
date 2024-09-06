@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using STROOP.Enums;
 using STROOP.Structs;
 using STROOP.Utilities;
 using STROOP.Tabs.MapTab.MapObjects;

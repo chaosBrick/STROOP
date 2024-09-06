@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using STROOP.Structs;
 using System.Windows.Forms;
+using STROOP.Enums;
 using STROOP.Structs.Configurations;
 
 namespace STROOP.Managers

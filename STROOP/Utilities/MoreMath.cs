@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using OpenTK;
+using STROOP.Enums;
 
 namespace STROOP.Utilities
 {

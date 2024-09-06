@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using STROOP.Enums;
 
 namespace STROOP.Structs
 {

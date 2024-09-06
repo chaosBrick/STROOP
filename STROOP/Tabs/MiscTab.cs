@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using System.Linq;
+using STROOP.Enums;
 
 namespace STROOP.Tabs
 {

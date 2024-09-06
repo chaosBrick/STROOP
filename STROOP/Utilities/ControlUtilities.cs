@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using STROOP.Structs;
 using System.Reflection;
+using STROOP.Enums;
 using STROOP.Structs.Configurations;
 using STROOP.Forms;
 

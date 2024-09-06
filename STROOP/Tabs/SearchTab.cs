@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using STROOP.Core.WatchVariables;
+using STROOP.Enums;
 
 namespace STROOP.Tabs
 {

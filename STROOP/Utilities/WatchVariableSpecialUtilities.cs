@@ -6,6 +6,7 @@ using System.Text;
 using STROOP.Controls.VariablePanel;
 using STROOP.Core.Variables;
 using STROOP.Core.WatchVariables;
+using STROOP.Enums;
 using STROOP.Models;
 using STROOP.Structs.Configurations;
 using STROOP.Ttc;

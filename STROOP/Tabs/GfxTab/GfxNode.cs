@@ -6,6 +6,7 @@ using STROOP.Structs;
 using STROOP.Utilities;
 using STROOP.Core.Variables;
 using STROOP.Core.WatchVariables;
+using STROOP.Enums;
 
 namespace STROOP.Tabs.GfxTab
 {

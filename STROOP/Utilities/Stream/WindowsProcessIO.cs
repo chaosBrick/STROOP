@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using STROOP.Enums;
 using static STROOP.Utilities.Kernal32NativeMethods;
 
 namespace STROOP.Utilities

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using STROOP.Enums;
 using STROOP.Structs;
 using STROOP.Utilities;
 

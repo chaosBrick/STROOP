@@ -3,6 +3,7 @@ using STROOP.Structs.Configurations;
 using System;
 using System.Diagnostics;
 using System.Text;
+using STROOP.Enums;
 
 namespace STROOP.Utilities
 {

@@ -6,6 +6,7 @@ using System.ComponentModel;
 using STROOP.Utilities;
 using System.Windows.Forms;
 using System.Drawing;
+using STROOP.Enums;
 
 namespace STROOP.M64
 {

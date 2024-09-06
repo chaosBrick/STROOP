@@ -13,6 +13,7 @@ using STROOP.Controls;
 using STROOP.Structs.Configurations;
 using STROOP.Tabs.MapTab;
 using STROOP.Core.Variables;
+using STROOP.Enums;
 
 namespace STROOP.Utilities
 {

@@ -1,4 +1,4 @@
-﻿namespace STROOP.Structs
+﻿namespace STROOP.Enums
 {
     public enum RomVersion
     {

@@ -5,6 +5,7 @@ using System.Windows.Forms;
 
 using STROOP.Controls.VariablePanel;
 using STROOP.Core.Variables;
+using STROOP.Enums;
 using STROOP.Forms;
 using STROOP.Models;
 using STROOP.Structs;

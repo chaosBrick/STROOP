@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using STROOP.Enums;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 

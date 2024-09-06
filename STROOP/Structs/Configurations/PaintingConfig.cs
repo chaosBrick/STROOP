@@ -1,4 +1,5 @@
 ﻿using System;
+using STROOP.Enums;
 
 namespace STROOP.Structs
 {
