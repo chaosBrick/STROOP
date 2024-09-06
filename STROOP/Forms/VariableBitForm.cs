@@ -8,7 +8,6 @@ using System.Linq;
 using System.Windows.Forms;
 using STROOP.Utilities;
 using STROOP.Models;
-using STROOP.Core.Variables;
 using STROOP.Core.WatchVariables;
 using STROOP.Extensions;
 

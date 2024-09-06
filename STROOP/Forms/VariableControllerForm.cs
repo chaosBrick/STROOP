@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-
 using STROOP.Core.Variables;
 using STROOP.Controls.VariablePanel;
 using STROOP.Core.WatchVariables;
-using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 
