@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace STROOP.Forms
 {
@@ -17,15 +16,16 @@ namespace STROOP.Forms
             label1.Text = labelText;
             button1.Text = buttonText;
 
-            Action okAction = () =>
+            button1.Click += (sender, e) => OkAction();
+            textBox1.AddEnterAction(OkAction);
+            return;
+
+            void OkAction()
             {
                 StringValue = textBox1.Text;
                 DialogResult = DialogResult.OK;
                 Close();
-            };
-
-            button1.Click += (sender, e) => okAction();
-            textBox1.AddEnterAction(okAction);
+            }
         }
     }
 }

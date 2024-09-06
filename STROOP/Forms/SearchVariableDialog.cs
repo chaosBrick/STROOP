@@ -5,14 +5,14 @@ namespace STROOP.Forms
 {
     public partial class SearchVariableDialog : Form
     {
-        private readonly StroopMainForm parent;
+        private readonly StroopMainForm _parent;
         private Regex _regex;
         public bool IsMatch(string str) => _regex?.IsMatch(chkCaseSensitive.Checked ? str : str.ToLower()) ?? false;
-        public bool searchHidden => chkSearchHidden.Checked;
+        public bool SearchHidden => chkSearchHidden.Checked;
 
         public SearchVariableDialog(StroopMainForm parent)
         {
-            this.parent = parent;
+            _parent = parent;
             InitializeComponent();
             TopMost = true;
             Activated += (_, __) => Opacity = 1;
@@ -37,7 +37,7 @@ namespace STROOP.Forms
             if (chkDollarWildcard.Checked)
                 searchText = Regex.Escape(searchText).Replace("\\$", ".*");
 
-            var exp = ".*" + searchText + ".*$";
+            var exp = $".*{searchText}.*$";
             _regex = new Regex(exp);
         }
     }

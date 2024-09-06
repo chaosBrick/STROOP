@@ -54,7 +54,7 @@ namespace STROOP.Forms
             SearchVariableDialog.Activate();
         }
 
-        private bool AttachToProcess(Process process)
+        private static bool AttachToProcess(Process process)
         {
             if (process.HasExited)
             {
@@ -92,7 +92,7 @@ namespace STROOP.Forms
             }
         }
 
-        private string GetDisplayNameForProcess(Process process)
+        private static string GetDisplayNameForProcess(Process process)
         {
             return string.IsNullOrWhiteSpace(process.MainWindowTitle) ? $"{process.ProcessName} ({process.Id})" : process.MainWindowTitle;
         }
@@ -315,7 +315,7 @@ namespace STROOP.Forms
         {
             using (new AccessScope<StroopMainForm>(this))
             {
-                labelFpsCounter.Text = "FPS: " + (int?)Config.Stream?.FpsInPractice;
+                labelFpsCounter.Text = $"FPS: {(int?)Config.Stream?.FpsInPractice}";
                 if (Config.Stream != null)
                 {
                     UpdateGlobalConfig();

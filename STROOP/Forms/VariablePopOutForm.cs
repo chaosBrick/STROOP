@@ -20,7 +20,7 @@ namespace STROOP.Forms
 
         private bool _alwaysOnTop = false;
 
-        private static int _instanceCouner = 0;
+        private static int _instanceCounter = 0;
 
         public VariablePopOutForm()
         {
@@ -28,8 +28,8 @@ namespace STROOP.Forms
             FormManager.AddForm(this);
             FormClosing += (sender, e) => FormManager.RemoveForm(this);
 
-            _instanceCouner++;
-            Text = $"Pop Out {_instanceCouner}";
+            _instanceCounter++;
+            Text = $"Pop Out {_instanceCounter}";
 
             if (WIDTH.HasValue) Width = WIDTH.Value;
             if (HEIGHT.HasValue) Height = HEIGHT.Value;

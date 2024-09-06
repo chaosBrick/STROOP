@@ -36,10 +36,10 @@ namespace STROOP.Forms
             FormManager.AddForm(this);
             FormClosing += (sender, e) => FormManager.RemoveForm(this);
 
-            _textBoxVarName.Text = String.Join(",", _varNames);
+            _textBoxVarName.Text = string.Join(",", _varNames);
 
-            ToolStripMenuItem itemInvertedAdd = new ToolStripMenuItem("Inverted");
-            ToolStripMenuItem itemInvertedSubtract = new ToolStripMenuItem("Inverted");
+            var itemInvertedAdd = new ToolStripMenuItem("Inverted");
+            var itemInvertedSubtract = new ToolStripMenuItem("Inverted");
             Action<bool> setInverted = (bool inverted) =>
             {
                 tableLayoutPanel1.Controls.Remove(_buttonAdd);
@@ -57,8 +57,10 @@ namespace STROOP.Forms
                 itemInvertedAdd.Checked = inverted;
                 itemInvertedSubtract.Checked = inverted;
             };
-            itemInvertedAdd.Click += (sender, e) => setInverted(!itemInvertedAdd.Checked);
-            itemInvertedSubtract.Click += (sender, e) => setInverted(!itemInvertedSubtract.Checked);
+
+            itemInvertedAdd.Click += OnItemInvertedAddOnClick;
+
+            itemInvertedSubtract.Click += OnItemInvertedSubtractOnClick;
             _buttonAdd.ContextMenuStrip = new ContextMenuStrip();
             _buttonSubtract.ContextMenuStrip = new ContextMenuStrip();
             _buttonAdd.ContextMenuStrip.Items.Add(new ToolStripSeparator());
@@ -69,7 +71,7 @@ namespace STROOP.Forms
             _buttonGet.Click += (s, e) => _textBoxGetSet.Text = GetValues();
 
             _buttonSet.Click += (s, e) => SetValues();
-            _textBoxGetSet.AddEnterAction(() => SetValues());
+            _textBoxGetSet.AddEnterAction(SetValues);
 
             _checkBoxFixAddress.Click += (s, e) => ToggleFixedAddress();
 
@@ -85,6 +87,11 @@ namespace STROOP.Forms
             //};
 
             UpdateFixedCheckState();
+            return;
+
+            void OnItemInvertedAddOnClick(object sender, EventArgs e) => setInverted(!itemInvertedAdd.Checked);
+
+            void OnItemInvertedSubtractOnClick(object sender, EventArgs e) => setInverted(!itemInvertedSubtract.Checked);
         }
 
         private string GetValues()

@@ -12,36 +12,37 @@ namespace STROOP.Forms
         {
             InitializeComponent();
 
-            List<uint> actions = TableConfig.MarioActions.GetActionList();
-            foreach (uint action in actions)
+            var actions = TableConfig.MarioActions.GetActionList();
+            foreach (var paramList in actions.Select(GetRowParams))
             {
-                List<object> paramList = GetRowParams(action);
                 dataGridViewActions.Rows.Add(paramList.ToArray());
             }
         }
 
-        public List<object> GetRowParams(uint action)
+        private static List<object> GetRowParams(uint action)
         {
-            string name = TableConfig.MarioActions.GetActionName(action);
-            ushort group = TableConfig.MarioActions.GetGroup(action);
-            string groupName = TableConfig.MarioActions.GetGroupName(action);
-            ushort id = TableConfig.MarioActions.GetId(action);
-            List<object> actionBits = Enumerable.Range(9, 23).ToList()
+            var name = TableConfig.MarioActions.GetActionName(action);
+            var group = TableConfig.MarioActions.GetGroup(action);
+            var groupName = TableConfig.MarioActions.GetGroupName(action);
+            var id = TableConfig.MarioActions.GetId(action);
+            var actionBits = Enumerable.Range(9, 23).ToList()
                 .ConvertAll(bit => (object)GetBit(action, bit));
 
-            List<object> paramList = new List<object>();
-            paramList.Add(name);
-            paramList.Add(HexUtilities.FormatValue(action, 8));
-            paramList.Add(HexUtilities.FormatValue(group, 3));
-            paramList.Add(groupName);
-            paramList.Add(HexUtilities.FormatValue(id, 3));
+            var paramList = new List<object>
+            {
+                name,
+                HexUtilities.FormatValue(action, 8),
+                HexUtilities.FormatValue(group, 3),
+                groupName,
+                HexUtilities.FormatValue(id, 3)
+            };
             paramList.AddRange(actionBits);
             return paramList;
         }
 
-        private bool GetBit(uint action, int bit)
+        private static bool GetBit(uint action, int bit)
         {
-            long value = action & (1 << bit);
+            var value = action & (1 << bit);
             return value != 0;
         }
     }

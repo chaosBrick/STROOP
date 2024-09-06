@@ -9,20 +9,20 @@ namespace STROOP.Forms
 {
     public partial class SelectionForm : Form
     {
-        public static int? WIDTH = null;
-        public static int? HEIGHT = null;
+        private static int? _width;
+        private static int? _height;
 
-        public object Selection;
+        private object _selection;
 
         public SelectionForm()
         {
             InitializeComponent();
-            if (WIDTH.HasValue) Width = WIDTH.Value;
-            if (HEIGHT.HasValue) Height = HEIGHT.Value;
+            if (_width.HasValue) Width = _width.Value;
+            if (_height.HasValue) Height = _height.Value;
             Resize += (sender, e) =>
             {
-                WIDTH = Width;
-                HEIGHT = Height;
+                _width = Width;
+                _height = Height;
             };
         }
 
@@ -35,29 +35,31 @@ namespace STROOP.Forms
             textBoxSelect.Text = selectionText;
             buttonSet.Text = buttonText;
             listBoxSelections.DataSource = items;
-                
-            Action enterAction = () =>
+
+            buttonSet.Click += (sender, e) => EnterAction();
+            listBoxSelections.DoubleClick += (sender, e) => EnterAction();
+            return;
+
+            void EnterAction()
             {
-                T selection = (T)listBoxSelections.SelectedItem;
+                var selection = (T)listBoxSelections.SelectedItem;
                 selectionAction(selection);
-                Selection = selection;
+                _selection = selection;
                 DialogResult = DialogResult.OK;
                 Close();
-            };
-            buttonSet.Click += (sender, e) => enterAction();
-            listBoxSelections.DoubleClick += (sender, e) => enterAction();
+            }
         }
 
         public static void ShowActionDescriptionSelectionForm()
         {
-            SelectionForm selectionForm = new SelectionForm();
+            var selectionForm = new SelectionForm();
             selectionForm.Initialize(
                 "Select an Action",
                 "Set Action",
                 TableConfig.MarioActions.GetActionNameList(),
                 actionName =>
                 {
-                    uint? action = TableConfig.MarioActions.GetActionFromName(actionName);
+                    var action = TableConfig.MarioActions.GetActionFromName(actionName);
                     if (action.HasValue)
                         Config.Stream.SetValue(action.Value, MarioConfig.StructAddress + MarioConfig.ActionOffset);
                 });
@@ -66,14 +68,14 @@ namespace STROOP.Forms
 
         public static void ShowPreviousActionDescriptionSelectionForm()
         {
-            SelectionForm selectionForm = new SelectionForm();
+            var selectionForm = new SelectionForm();
             selectionForm.Initialize(
                 "Select a Previous Action",
                 "Set Previous Action",
                 TableConfig.MarioActions.GetActionNameList(),
                 actionName =>
                 {
-                    uint? action = TableConfig.MarioActions.GetActionFromName(actionName);
+                    var action = TableConfig.MarioActions.GetActionFromName(actionName);
                     if (action.HasValue)
                         Config.Stream.SetValue(action.Value, MarioConfig.StructAddress + MarioConfig.PrevActionOffset);
                 });
@@ -82,58 +84,53 @@ namespace STROOP.Forms
 
         public static void ShowAnimationDescriptionSelectionForm()
         {
-            SelectionForm selectionForm = new SelectionForm();
+            var selectionForm = new SelectionForm();
             selectionForm.Initialize(
                 "Select an Animation",
                 "Set Animation",
                 TableConfig.MarioAnimations.GetAnimationNameList(),
                 animationName =>
                 {
-                    int? animation = TableConfig.MarioAnimations.GetAnimationFromName(animationName);
-                    if (animation.HasValue)
-                    {
-                        uint marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
-                        Config.Stream.SetValue((short)animation.Value, marioObjRef + MarioObjectConfig.AnimationOffset);
-                    }
+                    var animation = TableConfig.MarioAnimations.GetAnimationFromName(animationName);
+                    if (!animation.HasValue) return;
+                    var marioObjRef = Config.Stream.GetUInt32(MarioObjectConfig.PointerAddress);
+                    Config.Stream.SetValue((short)animation.Value, marioObjRef + MarioObjectConfig.AnimationOffset);
                 });
             selectionForm.Show();
         }
 
         public static int? GetAnimation(string firstText, string secondText)
         {
-            SelectionForm selectionForm = new SelectionForm();
+            var selectionForm = new SelectionForm();
             selectionForm.Initialize(
                 firstText,
                 secondText,
                 TableConfig.MarioAnimations.GetAnimationNameList(),
                 animationName => { });
-            if (selectionForm.ShowDialog() == DialogResult.OK)
+            if (selectionForm.ShowDialog() != DialogResult.OK) return null;
             {
-                string animationName = selectionForm.Selection as string;
-                int? animationIndex = TableConfig.MarioAnimations.GetAnimationFromName(animationName);
+                var animationName = selectionForm._selection as string;
+                var animationIndex = TableConfig.MarioAnimations.GetAnimationFromName(animationName);
                 return animationIndex;
             }
-            return null;
         }
 
         public static void ShowTriangleTypeDescriptionSelectionForm()
         {
-            SelectionForm selectionForm = new SelectionForm();
+            var selectionForm = new SelectionForm();
             selectionForm.Initialize(
                 "Select a Triangle Type",
                 "Set Triangle Type",
                 TableConfig.TriangleInfo.GetAllDescriptions(),
                 triangleTypeDescription =>
                 {
-                    short? triangleType = TableConfig.TriangleInfo.GetType(triangleTypeDescription);
-                    if (triangleType.HasValue)
+                    var triangleType = TableConfig.TriangleInfo.GetType(triangleTypeDescription);
+                    if (!triangleType.HasValue) return;
+                    foreach (var triangleAddress in AccessScope<StroopMainForm>.content.GetTab<Tabs.TrianglesTab>().TriangleAddresses)
                     {
-                        foreach (uint triangleAddress in AccessScope<StroopMainForm>.content.GetTab<Tabs.TrianglesTab>().TriangleAddresses)
-                        {
-                            Config.Stream.SetValue(
-                                triangleType.Value,
-                                triangleAddress + TriangleOffsetsConfig.SurfaceType);
-                        }
+                        Config.Stream.SetValue(
+                            triangleType.Value,
+                            triangleAddress + TriangleOffsetsConfig.SurfaceType);
                     }
                 });
             selectionForm.Show();
@@ -141,14 +138,14 @@ namespace STROOP.Forms
 
         public static void ShowDemoCounterDescriptionSelectionForm()
         {
-            SelectionForm selectionForm = new SelectionForm();
+            var selectionForm = new SelectionForm();
             selectionForm.Initialize(
                 "Select a Demo Counter",
                 "Set Demo Counter",
                 DemoCounterUtilities.GetDescriptions(),
                 demoCounterDescription =>
                 {
-                    short? demoCounter = DemoCounterUtilities.GetDemoCounter(demoCounterDescription);
+                    var demoCounter = DemoCounterUtilities.GetDemoCounter(demoCounterDescription);
                     if (demoCounter.HasValue)
                     {
                         Config.Stream.SetValue(demoCounter.Value, MiscConfig.DemoCounterAddress);
@@ -159,14 +156,14 @@ namespace STROOP.Forms
 
         public static void ShowTtcSpeedSettingDescriptionSelectionForm()
         {
-            SelectionForm selectionForm = new SelectionForm();
+            var selectionForm = new SelectionForm();
             selectionForm.Initialize(
                 "Select a TTC Speed Setting",
                 "Set TTC Speed Setting",
                 TtcSpeedSettingUtilities.GetDescriptions(),
                 ttcSpeedSettingDescription =>
                 {
-                    short? ttcSpeedSetting = TtcSpeedSettingUtilities.GetTtcSpeedSetting(ttcSpeedSettingDescription);
+                    var ttcSpeedSetting = TtcSpeedSettingUtilities.GetTtcSpeedSetting(ttcSpeedSettingDescription);
                     if (ttcSpeedSetting.HasValue)
                     {
                         Config.Stream.SetValue(ttcSpeedSetting.Value, MiscConfig.TtcSpeedSettingAddress);
@@ -177,14 +174,14 @@ namespace STROOP.Forms
 
         public static void ShowAreaTerrainDescriptionSelectionForm()
         {
-            SelectionForm selectionForm = new SelectionForm();
+            var selectionForm = new SelectionForm();
             selectionForm.Initialize(
                 "Select a Terrain Type",
                 "Set Terrain Type",
                 AreaUtilities.GetDescriptions(),
                 terrainTypeDescription =>
                 {
-                    short? terrainType = AreaUtilities.GetTerrainType(terrainTypeDescription);
+                    var terrainType = AreaUtilities.GetTerrainType(terrainTypeDescription);
                     if (terrainType.HasValue)
                     {
                         Config.Stream.SetValue(

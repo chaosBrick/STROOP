@@ -16,7 +16,6 @@ namespace STROOP.Forms
     // TODO: fix UI inconsistencies
     public partial class VariableBitForm : Form, IUpdatableForm
     {
-        private readonly string _varName;
         private readonly BindingList<ByteModel> _bytes;
         private readonly List<ByteModel> _reversedBytes;
         private readonly MemoryDescriptor _memoryDescriptor;
@@ -24,11 +23,10 @@ namespace STROOP.Forms
         private bool _hasDoneColoring = false;
         private bool _showFloatComponents = false;
 
-        private Func<IEnumerable<uint>> _addressGetter;
+        private readonly Func<IEnumerable<uint>> _addressGetter;
 
         public VariableBitForm(string varName, MemoryDescriptor memoryDescriptor, bool fixAddresses)
         {
-            _varName = varName;
             _memoryDescriptor = memoryDescriptor;
 
             if (fixAddresses)
@@ -37,29 +35,36 @@ namespace STROOP.Forms
                 _addressGetter = () => fixedAddresses;
             }
             else
-                _addressGetter = () => memoryDescriptor.GetAddressList();
+            {
+                IEnumerable<uint> AddressGetter() => memoryDescriptor.GetAddressList();
+
+                _addressGetter = AddressGetter;
+            }
 
             InitializeComponent();
             FormManager.AddForm(this);
-            FormClosing += (sender, e) => FormManager.RemoveForm(this);
 
-            _textBoxVarName.Text = _varName;
+            FormClosing += OnFormClosingEventHandler;
+
+            _textBoxVarName.Text = varName;
             _bytes = new BindingList<ByteModel>();
-            for (int i = 0; i < _memoryDescriptor.ByteCount.Value; i++)
-            {
-                _bytes.Add(new ByteModel(_memoryDescriptor.ByteCount.Value - 1 - i, 0, _dataGridViewBits, this));
-            }
+            if (_memoryDescriptor.ByteCount != null)
+                for (var i = 0; i < _memoryDescriptor.ByteCount.Value; i++)
+                {
+                    _bytes.Add(new ByteModel(_memoryDescriptor.ByteCount.Value - 1 - i, 0, _dataGridViewBits, this));
+                }
+
             _dataGridViewBits.DataSource = _bytes;
-            _dataGridViewBits.CellContentClick += (sender, e) =>
-                _dataGridViewBits.CommitEdit(new DataGridViewDataErrorContexts());
+
+            _dataGridViewBits.CellContentClick += OnDataGridViewBitsOnCellContentClick;
             ControlUtilities.SetTableDoubleBuffered(_dataGridViewBits, true);
 
             _reversedBytes = _bytes.ToList();
             _reversedBytes.Reverse();
 
-            int effectiveTableHeight = ControlUtilities.GetTableEffectiveHeight(_dataGridViewBits);
-            int totalTableHeight = _dataGridViewBits.Height;
-            int emptyHeight = totalTableHeight - effectiveTableHeight + 3;
+            var effectiveTableHeight = ControlUtilities.GetTableEffectiveHeight(_dataGridViewBits);
+            var totalTableHeight = _dataGridViewBits.Height;
+            var emptyHeight = totalTableHeight - effectiveTableHeight + 3;
             Height -= emptyHeight;
 
             ControlUtilities.AddCheckableContextMenuStripItems(
@@ -68,6 +73,11 @@ namespace STROOP.Forms
                 new List<bool>() { false, true },
                 boolValue => _showFloatComponents = boolValue,
                 false);
+            return;
+
+            void OnFormClosingEventHandler(object sender, FormClosingEventArgs e) => FormManager.RemoveForm(this);
+
+            void OnDataGridViewBitsOnCellContentClick(object sender, DataGridViewCellEventArgs e) => _dataGridViewBits.CommitEdit(new DataGridViewDataErrorContexts());
         }
 
         public void UpdateForm()
@@ -78,7 +88,7 @@ namespace STROOP.Forms
                 _hasDoneColoring = true;
             }
 
-            List<object> values = _addressGetter().Select(address => Config.Stream.GetValue(
+            var values = _addressGetter().Select(address => Config.Stream.GetValue(
                     _memoryDescriptor.MemoryType,
                     address,
                     _memoryDescriptor.UseAbsoluteAddressing,
@@ -87,15 +97,15 @@ namespace STROOP.Forms
                     )
                 ).ToList();
             if (values.Count == 0) return;
-            object value = values[0];
+            var value = values[0];
             if (!TypeUtilities.IsNumber(value))
                 throw new ArgumentOutOfRangeException();
 
-            byte[] bytes = TypeUtilities.GetBytes(value);
+            var bytes = TypeUtilities.GetBytes(value);
             if (bytes.Length != _bytes.Count)
                 throw new ArgumentOutOfRangeException();
 
-            for (int i = 0; i < _bytes.Count; i++)
+            for (var i = 0; i < _bytes.Count; i++)
             {
                 _bytes[i].SetByteValue(bytes[bytes.Length - 1 - i], false);
             }
@@ -109,40 +119,39 @@ namespace STROOP.Forms
             else
             {
                 _textBoxDecValue.Text = value.ToString();
-                _textBoxHexValue.Text = HexUtilities.FormatMemory(value, _memoryDescriptor.NibbleCount.Value);
-                _textBoxBinaryValue.Text = String.Join(" ", _bytes.ToList().ConvertAll(b => b.GetBinary()));
+                if (_memoryDescriptor.NibbleCount != null)
+                    _textBoxHexValue.Text = HexUtilities.FormatMemory(value, _memoryDescriptor.NibbleCount.Value);
+                _textBoxBinaryValue.Text = string.Join(" ", _bytes.ToList().ConvertAll(b => b.GetBinary()));
             }
         }
 
         public void SetValueInMemory()
         {
-            byte[] bytes = _reversedBytes.ConvertAll(b => b.GetByteValue()).ToArray();
-            if (TypeUtilities.ConvertBytes(_memoryDescriptor.MemoryType, bytes) is IConvertible validValue)
-                foreach (var address in _addressGetter())
-                    Config.Stream.SetValue(_memoryDescriptor.MemoryType, validValue, address, _memoryDescriptor.UseAbsoluteAddressing, _memoryDescriptor.Mask, _memoryDescriptor.Shift);
+            var bytes = _reversedBytes.ConvertAll(b => b.GetByteValue()).ToArray();
+            if (!(TypeUtilities.ConvertBytes(_memoryDescriptor.MemoryType, bytes) is IConvertible validValue)) return;
+            foreach (var address in _addressGetter())
+                Config.Stream.SetValue(_memoryDescriptor.MemoryType, validValue, address, _memoryDescriptor.UseAbsoluteAddressing, _memoryDescriptor.Mask, _memoryDescriptor.Shift);
         }
 
         private void DoColoring()
         {
             // Color specially the differents parts of a float
-            if (_memoryDescriptor.MemoryType == typeof(float))
+            if (_memoryDescriptor.MemoryType != typeof(float)) return;
+            var signColor = Color.LightBlue;
+            var exponentColor = Color.Pink;
+            var mantissaColor = Color.LightGreen.Lighten(0.5);
+
+            for (var i = 0; i < 32; i++)
             {
-                Color signColor = Color.LightBlue;
-                Color exponentColor = Color.Pink;
-                Color mantissaColor = Color.LightGreen.Lighten(0.5);
+                Color color;
+                if (i < 1) color = signColor;
+                else if (i < 9) color = exponentColor;
+                else color = mantissaColor;
 
-                for (int i = 0; i < 32; i++)
-                {
-                    Color color;
-                    if (i < 1) color = signColor;
-                    else if (i < 9) color = exponentColor;
-                    else color = mantissaColor;
-
-                    int rowIndex = i / 8;
-                    int colIndex = i % 8 + 4;
-                    DataGridViewCell cell = _dataGridViewBits.Rows[rowIndex].Cells[colIndex];
-                    cell.Style.BackColor = color;
-                }
+                var rowIndex = i / 8;
+                var colIndex = i % 8 + 4;
+                var cell = _dataGridViewBits.Rows[rowIndex].Cells[colIndex];
+                cell.Style.BackColor = color;
             }
         }
     }

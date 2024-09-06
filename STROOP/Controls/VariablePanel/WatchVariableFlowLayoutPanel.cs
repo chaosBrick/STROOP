@@ -865,7 +865,7 @@ namespace STROOP.Controls.VariablePanel
                 {
                     if (ShouldShow(v))
                         _shownWatchVarControls.Add(v);
-                    else if (searchForm != null && searchForm.searchHidden && searchForm.IsMatch(v.VarName))
+                    else if (searchForm != null && searchForm.SearchHidden && searchForm.IsMatch(v.VarName))
                         _hiddenSearchResults.Add(v);
                 }
                 else if (!ShouldShow(v))

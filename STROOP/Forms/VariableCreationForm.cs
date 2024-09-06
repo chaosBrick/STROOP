@@ -13,7 +13,7 @@ namespace STROOP.Forms
 {
     public partial class VariableCreationForm : Form
     {
-        private bool _disableMapping = false;
+        private bool _disableMapping;
 
         public VariableCreationForm()
         {
@@ -26,11 +26,11 @@ namespace STROOP.Forms
 
             ControlUtilities.AddCheckableContextMenuStripFunctions(
                 buttonAddVariable,
-                new List<string>()
+                new List<string>
                 {
                     "Disable Mapping",
                 },
-                new List<Func<bool>>()
+                new List<Func<bool>>
                 {
                     () =>
                     {
@@ -47,9 +47,9 @@ namespace STROOP.Forms
 
         private NamedVariableCollection.IView CreateWatchVariableControl()
         {
-            string memoryTypeString = comboBoxTypeValue.SelectedItem.ToString();
-            string baseAddressType = (string)comboBoxBaseValue.SelectedItem;
-            uint offset = ParsingUtilities.ParseHexNullable(textBoxOffsetValue.Text) ?? 0;
+            var memoryTypeString = comboBoxTypeValue.SelectedItem.ToString();
+            var baseAddressType = (string)comboBoxBaseValue.SelectedItem;
+            var offset = ParsingUtilities.ParseHexNullable(textBoxOffsetValue.Text) ?? 0;
 
             var memoryType = TypeUtilities.StringToType[memoryTypeString];
 

@@ -4,30 +4,24 @@ namespace STROOP.Forms
 {
     public static class FormManager
     {
-        private static List<IUpdatableForm> _forms = new List<IUpdatableForm>();
+        private static readonly List<IUpdatableForm> Forms = new List<IUpdatableForm>();
 
         public static void AddForm(IUpdatableForm form)
         {
-            _forms.Add(form);
+            Forms.Add(form);
         }
 
         public static void RemoveForm(IUpdatableForm form)
         {
-            _forms.Remove(form);
+            Forms.Remove(form);
         }
 
         public static void Update()
         {
-            foreach (IUpdatableForm form in _forms)
+            foreach (var form in Forms)
             {
                 form.UpdateForm();
             }
-        }
-
-        public static List<VariablePopOutForm> GetPopOutForms()
-        {
-            return _forms.FindAll(form => form is VariablePopOutForm)
-                .ConvertAll(form => form as VariablePopOutForm);
         }
     }
 }

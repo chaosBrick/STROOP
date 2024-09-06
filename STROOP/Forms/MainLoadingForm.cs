@@ -19,7 +19,7 @@ namespace STROOP.Forms
             ControlUtilities.AddContextMenuStripFunctions(
                 textBoxLoadingHelpfulHint,
                 new List<string>() { "Show All Helpful Hints" },
-                new List<Action>() { () => HelpfulHintUtilities.ShowAllHelpfulHints() });
+                new List<Action>() { HelpfulHintUtilities.ShowAllHelpfulHints });
         }
 
         private void LoadingForm_Load(object sender, EventArgs e)
@@ -43,9 +43,10 @@ namespace STROOP.Forms
                 tasks[i].task();
             }
 
-            void Action() => labelLoadingStatus.Text = "Finishing";
-
             Invoke(new Action(Action));
+            return;
+
+            void Action() => labelLoadingStatus.Text = "Finishing";
         }
 
         private void MainLoadingForm_MouseDown(object sender, MouseEventArgs e)
@@ -57,8 +58,8 @@ namespace STROOP.Forms
         private void MainLoadingForm_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.Button != MouseButtons.Left) return;
-            this.Left += e.X - _lastclickedpoint.X;
-            this.Top += e.Y - _lastclickedpoint.Y;
+            Left += e.X - _lastclickedpoint.X;
+            Top += e.Y - _lastclickedpoint.Y;
         }
 
         private void progressBarLoading_MouseDown(object sender, MouseEventArgs e)
@@ -70,8 +71,8 @@ namespace STROOP.Forms
         private void progressBarLoading_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.Button != MouseButtons.Left) return;
-            this.Left += e.X - _lastclickedpoint.X;
-            this.Top += e.Y - _lastclickedpoint.Y;
+            Left += e.X - _lastclickedpoint.X;
+            Top += e.Y - _lastclickedpoint.Y;
         }
     }
 }

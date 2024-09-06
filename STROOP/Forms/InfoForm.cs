@@ -34,7 +34,7 @@ namespace STROOP.Forms
         {
             Text = "Triangle Info";
             textBoxTitle.Text = "Triangle Data";
-            textBoxTriangleInfo.Text = String.Join(
+            textBoxTriangleInfo.Text = string.Join(
                 "\r\n\r\n",
                 coordinateList.ConvertAll(
                     coordinates => StringifyCoordinates(coordinates, repeatFirstVertex)));
@@ -48,13 +48,13 @@ namespace STROOP.Forms
 
             coordinateList.ForEach(AddVertices);
 
-            List<short[]> uniqueVertexList = new List<short[]>();
+            var uniqueVertexList = new List<short[]>();
 
             vertexList.ForEach(
                 UniqueVertex);
 
             uniqueVertexList.Sort(
-                (short[] v1, short[] v2) =>
+                (v1,v2) =>
                 {
                     var diff = v1[0] - v2[0];
                     if (diff != 0) return diff;
@@ -93,7 +93,7 @@ namespace STROOP.Forms
             textBoxTriangleInfo.Text = $"{TriangleDataModel.GetFieldNameString()}\n{String.Join("\n", triangleList)}";
         }
 
-        private String StringifyCoordinates(short[] coordinates, bool repeatCoordinates = false)
+        private static string StringifyCoordinates(short[] coordinates, bool repeatCoordinates = false)
         {
             if (coordinates.Length != 9) throw new ArgumentOutOfRangeException();
 
@@ -127,13 +127,14 @@ namespace STROOP.Forms
                 text += (keyName + "\t" + valueName + "\r\n");
             }
 
-            text = dictionary.Aggregate(text, (current, entry) => string.Format("{0}{1}", current, (entry.Key + "\t" + entry.Value + "\r\n")));
+            text = dictionary.Aggregate(text, (current, entry) =>
+                $"{current}{(entry.Key + "\t" + entry.Value + "\r\n")}");
             textBoxTriangleInfo.Text = text;
         }
 
         public void SetText(string formTitle, string textTitle, string text)
         {
-            this.Text = formTitle;
+            Text = formTitle;
             textBoxTitle.Text = textTitle;
             textBoxTriangleInfo.Text = text;
         }

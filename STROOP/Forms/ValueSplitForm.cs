@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace STROOP.Forms
 {
@@ -20,16 +19,16 @@ namespace STROOP.Forms
             button1.Text = button1Text;
             button2.Text = button2Text;
 
-            Action<bool> okAction = (bool rightButtonClicked) =>
+            void OkAction(bool rightButtonClicked)
             {
                 StringValue = textBox1.Text;
                 RightButtonClicked = rightButtonClicked;
                 DialogResult = DialogResult.OK;
                 Close();
-            };
+            }
 
-            button1.Click += (sender, e) => okAction(false);
-            button2.Click += (sender, e) => okAction(true);
+            button1.Click += (sender, e) => OkAction(false);
+            button2.Click += (sender, e) => OkAction(true);
         }
     }
 }
