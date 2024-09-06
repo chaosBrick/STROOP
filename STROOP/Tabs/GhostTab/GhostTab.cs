@@ -345,7 +345,7 @@ namespace STROOP.Tabs.GhostTab
                 Config.Stream.WriteRam(new byte[4], 0x80407FFC, EndiannessType.Little);
                 Config.Stream.WriteRam(new byte[0x70], 0x80407F90, EndiannessType.Little);
 
-                // EnableColoredHats();
+                EnableColoredHats();
 
                 //Tell ROM Hacks to suck it and get rid of the 01010101 pattern
                 Config.Stream.WriteRam(new byte[0x1000], 0x80408000 - 0x1000, EndiannessType.Big);

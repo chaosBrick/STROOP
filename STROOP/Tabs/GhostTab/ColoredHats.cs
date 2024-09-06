@@ -1,12 +1,10 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Windows.Forms;
 using OpenTK;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
-using System.Linq;
 
 namespace STROOP.Tabs.GhostTab
 {
@@ -29,15 +27,25 @@ namespace STROOP.Tabs.GhostTab
 
         Vector4 marioHatColor = new Vector4(1, 0, 0, 1);
 
+        const uint VANILLA_BANK_04_OFFSET_US = 0x0007EC20;
+        const uint VANILLA_BANK_04_OFFSET_JP = 0x0007BDC0;
+        const uint S_SEGMENT_TABLE_OFFSET_JP = 0x8033a090;
+        const uint S_SEGMENT_TABLE_OFFSET_US = 0x8033b400;
+
         const uint COLORED_HATS_CODE_TARGET_ADDR = 0x80408200;
         const uint COLORED_HATS_LIGHTS_ADDR = 0x80408500;
+
         private static void EnableColoredHats()
         {
             using (Config.Stream.Suspend())
             {
-                Config.Stream.WriteRam(File.ReadAllBytes("Resources/Hacks/gfx_generate_colored_hats.bin"), COLORED_HATS_CODE_TARGET_ADDR, EndiannessType.Big);
+                Config.Stream.WriteRam(
+                    File.ReadAllBytes($"Resources/Hacks/{RomVersionConfig.Version}_gfx_generate_colored_hats.bin"),
+                    COLORED_HATS_CODE_TARGET_ADDR,
+                    EndiannessType.Big
+                    );
 
-                uint jumpinOffset = 0xe0;
+                uint jumpinOffset = 0x00;
 
                 // Displaylist nodes that point to these should generate hats dynamically instead.
                 var originalDisplayListPointers = new uint[] {
@@ -46,9 +54,16 @@ namespace STROOP.Tabs.GhostTab
                     0x4011B80,
                     0x4012030
                 };
-                var bank0x04Size = 0x100000 - 0x7EC20; //Rough estimate, relevant references should be in this range
-                var bank0x04Location = Config.Stream.GetInt32(0x8033b410);
-                var bank0x04Offset = bank0x04Location - 0x0007EC20; // 0x0007EC20 is the offset of bank 4 in vanilla Mario 64
+
+                var vanillaOffset = RomVersionConfig.Version == RomVersion.JP
+                    ? VANILLA_BANK_04_OFFSET_JP
+                    : VANILLA_BANK_04_OFFSET_US;
+
+                var bank0x04Size = 0x100000 - vanillaOffset; //Rough estimate, relevant references should be in this range
+                var segmentTableOffset = RomVersionConfig.Version == RomVersion.JP ? S_SEGMENT_TABLE_OFFSET_JP : S_SEGMENT_TABLE_OFFSET_US;
+                var bank0x04Location = Config.Stream.GetInt32(segmentTableOffset + 0x10);
+                var bank0x04Offset = bank0x04Location - vanillaOffset;
+
                 for (uint addr = (uint)bank0x04Location; addr < bank0x04Location + bank0x04Size; addr += 4)
                 {
                     if ((Config.Stream.GetInt32(addr) & 0xFFFF0000) == 0x001B0000)
@@ -83,11 +98,21 @@ namespace STROOP.Tabs.GhostTab
                 }
                 */
 
-                uint jumpOutOfHeadAddr = (uint)(0x90580 + bank0x04Offset) + 0x8;
+                var findOutWhatToCallThis = RomVersionConfig.Version == RomVersion.JP ? 0x8D720 : 0x90580;
+                uint jumpOutOfHeadAddr = (uint)(findOutWhatToCallThis + bank0x04Offset) + 0x8;
                 Config.Stream.WriteRam(new byte[] { 0xB8, 0, 0, 0, 0, 0, 0, 0 }, jumpOutOfHeadAddr, EndiannessType.Big);
+
+                var offsetA = 0xf470c - bank0x04Location;
+
                 //Disable low poly Mario
-                Config.Stream.SetValue(0x02587fff, (uint)(0x800f470c + bank0x04Offset));
-                Config.Stream.SetValue(0x7fff7fff, (uint)(0x800f6634 + bank0x04Offset));
+                for (uint addr = (uint)bank0x04Location; addr < bank0x04Location + bank0x04Size; addr += 4)
+                {
+                    var value = Config.Stream.GetUInt32(addr);
+                    if (value == 0x02580640)
+                        Config.Stream.SetValue(0x02587fff, addr);
+                    else if (value == 0x06407fff)
+                        Config.Stream.SetValue(0x7fff7fff, addr);
+                }
             }
         }
 

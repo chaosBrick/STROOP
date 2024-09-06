@@ -17,6 +17,8 @@ gCurGraphNodeObjectLo equ 0xCFA0
 gMarioStatesHi equ 0x8033
 gMarioStatesLo equ 0x9e00
 
+alloc_display_list equ 0x8027897c
+
 
 .create "./build/JP_80408000_ghost_loop.bin", 0x00000000
 .include "./ghost_loop.asm"
@@ -33,4 +35,9 @@ gMarioStatesLo equ 0x9e00
 ; this is in the middle of geo_switch_mario_hand_grab_pos and prevents ghosts from updating held objects
 .create "./build/JP_802773D8_avoid_holp_desyncs.bin", 0x00000000
 .include "./avoid_holp_desyncs.asm"
+.close
+
+; a gfx_generate_colored_hats function to inject dynamically
+.create "./build/JP_gfx_generate_colored_hats.bin", 0x00000000
+.include "./gfx_generate_colored_hats.asm"
 .close
