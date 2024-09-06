@@ -6,7 +6,6 @@ using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using STROOP.Core.Variables;
 using STROOP.Enums;
 using STROOP.Extensions;
 using STROOP.Managers;
@@ -27,8 +26,8 @@ namespace STROOP.Forms
         private readonly Dictionary<Type, Tabs.STROOPTab> _tabsByType = new Dictionary<Type, Tabs.STROOPTab>();
         public readonly ObjectSlotsManager ObjectSlotsManager;
 
-        private bool _objSlotResizing = false;
-        private int _resizeObjSlotTime = 0;
+        private bool _objSlotResizing;
+        private int _resizeObjSlotTime;
         private readonly bool _isMainForm;
         private List<Process> _availableProcesses = new List<Process>();
             
@@ -164,7 +163,7 @@ namespace STROOP.Forms
         {
             ControlUtilities.AddContextMenuStripFunctions(
                 labelVersionNumber,
-                new List<string>()
+                new List<string>
                 {
                     "Open Mapping",
                     "Clear Mapping",
@@ -181,15 +180,15 @@ namespace STROOP.Forms
                     "Show Coin Ring Display Form",
                     "Format Subtitles",
                 },
-                new List<Action>()
+                new List<Action>
                 {
-                    () => MappingConfig.OpenMapping(),
-                    () => MappingConfig.ClearMapping(),
+                    MappingConfig.OpenMapping,
+                    MappingConfig.ClearMapping,
                     () => GetTab<Tabs.GfxTab.GfxTab>().InjectHitboxViewCode(),
                     () => Config.Stream.SetValue(MarioConfig.FreeMovementAction, MarioConfig.StructAddress + MarioConfig.ActionOffset),
                     () => GetTab<Tabs.FileTab>().DoEverything(),
                     () => GetTab<Tabs.TrianglesTab>().GoToClosestVertex(),
-                    () => saveAsSavestate(),
+                    SaveAsSavestate,
                     () =>
                     {
                         const string varFilePath = @"Config/MhsData.xml";
@@ -200,7 +199,7 @@ namespace STROOP.Forms
                     },
                     () => Process.Start("https://github.com/SM64-TAS-ABC/STROOP/releases/download/vDev/STROOP.zip"),
                     () => Process.Start("https://ukikipedia.net/wiki/STROOP"),
-                    () => HelpfulHintUtilities.ShowAllHelpfulHints(),
+                    HelpfulHintUtilities.ShowAllHelpfulHints,
                     () =>
                     {
                         var imageForm = new ImageForm();
@@ -208,10 +207,10 @@ namespace STROOP.Forms
                     },
                     () =>
                     {
-                        CoinRingDisplayForm form = new CoinRingDisplayForm();
+                        var form = new CoinRingDisplayForm();
                         form.Show();
                     },
-                    () => SubtitleUtilities.FormatSubtitlesFromClipboard(),
+                    SubtitleUtilities.FormatSubtitlesFromClipboard,
                 });
 
             ControlUtilities.AddCheckableContextMenuStripFunctions(
@@ -237,18 +236,18 @@ namespace STROOP.Forms
 
             ControlUtilities.AddContextMenuStripFunctions(
                 buttonMoveTabLeft,
-                new List<string>() { "Restore Recommended Tab Order" },
-                new List<Action>() { () => SavedSettingsConfig.InvokeRecommendedTabOrder() });
+                new List<string> { "Restore Recommended Tab Order" },
+                new List<Action> { SavedSettingsConfig.InvokeRecommendedTabOrder });
 
             ControlUtilities.AddContextMenuStripFunctions(
                 buttonMoveTabRight,
-                new List<string>() { "Restore Recommended Tab Order" },
-                new List<Action>() { () => SavedSettingsConfig.InvokeRecommendedTabOrder() });
+                new List<string> { "Restore Recommended Tab Order" },
+                new List<Action> { SavedSettingsConfig.InvokeRecommendedTabOrder });
 
             ControlUtilities.AddContextMenuStripFunctions(
                 trackBarObjSlotSize,
-                new List<string>() { "Reset to Default Object Slot Size" },
-                new List<Action>() {
+                new List<string> { "Reset to Default Object Slot Size" },
+                new List<Action> {
                     () =>
                     {
                         trackBarObjSlotSize.Value = ObjectSlotsManager.DefaultSlotSize;
@@ -282,21 +281,21 @@ namespace STROOP.Forms
 
         private void _sm64Stream_OnDisconnect(object sender, EventArgs e)
         {
-            this.BeginInvoke(new Action(() =>
+            BeginInvoke(new Action(() =>
             {
-                buttonRefresh_Click(this, new EventArgs());
+                buttonRefresh_Click(this, EventArgs.Empty);
             }));
         }
 
-        private List<Process> GetAvailableProcesses()
+        private static List<Process> GetAvailableProcesses()
         {
-            var AvailableProcesses = Process.GetProcesses();
-            List<Process> resortList = new List<Process>();
-            foreach (Process p in AvailableProcesses)
+            var availableProcesses = Process.GetProcesses();
+            var resortList = new List<Process>();
+            foreach (var p in availableProcesses)
             {
                 try
                 {
-                    if (!Config.Emulators.Any(e => e.ProcessName.ToLower() == p.ProcessName.ToLower()))
+                    if (Config.Emulators.All(e => !string.Equals(e.ProcessName, p.ProcessName, StringComparison.CurrentCultureIgnoreCase)))
                         continue;
 
                     if (p.HasExited)
@@ -316,7 +315,7 @@ namespace STROOP.Forms
         {
             using (new AccessScope<StroopMainForm>(this))
             {
-                labelFpsCounter.Text = "FPS: " + (int?)Config.Stream?.FpsInPractice ?? "<none>";
+                labelFpsCounter.Text = "FPS: " + (int?)Config.Stream?.FpsInPractice;
                 if (Config.Stream != null)
                 {
                     UpdateGlobalConfig();
@@ -346,7 +345,7 @@ namespace STROOP.Forms
 
         private void buttonShowTopPanel_Click(object sender, EventArgs e)
         {
-            SplitContainer splitContainer =
+            var splitContainer =
                 ControlUtilities.GetDescendantSplitContainer(
                     splitContainerMain, Orientation.Horizontal);
             if (splitContainer == null) return;
@@ -356,7 +355,7 @@ namespace STROOP.Forms
 
         private void buttonShowBottomPanel_Click(object sender, EventArgs e)
         {
-            SplitContainer splitContainer =
+            var splitContainer =
                 ControlUtilities.GetDescendantSplitContainer(
                     splitContainerMain, Orientation.Horizontal);
             if (splitContainer == null) return;
@@ -366,7 +365,7 @@ namespace STROOP.Forms
 
         private void buttonShowTopBottomPanel_Click(object sender, EventArgs e)
         {
-            SplitContainer splitContainer =
+            var splitContainer =
                 ControlUtilities.GetDescendantSplitContainer(
                     splitContainerMain, Orientation.Horizontal);
             if (splitContainer == null) return;
@@ -376,7 +375,7 @@ namespace STROOP.Forms
 
         private void buttonShowLeftPanel_Click(object sender, EventArgs e)
         {
-            SplitContainer splitContainer =
+            var splitContainer =
                 ControlUtilities.GetDescendantSplitContainer(
                     splitContainerMain, Orientation.Vertical);
             if (splitContainer == null) return;
@@ -386,7 +385,7 @@ namespace STROOP.Forms
 
         private void buttonShowRightPanel_Click(object sender, EventArgs e)
         {
-            SplitContainer splitContainer =
+            var splitContainer =
                 ControlUtilities.GetDescendantSplitContainer(
                     splitContainerMain, Orientation.Vertical);
             if (splitContainer == null) return;
@@ -396,7 +395,7 @@ namespace STROOP.Forms
 
         private void buttonShowLeftRightPanel_Click(object sender, EventArgs e)
         {
-            SplitContainer splitContainer =
+            var splitContainer =
                 ControlUtilities.GetDescendantSplitContainer(
                     splitContainerMain, Orientation.Vertical);
             if (splitContainer == null) return;
@@ -430,13 +429,13 @@ namespace STROOP.Forms
 
         private void MoveTab(bool rightwards)
         {
-            TabPage currentTab = tabControlMain.SelectedTab;
-            int currentIndex = tabControlMain.TabPages.IndexOf(currentTab);
-            int indexDiff = rightwards ? +1 : -1;
-            int newIndex = currentIndex + indexDiff;
+            var currentTab = tabControlMain.SelectedTab;
+            var currentIndex = tabControlMain.TabPages.IndexOf(currentTab);
+            var indexDiff = rightwards ? +1 : -1;
+            var newIndex = currentIndex + indexDiff;
             if (newIndex < 0 || newIndex >= tabControlMain.TabCount) return;
 
-            TabPage adjacentTab = tabControlMain.TabPages[newIndex];
+            var adjacentTab = tabControlMain.TabPages[newIndex];
             tabControlMain.TabPages.Remove(adjacentTab);
             tabControlMain.TabPages.Insert(currentIndex, adjacentTab);
 
@@ -450,22 +449,13 @@ namespace STROOP.Forms
 
         private void buttonConnect_Click(object sender, EventArgs e)
         {
-            Process selectedProcess;
-
             if (listBoxProcessesList.Items.Count == 0)
             {
                 return;
             }
-            
+
             // If there is no selection, we automatically choose to the first one
-            if (listBoxProcessesList.SelectedIndex == -1)
-            {
-                selectedProcess = _availableProcesses[0];
-            }
-            else
-            {
-                selectedProcess = _availableProcesses[listBoxProcessesList.SelectedIndex];
-            }
+            var selectedProcess = listBoxProcessesList.SelectedIndex == -1 ? _availableProcesses[0] : _availableProcesses[listBoxProcessesList.SelectedIndex];
 
             if (selectedProcess is null || !AttachToProcess(selectedProcess))
             {
@@ -500,7 +490,7 @@ namespace STROOP.Forms
         private void buttonDisconnect_Click(object sender, EventArgs e)
         {
             Task.Run(() => Config.Stream.SwitchProcess(null, null));
-            buttonRefresh_Click(this, new EventArgs());
+            buttonRefresh_Click(this, EventArgs.Empty);
             panelConnect.Visible = true;
         }
 
@@ -547,7 +537,7 @@ namespace STROOP.Forms
         {
             if (openFileDialogSt.ShowDialog() != DialogResult.OK)
                 return;
-            if (openFileDialogSt.CheckFileExists == true)
+            if (openFileDialogSt.CheckFileExists)
             {
                 try
                 {
@@ -558,21 +548,20 @@ namespace STROOP.Forms
                     MessageBox.Show("Savestate is corrupted, not a savestate, or doesn't exist", "Invalid Savestate", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
-            labelProcessSelect.Text = "Connected To: " + Config.Stream.ProcessName;
+            labelProcessSelect.Text = $"Connected To: {Config.Stream.ProcessName}";
             panelConnect.Visible = false;
         }
 
-        private void saveAsSavestate()
+        private void SaveAsSavestate()
         {
-            StFileIO io = Config.Stream.IO as StFileIO;
-            if (io == null)
+            if (!(Config.Stream.IO is StFileIO io))
             {
                 MessageBox.Show("The current connection is not an ST file. Open a savestate file to save the savestate.", "Connection not a savestate", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             saveFileDialogSt.FileName = io.Name;
-            DialogResult dr = saveFileDialogSt.ShowDialog();
+            var dr = saveFileDialogSt.ShowDialog();
             if (dr != DialogResult.OK)
                 return;
 
@@ -589,8 +578,7 @@ namespace STROOP.Forms
         public T GetTab<T>() where T : Tabs.STROOPTab => (T)_tabsByType[typeof(T)];
         public IEnumerable<Tabs.STROOPTab> EnumerateTabs()
         {
-            foreach (var t in _tabsByType)
-                yield return t.Value;
+            return _tabsByType.Select(t => t.Value);
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -601,14 +589,11 @@ namespace STROOP.Forms
                 Config.Stream.OnDisconnect -= _sm64Stream_OnDisconnect;
                 Config.Stream.WarnReadonlyOff -= _sm64Stream_WarnReadonlyOff;
             }
-            if (_isMainForm)
-            {
-                if (Config.Stream != null)
-                {
-                    Config.Stream.Dispose();
-                    Config.Stream = null;
-                }
-            }
+
+            if (!_isMainForm) return;
+            if (Config.Stream == null) return;
+            Config.Stream.Dispose();
+            Config.Stream = null;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace STROOP.Forms
 {
-    partial class TriangleListForm
+    sealed partial class TriangleListForm
     {
         /// <summary>
         /// Required designer variable.

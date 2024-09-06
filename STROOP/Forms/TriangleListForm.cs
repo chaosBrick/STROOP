@@ -1,6 +1,5 @@
 ﻿using STROOP.Tabs.MapTab;
 using STROOP.Models;
-using STROOP.Structs;
 using STROOP.Utilities;
 using System;
 using System.Collections.Generic;
@@ -10,7 +9,7 @@ using STROOP.Enums;
 
 namespace STROOP.Forms
 {
-    public partial class TriangleListForm : Form
+    public sealed partial class TriangleListForm : Form
     {
         private readonly IMapLevelTriangleObject _levelTriangleObject;
         private readonly List<uint> _triAddressList;
@@ -27,8 +26,8 @@ namespace STROOP.Forms
             _triAddressList = triAddressList;
             _lastRemoveTime = 0;
 
-            Text = classification + " Triangle List";
-            labelNumTriangles.Text = _triAddressList.Count + " Triangles";
+            Text = $"{classification} Triangle List";
+            labelNumTriangles.Text = $"{_triAddressList.Count} Triangles";
             FormClosing += (sender, e) => TriangleListFormClosing();
             buttonSort.Click += (sender, e) => RefreshAndSort();
             buttonAnnihilate.Click += (sender, e) => Annihilate();
@@ -46,26 +45,26 @@ namespace STROOP.Forms
         public void RefreshAndSort()
         {
             dataGridView.Rows.Clear();
-            List<(uint address, double dist)> dataList = _triAddressList.ConvertAll(address =>
+            var dataList = _triAddressList.ConvertAll(address =>
              {
-                 TriangleDataModel tri = TriangleDataModel.Create(address);
-                 double dist = tri.GetDistToMidpoint();
+                 var tri = TriangleDataModel.Create(address);
+                 var dist = tri.GetDistToMidpoint();
                  return (address, dist);
              });
-            dataList = Enumerable.OrderBy(dataList, data => data.dist).ToList();
+            dataList = dataList.OrderBy(data => data.dist).ToList();
             dataList.ForEach(data =>
             {
                 dataGridView.Rows.Add(HexUtilities.FormatValue(data.address), Math.Round(data.dist, 3));
             });
-            labelNumTriangles.Text = _triAddressList.Count + " Triangles";
+            labelNumTriangles.Text = $"{_triAddressList.Count} Triangles";
         }
 
         private void Annihilate()
         {
-            List<DataGridViewRow> rows = ControlUtilities.GetTableSelectedRows(dataGridView);
+            var rows = ControlUtilities.GetTableSelectedRows(dataGridView);
             rows.ForEach(row =>
             {
-                if (ParsingUtilities.TryParseHex((string)row.Cells[0].Value, out uint address))
+                if (ParsingUtilities.TryParseHex((string)row.Cells[0].Value, out var address))
                     ButtonUtilities.AnnihilateTriangle(new List<uint>() { address });
             });
         }
@@ -77,7 +76,7 @@ namespace STROOP.Forms
 
         private void Remove()
         {
-            long removeTime = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+            var removeTime = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
             if (removeTime < _lastRemoveTime + 1000)
             {
                 DialogUtilities.DisplayMessage("Attempted to remove twice in 1 second.", "Warning");
@@ -85,25 +84,25 @@ namespace STROOP.Forms
             }
             _lastRemoveTime = removeTime;
 
-            List<DataGridViewRow> rows = ControlUtilities.GetTableSelectedRows(dataGridView);
+            var rows = ControlUtilities.GetTableSelectedRows(dataGridView);
             rows.ForEach(row =>
             {
-                if (ParsingUtilities.TryParseHex((string)row.Cells[0].Value, out uint address))
+                if (ParsingUtilities.TryParseHex((string)row.Cells[0].Value, out var address))
                     _triAddressList.Remove(address);
             });
             RefreshDataGridViewAfterRemoval();
         }
 
-        public void RefreshDataGridViewAfterRemoval()
+        private void RefreshDataGridViewAfterRemoval()
         {
-            List<DataGridViewRow> rows = ControlUtilities.GetTableAllRows(dataGridView);
+            var rows = ControlUtilities.GetTableAllRows(dataGridView);
             rows.ForEach(row =>
             {
-                if (ParsingUtilities.TryParseHex((string)row.Cells[0].Value, out uint address))
-                    if (!_triAddressList.Contains(address))
-                        dataGridView.Rows.Remove(row);
+                if (!ParsingUtilities.TryParseHex((string)row.Cells[0].Value, out var address)) return;
+                if (!_triAddressList.Contains(address))
+                    dataGridView.Rows.Remove(row);
             });
-            labelNumTriangles.Text = _triAddressList.Count + " Triangles";
+            labelNumTriangles.Text = $"{_triAddressList.Count} Triangles";
         }
     }
 }
