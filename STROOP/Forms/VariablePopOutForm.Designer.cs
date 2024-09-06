@@ -1,6 +1,6 @@
 ﻿namespace STROOP.Forms
 {
-    partial class VariablePopOutForm
+    sealed partial class VariablePopOutForm
     {
         /// <summary>
         /// Required designer variable.

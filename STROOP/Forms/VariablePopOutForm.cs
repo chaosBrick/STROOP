@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using STROOP.Controls.VariablePanel;
 using STROOP.Core.Variables;
 
 namespace STROOP.Forms
 {
-    public partial class VariablePopOutForm : Form, IUpdatableForm
+    public sealed partial class VariablePopOutForm : Form, IUpdatableForm
     {
         private static int? WIDTH = null;
         private static int? HEIGHT = null;
@@ -28,7 +29,7 @@ namespace STROOP.Forms
             FormClosing += (sender, e) => FormManager.RemoveForm(this);
 
             _instanceCouner++;
-            Text = "Pop Out " + _instanceCouner;
+            Text = $"Pop Out {_instanceCouner}";
 
             if (WIDTH.HasValue) Width = WIDTH.Value;
             if (HEIGHT.HasValue) Height = HEIGHT.Value;
@@ -47,53 +48,68 @@ namespace STROOP.Forms
             _watchVariablePanel.AddVariables(vars);
 
             // add borderless item to panel
-            ToolStripMenuItem itemBorderless = new ToolStripMenuItem("Borderless");
-            itemBorderless.Click += (sender, e) =>
-            {
-                _borderless = !_borderless;
-                itemBorderless.Checked = _borderless;
-                FormBorderStyle = _borderless ? FormBorderStyle.None : FormBorderStyle.Sizable;
-            };
+            var itemBorderless = new ToolStripMenuItem("Borderless");
+
+            itemBorderless.Click += OnItemBorderlessOnClick;
             itemBorderless.Checked = _borderless;
             _watchVariablePanel.customContextMenuItems.Add(itemBorderless);
 
             // add always on top item to panel
-            ToolStripMenuItem itemAlwaysOnTop = new ToolStripMenuItem("Always On Top");
-            itemAlwaysOnTop.Click += (sender, e) =>
-            {
-                _alwaysOnTop = !_alwaysOnTop;
-                itemAlwaysOnTop.Checked = _alwaysOnTop;
-                TopMost = _alwaysOnTop;
-            };
+            var itemAlwaysOnTop = new ToolStripMenuItem("Always On Top");
+
+            itemAlwaysOnTop.Click += OnItemAlwaysOnTopOnClick;
             itemBorderless.Checked = _alwaysOnTop;
             _watchVariablePanel.customContextMenuItems.Add(itemAlwaysOnTop);
 
             // add close item to panel
-            ToolStripMenuItem itemClose = new ToolStripMenuItem("Close");
-            itemClose.Click += (sender, e) => Close();
-            _watchVariablePanel.customContextMenuItems.Add(itemClose);
+            var itemClose = new ToolStripMenuItem("Close");
 
-            // make panel draggable when borderless
-            _watchVariablePanel.MouseDown += (sender, e) =>
-            {
-                if (!_borderless) return;
-                _isDragging = true;
-                _dragX = e.X;
-                _dragY = e.Y;
-            };
-            _watchVariablePanel.MouseUp += (sender, e) =>
-            {
-                if (!_borderless) return;
-                _isDragging = false;
-            };
-            _watchVariablePanel.MouseMove += (sender, e) =>
+            itemClose.Click += OnItemCloseOnClick;
+            _watchVariablePanel.customContextMenuItems.Add(itemClose);
+            _watchVariablePanel.MouseDown += OnWatchVariablePanelOnMouseDown;
+            _watchVariablePanel.MouseUp += OnWatchVariablePanelOnMouseUp;
+            _watchVariablePanel.MouseMove += OnWatchVariablePanelOnMouseMove;
+            return;
+
+            void OnItemCloseOnClick(object sender, EventArgs e) => Close();
+
+            void OnWatchVariablePanelOnMouseMove(object sender, MouseEventArgs e)
             {
                 if (!_borderless) return;
                 if (_isDragging)
                 {
                     SetDesktopLocation(MousePosition.X - _dragX, MousePosition.Y - _dragY);
                 }
-            };
+            }
+
+            void OnWatchVariablePanelOnMouseUp(object sender, MouseEventArgs e)
+            {
+                if (!_borderless) return;
+                _isDragging = false;
+            }
+
+            // make panel draggable when borderless
+            void OnWatchVariablePanelOnMouseDown(object sender, MouseEventArgs e)
+            {
+                if (!_borderless) return;
+                _isDragging = true;
+                _dragX = e.X;
+                _dragY = e.Y;
+            }
+
+            void OnItemAlwaysOnTopOnClick(object sender, EventArgs e)
+            {
+                _alwaysOnTop = !_alwaysOnTop;
+                itemAlwaysOnTop.Checked = _alwaysOnTop;
+                TopMost = _alwaysOnTop;
+            }
+
+            void OnItemBorderlessOnClick(object sender, EventArgs e)
+            {
+                _borderless = !_borderless;
+                itemBorderless.Checked = _borderless;
+                FormBorderStyle = _borderless ? FormBorderStyle.None : FormBorderStyle.Sizable;
+            }
         }
 
         public void UpdateForm()

@@ -24,15 +24,15 @@ namespace STROOP.Forms
 
         public void SetTriangleEquation(float normalX, float normalY, float normalZ, float normalOffset)
         {
-            this.Text = "Triangle Info";
+            Text = "Triangle Info";
             textBoxTitle.Text = "Triangle Equation";
             textBoxTriangleInfo.Text =
-                normalX + "x + " + normalY + "y + " + normalZ + "z + " + normalOffset + " = 0";
+                $"{normalX}x + {normalY}y + {normalZ}z + {normalOffset} = 0";
         }
 
         public void SetTriangleData(List<short[]> coordinateList, bool repeatFirstVertex)
         {
-            this.Text = "Triangle Info";
+            Text = "Triangle Info";
             textBoxTitle.Text = "Triangle Data";
             textBoxTriangleInfo.Text = String.Join(
                 "\r\n\r\n",
@@ -44,27 +44,19 @@ namespace STROOP.Forms
         {
             this.Text = "Triangle Info";
             textBoxTitle.Text = "Triangle Vertices";
-            List<short[]> vertexList = new List<short[]>();
-            coordinateList.ForEach(
-                coordinates =>
-                {
-                    vertexList.Add(new short[] { coordinates[0], coordinates[1], coordinates[2] });
-                    vertexList.Add(new short[] { coordinates[3], coordinates[4], coordinates[5] });
-                    vertexList.Add(new short[] { coordinates[6], coordinates[7], coordinates[8] });
-                });
+            var vertexList = new List<short[]>();
+
+            coordinateList.ForEach(AddVertices);
 
             List<short[]> uniqueVertexList = new List<short[]>();
+
             vertexList.ForEach(
-                vertex =>
-                {
-                    bool hasAlready = uniqueVertexList.Any(v => Enumerable.SequenceEqual(v, vertex));
-                    if (!hasAlready) uniqueVertexList.Add(vertex);
-                });
+                UniqueVertex);
 
             uniqueVertexList.Sort(
                 (short[] v1, short[] v2) =>
                 {
-                    int diff = v1[0] - v2[0];
+                    var diff = v1[0] - v2[0];
                     if (diff != 0) return diff;
                     diff = v1[1] - v2[1];
                     if (diff != 0) return diff;
@@ -72,27 +64,43 @@ namespace STROOP.Forms
                     return diff;
                 });
 
-            textBoxTriangleInfo.Text = String.Join(
+            textBoxTriangleInfo.Text = string.Join(
                 "\r\n",
                 uniqueVertexList.ConvertAll(
-                    coordinate => StringifyCoordinate(coordinate)));
+                    Converter));
+            return;
+
+            void UniqueVertex(short[] vertex)
+            {
+                var hasAlready = uniqueVertexList.Any(v => v.SequenceEqual(vertex));
+                if (!hasAlready) uniqueVertexList.Add(vertex);
+            }
+
+            string Converter(short[] coordinate) => StringifyCoordinate(coordinate);
+
+            void AddVertices(short[] coordinates)
+            {
+                vertexList.Add(new[] { coordinates[0], coordinates[1], coordinates[2] });
+                vertexList.Add(new[] { coordinates[3], coordinates[4], coordinates[5] });
+                vertexList.Add(new[] { coordinates[6], coordinates[7], coordinates[8] });
+            }
         }
 
         public void SetTriangles(List<TriangleDataModel> triangleList)
         {
-            this.Text = "Triangle Info";
-            textBoxTitle.Text = triangleList.Count + " Triangles";
-            textBoxTriangleInfo.Text = TriangleDataModel.GetFieldNameString() + "\n" + String.Join("\n", triangleList);
+            Text = "Triangle Info";
+            textBoxTitle.Text = $"{triangleList.Count} Triangles";
+            textBoxTriangleInfo.Text = $"{TriangleDataModel.GetFieldNameString()}\n{String.Join("\n", triangleList)}";
         }
 
         private String StringifyCoordinates(short[] coordinates, bool repeatCoordinates = false)
         {
             if (coordinates.Length != 9) throw new ArgumentOutOfRangeException();
 
-            string text =
-                coordinates[0] + "\t" + coordinates[1] + "\t" + coordinates[2] + "\r\n" +
-                coordinates[3] + "\t" + coordinates[4] + "\t" + coordinates[5] + "\r\n" +
-                coordinates[6] + "\t" + coordinates[7] + "\t" + coordinates[8];
+            var text =
+                $"{coordinates[0]}\t{coordinates[1]}\t{coordinates[2]}\r\n" +
+                $"{coordinates[3]}\t{coordinates[4]}\t{coordinates[5]}\r\n" +
+                $"{coordinates[6]}\t{coordinates[7]}\t{coordinates[8]}";
 
             if (repeatCoordinates)
             {
@@ -102,26 +110,24 @@ namespace STROOP.Forms
             return text;
         }
 
-        private String StringifyCoordinate(short[] coordinate)
+        private static string StringifyCoordinate(short[] coordinate)
         {
             if (coordinate.Length != 3) throw new ArgumentOutOfRangeException();
-            string text = coordinate[0] + "\t" + coordinate[1] + "\t" + coordinate[2];
+            var text = coordinate[0] + "\t" + coordinate[1] + "\t" + coordinate[2];
             return text;
         }
 
         public void SetDictionary<TKey, TValue>(Dictionary<TKey, TValue> dictionary, string keyName = null, string valueName = null)
         {
-            this.Text = "Dictionary Info";
+            Text = "Dictionary Info";
             textBoxTitle.Text = "Dictionary";
-            String text = "";
+            var text = "";
             if (keyName != null && valueName != null)
             {
                 text += (keyName + "\t" + valueName + "\r\n");
             }
-            foreach (KeyValuePair<TKey, TValue> entry in dictionary)
-            {
-                text += (entry.Key + "\t" + entry.Value + "\r\n");
-            }
+
+            text = dictionary.Aggregate(text, (current, entry) => string.Format("{0}{1}", current, (entry.Key + "\t" + entry.Value + "\r\n")));
             textBoxTriangleInfo.Text = text;
         }
 
@@ -134,7 +140,7 @@ namespace STROOP.Forms
 
         public static void ShowValue(object value, string formTitle = "Title", string textTitle = "Text")
         {
-            InfoForm infoForm = new InfoForm();
+            var infoForm = new InfoForm();
             infoForm.SetText(formTitle, textTitle, value.ToString());
             infoForm.Show();
         }
