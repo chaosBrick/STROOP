@@ -5,6 +5,7 @@ using STROOP.Utilities;
 using STROOP.Structs.Configurations;
 using System.Linq;
 using STROOP.Enums;
+using STROOP.Extensions;
 
 namespace STROOP.Tabs
 {

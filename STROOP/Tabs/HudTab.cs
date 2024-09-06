@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using STROOP.Extensions;
 using STROOP.Structs;
 using STROOP.Utilities;
 using STROOP.Structs.Configurations;

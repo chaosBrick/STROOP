@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace STROOP.Utilities
+namespace STROOP.Extensions
 {
     public static class ColorExtensions
     {

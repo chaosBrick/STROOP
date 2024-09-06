@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using STROOP.Utilities;
 using System.Drawing;
 using STROOP.Enums;
+using STROOP.Extensions;
 using STROOP.Structs;
 using STROOP.Structs.Configurations;
 

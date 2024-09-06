@@ -1,5 +1,6 @@
 ﻿using STROOP.Utilities;
 using System.Windows.Forms;
+using STROOP.Extensions;
 using STROOP.Structs.Configurations;
 
 namespace STROOP.Tabs

@@ -10,6 +10,7 @@ using STROOP.Utilities;
 using STROOP.Models;
 using STROOP.Core.Variables;
 using STROOP.Core.WatchVariables;
+using STROOP.Extensions;
 
 namespace STROOP.Forms
 {

@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
 
-namespace STROOP.Utilities
+namespace STROOP.Extensions
 {
     public static class RichTextBoxExtensions
     {
