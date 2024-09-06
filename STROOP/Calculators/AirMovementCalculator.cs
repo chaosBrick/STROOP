@@ -2,55 +2,39 @@
 using System.Collections.Generic;
 using STROOP.Enums;
 using STROOP.Models;
-using STROOP.Structs;
 using STROOP.Utilities;
 
 namespace STROOP.Calculators
 {
-    public static class AirMovementCalculator
+    public class AirMovementCalculator
     {
-        public static MarioState ApplyInput(MarioState marioState, Input input, int numQSteps = 4, List<TriangleDataModel> wallTris = null, List<MarioState> quarterSteps = null, bool resetHSpeedOnWalls = false)
+
+        public MarioState ApplyInput(MarioState marioState, RelativeDirection direction, int numQSteps = 4)
         {
-            MarioState withHSpeed = ComputeAirHSpeed(marioState, input);
-            MarioState moved = AirMove(withHSpeed, numQSteps, wallTris, quarterSteps, resetHSpeedOnWalls);
-            MarioState withYSpeed = ComputeAirYSpeed(moved);
+            var withHSpeed = ComputeAirHSpeed(marioState, direction);
+            var moved = AirMove(withHSpeed, numQSteps);
+            var withYSpeed = ComputeAirYSpeed(moved);
             return withYSpeed;
         }
 
-        public static MarioState ApplyInput(MarioState marioState, int angleDiff, int numQSteps = 4, List<TriangleDataModel> wallTris = null, List<MarioState> quarterSteps = null, bool resetHSpeedOnWalls = false)
+        public MarioState ApplyInputRepeatedly(MarioState marioState, RelativeDirection direction, int numQSteps)
         {
-            MarioState withHSpeed = ComputeAirHSpeed(marioState, angleDiff);
-            MarioState moved = AirMove(withHSpeed, numQSteps, wallTris, quarterSteps, resetHSpeedOnWalls);
-            MarioState withYSpeed = ComputeAirYSpeed(moved);
-            return withYSpeed;
-        }
-
-        public static MarioState ApplyInput(MarioState marioState, RelativeDirection direction, int numQSteps = 4)
-        {
-            MarioState withHSpeed = ComputeAirHSpeed(marioState, direction);
-            MarioState moved = AirMove(withHSpeed, numQSteps);
-            MarioState withYSpeed = ComputeAirYSpeed(moved);
-            return withYSpeed;
-        }
-
-        public static MarioState ApplyInputRepeatedly(MarioState marioState, RelativeDirection direction, int numQSteps)
-        {
-            int numFrames = numQSteps / 4;
-            int remainderQSteps = numQSteps % 4;
-            for (int i = 0; i < numFrames; i++)
+            var numFrames = numQSteps / 4;
+            var remainderQSteps = numQSteps % 4;
+            for (var i = 0; i < numFrames; i++)
             {
                 marioState = ApplyInput(marioState, direction);
             }
             return remainderQSteps == 0 ? marioState : ApplyInput(marioState, direction, remainderQSteps);
         }
 
-        public static MarioState AirMove(MarioState initialState, int numQSteps = 4, List<TriangleDataModel> wallTris = null, List<MarioState> quarterSteps = null, bool resetHSpeedOnWalls = false)
+        public MarioState AirMove(MarioState initialState, int numQSteps = 4, List<TriangleDataModel> wallTris = null, List<MarioState> quarterSteps = null, bool resetHSpeedOnWalls = false)
         {
-            bool resetHSpeed = false;
+            var resetHSpeed = false;
 
-            float newX = initialState.X;
-            float newY = initialState.Y;
-            float newZ = initialState.Z;
+            var newX = initialState.X;
+            var newY = initialState.Y;
+            var newZ = initialState.Z;
 
             if (wallTris != null)
             {
@@ -59,7 +43,7 @@ namespace STROOP.Calculators
                 if (collidedWithWall && resetHSpeedOnWalls) resetHSpeed = true;
             }
 
-            for (int i = 0; i < numQSteps; i++)
+            for (var i = 0; i < numQSteps; i++)
             {
                 newX += initialState.XSpeed / 4;
                 newY += initialState.YSpeed / 4;
@@ -75,26 +59,23 @@ namespace STROOP.Calculators
                     if (collidedWithWall2 && resetHSpeedOnWalls) resetHSpeed = true;
                 }
 
-                if (quarterSteps != null)
-                {
-                    quarterSteps.Add(
-                        new MarioState(
-                            newX,
-                            newY,
-                            newZ,
-                            initialState.XSpeed,
-                            initialState.YSpeed,
-                            initialState.ZSpeed,
-                            initialState.HSpeed,
-                            initialState.SlidingSpeedX,
-                            initialState.SlidingSpeedZ,
-                            initialState.SlidingAngle,
-                            initialState.MarioAngle,
-                            initialState.CameraAngle,
-                            initialState.PreviousState,
-                            initialState.LastInput,
-                            initialState.Index));
-                }
+                quarterSteps?.Add(
+                    new MarioState(
+                        newX,
+                        newY,
+                        newZ,
+                        initialState.XSpeed,
+                        initialState.YSpeed,
+                        initialState.ZSpeed,
+                        initialState.HSpeed,
+                        initialState.SlidingSpeedX,
+                        initialState.SlidingSpeedZ,
+                        initialState.SlidingAngle,
+                        initialState.MarioAngle,
+                        initialState.CameraAngle,
+                        initialState.PreviousState,
+                        initialState.LastInput,
+                        initialState.Index));
             }
 
             return new MarioState(
@@ -116,32 +97,31 @@ namespace STROOP.Calculators
         }
 
         // update_air_without_turn
-        private static MarioState ComputeAirHSpeed(MarioState initialState, int angleDiff)
+        private MarioState ComputeAirHSpeed(MarioState initialState, int angleDiff)
         {
-            bool longJump = false;
-            int maxSpeed = longJump ? 48 : 32;
+            var longJump = false;
+            var maxSpeed = longJump ? 48 : 32;
 
-            ushort marioAngle = initialState.MarioAngle;
-            int deltaAngleIntendedFacing = angleDiff;
-            float inputScaledMagnitude = 32;
+            var marioAngle = initialState.MarioAngle;
+            var inputScaledMagnitude = 32;
 
             float perpSpeed = 0;
-            float newHSpeed = ApproachHSpeed(initialState.HSpeed, 0, 0.35f, 0.35f);
+            var newHSpeed = ApproachHSpeed(initialState.HSpeed, 0, 0.35f, 0.35f);
             if (inputScaledMagnitude > 0)
             {
-                newHSpeed += (inputScaledMagnitude / 32) * 1.5f * InGameTrigUtilities.InGameCosine(deltaAngleIntendedFacing);
-                perpSpeed = InGameTrigUtilities.InGameSine(deltaAngleIntendedFacing) * (inputScaledMagnitude / 32) * 10;
+                newHSpeed += (inputScaledMagnitude / 32) * 1.5f * InGameTrigUtilities.InGameCosine(angleDiff);
+                perpSpeed = InGameTrigUtilities.InGameSine(angleDiff) * (inputScaledMagnitude / 32) * 10;
             }
 
             if (newHSpeed > maxSpeed) newHSpeed -= 1;
             if (newHSpeed < -16) newHSpeed += 2;
 
-            float newSlidingXSpeed = InGameTrigUtilities.InGameSine(marioAngle) * newHSpeed;
-            float newSlidingZSpeed = InGameTrigUtilities.InGameCosine(marioAngle) * newHSpeed;
+            var newSlidingXSpeed = InGameTrigUtilities.InGameSine(marioAngle) * newHSpeed;
+            var newSlidingZSpeed = InGameTrigUtilities.InGameCosine(marioAngle) * newHSpeed;
             newSlidingXSpeed += perpSpeed * InGameTrigUtilities.InGameSine(marioAngle + 0x4000);
             newSlidingZSpeed += perpSpeed * InGameTrigUtilities.InGameCosine(marioAngle + 0x4000);
-            float newXSpeed = newSlidingXSpeed;
-            float newZSpeed = newSlidingZSpeed;
+            var newXSpeed = newSlidingXSpeed;
+            var newZSpeed = newSlidingZSpeed;
 
             return new MarioState(
                 initialState.X,
@@ -162,18 +142,18 @@ namespace STROOP.Calculators
         }
 
         // update_air_without_turn
-        private static MarioState ComputeAirHSpeed(MarioState initialState, Input input)
+        private MarioState ComputeAirHSpeed(MarioState initialState, Input input)
         {
-            bool longJump = false;
-            int maxSpeed = longJump ? 48 : 32;
+            var longJump = false;
+            var maxSpeed = longJump ? 48 : 32;
 
-            ushort marioAngle = initialState.MarioAngle;
-            ushort yawIntended = MoreMath.CalculateAngleFromInputs(input.X, input.Y, initialState.CameraAngle);
-            int deltaAngleIntendedFacing = yawIntended - marioAngle;
-            float inputScaledMagnitude = input.GetScaledMagnitude();
+            var marioAngle = initialState.MarioAngle;
+            var yawIntended = MoreMath.CalculateAngleFromInputs(input.X, input.Y, initialState.CameraAngle);
+            var deltaAngleIntendedFacing = yawIntended - marioAngle;
+            var inputScaledMagnitude = input.GetScaledMagnitude();
 
             float perpSpeed = 0;
-            float newHSpeed = ApproachHSpeed(initialState.HSpeed, 0, 0.35f, 0.35f);
+            var newHSpeed = ApproachHSpeed(initialState.HSpeed, 0, 0.35f, 0.35f);
             if (inputScaledMagnitude > 0)
             {
                 newHSpeed += (inputScaledMagnitude / 32) * 1.5f * InGameTrigUtilities.InGameCosine(deltaAngleIntendedFacing);
@@ -183,12 +163,12 @@ namespace STROOP.Calculators
             if (newHSpeed > maxSpeed) newHSpeed -= 1;
             if (newHSpeed < -16) newHSpeed += 2;
 
-            float newSlidingXSpeed = InGameTrigUtilities.InGameSine(marioAngle) * newHSpeed;
-            float newSlidingZSpeed = InGameTrigUtilities.InGameCosine(marioAngle) * newHSpeed;
+            var newSlidingXSpeed = InGameTrigUtilities.InGameSine(marioAngle) * newHSpeed;
+            var newSlidingZSpeed = InGameTrigUtilities.InGameCosine(marioAngle) * newHSpeed;
             newSlidingXSpeed += perpSpeed * InGameTrigUtilities.InGameSine(marioAngle + 0x4000);
             newSlidingZSpeed += perpSpeed * InGameTrigUtilities.InGameCosine(marioAngle + 0x4000);
-            float newXSpeed = newSlidingXSpeed;
-            float newZSpeed = newSlidingZSpeed;
+            var newXSpeed = newSlidingXSpeed;
+            var newZSpeed = newSlidingZSpeed;
 
             return new MarioState(
                 initialState.X,
@@ -209,12 +189,12 @@ namespace STROOP.Calculators
         }
 
         // update_air_without_turn
-        private static MarioState ComputeAirHSpeed(MarioState initialState, RelativeDirection direction)
+        private MarioState ComputeAirHSpeed(MarioState initialState, RelativeDirection direction)
         {
-            bool longJump = false;
-            int maxSpeed = longJump ? 48 : 32;
+            var longJump = false;
+            var maxSpeed = longJump ? 48 : 32;
 
-            ushort marioAngle = initialState.MarioAngle;
+            var marioAngle = initialState.MarioAngle;
             int deltaAngleIntendedFacing;
             switch (direction)
             {
@@ -239,7 +219,7 @@ namespace STROOP.Calculators
             float inputScaledMagnitude = direction == RelativeDirection.Center ? 0 : 32;
 
             float perpSpeed = 0;
-            float newHSpeed = ApproachHSpeed(initialState.HSpeed, 0, 0.35f, 0.35f);
+            var newHSpeed = ApproachHSpeed(initialState.HSpeed, 0, 0.35f, 0.35f);
             if (inputScaledMagnitude > 0)
             {
                 newHSpeed += (inputScaledMagnitude / 32) * 1.5f * InGameTrigUtilities.InGameCosine(deltaAngleIntendedFacing);
@@ -249,12 +229,12 @@ namespace STROOP.Calculators
             if (newHSpeed > maxSpeed) newHSpeed -= 1;
             if (newHSpeed < -16) newHSpeed += 2;
 
-            float newSlidingXSpeed = InGameTrigUtilities.InGameSine(marioAngle) * newHSpeed;
-            float newSlidingZSpeed = InGameTrigUtilities.InGameCosine(marioAngle) * newHSpeed;
+            var newSlidingXSpeed = InGameTrigUtilities.InGameSine(marioAngle) * newHSpeed;
+            var newSlidingZSpeed = InGameTrigUtilities.InGameCosine(marioAngle) * newHSpeed;
             newSlidingXSpeed += perpSpeed * InGameTrigUtilities.InGameSine(marioAngle + 0x4000);
             newSlidingZSpeed += perpSpeed * InGameTrigUtilities.InGameCosine(marioAngle + 0x4000);
-            float newXSpeed = newSlidingXSpeed;
-            float newZSpeed = newSlidingZSpeed;
+            var newXSpeed = newSlidingXSpeed;
+            var newZSpeed = newSlidingZSpeed;
 
             return new MarioState(
                 initialState.X,
@@ -274,18 +254,18 @@ namespace STROOP.Calculators
                 initialState.Index + 1);
         }
 
-        private static float ComputeAirHSpeed(float initialHSpeed)
+        private float ComputeAirHSpeed(float initialHSpeed)
         {
-            int maxSpeed = 32;
-            float newHSpeed = ApproachHSpeed(initialHSpeed, 0, 0.35f, 0.35f);
+            const int maxSpeed = 32;
+            var newHSpeed = ApproachHSpeed(initialHSpeed, 0, 0.35f, 0.35f);
             if (newHSpeed > maxSpeed) newHSpeed -= 1;
             if (newHSpeed < -16) newHSpeed += 2;
             return newHSpeed;
         }
 
-        public static float ComputePosition(float position, float hSpeed, int frames)
+        public float ComputePosition(float position, float hSpeed, int frames)
         {
-            for (int i = 0; i < frames; i++)
+            for (var i = 0; i < frames; i++)
             {
                 hSpeed = ComputeAirHSpeed(hSpeed);
                 position += hSpeed;
@@ -293,9 +273,9 @@ namespace STROOP.Calculators
             return position;
         }
 
-        private static MarioState ComputeAirYSpeed(MarioState initialState)
+        private MarioState ComputeAirYSpeed(MarioState initialState)
         {
-            float newYSpeed = Math.Max(initialState.YSpeed - 4, -75);
+            var newYSpeed = Math.Max(initialState.YSpeed - 4, -75);
             return new MarioState(
                 initialState.X,
                 initialState.Y,
@@ -314,12 +294,9 @@ namespace STROOP.Calculators
                 initialState.Index);
         }
 
-        private static float ApproachHSpeed(float speed, float maxSpeed, float increase, float decrease)
+        private float ApproachHSpeed(float speed, float maxSpeed, float increase, float decrease)
         {
-            if (speed < maxSpeed)
-                return Math.Min(maxSpeed, speed + increase);
-            else
-                return Math.Max(maxSpeed, speed - decrease);
+            return speed < maxSpeed ? Math.Min(maxSpeed, speed + increase) : Math.Max(maxSpeed, speed - decrease);
         }
     }
 }

@@ -3,7 +3,6 @@ using System.Drawing;
 using STROOP.Utilities;
 using OpenTK;
 using STROOP.Structs.Configurations;
-using STROOP.Structs;
 using System;
 using System.Windows.Forms;
 using STROOP.Calculators;
@@ -14,6 +13,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
     [ObjectDescription("Iwerlipses", "Movement")]
     public class MapIwerlipsesObject : MapObject
     {
+       
         public MapIwerlipsesObject() : base(null)
         {
             Opacity = 0.5;
@@ -79,6 +79,7 @@ namespace STROOP.Tabs.MapTab.MapObjects
 
         public override void Update()
         {
+            var airMovementCalculator = new AirMovementCalculator();
             base.Update();
 
             if (!_lockPositions)
@@ -89,10 +90,10 @@ namespace STROOP.Tabs.MapTab.MapObjects
             _ellipseTransforms.Clear();
             for (int it_numQSteps = 1; it_numQSteps <= _numQSteps; it_numQSteps++)
             {
-                MarioState marioStateCenter = AirMovementCalculator.ApplyInputRepeatedly(_marioState, RelativeDirection.Center, it_numQSteps);
-                MarioState marioStateForward = AirMovementCalculator.ApplyInputRepeatedly(_marioState, RelativeDirection.Forward, it_numQSteps);
-                MarioState marioStateBackward = AirMovementCalculator.ApplyInputRepeatedly(_marioState, RelativeDirection.Backward, it_numQSteps);
-                MarioState marioStateLeft = AirMovementCalculator.ApplyInputRepeatedly(_marioState, RelativeDirection.Left, it_numQSteps);
+                MarioState marioStateCenter = airMovementCalculator.ApplyInputRepeatedly(_marioState, RelativeDirection.Center, it_numQSteps);
+                MarioState marioStateForward = airMovementCalculator.ApplyInputRepeatedly(_marioState, RelativeDirection.Forward, it_numQSteps);
+                MarioState marioStateBackward = airMovementCalculator.ApplyInputRepeatedly(_marioState, RelativeDirection.Backward, it_numQSteps);
+                MarioState marioStateLeft = airMovementCalculator.ApplyInputRepeatedly(_marioState, RelativeDirection.Left, it_numQSteps);
 
                 ushort marioAngle = _marioState.MarioAngle;
                 (float cx, float cz) = (marioStateCenter.X, marioStateCenter.Z);
