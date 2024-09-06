@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using STROOP.Controls;
 using STROOP.Controls.VariablePanel;
+using STROOP.Forms;
 
 namespace STROOP.Tabs
 {

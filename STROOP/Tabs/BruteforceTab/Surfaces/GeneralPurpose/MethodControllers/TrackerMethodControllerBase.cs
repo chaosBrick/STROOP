@@ -2,6 +2,7 @@
 
 using STROOP.Controls.VariablePanel;
 using STROOP.Core.Variables;
+using STROOP.Forms;
 using STROOP.Utilities;
 
 namespace STROOP.Tabs.BruteforceTab.Surfaces.GeneralPurpose.MethodControllers

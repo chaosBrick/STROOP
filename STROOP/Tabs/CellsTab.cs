@@ -2,6 +2,7 @@
 using STROOP.Utilities;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using STROOP.Forms;
 using STROOP.Structs;
 
 namespace STROOP.Tabs

@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Xml.Linq;
 using STROOP.Extensions;
+using STROOP.Forms;
 using STROOP.Managers;
 using STROOP.Models;
 using STROOP.Structs;

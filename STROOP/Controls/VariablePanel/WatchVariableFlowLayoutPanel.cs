@@ -855,7 +855,7 @@ namespace STROOP.Controls.VariablePanel
             else if (Font != SystemFonts.DefaultFont)
                 Font = SystemFonts.DefaultFont;
 
-            var searchForm = (FindForm() as StroopMainForm)?.searchVariableDialog ?? null;
+            var searchForm = (FindForm() as StroopMainForm)?.SearchVariableDialog ?? null;
             _hiddenSearchResults.Clear();
             var shownVars = new HashSet<WatchVariableControl>(_shownWatchVarControls);
             var removeLater = new HashSet<WatchVariableControl>();

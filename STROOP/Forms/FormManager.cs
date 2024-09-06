@@ -1,7 +1,6 @@
-﻿using STROOP.Forms;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace STROOP.Structs
+namespace STROOP.Forms
 {
     public static class FormManager
     {

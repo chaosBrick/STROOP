@@ -7,6 +7,7 @@ using STROOP.Controls.VariablePanel;
 using STROOP.Core.Variables;
 using STROOP.Core.WatchVariables;
 using STROOP.Enums;
+using STROOP.Forms;
 using STROOP.Models;
 using STROOP.Structs.Configurations;
 using STROOP.Ttc;

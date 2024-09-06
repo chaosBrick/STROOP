@@ -1,5 +1,4 @@
-﻿using STROOP.Structs;
-using STROOP.Utilities;
+﻿using STROOP.Utilities;
 using System.Drawing;
 using System.Windows.Forms;
 using STROOP.Enums;

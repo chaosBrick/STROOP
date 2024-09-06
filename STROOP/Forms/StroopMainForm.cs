@@ -1,47 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Diagnostics;
-using STROOP.Utilities;
-using STROOP.Structs;
-using STROOP.Managers;
-using STROOP.Extensions;
-using STROOP.Structs.Configurations;
-using STROOP.Forms;
-using STROOP.Models;
 using STROOP.Core.Variables;
 using STROOP.Enums;
+using STROOP.Extensions;
+using STROOP.Managers;
+using STROOP.Models;
+using STROOP.Structs;
+using STROOP.Structs.Configurations;
+using STROOP.Utilities;
 
-namespace STROOP
+namespace STROOP.Forms
 {
     public partial class StroopMainForm : Form
     {
         // STROOP VERSION NAME
-        const string _version = "Refactor 0.6.2";
+        private const string Version = "Refactor 0.6.2";
 
         public event Action Updating;
 
-        DataTable _tableOtherData = new DataTable();
-        Dictionary<int, DataRow> _otherDataRowAssoc = new Dictionary<int, DataRow>();
-        Dictionary<Type, Tabs.STROOPTab> tabsByType = new Dictionary<Type, Tabs.STROOPTab>();
-        public ObjectSlotsManager ObjectSlotsManager;
+        private readonly Dictionary<Type, Tabs.STROOPTab> _tabsByType = new Dictionary<Type, Tabs.STROOPTab>();
+        public readonly ObjectSlotsManager ObjectSlotsManager;
 
-        bool _objSlotResizing = false;
-        int _resizeObjSlotTime = 0;
-        readonly bool isMainForm;
-        List<Process> _availableProcesses = new List<Process>();
+        private bool _objSlotResizing = false;
+        private int _resizeObjSlotTime = 0;
+        private readonly bool _isMainForm;
+        private List<Process> _availableProcesses = new List<Process>();
             
-        public readonly SearchVariableDialog searchVariableDialog;
+        public readonly SearchVariableDialog SearchVariableDialog;
         
         public StroopMainForm(bool isMainForm)
         {
-            this.searchVariableDialog = new SearchVariableDialog(this);
-            this.isMainForm = isMainForm;
+            SearchVariableDialog = new SearchVariableDialog(this);
+            _isMainForm = isMainForm;
             InitializeComponent();
             InitTabs();
             ObjectSlotsManager = new ObjectSlotsManager(this, tabControlMain);
@@ -50,13 +46,13 @@ namespace STROOP
 
         public void ShowSearchDialog()
         {
-            if (!searchVariableDialog.Visible)
+            if (!SearchVariableDialog.Visible)
             {
-                searchVariableDialog.StartPosition = FormStartPosition.Manual;
-                searchVariableDialog.Location = PointToScreen(new Point(150, 150));
+                SearchVariableDialog.StartPosition = FormStartPosition.Manual;
+                SearchVariableDialog.Location = PointToScreen(new Point(150, 150));
             }
-            searchVariableDialog.Show();
-            searchVariableDialog.Activate();
+            SearchVariableDialog.Show();
+            SearchVariableDialog.Activate();
         }
 
         private bool AttachToProcess(Process process)
@@ -67,7 +63,7 @@ namespace STROOP
             }
             
             // Find emulator
-            var emulators = Config.Emulators.Where(e => e.ProcessName.ToLower() == process.ProcessName.ToLower()).ToList();
+            var emulators = Config.Emulators.Where(e => string.Equals(e.ProcessName, process.ProcessName, StringComparison.CurrentCultureIgnoreCase)).ToList();
 
             if (emulators.Count > 1)
             {
@@ -83,32 +79,23 @@ namespace STROOP
             tabControlMain.TabPages.Clear();
             foreach (var t in typeof(Tabs.STROOPTab).Assembly.GetTypes())
             {
-                if (t.IsSubclassOf(typeof(Tabs.STROOPTab)) && !t.IsAbstract && !t.IsGenericType)
-                {
-                    var ctor = t.GetConstructor(new Type[0]);
-                    if (ctor != null)
-                    {
-                        var tabControl = (Tabs.STROOPTab)ctor.Invoke(new object[0]);
-                        var newTab = new TabPage(tabControl.GetDisplayName());
-                        newTab.Controls.Add(tabControl);
-                        tabControl.Bounds = newTab.ClientRectangle;
-                        tabControl.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top | AnchorStyles.Bottom;
-                        tabsByType[t] = tabControl;
-                        tabControlMain.TabPages.Add(newTab);
-                        SavedSettingsConfig._allTabs.Add(newTab);
-                    }
-                }
+                if (!t.IsSubclassOf(typeof(Tabs.STROOPTab)) || t.IsAbstract || t.IsGenericType) continue;
+                var ctor = t.GetConstructor(Type.EmptyTypes);
+                if (ctor == null) continue;
+                var tabControl = (Tabs.STROOPTab)ctor.Invoke(Array.Empty<object>());
+                var newTab = new TabPage(tabControl.GetDisplayName());
+                newTab.Controls.Add(tabControl);
+                tabControl.Bounds = newTab.ClientRectangle;
+                tabControl.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top | AnchorStyles.Bottom;
+                _tabsByType[t] = tabControl;
+                tabControlMain.TabPages.Add(newTab);
+                SavedSettingsConfig._allTabs.Add(newTab);
             }
         }
 
         private string GetDisplayNameForProcess(Process process)
         {
-            if (string.IsNullOrWhiteSpace(process.MainWindowTitle))
-            {
-                return $"{process.ProcessName} ({process.Id})";
-            }
-            
-            return process.MainWindowTitle;
+            return string.IsNullOrWhiteSpace(process.MainWindowTitle) ? $"{process.ProcessName} ({process.Id})" : process.MainWindowTitle;
         }
         
         private void StroopMainForm_Load(object sender, EventArgs e)
@@ -129,14 +116,14 @@ namespace STROOP
             InitializeTabRemoval();
             SavedSettingsConfig.InvokeInitiallySavedRemovedTabs();
 
-            labelVersionNumber.Text = _version;
+            labelVersionNumber.Text = Version;
 
             // Collect garbage, we are fully loaded now!
             GC.Collect();
             GC.WaitForPendingFinalizers();
 
             // Load process
-            buttonRefresh_Click(this, new EventArgs());
+            buttonRefresh_Click(this, EventArgs.Empty);
         }
 
         protected override void OnShown(EventArgs e)
@@ -150,23 +137,27 @@ namespace STROOP
 
         private void InitializeTabRemoval()
         {
-            tabControlMain.Click += (se, ev) =>
+            tabControlMain.Click += OnTabControlMainOnClick;
+
+            buttonTabAdd.ContextMenuStrip = new ContextMenuStrip();
+
+            buttonTabAdd.ContextMenuStrip.Opening += (se, ev) => OpeningFunction();
+            OpeningFunction();
+            return;
+
+            void OpeningFunction()
+            {
+                buttonTabAdd.ContextMenuStrip.Items.Clear();
+                SavedSettingsConfig.GetRemovedTabItems().ForEach(item => buttonTabAdd.ContextMenuStrip.Items.Add(item));
+            }
+
+            void OnTabControlMainOnClick(object se, EventArgs ev)
             {
                 if (KeyboardUtilities.IsCtrlHeld())
                 {
                     SavedSettingsConfig.RemoveTab(tabControlMain.SelectedTab);
                 }
-            };
-
-            buttonTabAdd.ContextMenuStrip = new ContextMenuStrip();
-            Action openingFunction = () =>
-            {
-                buttonTabAdd.ContextMenuStrip.Items.Clear();
-                SavedSettingsConfig.GetRemovedTabItems().ForEach(
-                    item => buttonTabAdd.ContextMenuStrip.Items.Add(item));
-            };
-            buttonTabAdd.ContextMenuStrip.Opening += (se, ev) => openingFunction();
-            openingFunction();
+            }
         }
 
         private void SetUpContextMenuStrips()
@@ -201,8 +192,8 @@ namespace STROOP
                     () => saveAsSavestate(),
                     () =>
                     {
-                        string varFilePath = @"Config/MhsData.xml";
-                        List<NamedVariableCollection.IView> precursors = XmlConfigParser.OpenWatchVariableControlPrecursors(varFilePath);
+                        const string varFilePath = @"Config/MhsData.xml";
+                        var precursors = XmlConfigParser.OpenWatchVariableControlPrecursors(varFilePath);
                         VariablePopOutForm form = new VariablePopOutForm();
                         form.Initialize(precursors);
                         form.ShowForm();
@@ -212,7 +203,7 @@ namespace STROOP
                     () => HelpfulHintUtilities.ShowAllHelpfulHints(),
                     () =>
                     {
-                        ImageForm imageForm = new ImageForm();
+                        var imageForm = new ImageForm();
                         imageForm.Show();
                     },
                     () =>
@@ -595,10 +586,10 @@ namespace STROOP
             tabControlMain.SelectedTab = stroopTab.Tab;
         }
 
-        public T GetTab<T>() where T : Tabs.STROOPTab => (T)tabsByType[typeof(T)];
+        public T GetTab<T>() where T : Tabs.STROOPTab => (T)_tabsByType[typeof(T)];
         public IEnumerable<Tabs.STROOPTab> EnumerateTabs()
         {
-            foreach (var t in tabsByType)
+            foreach (var t in _tabsByType)
                 yield return t.Value;
         }
 
@@ -610,7 +601,7 @@ namespace STROOP
                 Config.Stream.OnDisconnect -= _sm64Stream_OnDisconnect;
                 Config.Stream.WarnReadonlyOff -= _sm64Stream_WarnReadonlyOff;
             }
-            if (isMainForm)
+            if (_isMainForm)
             {
                 if (Config.Stream != null)
                 {

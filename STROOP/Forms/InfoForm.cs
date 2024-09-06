@@ -17,7 +17,7 @@ namespace STROOP.Forms
 
         public void SetTriangleCoordinates(short[] coordinates)
         {
-            this.Text = "Triangle Info";
+            Text = "Triangle Info";
             textBoxTitle.Text = "Triangle Coordinates";
             textBoxTriangleInfo.Text = StringifyCoordinates(coordinates);
         }

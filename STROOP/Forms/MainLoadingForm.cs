@@ -9,8 +9,8 @@ namespace STROOP.Forms
 {
     public partial class MainLoadingForm : Form
     {
-        int _maxStatus;
-        Point lastclickedpoint;
+        private int _maxStatus;
+        private Point _lastclickedpoint;
 
         public MainLoadingForm()
         {
@@ -31,7 +31,7 @@ namespace STROOP.Forms
         public void RunLoadingTasks(params (string name, Action task)[] tasks)
         {
             _maxStatus = tasks.Length;
-            for (int i = 0; i < tasks.Length; i++)
+            for (var i = 0; i < tasks.Length; i++)
             {
                 var taskNumber = i;
                 Invoke(new Action(() =>
@@ -42,37 +42,36 @@ namespace STROOP.Forms
                 }));
                 tasks[i].task();
             }
-            Invoke(new Action(() => labelLoadingStatus.Text = "Finishing"));
+
+            void Action() => labelLoadingStatus.Text = "Finishing";
+
+            Invoke(new Action(Action));
         }
 
         private void MainLoadingForm_MouseDown(object sender, MouseEventArgs e)
         {
-            lastclickedpoint.X = e.X;
-            lastclickedpoint.Y = e.Y;
+            _lastclickedpoint.X = e.X;
+            _lastclickedpoint.Y = e.Y;
         }
 
         private void MainLoadingForm_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left)
-            {
-                this.Left += e.X - lastclickedpoint.X;
-                this.Top += e.Y - lastclickedpoint.Y;
-            }
+            if (e.Button != MouseButtons.Left) return;
+            this.Left += e.X - _lastclickedpoint.X;
+            this.Top += e.Y - _lastclickedpoint.Y;
         }
 
         private void progressBarLoading_MouseDown(object sender, MouseEventArgs e)
         {
             // This has 4 references (each control)
-            lastclickedpoint = new Point(e.X, e.Y);
+            _lastclickedpoint = new Point(e.X, e.Y);
         }
 
         private void progressBarLoading_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left)
-            {
-                this.Left += e.X - lastclickedpoint.X;
-                this.Top += e.Y - lastclickedpoint.Y;
-            }
+            if (e.Button != MouseButtons.Left) return;
+            this.Left += e.X - _lastclickedpoint.X;
+            this.Top += e.Y - _lastclickedpoint.Y;
         }
     }
 }

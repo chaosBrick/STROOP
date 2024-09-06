@@ -9,6 +9,7 @@ using STROOP.Structs.Configurations;
 using STROOP.Models;
 using System.Collections.ObjectModel;
 using STROOP.Controls;
+using STROOP.Forms;
 
 namespace STROOP.Managers
 {

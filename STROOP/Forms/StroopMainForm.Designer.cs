@@ -1,7 +1,7 @@
-using STROOP.Controls;
 using System.Windows.Forms;
+using STROOP.Controls;
 
-namespace STROOP
+namespace STROOP.Forms
 {
     partial class StroopMainForm
     {

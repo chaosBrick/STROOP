@@ -2,6 +2,7 @@
 using STROOP.Utilities;
 using System;
 using System.Collections.Generic;
+using STROOP.Forms;
 
 namespace STROOP.Structs.Configurations
 {

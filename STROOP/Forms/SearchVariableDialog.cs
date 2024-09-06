@@ -5,9 +5,9 @@ namespace STROOP.Forms
 {
     public partial class SearchVariableDialog : Form
     {
-        public readonly StroopMainForm parent;
-        Regex regex = null;
-        public bool IsMatch(string str) => regex?.IsMatch(chkCaseSensitive.Checked ? str : str.ToLower()) ?? false;
+        private readonly StroopMainForm parent;
+        private Regex _regex;
+        public bool IsMatch(string str) => _regex?.IsMatch(chkCaseSensitive.Checked ? str : str.ToLower()) ?? false;
         public bool searchHidden => chkSearchHidden.Checked;
 
         public SearchVariableDialog(StroopMainForm parent)
@@ -17,9 +17,9 @@ namespace STROOP.Forms
             TopMost = true;
             Activated += (_, __) => Opacity = 1;
             Deactivate += (_, __) => Opacity = 0.5;
-            FormClosing += (_, __) =>
+            FormClosing += (_, a) =>
             {
-                __.Cancel = true;
+                a.Cancel = true;
                 Hide();
             };
             txtSearchQuery.TextChanged += UpdateRegex;
@@ -29,18 +29,16 @@ namespace STROOP.Forms
 
         private void UpdateRegex(object sender, System.EventArgs e)
         {
-            regex = null;
-            if (txtSearchQuery.Text.Length > 0)
-            {
-                var searchText = txtSearchQuery.Text;
-                if (!chkCaseSensitive.Checked)
-                    searchText = searchText.ToLower();
-                if (chkDollarWildcard.Checked)
-                    searchText = Regex.Escape(searchText).Replace("\\$", ".*");
+            _regex = null;
+            if (txtSearchQuery.Text.Length <= 0) return;
+            var searchText = txtSearchQuery.Text;
+            if (!chkCaseSensitive.Checked)
+                searchText = searchText.ToLower();
+            if (chkDollarWildcard.Checked)
+                searchText = Regex.Escape(searchText).Replace("\\$", ".*");
 
-                var exp = ".*" + searchText + ".*$";
-                regex = new Regex(exp);
-            }
+            var exp = ".*" + searchText + ".*$";
+            _regex = new Regex(exp);
         }
     }
 }

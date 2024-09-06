@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using OpenTK;
 
 using STROOP.Core.Variables;
+using STROOP.Forms;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 
@@ -175,7 +176,7 @@ namespace STROOP.Controls.VariablePanel
                 var varNameFont = SavedSettingsConfig.WatchVarPanelBoldNames ? boldFont : Font;
 
                 lastRefreshed = DateTime.Now;
-                var searchForm = (form as StroopMainForm)?.searchVariableDialog;
+                var searchForm = (form as StroopMainForm)?.SearchVariableDialog;
                 bool SearchHighlight(string text) => searchForm?.IsMatch(text) ?? false;
 
                 int maxRows = GetMaxRows();

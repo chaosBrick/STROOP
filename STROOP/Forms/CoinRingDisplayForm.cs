@@ -1,5 +1,4 @@
-﻿using STROOP.Structs;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace STROOP.Forms
 {

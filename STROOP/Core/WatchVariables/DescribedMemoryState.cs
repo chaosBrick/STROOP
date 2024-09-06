@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using STROOP.Core.Variables;
+using STROOP.Forms;
 using STROOP.Structs.Configurations;
 using STROOP.Utilities;
 

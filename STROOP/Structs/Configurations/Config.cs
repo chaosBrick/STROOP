@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using STROOP.Controls;
+using STROOP.Forms;
 
 namespace STROOP.Structs.Configurations
 {
