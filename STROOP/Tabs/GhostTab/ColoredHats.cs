@@ -33,20 +33,12 @@ namespace STROOP.Tabs.GhostTab
         const uint S_SEGMENT_TABLE_OFFSET_US = 0x8033b400;
 
         const uint COLORED_HATS_CODE_TARGET_ADDR = 0x80408200;
-        const uint COLORED_HATS_LIGHTS_ADDR = 0x80408500;
+        const uint COLORED_HATS_LIGHTS_ADDR = 0x80408300;
 
         private static void EnableColoredHats()
         {
             using (Config.Stream.Suspend())
             {
-                Config.Stream.WriteRam(
-                    File.ReadAllBytes($"Resources/Hacks/{RomVersionConfig.Version}_gfx_generate_colored_hats.bin"),
-                    COLORED_HATS_CODE_TARGET_ADDR,
-                    EndiannessType.Big
-                    );
-
-                uint jumpinOffset = 0x00;
-
                 // Displaylist nodes that point to these should generate hats dynamically instead.
                 var originalDisplayListPointers = new uint[] {
                     0x40119A0,
@@ -71,40 +63,19 @@ namespace STROOP.Tabs.GhostTab
                         var foundPointer = Config.Stream.GetUInt32(addr + 0x14);
                         if (Array.IndexOf(originalDisplayListPointers, foundPointer) != -1)
                         {
-                            Config.Stream.SetValue((COLORED_HATS_CODE_TARGET_ADDR + jumpinOffset), addr + 0x14);
+                            Config.Stream.SetValue(COLORED_HATS_CODE_TARGET_ADDR, addr + 0x14);
                             Config.Stream.SetValue((ushort)0x12A, addr);
                         }
                     }
                 }
-
-                /* Old code to achieve the same thing in vanilla
-                var gfxNodesPerAnimationState = new[] { // addresses at which mario's hat gfx nodes are stored
-                    new [] { 0xf0a74, 0xf12f0, 0xf2990, 0xf320c, 0xf4898, 0xf5114},
-                    new [] { 0xf0a8c, 0xf1308, 0xf29a8, 0xf3224, 0xf48b0, 0xf512c},
-                    new [] { 0xf0aa4, 0xf1320, 0xf29c0, 0xf323c, 0xf48c8, 0xf5144},
-                    new [] { 0xf0b1c, 0xf1398, 0xf2a38, 0xf32b4, 0xf4940, 0xf51bc},
-                };
-                var originalValues = new HashSet<uint>();
-
-                foreach (var gfxNodeLst in gfxNodesPerAnimationState)
-                {
-                    foreach (var originalAddr in gfxNodeLst)
-                    {
-                        var addr = originalAddr + bank0x04Offset;
-                        originalValues.Add(Config.Stream.GetUInt32((uint)(addr + bank0x04Offset)));
-                        Config.Stream.SetValue((COLORED_HATS_CODE_TARGET_ADDR + jumpinOffset), (uint)addr);
-                        Config.Stream.SetValue((ushort)0x12A, (uint)(addr - 0x14));
-                    }
-                }
-                */
-
+                
                 var findOutWhatToCallThis = RomVersionConfig.Version == RomVersion.JP ? 0x8D720 : 0x90580;
                 uint jumpOutOfHeadAddr = (uint)(findOutWhatToCallThis + bank0x04Offset) + 0x8;
                 Config.Stream.WriteRam(new byte[] { 0xB8, 0, 0, 0, 0, 0, 0, 0 }, jumpOutOfHeadAddr, EndiannessType.Big);
 
                 var offsetA = 0xf470c - bank0x04Location;
 
-                //Disable low poly Mario
+                // Disable low poly Mario by finding the LOD threshold values and replacing them with the maximum distance (0x7fff) as appropriate
                 for (uint addr = (uint)bank0x04Location; addr < bank0x04Location + bank0x04Size; addr += 4)
                 {
                     var value = Config.Stream.GetUInt32(addr);

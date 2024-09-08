@@ -1,5 +1,8 @@
 .n64
 
+addiu sp, sp, 0xFFC0
+sw ra, 0x14 (sp)
+
 lui t1, 0x0401
 ori t0, t1, 0x19A0
 lui at, MarioObjectAddrHi
@@ -13,9 +16,6 @@ lb t2, 0x60 (t8)
 @@SkipGhostRead:
 ori t1, t1, 0x1978
 
-; main entry point?!
-addiu sp, sp, 0xFFC0
-sw ra, 0x14 (sp)
 sw t0, 0x18 (sp)
 sw t1, 0x1C (sp)
 sw t2, 0x20 (sp)
@@ -32,8 +32,8 @@ lui at, 0x0388
 ori at, at, 0x0010
 sw at, 0x18 (v0)
 sw at, 0x0 (v0)
-lui t0, 0x0040
-ori t0, t0, 0x8500
+lui t0, 0x8040
+ori t0, t0, 0x8300
 lw t1, 0x20 (sp)
 sll t1, t1, 0x5
 addu t2, t1, t0

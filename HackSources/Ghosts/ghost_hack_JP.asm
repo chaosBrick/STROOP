@@ -37,7 +37,6 @@ alloc_display_list equ 0x8027897c
 .include "./avoid_holp_desyncs.asm"
 .close
 
-; a gfx_generate_colored_hats function to inject dynamically
-.create "./build/JP_gfx_generate_colored_hats.bin", 0x00000000
+.create "./build/JP_80408200_gfx_generate_colored_hats.bin", 0x00000000
 .include "./gfx_generate_colored_hats.asm"
 .close

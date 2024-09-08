@@ -12,12 +12,14 @@ namespace STROOP.Tabs.GhostTab
 {
     public partial class GhostTab : STROOPTab
     {
+        const uint bufferBaseAddress = 0x80409B00;
+
         static IEnumerable<uint> GetActiveGhostIndices()
         {
             foreach (var ind in instance.listBoxGhosts.SelectedIndices)
                 yield return (uint)(int)ind;
         }
-        
+
         [InitializeSpecial]
         static void AddSpecialVariables()
         {
@@ -36,8 +38,6 @@ namespace STROOP.Tabs.GhostTab
         static GhostTab instance;
 
         RomHack ghostHack;
-
-        uint bufferBaseAddress = 0x80408800;
 
         float yTargetPosition;
         int lastGlobalTimer;
@@ -442,8 +442,7 @@ Are you sure you want to continue?";
                     if (poolAddr1 + requiredSpace > poolAddr2)
                         warningTextBuilder.AppendLine("Warning: Pool 1 overlaps with pool 2");
                 }
-                else
-                    if (poolAddr2 + requiredSpace > poolAddr1)
+                else if (poolAddr2 + requiredSpace > poolAddr1)
                     warningTextBuilder.AppendLine("Warning: Pool 2 overlaps with pool 1");
 
                 DialogResult proceed = DialogResult.Yes;

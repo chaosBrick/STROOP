@@ -32,7 +32,7 @@ sw RegCurrentGhost, 0x28 (SP)
 sw RegPointerToCurrentGhost, 0x24 (SP)
 sw RegProcessedGhostCount, 0x20 (SP)
 
-; skip initializing if already Mario object is flagged
+; skip initializing if Mario object is already flagged
 or RegMarioObject, r0, t0
 lh t0, 0x2 (RegMarioObject)
 andi t1, t0, InitializedGhostsFlag
@@ -109,7 +109,7 @@ sll t1, RegProcessedGhostCount, 0xC
 addu t0, t0, t1
 lui at, 0x8041
 addu t0, t0, at
-addiu t0, t0, 0x8800
+addiu t0, t0, 0x9B00
 
 ; copy data from buffer to ghost node
 
@@ -121,7 +121,7 @@ sw t1, 0x24 (RegCurrentGhost)
 lw t1, 0x08 (t0)
 sw t1, 0x28 (RegCurrentGhost)
 
-; angles (TODO: store angles as RegPointerToCurrentGhost6 in file?)
+; angles (TODO: store angles as s16 in file?)
 lw t1, 0x10 (t0)
 sh t1, 0x1A (RegCurrentGhost)
 lw t1, 0x14 (t0)
