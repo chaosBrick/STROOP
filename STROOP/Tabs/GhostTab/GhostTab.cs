@@ -12,6 +12,8 @@ namespace STROOP.Tabs.GhostTab
 {
     public partial class GhostTab : STROOPTab
     {
+        const uint bufferBaseAddress = 0x80409B00;
+
         static IEnumerable<uint> GetActiveGhostIndices()
         {
             foreach (var ind in instance.listBoxGhosts.SelectedIndices)
@@ -37,8 +39,6 @@ namespace STROOP.Tabs.GhostTab
 
         RomHack ghostHack;
 
-        uint bufferBaseAddress = 0x80408800;
-
         float yTargetPosition;
         int lastGlobalTimer;
 
@@ -52,7 +52,6 @@ namespace STROOP.Tabs.GhostTab
             listBoxGhosts.KeyDown += listBoxGhosts_KeyDown;
 
             instance = this;
-            ghostHack = new RomHack("Resources/Hacks/GhostHack.hck", "Ghost Hack");
             UpdateFileWatchers();
         }
 
@@ -212,10 +211,10 @@ namespace STROOP.Tabs.GhostTab
             labelGhostPlaybackStart.Text = $"Original playback start: {originalPlaybackStartValue ?? "-"}";
 
             if (originalPlaybackStartValue != MULTIPLE_VALUES)
-                numericUpDownStartOfPlayback.Value = uint.Parse(originalPlaybackStartValue);
+                numericUpDownStartOfPlayback.Value = originalPlaybackStartValue == null ? 0 : uint.Parse(originalPlaybackStartValue);
 
             if (playbackOffset != MULTIPLE_VALUES)
-                numericUpDownPlaybackOffset.Value = long.Parse(playbackOffset);
+                numericUpDownPlaybackOffset.Value = playbackOffset == null ? 0 : long.Parse(playbackOffset);
 
             if (uint.TryParse(playbackStartValue, out uint val))
                 numericUpDownStartOfPlayback.Value = val;
@@ -238,6 +237,10 @@ namespace STROOP.Tabs.GhostTab
 
         bool UpdateHackStatus()
         {
+            var expectedHackName = $"Ghost Hack {RomVersionConfig.Version}";
+            if (ghostHack?.Name != expectedHackName)
+                ghostHack = new RomHack($"Resources/Hacks/GhostHack{RomVersionConfig.Version}.hck", expectedHackName);
+
             var ghostPointer = Config.Stream.GetInt32(0x80407FF8);
             bool ghostsActive = (ghostPointer & 0xFF000000) == 0x80000000;
             bool shouldDisable = Config.Stream.GetByte(0x80407FFC) == 0xFF;
@@ -341,6 +344,7 @@ namespace STROOP.Tabs.GhostTab
                 ghostHack.LoadPayload();
                 Config.Stream.WriteRam(new byte[4], 0x80407FFC, EndiannessType.Little);
                 Config.Stream.WriteRam(new byte[0x70], 0x80407F90, EndiannessType.Little);
+
                 EnableColoredHats();
 
                 //Tell ROM Hacks to suck it and get rid of the 01010101 pattern
@@ -438,8 +442,7 @@ Are you sure you want to continue?";
                     if (poolAddr1 + requiredSpace > poolAddr2)
                         warningTextBuilder.AppendLine("Warning: Pool 1 overlaps with pool 2");
                 }
-                else
-                    if (poolAddr2 + requiredSpace > poolAddr1)
+                else if (poolAddr2 + requiredSpace > poolAddr1)
                     warningTextBuilder.AppendLine("Warning: Pool 2 overlaps with pool 1");
 
                 DialogResult proceed = DialogResult.Yes;

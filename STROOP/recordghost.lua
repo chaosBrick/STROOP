@@ -1,5 +1,35 @@
-GLOBAL_TIMER_ADDRESS = 0x8032D5D4
-MARIO_OBJ_ADDRESS = 0x80361158
+
+local ROM = {
+	DetectedROM,
+	U = 0xC58400A4,
+	J = 0x27BD0020,
+	Detect = function(this)
+		DetectedROM = memory.readdword(0x802F0000)
+
+		if DetectedROM == this.U then
+			DetectedROM = "U"
+			print("U ROM detected")
+		elseif DetectedROM == this.J then
+			DetectedROM = "J"
+			print("J ROM detected")
+		else
+			DetectedROM = nil
+			print("Error: ROM must be U or J")
+		end
+	end,
+	SwitchAddress = function(addressU, addressJ)
+		if DetectedROM == "U" then
+			return addressU
+		elseif DetectedROM == "J" then
+			return addressJ
+		end
+	end
+}
+
+ROM:Detect()
+
+GLOBAL_TIMER_ADDRESS = ROM.SwitchAddress(0x8032D5D4, 0x8032C694)
+MARIO_OBJ_ADDRESS = ROM.SwitchAddress(0x80361158, 0x8035FDE8)
 
 OBJ_POSITION_OFFSET = 0x20
 OBJ_ANIMATION_OFFSET = 0x38

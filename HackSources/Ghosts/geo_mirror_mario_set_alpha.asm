@@ -16,20 +16,21 @@ sll t9, t9, 0x3
 addu t1, t9, t0
 lui t0, gCurGraphNodeObjectHi
 lw t0, gCurGraphNodeObjectLo (t0)
-bne t0, at, @@EEH
-lui t8, 0x8040
+lui at, MarioObjectAddrHi
+lw at, MarioObjectAddrLo (at)
+bne t0, at, @@IsGhost
 lh t4, 0x8 (t1)
-beq t5, r0, @@DO_THE_THING
+andi t5, t4, 0x0100
+beq t5, r0, @@JAL
 ori a1, r0, 0xFF
+beq r0, r0, @@JAL
 andi a1, t4, 0xFF
-beq r0, r0, @@DO_THE_THING
-nop
-@@EEH:
+@@IsGhost:
 lb t8, 0x61 (t0)
-beq t8, r0, @@DO_THE_THING
+beq t8, r0, @@JAL
 ori a1, r0, 0xFF
 ori A1, r0, 0x7F
-@@DO_THE_THING:
+@@JAL:
 jal make_gfx_mario_alpha;
 nop
 @@RETURN:
