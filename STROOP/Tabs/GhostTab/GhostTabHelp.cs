@@ -50,12 +50,14 @@ Always make sure your runs work from a clean savestate.
             frm.Size = new System.Drawing.Size(900, 400);
             frm.SetText("Ghost Help",
                         "Notes",
-@"The ghost hack currently works only on the US version of Super Mario 64 (and therefore also on numerous ROM hacks).
+@"The ghost hack works on the US and JP versions of Super Mario 64 (and therefore also on numerous ROM hacks).
 It works best when mupen is set to ""Pure Interpreter"" mode to apply code changes immediately.
 If you are not on ""Pure Interpreter"", follow the steps displayed under the ""Enable Ghost Hack"" button exactly and it should still work.
 
 While in most cases the use of the ghost hack is unproblematic, there are several instances in which enabling the ghost hack may alter game behavior. It is therefore recommended that you only use the hack during a recording or playback, but never in a savestate from which an m64 file starts.
 Always verify that your runs work without the hack.
+
+Rendering too many ghosts at once can cause a game crash. This number is usually somewhere around 15 to 18, but can be increased by moving the game's Gfx pool. See ""Moving the GFX pool"" for details.
 
 Disabling the ghost hack via the 'Disable Ghost hack' button may have unintended side effects, including crashing the game.
 Try to keep a savestate around that doesn't have the hack enabled instead.

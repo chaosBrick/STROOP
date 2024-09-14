@@ -12,17 +12,7 @@ namespace STROOP.Tabs.GhostTab
 {
     public partial class GhostTab : STROOPTab
     {
-        static int defaultGhostColorCounter = 1;
-        static readonly Vector4[] DefaultGhostColors = new[] {
-            new Vector4(1, 0, 0, 1),
-            new Vector4(1, 0.5f, 0, 1),
-            new Vector4(1, 1, 0, 1),
-            new Vector4(0, 1, 0, 1),
-            new Vector4(0, 1, 1, 1),
-            new Vector4(0, 0, 1, 1),
-            new Vector4(1, 1, 1, 1),
-            new Vector4(0.2f, 0.2f, 0.2f, 1),
-        };
+        const uint bufferBaseAddress = 0x80409B00;
 
         static IEnumerable<uint> GetActiveGhostIndices()
         {
@@ -44,76 +34,16 @@ namespace STROOP.Tabs.GhostTab
             target.Add<float>("GhostPitch", () => displayGhostVarFloat(frame => frame.oPitch)(), _ => Array.Empty<bool>());
             target.Add<float>("GhostRoll", () => displayGhostVarFloat(frame => frame.oRoll)(), _ => Array.Empty<bool>());
         }
+
         static GhostTab instance;
 
-        const uint COLORED_HATS_CODE_TARGET_ADDR = 0x80408200;
-        const uint COLORED_HATS_LIGHTS_ADDR = 0x80408500;
-        static void InjectHeadRenderOverrides()
-        {
-            using (Config.Stream.Suspend())
-            {
-                uint jumpinOffset = 0xe0;
+        RomHack ghostHack;
 
-                // Displaylist nodes that point to these should generate hats dynamically instead.
-                var originalDisplayListPointers = new uint[] {
-                    0x40119A0,
-                    0x4011A90,
-                    0x4011B80,
-                    0x4012030
-                };
-                var bank0x04Size = 0x100000 - 0x7EC20; //Rough estimate, relevant references should be in this range
-                var bank0x04Location = Config.Stream.GetInt32(0x8033b410);
-                var bank0x04Offset = bank0x04Location - 0x0007EC20; // 0x0007EC20 is the offset of bank 4 in vanilla Mario 64
-                for (uint addr = (uint)bank0x04Location; addr < bank0x04Location + bank0x04Size; addr += 4)
-                {
-                    if ((Config.Stream.GetInt32(addr) & 0xFFFF0000) == 0x001B0000)
-                    {
-                        var foundPointer = Config.Stream.GetUInt32(addr + 0x14);
-                        if (Array.IndexOf(originalDisplayListPointers, foundPointer) != -1)
-                        {
-                            Config.Stream.SetValue((COLORED_HATS_CODE_TARGET_ADDR + jumpinOffset), addr + 0x14);
-                            Config.Stream.SetValue((ushort)0x12A, addr);
-                        }
-                    }
-                }
-
-                /* Old code to achieve the same thing in vanilla
-                var gfxNodesPerAnimationState = new[] { // addresses at which mario's hat gfx nodes are stored
-                    new [] { 0xf0a74, 0xf12f0, 0xf2990, 0xf320c, 0xf4898, 0xf5114},
-                    new [] { 0xf0a8c, 0xf1308, 0xf29a8, 0xf3224, 0xf48b0, 0xf512c},
-                    new [] { 0xf0aa4, 0xf1320, 0xf29c0, 0xf323c, 0xf48c8, 0xf5144},
-                    new [] { 0xf0b1c, 0xf1398, 0xf2a38, 0xf32b4, 0xf4940, 0xf51bc},
-                };
-                var originalValues = new HashSet<uint>();
-
-                foreach (var gfxNodeLst in gfxNodesPerAnimationState)
-                {
-                    foreach (var originalAddr in gfxNodeLst)
-                    {
-                        var addr = originalAddr + bank0x04Offset;
-                        originalValues.Add(Config.Stream.GetUInt32((uint)(addr + bank0x04Offset)));
-                        Config.Stream.SetValue((COLORED_HATS_CODE_TARGET_ADDR + jumpinOffset), (uint)addr);
-                        Config.Stream.SetValue((ushort)0x12A, (uint)(addr - 0x14));
-                    }
-                }
-                */
-
-                uint jumpOutOfHeadAddr = (uint)(0x90580 + bank0x04Offset) + 0x8;
-                Config.Stream.WriteRam(new byte[] { 0xB8, 0, 0, 0, 0, 0, 0, 0 }, jumpOutOfHeadAddr, EndiannessType.Big);
-                //Disable low poly Mario
-                Config.Stream.SetValue(0x02587fff, (uint)(0x800f470c + bank0x04Offset));
-                Config.Stream.SetValue(0x7fff7fff, (uint)(0x800f6634 + bank0x04Offset));
-            }
-        }
-
-        Vector4 marioHatColor = new Vector4(1, 0, 0, 1);
-
-        uint bufferBaseAddress = 0x80408800;
+        float yTargetPosition;
+        int lastGlobalTimer;
 
         Ghost selectedGhost => listBoxGhosts.SelectedItem as Ghost;
         GhostFrame lastValidPlaybackFrame => selectedGhost?.lastValidPlaybackFrame ?? default(GhostFrame);
-
-        RomHack ghostHack;
 
         public GhostTab()
         {
@@ -122,86 +52,10 @@ namespace STROOP.Tabs.GhostTab
             listBoxGhosts.KeyDown += listBoxGhosts_KeyDown;
 
             instance = this;
-            ghostHack = new RomHack("Resources/Hacks/GhostHack.hck", "Ghost Hack");
             UpdateFileWatchers();
         }
 
-        IEnumerable<Ghost> GetSelectedGhosts()
-        {
-            var lst = listBoxGhosts.SelectedItems.ConvertAndRemoveNull(_ => _ as Ghost);
-            lst.Sort((a, b) => a.transparent && !b.transparent ? 1 : (a.transparent == b.transparent ? 0 : -1));
-            return lst;
-        }
         public override string GetDisplayName() => "Ghost";
-
-        void AddGhost(string name, Ghost newGhost)
-        {
-            newGhost.name = name;
-            newGhost.hatColor = DefaultGhostColors[defaultGhostColorCounter];
-            defaultGhostColorCounter = (defaultGhostColorCounter + 1) % DefaultGhostColors.Length;
-            listBoxGhosts.Items.Add(newGhost);
-            listBoxGhosts.SelectedItem = newGhost;
-        }
-
-        void SelectGhost(object sender, EventArgs e) => UpdateGhostInfoControls();
-
-        void UpdateGhostInfoControls()
-        {
-            const string MULTIPLE_VALUES = "<Multiple values>";
-
-            string fileValue = null;
-            string numFramesValue = null;
-            string originalPlaybackStartValue = null;
-            string playbackStartValue = null;
-            string playbackOffset = null;
-            string nameValue = null;
-            CheckState? transparentValue = null;
-
-            foreach (var g in GetSelectedGhosts())
-            {
-                GeneralUtilities.GetMeaningfulValue(ref fileValue, g.fileName, "<Multiple Files>");
-                GeneralUtilities.GetMeaningfulValue(ref numFramesValue, g.numFrames.ToString(), MULTIPLE_VALUES);
-                GeneralUtilities.GetMeaningfulValue(ref originalPlaybackStartValue, g.originalPlaybackBaseFrame.ToString(), MULTIPLE_VALUES);
-                GeneralUtilities.GetMeaningfulValue(ref playbackOffset, ((long)g.playbackBaseFrame - g.originalPlaybackBaseFrame).ToString(), MULTIPLE_VALUES);
-                GeneralUtilities.GetMeaningfulValue(ref playbackStartValue, g.playbackBaseFrame.ToString(), MULTIPLE_VALUES);
-                GeneralUtilities.GetMeaningfulValue(ref nameValue, g.name, "<Multiple Names>");
-                GeneralUtilities.GetMeaningfulValue(ref transparentValue, g.transparent ? CheckState.Checked : CheckState.Unchecked, CheckState.Indeterminate);
-            }
-
-            suspendHandlers = true;
-            labelGhostFile.Text = $"File: {fileValue ?? "-"}";
-            labelNumFrames.Text = $"Number of frames: {numFramesValue ?? "-"}";
-            labelGhostPlaybackStart.Text = $"Original playback start: {originalPlaybackStartValue ?? "-"}";
-
-            if (originalPlaybackStartValue != MULTIPLE_VALUES)
-                numericUpDownStartOfPlayback.Value = uint.Parse(originalPlaybackStartValue);
-
-            if (playbackOffset != MULTIPLE_VALUES)
-                numericUpDownPlaybackOffset.Value = long.Parse(playbackOffset);
-
-            if (uint.TryParse(playbackStartValue, out uint val))
-                numericUpDownStartOfPlayback.Value = val;
-
-            if (numericUpDownStartOfPlayback.Controls[1] is TextBox txt)
-                txt.Text = playbackStartValue ?? "<No value>";
-
-            checkTransparentGhosts.CheckState = transparentValue.HasValue ? transparentValue.Value : CheckState.Indeterminate;
-
-            textBoxGhostName.Text = nameValue;
-            suspendHandlers = false;
-        }
-
-        void SetStartOfPlayback(uint newValue)
-        {
-            foreach (var g in GetSelectedGhosts())
-                g.playbackBaseFrame = newValue;
-            UpdateGhostInfoControls();
-        }
-
-        float yTargetPosition;
-        int lastGlobalTimer;
-
-        bool updateGhostData => ghostHack.Status != RomHack.EnabledStatus.Disabled;
 
         public IEnumerable<PositionAngle> GetGhosts()
         {
@@ -213,29 +67,12 @@ namespace STROOP.Tabs.GhostTab
         public override void Update(bool active)
         {
             base.Update(active);
-            var ghostPointer = Config.Stream.GetInt32(0x80407FF8);
-            bool ghostsActive = (ghostPointer & 0xFF000000) == 0x80000000;
-            bool shouldDelete = Config.Stream.GetByte(0x80407FFC) == 0xFF;
-            if (shouldDelete)
-            {
-                labelHackActiveState.Text = "Disabling Ghost hack...\nInside a level, frame advance\nthen save state and load state.\nNot doing so will crash.\n(Not on Pure Interpreter)";
-                if (!ghostsActive)
-                {
-                    ghostHack.ClearPayload();
-                    Config.Stream.SetValue((byte)0, 0x80407FFC);
-                }
-                else
-                    return;
-            }
+
+            if (!UpdateHackStatus())
+                return;
+
+            var updateGhostData = ghostHack.Status != RomHack.EnabledStatus.Disabled;
             var buffer = new byte[0x1000];
-            ghostHack.UpdateEnabledStatus();
-            bool enabled = ghostHack.Status != RomHack.EnabledStatus.Disabled;
-            labelHackActiveState.Text = (ghostsActive && enabled) ?
-                                         "Ghost hack is enabled." :
-                                         (enabled ?
-                                         "Ghost hack is enabled\nbut not running.\nInside a level,\nsave state and load state,\nthen frame advance." :
-                                         "Ghost hack is disabled.");
-            buttonDisableGhostHack.Enabled = enabled;
 
             var globalTimer = Config.Stream.GetInt32(MiscConfig.GlobalTimerAddress);
             var ghostArr = GetSelectedGhosts().ToArray();
@@ -243,7 +80,7 @@ namespace STROOP.Tabs.GhostTab
             if (updateGhostData)
             {
                 Config.Stream.SetValue((byte)numGhosts, 0x80407FFF);
-                Config.Stream.WriteRam(ColorToLights(marioHatColor), (UIntPtr)(COLORED_HATS_LIGHTS_ADDR), EndiannessType.Big);
+                WriteMarioColorToStream();
             }
 
             for (int ghostIndex = 0; ghostIndex < numGhosts; ghostIndex++)
@@ -319,9 +156,8 @@ namespace STROOP.Tabs.GhostTab
                 {
                     Config.Stream.WriteRam(buffer, (UIntPtr)(bufferBaseAddress + ghostIndex * 0x1000), EndiannessType.Little);
 
-                    var color = ghostIndex < ghostArr.Length ? ghostArr[ghostIndex].hatColor : new Vector4(0.8f, 0.8f, 0.8f, 1.0f);
+                    WriteGhostColorToStream(ghostIndex, ghostArr);
 
-                    Config.Stream.WriteRam(ColorToLights(color), (UIntPtr)(COLORED_HATS_LIGHTS_ADDR + (ghostIndex + 1) * 0x20), EndiannessType.Big);
                     var ptr = Config.Stream.GetUInt32((uint)(0x80407ff8 - ghostIndex * 0x68));
                     Config.Stream.SetValue((byte)(ghostTransparent ? 1 : 0), ptr + 0x61);
                     lastGlobalTimer = globalTimer;
@@ -329,18 +165,107 @@ namespace STROOP.Tabs.GhostTab
             }
         }
 
-        static byte[] ColorToLights(Vector4 color)
+        IEnumerable<Ghost> GetSelectedGhosts()
         {
-            var c2 = color * 0.5f;
-            var R1 = (byte)Math.Max(0, Math.Min(255, (color.X * 255)));
-            var G1 = (byte)Math.Max(0, Math.Min(255, (color.Y * 255)));
-            var B1 = (byte)Math.Max(0, Math.Min(255, (color.Z * 255)));
+            var lst = listBoxGhosts.SelectedItems.ConvertAndRemoveNull(_ => _ as Ghost);
+            lst.Sort((a, b) => a.transparent && !b.transparent ? 1 : (a.transparent == b.transparent ? 0 : -1));
+            return lst;
+        }
 
-            var R2 = (byte)Math.Max(0, Math.Min(255, (c2.X * 255)));
-            var G2 = (byte)Math.Max(0, Math.Min(255, (c2.Y * 255)));
-            var B2 = (byte)Math.Max(0, Math.Min(255, (c2.Z * 255)));
+        void AddGhost(string name, Ghost newGhost)
+        {
+            newGhost.name = name;
+            SetColorForNewGhost(newGhost);
+            listBoxGhosts.Items.Add(newGhost);
+            listBoxGhosts.SelectedItem = newGhost;
+        }
 
-            return new byte[] { R2, G2, B2, 0x00, R2, G2, B2, 0x00, R1, G1, B1, 0x00, R1, G1, B1, 0x00, 0x28, 0x28, 0x28, 0x00, 0x00, 0x00, 0x00, 0x00 };
+        void SelectGhost(object sender, EventArgs e) => UpdateGhostInfoControls();
+
+        void UpdateGhostInfoControls()
+        {
+            const string MULTIPLE_VALUES = "<Multiple values>";
+
+            string fileValue = null;
+            string numFramesValue = null;
+            string originalPlaybackStartValue = null;
+            string playbackStartValue = null;
+            string playbackOffset = null;
+            string nameValue = null;
+            CheckState? transparentValue = null;
+
+            foreach (var g in GetSelectedGhosts())
+            {
+                GeneralUtilities.GetMeaningfulValue(ref fileValue, g.fileName, "<Multiple Files>");
+                GeneralUtilities.GetMeaningfulValue(ref numFramesValue, g.numFrames.ToString(), MULTIPLE_VALUES);
+                GeneralUtilities.GetMeaningfulValue(ref originalPlaybackStartValue, g.originalPlaybackBaseFrame.ToString(), MULTIPLE_VALUES);
+                GeneralUtilities.GetMeaningfulValue(ref playbackOffset, ((long)g.playbackBaseFrame - g.originalPlaybackBaseFrame).ToString(), MULTIPLE_VALUES);
+                GeneralUtilities.GetMeaningfulValue(ref playbackStartValue, g.playbackBaseFrame.ToString(), MULTIPLE_VALUES);
+                GeneralUtilities.GetMeaningfulValue(ref nameValue, g.name, "<Multiple Names>");
+                GeneralUtilities.GetMeaningfulValue(ref transparentValue, g.transparent ? CheckState.Checked : CheckState.Unchecked, CheckState.Indeterminate);
+            }
+
+            suspendHandlers = true;
+            labelGhostFile.Text = $"File: {fileValue ?? "-"}";
+            labelNumFrames.Text = $"Number of frames: {numFramesValue ?? "-"}";
+            labelGhostPlaybackStart.Text = $"Original playback start: {originalPlaybackStartValue ?? "-"}";
+
+            if (originalPlaybackStartValue != MULTIPLE_VALUES)
+                numericUpDownStartOfPlayback.Value = originalPlaybackStartValue == null ? 0 : uint.Parse(originalPlaybackStartValue);
+
+            if (playbackOffset != MULTIPLE_VALUES)
+                numericUpDownPlaybackOffset.Value = playbackOffset == null ? 0 : long.Parse(playbackOffset);
+
+            if (uint.TryParse(playbackStartValue, out uint val))
+                numericUpDownStartOfPlayback.Value = val;
+
+            if (numericUpDownStartOfPlayback.Controls[1] is TextBox txt)
+                txt.Text = playbackStartValue ?? "<No value>";
+
+            checkTransparentGhosts.CheckState = transparentValue.HasValue ? transparentValue.Value : CheckState.Indeterminate;
+
+            textBoxGhostName.Text = nameValue;
+            suspendHandlers = false;
+        }
+
+        void SetStartOfPlayback(uint newValue)
+        {
+            foreach (var g in GetSelectedGhosts())
+                g.playbackBaseFrame = newValue;
+            UpdateGhostInfoControls();
+        }
+
+        bool UpdateHackStatus()
+        {
+            var expectedHackName = $"Ghost Hack {RomVersionConfig.Version}";
+            if (ghostHack?.Name != expectedHackName)
+                ghostHack = new RomHack($"Resources/Hacks/GhostHack{RomVersionConfig.Version}.hck", expectedHackName);
+
+            var ghostPointer = Config.Stream.GetInt32(0x80407FF8);
+            bool ghostsActive = (ghostPointer & 0xFF000000) == 0x80000000;
+            bool shouldDisable = Config.Stream.GetByte(0x80407FFC) == 0xFF;
+            if (shouldDisable)
+            {
+                labelHackActiveState.Text = "Disabling Ghost hack...\nInside a level, frame advance\nthen save state and load state.\nNot doing so will crash.\n(Not on Pure Interpreter)";
+                if (!ghostsActive)
+                {
+                    ghostHack.ClearPayload();
+                    Config.Stream.SetValue((byte)0, 0x80407FFC);
+                }
+                else
+                    return true;
+            }
+
+            ghostHack.UpdateEnabledStatus();
+            bool enabled = ghostHack.Status != RomHack.EnabledStatus.Disabled;
+            labelHackActiveState.Text = (ghostsActive && enabled) ?
+                                         "Ghost hack is enabled." :
+                                         (enabled ?
+                                         "Ghost hack is enabled\nbut not running.\nInside a level,\nsave state and load state,\nthen frame advance." :
+                                         "Ghost hack is disabled.");
+            buttonDisableGhostHack.Enabled = enabled;
+
+            return true;
         }
 
         private void buttonLoadGhost_Click(object sender, EventArgs e)
@@ -405,22 +330,6 @@ namespace STROOP.Tabs.GhostTab
             }
         }
 
-        bool suspendSelectedIndexChanged = false;
-        private void listBoxGhosts_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (suspendSelectedIndexChanged)
-                return;
-            Ghost ghost = listBoxGhosts.SelectedItem as Ghost;
-            if (ghost == null)
-                buttonGhostColor.Enabled = false;
-            else
-            {
-                buttonGhostColor.BackColor = ColorUtilities.Vec4ToColor(ghost.hatColor);
-                buttonGhostColor.Enabled = true;
-            }
-            UpdateGhostInfoControls();
-        }
-
         private void listBoxGhosts_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Delete)
@@ -435,8 +344,8 @@ namespace STROOP.Tabs.GhostTab
                 ghostHack.LoadPayload();
                 Config.Stream.WriteRam(new byte[4], 0x80407FFC, EndiannessType.Little);
                 Config.Stream.WriteRam(new byte[0x70], 0x80407F90, EndiannessType.Little);
-                Config.Stream.WriteRam(File.ReadAllBytes("Resources/Hacks/gfx_generate_colored_hats.bin"), COLORED_HATS_CODE_TARGET_ADDR, EndiannessType.Big);
-                InjectHeadRenderOverrides();
+
+                EnableColoredHats();
 
                 //Tell ROM Hacks to suck it and get rid of the 01010101 pattern
                 Config.Stream.WriteRam(new byte[0x1000], 0x80408000 - 0x1000, EndiannessType.Big);
@@ -501,31 +410,6 @@ Are you sure you want to continue?";
             suspendSelectedIndexChanged = false;
         }
 
-        private void buttonMarioColor_Click(object sender, EventArgs e)
-        {
-            var dlg = new ColorDialog();
-            dlg.Color = System.Drawing.Color.Red;
-            if (dlg.ShowDialog() == DialogResult.OK)
-            {
-                marioHatColor = ColorUtilities.ColorToVec4(dlg.Color);
-                buttonMarioColor.BackColor = dlg.Color;
-            }
-        }
-
-        private void buttonGhostColor_Click(object sender, EventArgs e)
-        {
-            if (selectedGhost != null)
-            {
-                var dlg = new ColorDialog();
-                if (dlg.ShowDialog() == DialogResult.OK)
-                {
-                    foreach (var g in GetSelectedGhosts())
-                        g.hatColor = ColorUtilities.ColorToVec4(dlg.Color);
-                    buttonGhostColor.BackColor = dlg.Color;
-                }
-            }
-        }
-
         private void checkTransparentGhosts_CheckedChanged(object sender, EventArgs e)
         {
             if (suspendHandlers)
@@ -539,78 +423,73 @@ Are you sure you want to continue?";
             //This hack loads the gfx pool addresses from 0x80248068 and 0x8024806C instead of hardcoded addresses
             //0x80248070 is the new GFX_POOL_SIZE
             var hack = new RomHack("Resources\\Hacks\\movable_gfx_pool.hck", "Movable GFX Pool");
-            if (ParsingUtilities.TryParseHex(textBoxPoolAddr1.Text, out var poolAddr1))
+            if (ParseWithValidationMessage(textBoxPoolAddr1.Text, out var poolAddr1, "Pool Address 1")
+                && ParseWithValidationMessage(textBoxPoolAddr2.Text, out var poolAddr2, "Pool Address 2")
+                && ParseWithValidationMessage(textBoxPoolSize.Text, out var poolSize, "Pool Size")
+                )
             {
-                if (ParsingUtilities.TryParseHex(textBoxPoolAddr2.Text, out var poolAddr2))
+                var requiredSpace = poolSize + 0x50;
+                var warningTextBuilder = new System.Text.StringBuilder();
+
+                if (!AssertPoolRange(poolAddr1, "Pool 1"))
+                    return;
+
+                if (!AssertPoolRange(poolAddr2, "Pool 2"))
+                    return;
+
+                if (poolAddr1 < poolAddr2)
                 {
-                    if (ParsingUtilities.TryParseHex(textBoxPoolSize.Text, out var poolSize))
+                    if (poolAddr1 + requiredSpace > poolAddr2)
+                        warningTextBuilder.AppendLine("Warning: Pool 1 overlaps with pool 2");
+                }
+                else if (poolAddr2 + requiredSpace > poolAddr1)
+                    warningTextBuilder.AppendLine("Warning: Pool 2 overlaps with pool 1");
+
+                DialogResult proceed = DialogResult.Yes;
+                if (warningTextBuilder.Length > 0)
+                    proceed = MessageBox.Show(
+                        $"{warningTextBuilder.ToString()}\n\nDo you wish to proceed anyway?",
+                        "Warning",
+                        MessageBoxButtons.YesNo);
+
+                if (proceed == DialogResult.Yes)
+                    using (Config.Stream.Suspend())
                     {
+                        hack.LoadPayload();
 
-                        var requiredSpace = poolSize + 0x50;
-                        var warningTextBuilder = new System.Text.StringBuilder();
+                        Config.Stream.SetValue(poolAddr1, 0x80248068);
+                        Config.Stream.SetValue(poolAddr2, 0x8024806C);
+                        Config.Stream.SetValue(poolSize, 0x80248070);
+                    }
 
-                        var _poolAddr1 = poolAddr1 & 0x00FFFFFF;
-                        if (_poolAddr1 + requiredSpace > 0x800000)
-                        {
-                            MessageBox.Show("Error: Pool 1 exceeds RAM length.");
-                            return;
-                        }
-                        else
-                            for (uint i = _poolAddr1; i < _poolAddr1 + requiredSpace; i++)
-                                if (Config.Stream.Ram[i] != 0)
-                                {
-                                    warningTextBuilder.AppendLine("Warning: Pool 1 overrides non-zero data.");
-                                    break;
-                                }
-
-                        var _poolAddr2 = poolAddr2 & 0x00FFFFFF;
-                        if (_poolAddr2 + requiredSpace > 0x800000)
-                        {
-                            MessageBox.Show("Error: Pool 2 exceeds RAM length.");
-                            return;
-                        }
-                        for (uint i = _poolAddr2; i < _poolAddr2 + requiredSpace; i++)
+                bool AssertPoolRange(uint poolStart, string poolName)
+                {
+                    poolStart &= 0x00FFFFFF;
+                    if (poolStart + requiredSpace > 0x800000)
+                    {
+                        MessageBox.Show($"Error: {poolName} exceeds RAM length.");
+                        return false;
+                    }
+                    else
+                        for (uint i = poolStart; i < poolStart + requiredSpace; i++)
                             if (Config.Stream.Ram[i] != 0)
                             {
-                                warningTextBuilder.AppendLine("Warning: Pool 2 overrides non-zero data.");
+                                warningTextBuilder.AppendLine($"Warning: {poolName} overrides non-zero data.");
                                 break;
                             }
 
-                        if (poolAddr1 < poolAddr2)
-                        {
-                            if (poolAddr1 + requiredSpace > poolAddr2)
-                                warningTextBuilder.AppendLine("Warning: Pool 1 overlaps with pool 2");
-                        }
-                        else
-                            if (poolAddr2 + requiredSpace > poolAddr1)
-                                warningTextBuilder.AppendLine("Warning: Pool 2 overlaps with pool 1");
-
-                        DialogResult proceed = DialogResult.Yes;
-                        if (warningTextBuilder.Length > 0)
-                            proceed = MessageBox.Show(
-                                warningTextBuilder.ToString() + "\n\nDo you wish to proceed anyway?",
-                                "Warning",
-                                MessageBoxButtons.YesNo);
-
-                        if (proceed == DialogResult.Yes)
-                            using (Config.Stream.Suspend())
-                            {
-                                hack.LoadPayload();
-
-                                Config.Stream.SetValue(poolAddr1, 0x80248068);
-                                Config.Stream.SetValue(poolAddr2, 0x8024806C);
-                                Config.Stream.SetValue(poolSize, 0x80248070);
-                            }
-                    }
-                    else
-                        MessageBox.Show("Invalid value for Pool Size");
+                    return true;
                 }
-                else
-                    MessageBox.Show("Invalid value for Pool Address 2");
             }
-            else
-                MessageBox.Show("Invalid value for Pool Address 1");
 
+            bool ParseWithValidationMessage(string input, out uint value, string valueName)
+            {
+                if (ParsingUtilities.TryParseHex(input, out value))
+                    return true;
+
+                MessageBox.Show($"Invalid value for {valueName}!");
+                return false;
+            }
         }
     }
 }
