@@ -21,7 +21,7 @@ namespace STROOP.Tabs.MapTab
                     {
                         System.Threading.Thread.Sleep(2000); // We don't want to spam github with image fetches
                         var path = sourcePath.Replace('\\', '/').Replace(" ", "%20");
-                        var source = $"{"https://"}github.com/SM64-TAS-ABC/STROOP/blob/Development/STROOP/{path}?raw=true";
+                        var source = $"https://raw.githubusercontent.com/SM64-TAS-ABC/STROOP/dev/STROOP/{path}";
                         try
                         {
                             using (WebClient client = new WebClient())
