@@ -46,23 +46,23 @@ namespace STROOP.M64
         public byte Fps { get => _fps; set { _fps = value; NotifyChange(); } }
 
         private byte _extendedVersion;
-        [CategoryAttribute("\u200B\u200BMain"), DisplayName("Extended Version")]
+        [CategoryAttribute("\u200B\u200B\u200B\u200B\u200BMain"), DisplayName("Extended Version")]
         public byte ExtendedVersion { get => _extendedVersion; set { _extendedVersion = value; NotifyChange(); } }
         
         private byte _extendedFlags;
-        [CategoryAttribute("\u200B\u200BMain"), DisplayName("Extended Flags")]
+        [CategoryAttribute("\u200B\u200B\u200B\u200B\u200BMain"), DisplayName("Extended Flags")]
         public byte ExtendedFlags { get => _extendedFlags; set { _extendedFlags = value; NotifyChange(); } }
 
         private uint _authorshipTag;
-        [CategoryAttribute("\u200B\u200BMain"), DisplayName("Authorship Tag")]
+        [CategoryAttribute("\u200B\u200B\u200B\u200B\u200BMain"), DisplayName("Authorship Tag")]
         public uint AuthorshipTag { get => _authorshipTag; set { _authorshipTag = value; NotifyChange(); } }
 
         private uint _bruteforceExtraData;
-        [CategoryAttribute("\u200B\u200BMain"), DisplayName("Bruteforce Extra Data")]
+        [CategoryAttribute("\u200B\u200B\u200B\u200B\u200BMain"), DisplayName("Bruteforce Extra Data")]
         public uint BruteforceExtraData { get => _bruteforceExtraData; set { _bruteforceExtraData = value; NotifyChange(); } }
 
         private uint _numRerecordsHi;
-        [CategoryAttribute("\u200B\u200BMain"), DisplayName("Num Rerecords (Hiword)")]
+        [CategoryAttribute("\u200B\u200B\u200B\u200B\u200BMain"), DisplayName("Num Rerecords (Hiword)")]
         public uint NumRerecordsHi { get => _numRerecordsHi; set { _numRerecordsHi = value; NotifyChange(); } }
         
         // 0C4 32-byte ASCII string: internal name of ROM used when recording, directly from ROM
