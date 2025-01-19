@@ -45,6 +45,26 @@ namespace STROOP.M64
         [CategoryAttribute("\u200B\u200B\u200B\u200B\u200BMain"), DisplayName("FPS")]
         public byte Fps { get => _fps; set { _fps = value; NotifyChange(); } }
 
+        private byte _extendedVersion;
+        [CategoryAttribute("\u200B\u200B\u200B\u200B\u200BMain"), DisplayName("Extended Version")]
+        public byte ExtendedVersion { get => _extendedVersion; set { _extendedVersion = value; NotifyChange(); } }
+        
+        private byte _extendedFlags;
+        [CategoryAttribute("\u200B\u200B\u200B\u200B\u200BMain"), DisplayName("Extended Flags")]
+        public byte ExtendedFlags { get => _extendedFlags; set { _extendedFlags = value; NotifyChange(); } }
+
+        private uint _authorshipTag;
+        [CategoryAttribute("\u200B\u200B\u200B\u200B\u200BMain"), DisplayName("Authorship Tag")]
+        public uint AuthorshipTag { get => _authorshipTag; set { _authorshipTag = value; NotifyChange(); } }
+
+        private uint _bruteforceExtraData;
+        [CategoryAttribute("\u200B\u200B\u200B\u200B\u200BMain"), DisplayName("Bruteforce Extra Data")]
+        public uint BruteforceExtraData { get => _bruteforceExtraData; set { _bruteforceExtraData = value; NotifyChange(); } }
+
+        private uint _numRerecordsHi;
+        [CategoryAttribute("\u200B\u200B\u200B\u200B\u200BMain"), DisplayName("Num Rerecords (Hiword)")]
+        public uint NumRerecordsHi { get => _numRerecordsHi; set { _numRerecordsHi = value; NotifyChange(); } }
+        
         // 0C4 32-byte ASCII string: internal name of ROM used when recording, directly from ROM
         private string _romName;
         [CategoryAttribute("\u200B\u200B\u200B\u200BRom"), DisplayName("\u200B\u200BRom Name")]
@@ -187,8 +207,10 @@ namespace STROOP.M64
             NumRerecords = BitConverter.ToInt32(bytes, 0x010);
             Fps = bytes[0x014];
             NumControllers = bytes[0x015];
+            ExtendedVersion = bytes[0x016];
+            ExtendedFlags = bytes[0x017];
             NumInputs = BitConverter.ToInt32(bytes, 0x018);
-
+            
             MovieStartType = (MovieStartTypeEnum)BitConverter.ToUInt16(bytes, 0x01C);
 
             uint controllerFlagsValue = BitConverter.ToUInt16(bytes, 0x020);
@@ -205,6 +227,9 @@ namespace STROOP.M64
             Controller3RumblePak = (controllerFlagsValue & (1 << 10)) != 0;
             Controller4RumblePak = (controllerFlagsValue & (1 << 11)) != 0;
 
+            AuthorshipTag = BitConverter.ToUInt32(bytes, 0x024);
+            BruteforceExtraData = BitConverter.ToUInt32(bytes, 0x028);
+            NumRerecordsHi = BitConverter.ToUInt32(bytes, 0x02C);
             RomName = Encoding.ASCII.GetString(bytes, 0x0C4, 32).Replace("\0", "");
             Crc32 = BitConverter.ToUInt32(bytes, 0x0E4);
             CountryCode = BitConverter.ToUInt16(bytes, 0x0E8);
@@ -229,12 +254,16 @@ namespace STROOP.M64
             bytes.AddRange(TypeUtilities.GetBytes(NumRerecords));
             bytes.AddRange(TypeUtilities.GetBytes(Fps));
             bytes.AddRange(TypeUtilities.GetBytes(NumControllers));
-            bytes.AddRange(new byte[2]);
+            bytes.AddRange(TypeUtilities.GetBytes(ExtendedVersion));
+            bytes.AddRange(TypeUtilities.GetBytes(ExtendedFlags));
             bytes.AddRange(TypeUtilities.GetBytes(NumInputs));
             bytes.AddRange(TypeUtilities.GetBytes((ushort)MovieStartType));
             bytes.AddRange(new byte[2]);
             bytes.AddRange(TypeUtilities.GetBytes(GetControllerFlagsValue()));
-            bytes.AddRange(new byte[160]);
+            bytes.AddRange(TypeUtilities.GetBytes(AuthorshipTag));
+            bytes.AddRange(TypeUtilities.GetBytes(BruteforceExtraData));
+            bytes.AddRange(TypeUtilities.GetBytes(NumRerecordsHi));
+            bytes.AddRange(new byte[148]);
             bytes.AddRange(TypeUtilities.GetBytes(RomName, 32, Encoding.ASCII));
             bytes.AddRange(TypeUtilities.GetBytes(Crc32));
             bytes.AddRange(TypeUtilities.GetBytes(CountryCode));
@@ -287,6 +316,8 @@ namespace STROOP.M64
             NumRerecords = 0;
             MovieStartType = MovieStartTypeEnum.FromStart;
             Fps = 0;
+            ExtendedVersion = 0;
+            ExtendedFlags = 0;
             RomName = null;
             CountryCode = 0;
             Crc32 = 0;
@@ -305,6 +336,9 @@ namespace STROOP.M64
             Controller2RumblePak = false;
             Controller3RumblePak = false;
             Controller4RumblePak = false;
+            AuthorshipTag = 0;
+            BruteforceExtraData = 0;
+            NumRerecordsHi = 0;
             VideoPlugin = null;
             SoundPlugin = null;
             InputPlugin = null;
